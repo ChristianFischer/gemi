@@ -16,10 +16,13 @@
  */
 
 mod cartridge;
+mod cpu;
+mod opcodes;
 
 use std::env;
 use cartridge::Cartridge;
 use cartridge::GameBoyColorSupport;
+use cpu::Cpu;
 
 
 fn print_rom_info(filename: &String, cartridge: &Cartridge) {
@@ -59,6 +62,13 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
 
 
 
+fn run(cartridge: &Cartridge) {
+	let mut cpu = Cpu::new();
+	cpu.run(cartridge);
+}
+
+
+
 fn main() {
 	let args: Vec<String> = env::args().collect();
 	if args.len() >= 2 {
@@ -67,5 +77,7 @@ fn main() {
 		let cartridge = Cartridge::load_file(file).expect("Unable to load ROM");
 
 		print_rom_info(file, &cartridge);
+
+		run(&cartridge);
 	}
 }
