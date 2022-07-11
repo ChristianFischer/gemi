@@ -17,67 +17,70 @@
 
 mod cartridge;
 mod cpu;
+mod gameboy;
+mod memory;
+mod opcode;
+mod opcode_table;
+mod opcodes_ld;
+mod opcodes_jump;
 mod opcodes;
 
-use std::env;
 use cartridge::Cartridge;
 use cartridge::GameBoyColorSupport;
 use cpu::Cpu;
-
+use std::env;
+use crate::gameboy::GameBoy;
 
 fn print_rom_info(filename: &String, cartridge: &Cartridge) {
-	let mut features: Vec<&str> = vec![];
+    let mut features: Vec<&str> = vec![];
 
-	if cartridge.has_ram() {
-		features.push("RAM");
-	}
+    if cartridge.has_ram() {
+        features.push("RAM");
+    }
 
-	if cartridge.has_battery() {
-		features.push("Battery");
-	}
+    if cartridge.has_battery() {
+        features.push("Battery");
+    }
 
-	if cartridge.has_timer() {
-		features.push("Timer");
-	}
+    if cartridge.has_timer() {
+        features.push("Timer");
+    }
 
-	if cartridge.has_rumble() {
-		features.push("Rumble");
-	}
+    if cartridge.has_rumble() {
+        features.push("Rumble");
+    }
 
-	let gbc = match cartridge.get_cgb_support() {
-		GameBoyColorSupport::Supported => "Supported",
-		GameBoyColorSupport::Required  => "Required",
-		GameBoyColorSupport::None      => "-",
-	};
+    let gbc = match cartridge.get_cgb_support() {
+        GameBoyColorSupport::Supported => "Supported",
+        GameBoyColorSupport::Required => "Required",
+        GameBoyColorSupport::None => "-",
+    };
 
-	println!("ROM file: {}", filename);
-	println!("Title:         {}",     cartridge.get_title());
-	println!("Manufacturer:  {}",     cartridge.get_manufacturer_code());
-	println!("Features:      {}",     features.join(", "));
-	println!("ROM size:      {} kiB", cartridge.get_rom_size() / 1024);
-	println!("RAM size:      {} kiB", cartridge.get_ram_size() / 1024);
-	println!("GameBoy Color: {}",     gbc);
-	println!("SuperGameBoy:  {}",     cartridge.supports_sgb());
+    println!("ROM file: {}", filename);
+    println!("Title:         {}",     cartridge.get_title());
+    println!("Manufacturer:  {}",     cartridge.get_manufacturer_code());
+    println!("Features:      {}",     features.join(", "));
+    println!("ROM size:      {} kiB", cartridge.get_rom_size() / 1024);
+    println!("RAM size:      {} kiB", cartridge.get_ram_size() / 1024);
+    println!("GameBoy Color: {}",     gbc);
+    println!("SuperGameBoy:  {}",     cartridge.supports_sgb());
 }
-
-
 
 fn run(cartridge: &Cartridge) {
-	let mut cpu = Cpu::new();
-	cpu.run(cartridge);
+    let mut gb = GameBoy::new();
+    gb.insert_cart(cartridge);
+    gb.run();
 }
 
-
-
 fn main() {
-	let args: Vec<String> = env::args().collect();
-	if args.len() >= 2 {
-		let file = &args[1];
+    let args: Vec<String> = env::args().collect();
+    if args.len() >= 2 {
+        let file = &args[1];
 
-		let cartridge = Cartridge::load_file(file).expect("Unable to load ROM");
+        let cartridge = Cartridge::load_file(file).expect("Unable to load ROM");
 
-		print_rom_info(file, &cartridge);
+        print_rom_info(file, &cartridge);
 
-		run(&cartridge);
-	}
+        run(&cartridge);
+    }
 }

@@ -17,10 +17,7 @@
 
 use crate::gameboy::GameBoy;
 
-pub fn nop(gb: &mut GameBoy) {}
-
-pub fn disable_interrupts(gb: &mut GameBoy) {
-}
-
-fn enable_interrupts(gb: &mut GameBoy) {
+pub fn jr_i8(gb: &mut GameBoy) {
+    let offset = gb.cpu.fetch_i8();
+    gb.cpu.jump_relative(offset as i16);
 }
