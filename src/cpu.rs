@@ -16,7 +16,7 @@
  */
 
 use crate::opcode::{Instruction, OpCode};
-use crate::memory::MemoryReadWrite;
+use crate::memory::{MemoryRead, MemoryReadWriteHandle};
 use crate::opcode_table::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 
 /// Definition for each supported 8 bit Register.
@@ -57,7 +57,7 @@ pub struct CpuFlags {
 /// An object representing the gameboy's CPU
 pub struct Cpu {
     /// Handle to the device memory.
-    mem: MemoryReadWrite,
+    mem: MemoryReadWriteHandle,
 
     /// All CPU registers as 8 bit value each.
     /// To access 16 bit registers there is a set of functions.
@@ -127,7 +127,7 @@ impl RegisterR16 {
 
 impl Cpu {
     /// Creates an empty CPU object.
-    pub fn new(mem: MemoryReadWrite) -> Cpu {
+    pub fn new(mem: MemoryReadWriteHandle) -> Cpu {
         Cpu {
             mem,
 
@@ -165,18 +165,25 @@ impl Cpu {
         let opcode_id = self.get_next_byte() as u16;
         let opcode = self.fetch_next_opcode();
         let param_address = self.instruction_pointer;
+        let memory = self.mem.clone_readonly();
 
         Instruction {
             opcode,
             opcode_id,
             opcode_address,
-            param_address
+            param_address,
+            memory
         }
     }
 
     /// Get the next byte on the current location of the instruction pointer, without moving it.
     pub fn get_next_byte(&self) -> u8 {
-        self.mem.read(self.instruction_pointer)
+        self.mem.read_byte(self.instruction_pointer)
+    }
+
+    /// Get the next byte relative to the current location of the instruction pointer, without moving it.
+    pub fn get_next_byte_at(&self, offset: u16) -> u8 {
+        self.mem.read_byte(self.instruction_pointer + offset)
     }
 
     /// Get the next i8 value on the current location of the instruction pointer, without moving it.
@@ -187,6 +194,13 @@ impl Cpu {
     /// Get the next u8 value on the current location of the instruction pointer, without moving it.
     pub fn get_next_u8(&self) -> u8 {
         self.get_next_byte()
+    }
+
+    /// Get the next u16 value on the current location of the instruction pointer, without moving it.
+    pub fn get_next_u16(&self) -> u16 {
+        let low  = self.get_next_byte_at(0);
+        let high = self.get_next_byte_at(1);
+        to_u16(high, low)
     }
 
     /// Fetches the next u8 value on the current location of the instruction pointer.
@@ -200,8 +214,8 @@ impl Cpu {
     /// Fetches the next u16 value on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
     pub fn fetch_u16(&mut self) -> u16 {
-        let high = self.fetch_u8();
         let low  = self.fetch_u8();
+        let high = self.fetch_u8();
         to_u16(high, low)
     }
 

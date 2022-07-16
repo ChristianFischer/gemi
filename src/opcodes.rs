@@ -22,5 +22,5 @@ pub fn nop(gb: &mut GameBoy) {}
 pub fn disable_interrupts(gb: &mut GameBoy) {
 }
 
-fn enable_interrupts(gb: &mut GameBoy) {
+pub fn enable_interrupts(gb: &mut GameBoy) {
 }

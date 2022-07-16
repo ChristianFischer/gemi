@@ -18,7 +18,6 @@
 use crate::cartridge::Cartridge;
 use crate::cpu::Cpu;
 use crate::memory::Memory;
-use crate::opcode::ParamType;
 
 /// The GameBoy object providing access to all it's emulated components.
 pub struct GameBoy {
@@ -49,22 +48,15 @@ impl GameBoy {
         while true {
             let instruction = self.cpu.fetch_next_instruction();
 
-            print!(
-                "@ {:#06x}: {:#02x} {}",
+            println!(
+                "/* {:04x} [{:02x}] */ {}",
                 instruction.opcode_address,
                 instruction.opcode_id,
-                instruction.opcode.name
+                instruction
             );
 
-            match instruction.opcode.param1 {
-                ParamType::U8 => print!(" {}", self.cpu.get_next_u8()),
-                _ => { }
-            }
-
-            println!();
-
             if instruction.opcode.name == "???" {
-                println!("Invalid OpCode @ {:#04x}", instruction.opcode_address);
+                println!("Invalid OpCode @ ${:04x}", instruction.opcode_address);
                 return;
             }
 

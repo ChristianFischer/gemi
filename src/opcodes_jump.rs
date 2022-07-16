@@ -21,3 +21,8 @@ pub fn jr_i8(gb: &mut GameBoy) {
     let offset = gb.cpu.fetch_i8();
     gb.cpu.jump_relative(offset as i16);
 }
+
+pub fn jp_u16(gb: &mut GameBoy) {
+    let address = gb.cpu.fetch_u16();
+    gb.cpu.jump_to(address);
+}

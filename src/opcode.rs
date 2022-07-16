@@ -15,18 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter, write};
 use crate::gameboy::GameBoy;
+use crate::memory::{MemoryRead, MemoryReadOnlyHandle};
 use crate::opcodes::nop;
 
 type ProcessOpCode = fn(gb: &mut GameBoy);
-
-/// Data types for opcode parameters.
-#[derive(Copy, Clone)]
-pub enum ParamType {
-    None,
-    U8,
-    U16,
-}
 
 /// Data struct describing a single opcode.
 #[derive(Copy, Clone)]
@@ -35,7 +29,6 @@ pub struct OpCode {
     pub bytes: usize,
     pub cycles: usize,
     pub proc: ProcessOpCode,
-    pub param1: ParamType,
 }
 
 
@@ -46,10 +39,74 @@ pub struct Instruction {
     pub opcode_id: u16,
     pub opcode_address: u16,
     pub param_address: u16,
+    pub memory: MemoryReadOnlyHandle,
+}
+
+fn get_arg(arg: &str, instruction: &Instruction) -> String {
+    match arg {
+        "i8" => {
+            let value = instruction.memory.read_i8(instruction.param_address);
+            format!("{}", value)
+        }
+
+        "u8" => {
+            let value = instruction.memory.read_u8(instruction.param_address);
+            format!("{}", value)
+        }
+
+        "x8" => {
+            let value = instruction.memory.read_u8(instruction.param_address);
+            format!("{:02x}", value)
+        }
+
+        "i16" => {
+            let value = instruction.memory.read_i16(instruction.param_address);
+            format!("{}", value)
+        }
+
+        "u16" => {
+            let value = instruction.memory.read_u16(instruction.param_address);
+            format!("{}", value)
+        }
+
+        "x16" => {
+            let value = instruction.memory.read_u16(instruction.param_address);
+            format!("{:04x}", value)
+        }
+
+        _ => arg.to_string()
+    }
+}
+
+impl Display for Instruction {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut label = self.opcode.name.to_string();
+
+        loop {
+            let begin = label.find("{");
+            match begin {
+                Some(begin_index) => {
+                    let end = label.find("}");
+                    if let Some(end_index) = end {
+                        let substring = &label[begin_index+1 .. end_index];
+                        let formatted = get_arg(substring, &self);
+
+                        label.replace_range(begin_index .. end_index+1, formatted.as_str());
+                    }
+                }
+
+                None => {
+                    break;
+                }
+            }
+        }
+
+        write!(f, "{}", label)
+    }
 }
 
 
 /// Represents an invalid opcode.
 /// This is intended as a placeholder for opcodes not yet implemented.
-pub static OPCODE_INVALID: OpCode = OpCode { name: "???", bytes: 1, cycles: 0, proc: nop, param1: ParamType::None };
+pub static OPCODE_INVALID: OpCode = OpCode { name: "???", bytes: 1, cycles: 0, proc: nop };
 

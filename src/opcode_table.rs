@@ -18,14 +18,12 @@
 
 use crate::{opcodes, opcodes_jump, opcodes_ld};
 use crate::opcode::{OpCode, OPCODE_INVALID};
-use crate::opcode::ParamType::None;
-use crate::opcode::ParamType::U8;
 
 /// The table of all supported opcodes.
 /// The array's index is the opcodes numerical value.
 pub static OPCODE_TABLE: [OpCode; 256] = [
-    /* 0x00*/ OpCode { name: "NOP", bytes: 1, cycles: 0, proc: opcodes::nop, param1: None },
-    /* 0x01*/ OPCODE_INVALID,
+    /* 0x00*/ OpCode { name: "NOP", bytes: 1, cycles: 0, proc: opcodes::nop },
+    /* 0x01*/ OpCode { name: "LD BC, ${x16}", bytes: 3, cycles: 12, proc: opcodes_ld::ld_bc_u16 },
     /* 0x02*/ OPCODE_INVALID,
     /* 0x03*/ OPCODE_INVALID,
     /* 0x04*/ OPCODE_INVALID,
@@ -42,14 +40,14 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0x0F*/ OPCODE_INVALID,
 
     /* 0x10*/ OPCODE_INVALID,
-    /* 0x11*/ OPCODE_INVALID,
+    /* 0x11*/ OpCode { name: "LD DE, ${x16}", bytes: 3, cycles: 12, proc: opcodes_ld::ld_de_u16 },
     /* 0x12*/ OPCODE_INVALID,
     /* 0x13*/ OPCODE_INVALID,
     /* 0x14*/ OPCODE_INVALID,
     /* 0x15*/ OPCODE_INVALID,
     /* 0x16*/ OPCODE_INVALID,
     /* 0x17*/ OPCODE_INVALID,
-    /* 0x18*/ OpCode { name: "JR", bytes: 2, cycles: 0, proc: opcodes_jump::jr_i8, param1: U8 },
+    /* 0x18*/ OpCode { name: "JR {i8}", bytes: 2, cycles: 12, proc: opcodes_jump::jr_i8 },
     /* 0x19*/ OPCODE_INVALID,
     /* 0x1A*/ OPCODE_INVALID,
     /* 0x1B*/ OPCODE_INVALID,
@@ -59,7 +57,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0x1F*/ OPCODE_INVALID,
 
     /* 0x20*/ OPCODE_INVALID,
-    /* 0x21*/ OPCODE_INVALID,
+    /* 0x21*/ OpCode { name: "LD HL, ${x16}", bytes: 3, cycles: 12, proc: opcodes_ld::ld_hl_u16 },
     /* 0x22*/ OPCODE_INVALID,
     /* 0x23*/ OPCODE_INVALID,
     /* 0x24*/ OPCODE_INVALID,
@@ -76,7 +74,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0x2F*/ OPCODE_INVALID,
 
     /* 0x30*/ OPCODE_INVALID,
-    /* 0x31*/ OPCODE_INVALID,
+    /* 0x31*/ OpCode { name: "LD SP, ${x16}", bytes: 3, cycles: 12, proc: opcodes_ld::ld_sp_u16 },
     /* 0x32*/ OPCODE_INVALID,
     /* 0x33*/ OPCODE_INVALID,
     /* 0x34*/ OPCODE_INVALID,
@@ -116,8 +114,8 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0x54*/ OPCODE_INVALID,
     /* 0x55*/ OPCODE_INVALID,
     /* 0x56*/ OPCODE_INVALID,
-    /* 0x57*/ OpCode { name: "LD D,A ", bytes: 1, cycles: 4, proc: opcodes_ld::ld_d_a, param1: None },
-    /* 0x58*/ OpCode { name: "LD E,B ", bytes: 1, cycles: 4, proc: opcodes_ld::ld_e_b, param1: None },
+    /* 0x57*/ OpCode { name: "LD D, A ", bytes: 1, cycles: 4, proc: opcodes_ld::ld_d_a },
+    /* 0x58*/ OpCode { name: "LD E, B ", bytes: 1, cycles: 4, proc: opcodes_ld::ld_e_b },
     /* 0x59*/ OPCODE_INVALID,
     /* 0x5A*/ OPCODE_INVALID,
     /* 0x5B*/ OPCODE_INVALID,
@@ -231,7 +229,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xC0*/ OPCODE_INVALID,
     /* 0xC1*/ OPCODE_INVALID,
     /* 0xC2*/ OPCODE_INVALID,
-    /* 0xC3*/ OPCODE_INVALID,
+    /* 0xC3*/ OpCode { name: "JP 0x{x16}", bytes: 3, cycles: 12, proc: opcodes_jump::jp_u16 },
     /* 0xC4*/ OPCODE_INVALID,
     /* 0xC5*/ OPCODE_INVALID,
     /* 0xC6*/ OPCODE_INVALID,
@@ -282,7 +280,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xF0*/ OPCODE_INVALID,
     /* 0xF1*/ OPCODE_INVALID,
     /* 0xF2*/ OPCODE_INVALID,
-    /* 0xF3*/ OpCode { name: "DI", bytes: 1, cycles: 4, proc: opcodes::disable_interrupts, param1: None },
+    /* 0xF3*/ OpCode { name: "DI", bytes: 1, cycles: 4, proc: opcodes::disable_interrupts },
     /* 0xF4*/ OPCODE_INVALID,
     /* 0xF5*/ OPCODE_INVALID,
     /* 0xF6*/ OPCODE_INVALID,
