@@ -15,10 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::fmt::{Display, Formatter, write};
+use std::fmt::{Display, Formatter};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryReadOnlyHandle};
-use crate::opcodes::nop;
 
 type ProcessOpCode = fn(gb: &mut GameBoy);
 
@@ -104,9 +103,3 @@ impl Display for Instruction {
         write!(f, "{}", label)
     }
 }
-
-
-/// Represents an invalid opcode.
-/// This is intended as a placeholder for opcodes not yet implemented.
-pub static OPCODE_INVALID: OpCode = OpCode { name: "???", bytes: 1, cycles: 0, proc: nop };
-

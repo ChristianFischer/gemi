@@ -20,14 +20,10 @@ mod cpu;
 mod gameboy;
 mod memory;
 mod opcode;
-mod opcode_table;
-mod opcodes_ld;
-mod opcodes_jump;
 mod opcodes;
 
 use cartridge::Cartridge;
 use cartridge::GameBoyColorSupport;
-use cpu::Cpu;
 use std::env;
 use crate::gameboy::GameBoy;
 

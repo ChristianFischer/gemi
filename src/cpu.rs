@@ -17,9 +17,10 @@
 
 use crate::opcode::{Instruction, OpCode};
 use crate::memory::{MemoryRead, MemoryReadWriteHandle};
-use crate::opcode_table::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
+use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 
 /// Definition for each supported 8 bit Register.
+#[derive(Copy, Clone)]
 pub enum RegisterR8 {
     A,
     B,
@@ -32,11 +33,20 @@ pub enum RegisterR8 {
 }
 
 /// Definition for each supported 16 bit Register.
+#[derive(Copy, Clone)]
 pub enum RegisterR16 {
     AF,
     BC,
     DE,
     HL,
+}
+
+/// A list of CPU flags.
+pub enum CpuFlag {
+    Zero,
+    Negative,
+    HalfCarry,
+    Carry,
 }
 
 /// Current configuration of CPU flags.
@@ -241,6 +251,28 @@ impl Cpu {
         self.registers[register as usize] = value;
     }
 
+    /// Increments the value of a 8 bit register.
+    pub fn increment_r8(&mut self, register: RegisterR8) {
+        let value = self.get_r8(register);
+        if value == 0xff {
+            self.set_r8(register, 0);
+        }
+        else {
+            self.set_r8(register, value + 1);
+        }
+    }
+
+    /// Decrements the value of a 8 bit register.
+    pub fn decrement_r8(&mut self, register: RegisterR8) {
+        let value = self.get_r8(register);
+        if value == 0x0 {
+            self.set_r8(register, 0xff);
+        }
+        else {
+            self.set_r8(register, value - 1);
+        }
+    }
+
     /// Get the value of a 16 bit register.
     pub fn get_r16(&self, register: RegisterR16) -> u16 {
         let (high_r8, low_r8) = register.to_r8();
@@ -255,6 +287,38 @@ impl Cpu {
         let (high, low) = to_u8(value);
         self.registers[high_r8 as usize] = high;
         self.registers[low_r8 as usize]  = low;
+    }
+
+    /// Increments the value of a 16 bit register.
+    pub fn increment_r16(&mut self, register: RegisterR16) {
+        let value = self.get_r16(register);
+        if value == 0xffff {
+            self.set_r16(register, 0);
+        }
+        else {
+            self.set_r16(register, value + 1);
+        }
+    }
+
+    /// Decrements the value of a 16 bit register.
+    pub fn decrement_r16(&mut self, register: RegisterR16) {
+        let value = self.get_r16(register);
+        if value == 0x0 {
+            self.set_r16(register, 0xffff);
+        }
+        else {
+            self.set_r16(register, value - 1);
+        }
+    }
+
+    /// Checks whether a specific CPU flag is set.
+    pub fn is_flag_set(&self, flag: CpuFlag) -> bool {
+        match flag {
+            CpuFlag::Zero      => self.flags.z,
+            CpuFlag::Negative  => self.flags.n,
+            CpuFlag::HalfCarry => self.flags.h,
+            CpuFlag::Carry     => self.flags.c,
+        }
     }
 
     /// Moves the instruction pointer relative to it's current position.
@@ -272,8 +336,13 @@ impl Cpu {
         self.instruction_pointer = offset;
     }
 
-    /// set the current address of the stack pointer
+    /// Set the current address of the stack pointer.
     pub fn set_stack_pointer(&mut self, address: u16) {
         self.stack_pointer = address;
+    }
+
+    /// Increments the stack pointer's value.
+    pub fn increment_sp(&mut self) {
+        self.stack_pointer += 1;
     }
 }
