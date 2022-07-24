@@ -26,7 +26,7 @@ use crate::memory::{MemoryRead, MemoryWrite};
 /// Increments a value.
 /// (r16) <- (r16) + 1
 fn inc_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
-    let address = gb.cpu.get_r16(RegisterR16::HL);
+    let address = gb.cpu.get_r16(r16_ptr);
     let value   = gb.mem.read_u8(address);
     let result  = value + 1;
     gb.mem.write_u8(address, result);
@@ -88,7 +88,7 @@ pub fn inc_sp(gb: &mut GameBoy) {
 /// Decrements a value.
 /// (r16) <- (r16) - 1
 fn dec_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
-    let address = gb.cpu.get_r16(RegisterR16::HL);
+    let address = gb.cpu.get_r16(r16_ptr);
     let value   = gb.mem.read_u8(address);
     let result  = value - 1;
     gb.mem.write_u8(address, result);
@@ -300,6 +300,13 @@ fn sub_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8, sub_carry: bool) {
     gb.cpu.set_r8(r8, result as u8);
 }
 
+/// Adds two values and stores it into a 8bit register.
+/// dst <- dst + u8 + (carry flag, if add_carry)
+fn sub_r8_u8(gb: &mut GameBoy, dst: RegisterR8, add_carry: bool) {
+    let value = gb.cpu.fetch_u8();
+    sub_r8_u8v(gb, dst, value, add_carry);
+}
+
 /// Subtracts a value from another one and stores the result into a 8bit register.
 /// dst <- dst - src - (carry flag, if sub_carry)
 fn sub_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8, sub_carry: bool) {
@@ -332,6 +339,10 @@ fn sub_r16_r16(gb: &mut GameBoy, dst: RegisterR16, src: RegisterR16) {
 }
 
 
+pub fn sub_a_u8(gb: &mut GameBoy) {
+    sub_r8_u8(gb, RegisterR8::A, false);
+}
+
 pub fn sub_a_a(gb: &mut GameBoy) {
     sub_r8_r8(gb, RegisterR8::A, RegisterR8::A, false);
 }
@@ -362,6 +373,10 @@ pub fn sub_a_l(gb: &mut GameBoy) {
 
 pub fn sub_a_hlptr(gb: &mut GameBoy) {
     sub_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL, false);
+}
+
+pub fn sbc_a_u8(gb: &mut GameBoy) {
+    sub_r8_u8(gb, RegisterR8::A, true);
 }
 
 pub fn sbc_a_a(gb: &mut GameBoy) {
@@ -570,6 +585,13 @@ fn and_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
 }
 
 /// Computes a bitwise AND.
+/// dst <- dst & u8
+fn and_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
+    let value = gb.cpu.fetch_u8();
+    and_r8_u8v(gb, dst, value);
+}
+
+/// Computes a bitwise AND.
 /// dst <- dst & src
 fn and_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
     let value = gb.cpu.get_r8(src);
@@ -584,6 +606,10 @@ fn and_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
     and_r8_u8v(gb, dst, value);
 }
 
+
+pub fn and_a_u8(gb: &mut GameBoy) {
+    and_r8_u8(gb, RegisterR8::A);
+}
 
 pub fn and_a_a(gb: &mut GameBoy) {
     and_r8_r8(gb, RegisterR8::A, RegisterR8::A);
@@ -634,6 +660,13 @@ fn or_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
 }
 
 /// Computes a bitwise OR.
+/// dst <- dst | u8
+fn or_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
+    let value = gb.cpu.fetch_u8();
+    or_r8_u8v(gb, dst, value);
+}
+
+/// Computes a bitwise OR.
 /// dst <- dst | src
 fn or_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
     let value = gb.cpu.get_r8(src);
@@ -648,6 +681,10 @@ fn or_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
     or_r8_u8v(gb, dst, value);
 }
 
+
+pub fn or_a_u8(gb: &mut GameBoy) {
+    or_r8_u8(gb, RegisterR8::A);
+}
 
 pub fn or_a_a(gb: &mut GameBoy) {
     or_r8_r8(gb, RegisterR8::A, RegisterR8::A);
