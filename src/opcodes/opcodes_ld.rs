@@ -42,6 +42,11 @@ fn ld_addr_u8(gb: &mut GameBoy, dst_address: u16, value: u8) {
     gb.mem.write_u8(dst_address, value);
 }
 
+/// Writes a 8bit value to a given address in the device memory.
+fn ld_addr_u16(gb: &mut GameBoy, dst_address: u16, value: u16) {
+    gb.mem.write_u16(dst_address, value);
+}
+
 /// Loads the value on a given address into a 8bit register.
 fn ld_r8_addr(gb: &mut GameBoy, dst: RegisterR8, src_address: u16) {
     let value = gb.mem.read_u8(src_address);
@@ -66,6 +71,12 @@ fn ld_r16ptr_u8(gb: &mut GameBoy, dst: RegisterR16) {
     let address = gb.cpu.get_r16(dst);
     let value   = gb.cpu.fetch_u8();
     ld_addr_u8(gb, address, value);
+}
+
+/// Loads a 16bit value into a constant address of the device memory.
+fn ld_u16ptr_u16v(gb: &mut GameBoy, value: u16) {
+    let address = gb.cpu.fetch_u16();
+    ld_addr_u16(gb, address, value);
 }
 
 /// Loads the value at the address stored in a 16bit register
@@ -349,8 +360,26 @@ pub fn ld_a_u16ptr(gb: &mut GameBoy) {
     ld_r8_u16ptr(gb, RegisterR8::A);
 }
 
+pub fn ld_a_bcptr(gb: &mut GameBoy) {
+    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::BC);
+}
+
+pub fn ld_a_deptr(gb: &mut GameBoy) {
+    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::BC);
+}
+
 pub fn ld_a_hlptr(gb: &mut GameBoy) {
     ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL);
+}
+
+pub fn ld_a_hlptri(gb: &mut GameBoy) {
+    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL);
+    gb.cpu.increment_r16(RegisterR16::HL);
+}
+
+pub fn ld_a_hlptrd(gb: &mut GameBoy) {
+    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL);
+    gb.cpu.decrement_r16(RegisterR16::HL);
 }
 
 pub fn ld_b_hlptr(gb: &mut GameBoy) {
@@ -429,6 +458,10 @@ pub fn ld_hlptr_u8(gb: &mut GameBoy) {
 
 pub fn ld_u16ptr_a(gb: &mut GameBoy) {
     ld_u16ptr_r8(gb, RegisterR8::A);
+}
+
+pub fn ld_u16ptr_sp(gb: &mut GameBoy) {
+    ld_u16ptr_u16v(gb, gb.cpu.get_stack_pointer());
 }
 
 pub fn ldh_u8_a(gb: &mut GameBoy) {

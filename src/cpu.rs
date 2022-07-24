@@ -321,6 +321,33 @@ impl Cpu {
         }
     }
 
+    /// Set the value of a CPU flag.
+    pub fn set_flag(&mut self, flag: CpuFlag, value: bool) {
+        match flag {
+            CpuFlag::Zero      => self.flags.z = value,
+            CpuFlag::Negative  => self.flags.n = value,
+            CpuFlag::HalfCarry => self.flags.h = value,
+            CpuFlag::Carry     => self.flags.c = value,
+        }
+    }
+
+    /// Clear all CPU flags.
+    pub fn clear_flags(&mut self) {
+        self.flags.z = false;
+        self.flags.n = false;
+        self.flags.h = false;
+        self.flags.c = false;
+    }
+
+    /// Set CPU flags based on a calculation result.
+    pub fn set_flags_by_result(&mut self, old_value: u32, new_value: u32) {
+        let carry_bits = old_value ^ new_value;
+        self.set_flag(CpuFlag::Negative,  false);
+        self.set_flag(CpuFlag::Zero,      new_value == 0);
+        self.set_flag(CpuFlag::Carry,     (carry_bits & 0x0100) != 0);
+        self.set_flag(CpuFlag::HalfCarry, (carry_bits & 0x0010) != 0);
+    }
+
     /// Moves the instruction pointer relative to it's current position.
     pub fn jump_relative(&mut self, offset: i16) {
         if offset < 0 {
@@ -334,6 +361,11 @@ impl Cpu {
     /// Moves the instruction pointer to a fixed location.
     pub fn jump_to(&mut self, offset: u16) {
         self.instruction_pointer = offset;
+    }
+
+    /// GEt the current address of the stack pointer.
+    pub fn get_stack_pointer(&self) -> u16 {
+        self.stack_pointer
     }
 
     /// Set the current address of the stack pointer.

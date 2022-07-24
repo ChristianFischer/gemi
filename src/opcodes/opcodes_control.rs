@@ -19,6 +19,9 @@ use crate::gameboy::GameBoy;
 
 pub fn nop(gb: &mut GameBoy) {}
 
+pub fn stop(gb: &mut GameBoy) {
+}
+
 pub fn halt(gb: &mut GameBoy) {
 }
 
