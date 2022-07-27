@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::{RegisterR16, RegisterR8};
+use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryWrite};
 
@@ -114,6 +114,35 @@ fn ldh_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
     let value     = gb.mem.read_u8(address);
     gb.cpu.set_r8(dst, value);
 }
+
+/// Loads a value from a 8bit register into the device memory at the address (0xff00 + r8)
+fn ldh_r8ptr_r8(gb: &mut GameBoy, dst_ptr: RegisterR8, src: RegisterR8) {
+    let address_h = gb.cpu.get_r8(dst_ptr);
+    let address   = 0xff00 | (address_h as u16);
+    let value     = gb.cpu.get_r8(src);
+    gb.mem.write_u8(address, value);
+}
+
+/// Loads a value from the device memory at the address (0xff00 + r8) into a 8bit register.
+fn ldh_r8_r8ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR8) {
+    let address_h = gb.cpu.get_r8(src_ptr);
+    let address   = 0xff00 | (address_h as u16);
+    let value     = gb.mem.read_u8(address);
+    gb.cpu.set_r8(dst, value);
+}
+
+/// Pushes the value of a 16bit register on the stack.
+pub fn push_r16(gb: &mut GameBoy, r16: RegisterR16) {
+    let value = gb.cpu.get_r16(r16);
+    gb.cpu.push_u16(value);
+}
+
+/// Pops a 16bit value from the stack into a 16bit register.
+pub fn pop_r16(gb: &mut GameBoy, r16: RegisterR16) {
+    let value = gb.cpu.pop_u16();
+    gb.cpu.set_r16(r16, value);
+}
+
 
 pub fn ld_a_a(gb: &mut GameBoy) {
     ld_r8_r8(gb, RegisterR8::A, RegisterR8::A);
@@ -469,5 +498,66 @@ pub fn ldh_u8_a(gb: &mut GameBoy) {
 }
 
 pub fn ldh_a_u8(gb: &mut GameBoy) {
-    ldh_u8_r8(gb, RegisterR8::A);
+    ldh_r8_u8(gb, RegisterR8::A);
+}
+
+pub fn ldh_cptr_a(gb: &mut GameBoy) {
+    ldh_r8ptr_r8(gb, RegisterR8::C, RegisterR8::A);
+}
+
+pub fn ldh_a_cptr(gb: &mut GameBoy) {
+    ldh_r8_r8ptr(gb, RegisterR8::A, RegisterR8::C);
+}
+
+pub fn ld_hl_sp_i8(gb: &mut GameBoy) {
+    let offset = gb.cpu.fetch_i8();
+    let sp     = gb.cpu.get_stack_pointer();
+    let value  = if offset >= 0 {
+        sp + (offset as u16)
+    }
+    else {
+        sp - (-offset as u16)
+    };
+
+    gb.cpu.set_flags_by_result(sp as u32, value as u32);
+    gb.cpu.set_flag(CpuFlag::Zero,     false);
+    gb.cpu.set_flag(CpuFlag::Negative, false);
+    gb.cpu.set_r16(RegisterR16::HL, value);
+}
+
+pub fn ld_sp_hl(gb: &mut GameBoy) {
+    let value = gb.cpu.get_r16(RegisterR16::HL);
+    gb.cpu.set_stack_pointer(value);
+}
+
+pub fn push_af(gb: &mut GameBoy) {
+    push_r16(gb, RegisterR16::AF);
+}
+
+pub fn push_bc(gb: &mut GameBoy) {
+    push_r16(gb, RegisterR16::BC);
+}
+
+pub fn push_de(gb: &mut GameBoy) {
+    push_r16(gb, RegisterR16::DE);
+}
+
+pub fn push_hl(gb: &mut GameBoy) {
+    push_r16(gb, RegisterR16::HL);
+}
+
+pub fn pop_af(gb: &mut GameBoy) {
+    pop_r16(gb, RegisterR16::AF);
+}
+
+pub fn pop_bc(gb: &mut GameBoy) {
+    pop_r16(gb, RegisterR16::BC);
+}
+
+pub fn pop_de(gb: &mut GameBoy) {
+    pop_r16(gb, RegisterR16::DE);
+}
+
+pub fn pop_hl(gb: &mut GameBoy) {
+    pop_r16(gb, RegisterR16::HL);
 }

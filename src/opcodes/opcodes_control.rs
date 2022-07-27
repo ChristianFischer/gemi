@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::cpu::CpuFlag;
 use crate::gameboy::GameBoy;
 
 pub fn nop(gb: &mut GameBoy) {}
@@ -26,7 +27,26 @@ pub fn halt(gb: &mut GameBoy) {
 }
 
 pub fn disable_interrupts(gb: &mut GameBoy) {
+    gb.cpu.enable_interrupts();
 }
 
 pub fn enable_interrupts(gb: &mut GameBoy) {
+    gb.cpu.disable_interrupts();
+}
+
+pub fn add_sp_i8(gb: &mut GameBoy) {
+    let offset = gb.cpu.fetch_i8();
+    let sp     = gb.cpu.get_stack_pointer();
+
+    let sp_new = if offset >= 0 {
+        sp + (offset as u16)
+    }
+    else {
+        sp - (-offset as u16)
+    };
+
+    gb.cpu.set_flags_by_result(sp as u32, sp_new as u32);
+    gb.cpu.set_flag(CpuFlag::Zero,     false);
+    gb.cpu.set_flag(CpuFlag::Negative, false);
+    gb.cpu.set_stack_pointer(sp_new);
 }

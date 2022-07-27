@@ -16,7 +16,7 @@
  */
 
 use crate::opcode::{Instruction, OpCode};
-use crate::memory::{MemoryRead, MemoryReadWriteHandle};
+use crate::memory::{MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 
 /// Definition for each supported 8 bit Register.
@@ -78,6 +78,9 @@ pub struct Cpu {
 
     /// Offset where to read the next value from the stack.
     stack_pointer: u16,
+
+    /// Sets interrupts to be enabled.
+    interrupts_enabled: bool,
 
     /// Currently active CPU flags.
     flags: CpuFlags,
@@ -146,6 +149,8 @@ impl Cpu {
             instruction_pointer: 0x0100,
             stack_pointer: 0x0000,
 
+            interrupts_enabled: false,
+
             flags: CpuFlags {
                 z: false,
                 n: false,
@@ -153,6 +158,16 @@ impl Cpu {
                 c: false,
             },
         }
+    }
+
+    /// Enables interrupts.
+    pub fn enable_interrupts(&mut self) {
+        self.interrupts_enabled = true;
+    }
+
+    /// Disables interrupts.
+    pub fn disable_interrupts(&mut self) {
+        self.interrupts_enabled = false;
     }
 
     /// Fetches the next opcode on the current location of the instruction pointer.
@@ -239,6 +254,33 @@ impl Cpu {
     /// The instruction pointer will be forwarded to the next instruction.
     pub fn fetch_i16(&mut self) -> i16 {
         self.fetch_u16() as i16
+    }
+
+    /// Pushes a 8bit value on the stack, moving the stack pointer.
+    pub fn push_u8(&mut self, value: u8) {
+        self.stack_pointer -= 1;
+        self.mem.write_u8(self.stack_pointer, value);
+    }
+
+    /// Pushes a 16bit value on the stack, moving the stack pointer.
+    pub fn push_u16(&mut self, value: u16) {
+        let (high, low) = to_u8(value);
+        self.push_u8(high);
+        self.push_u8(low);
+    }
+
+    /// Pops a 8bit value from the stack, moving the stack pointer.
+    pub fn pop_u8(&mut self) -> u8 {
+        let value = self.mem.read_u8(self.stack_pointer);
+        self.stack_pointer += 1;
+        value
+    }
+
+    /// Pops a 8bit value from the stack, moving the stack pointer.
+    pub fn pop_u16(&mut self) -> u16 {
+        let low  = self.pop_u8();
+        let high = self.pop_u8();
+        to_u16(high, low)
     }
 
     /// Get the value of a 8 bit register.
@@ -359,11 +401,21 @@ impl Cpu {
     }
 
     /// Moves the instruction pointer to a fixed location.
-    pub fn jump_to(&mut self, offset: u16) {
-        self.instruction_pointer = offset;
+    pub fn jump_to(&mut self, address: u16) {
+        self.set_instruction_pointer(address);
     }
 
-    /// GEt the current address of the stack pointer.
+    /// Get the current address of the instruction pointer.
+    pub fn get_instruction_pointer(&self) -> u16 {
+        self.instruction_pointer
+    }
+
+    /// Set the current address of the instruction pointer.
+    pub fn set_instruction_pointer(&mut self, address: u16) {
+        self.instruction_pointer = address;
+    }
+
+    /// Get the current address of the stack pointer.
     pub fn get_stack_pointer(&self) -> u16 {
         self.stack_pointer
     }
