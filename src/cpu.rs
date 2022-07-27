@@ -187,10 +187,11 @@ impl Cpu {
     /// The instruction pointer will be forwarded to the next instruction.
     pub fn fetch_next_instruction(&mut self) -> Instruction {
         let opcode_address = self.instruction_pointer;
-        let opcode_id = self.get_next_byte() as u16;
-        let opcode = self.fetch_next_opcode();
-        let param_address = self.instruction_pointer;
-        let memory = self.mem.clone_readonly();
+        let opcode_byte    = self.get_next_byte() as u16;
+        let opcode_id      = if opcode_byte == 0xCB { self.get_next_u16() } else { opcode_byte };
+        let opcode         = self.fetch_next_opcode();
+        let param_address  = self.instruction_pointer;
+        let memory         = self.mem.clone_readonly();
 
         Instruction {
             opcode,
@@ -293,28 +294,6 @@ impl Cpu {
         self.registers[register as usize] = value;
     }
 
-    /// Increments the value of a 8 bit register.
-    pub fn increment_r8(&mut self, register: RegisterR8) {
-        let value = self.get_r8(register);
-        if value == 0xff {
-            self.set_r8(register, 0);
-        }
-        else {
-            self.set_r8(register, value + 1);
-        }
-    }
-
-    /// Decrements the value of a 8 bit register.
-    pub fn decrement_r8(&mut self, register: RegisterR8) {
-        let value = self.get_r8(register);
-        if value == 0x0 {
-            self.set_r8(register, 0xff);
-        }
-        else {
-            self.set_r8(register, value - 1);
-        }
-    }
-
     /// Get the value of a 16 bit register.
     pub fn get_r16(&self, register: RegisterR16) -> u16 {
         let (high_r8, low_r8) = register.to_r8();
@@ -329,28 +308,6 @@ impl Cpu {
         let (high, low) = to_u8(value);
         self.registers[high_r8 as usize] = high;
         self.registers[low_r8 as usize]  = low;
-    }
-
-    /// Increments the value of a 16 bit register.
-    pub fn increment_r16(&mut self, register: RegisterR16) {
-        let value = self.get_r16(register);
-        if value == 0xffff {
-            self.set_r16(register, 0);
-        }
-        else {
-            self.set_r16(register, value + 1);
-        }
-    }
-
-    /// Decrements the value of a 16 bit register.
-    pub fn decrement_r16(&mut self, register: RegisterR16) {
-        let value = self.get_r16(register);
-        if value == 0x0 {
-            self.set_r16(register, 0xffff);
-        }
-        else {
-            self.set_r16(register, value - 1);
-        }
     }
 
     /// Checks whether a specific CPU flag is set.
@@ -423,10 +380,5 @@ impl Cpu {
     /// Set the current address of the stack pointer.
     pub fn set_stack_pointer(&mut self, address: u16) {
         self.stack_pointer = address;
-    }
-
-    /// Increments the stack pointer's value.
-    pub fn increment_sp(&mut self) {
-        self.stack_pointer += 1;
     }
 }

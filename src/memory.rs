@@ -43,7 +43,7 @@ pub struct MemoryReadWriteHandle {
 
 /// Shared internal object for multiple Memory and MemoryReadWrite instances.
 struct MemoryInternal {
-    memory: [u8; 0xffff]
+    memory: [u8; 0x10000]
 }
 
 /// Helper object to store a shared reference to the internal memory object.
@@ -117,7 +117,7 @@ impl Memory {
         Self {
             internal: MemoryInternalRef::new(
                 MemoryInternal {
-                    memory: [0; 0xffff],
+                    memory: [0; 0x10000],
                 }
             )
         }

@@ -23,120 +23,208 @@ use crate::memory::{MemoryRead, MemoryWrite};
 ////////////////////////////////////////////////
 //// INC opcodes
 
+/// Increments a 8bit value.
+fn increment_u8v(gb: &mut GameBoy, value: u8) -> u8 {
+    let result = if value == 0xff {
+        0x00
+    }
+    else {
+        value + 1
+    };
+
+    gb.cpu.set_flags_by_result(value as u32, result as u32);
+    gb.cpu.set_flag(CpuFlag::Negative, false);
+
+    result
+}
+
+/// Increments a 16bit value.
+fn increment_u16v(gb: &mut GameBoy, value: u16) -> u16 {
+    let result = if value == 0xff {
+        0x00
+    }
+    else {
+        value + 1
+    };
+
+    result
+}
+
+/// Increments a value
+/// r8 <- r8 + 1
+fn increment_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = increment_u8v(gb, value);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Increments a value
+/// r16 <- r16 + 1
+fn increment_r16(gb: &mut GameBoy, r16: RegisterR16) {
+    let value  = gb.cpu.get_r16(r16);
+    let result = increment_u16v(gb, value);
+    gb.cpu.set_r16(r16, result);
+}
+
 /// Increments a value.
 /// (r16) <- (r16) + 1
-fn inc_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
+fn increment_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
     let address = gb.cpu.get_r16(r16_ptr);
     let value   = gb.mem.read_u8(address);
-    let result  = value + 1;
+    let result  = increment_u8v(gb, value);
     gb.mem.write_u8(address, result);
 }
 
 
 pub fn inc_a(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::A);
+    increment_r8(gb, RegisterR8::A);
 }
 
 pub fn inc_b(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::B);
+    increment_r8(gb, RegisterR8::B);
 }
 
 pub fn inc_c(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::C);
+    increment_r8(gb, RegisterR8::C);
 }
 
 pub fn inc_d(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::D);
+    increment_r8(gb, RegisterR8::D);
 }
 
 pub fn inc_e(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::E);
+    increment_r8(gb, RegisterR8::E);
 }
 
 pub fn inc_h(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::H);
+    increment_r8(gb, RegisterR8::H);
 }
 
 pub fn inc_l(gb: &mut GameBoy) {
-    gb.cpu.increment_r8(RegisterR8::L);
+    increment_r8(gb, RegisterR8::L);
 }
 
 pub fn inc_bc(gb: &mut GameBoy) {
-    gb.cpu.increment_r16(RegisterR16::BC);
+    increment_r16(gb, RegisterR16::BC);
 }
 
 pub fn inc_de(gb: &mut GameBoy) {
-    gb.cpu.increment_r16(RegisterR16::DE);
+    increment_r16(gb, RegisterR16::DE);
 }
 
 pub fn inc_hl(gb: &mut GameBoy) {
-    gb.cpu.increment_r16(RegisterR16::HL);
+    increment_r16(gb, RegisterR16::HL);
 }
 
 pub fn inc_hlptr(gb: &mut GameBoy) {
-    inc_r16ptr(gb, RegisterR16::HL);
+    increment_r16ptr(gb, RegisterR16::HL);
 }
 
 pub fn inc_sp(gb: &mut GameBoy) {
-    gb.cpu.increment_sp();
+    let sp_old = gb.cpu.get_stack_pointer();
+    let sp_new = sp_old + 1;
+    gb.cpu.set_stack_pointer(sp_new);
 }
 
 
 ////////////////////////////////////////////////
 //// DEC opcodes
 
+/// Decrements a 8bit value.
+fn decrement_u8v(gb: &mut GameBoy, value: u8) -> u8 {
+    let result = if value == 0x00 {
+        0xff
+    }
+    else {
+        value - 1
+    };
+
+    gb.cpu.set_flags_by_result(value as u32, result as u32);
+    gb.cpu.set_flag(CpuFlag::Negative, true);
+
+    result
+}
+
+/// Decrements a 16bit value.
+fn decrement_u16v(gb: &mut GameBoy, value: u16) -> u16 {
+    let result = if value == 0x00 {
+        0xff
+    }
+    else {
+        value - 1
+    };
+
+    result
+}
+
+/// Decrements a value
+/// r8 <- r8 - 1
+fn decrement_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = decrement_u8v(gb, value);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Decrements a value
+/// r16 <- r16 - 1
+fn decrement_r16(gb: &mut GameBoy, r16: RegisterR16) {
+    let value  = gb.cpu.get_r16(r16);
+    let result = decrement_u16v(gb, value);
+    gb.cpu.set_r16(r16, result);
+}
+
 /// Decrements a value.
 /// (r16) <- (r16) - 1
-fn dec_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
+fn decrement_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
     let address = gb.cpu.get_r16(r16_ptr);
     let value   = gb.mem.read_u8(address);
-    let result  = value - 1;
+    let result  = decrement_u8v(gb, value);
     gb.mem.write_u8(address, result);
 }
 
 
 pub fn dec_a(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::A);
+    decrement_r8(gb, RegisterR8::A);
 }
 
 pub fn dec_b(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::B);
+    decrement_r8(gb, RegisterR8::B);
 }
 
 pub fn dec_c(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::C);
+    decrement_r8(gb, RegisterR8::C);
 }
 
 pub fn dec_d(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::D);
+    decrement_r8(gb, RegisterR8::D);
 }
 
 pub fn dec_e(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::E);
+    decrement_r8(gb, RegisterR8::E);
 }
 
 pub fn dec_h(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::H);
+    decrement_r8(gb, RegisterR8::H);
 }
 
 pub fn dec_l(gb: &mut GameBoy) {
-    gb.cpu.decrement_r8(RegisterR8::L);
+    decrement_r8(gb, RegisterR8::L);
 }
 
 pub fn dec_bc(gb: &mut GameBoy) {
-    gb.cpu.decrement_r16(RegisterR16::BC);
+    decrement_r16(gb, RegisterR16::BC);
 }
 
 pub fn dec_de(gb: &mut GameBoy) {
-    gb.cpu.decrement_r16(RegisterR16::DE);
+    decrement_r16(gb, RegisterR16::DE);
 }
 
 pub fn dec_hl(gb: &mut GameBoy) {
-    gb.cpu.decrement_r16(RegisterR16::HL);
+    decrement_r16(gb, RegisterR16::HL);
 }
 
 pub fn dec_hlptr(gb: &mut GameBoy) {
-    dec_r16ptr(gb, RegisterR16::HL);
+    decrement_r16ptr(gb, RegisterR16::HL);
 }
 
 pub fn dec_sp(gb: &mut GameBoy) {

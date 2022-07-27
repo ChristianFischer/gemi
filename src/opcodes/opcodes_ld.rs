@@ -402,13 +402,15 @@ pub fn ld_a_hlptr(gb: &mut GameBoy) {
 }
 
 pub fn ld_a_hlptri(gb: &mut GameBoy) {
-    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL);
-    gb.cpu.increment_r16(RegisterR16::HL);
+    let hl = gb.cpu.get_r16(RegisterR16::HL);
+    ld_r8_addr(gb, RegisterR8::A, hl);
+    gb.cpu.set_r16(RegisterR16::HL, hl + 1);
 }
 
 pub fn ld_a_hlptrd(gb: &mut GameBoy) {
-    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL);
-    gb.cpu.decrement_r16(RegisterR16::HL);
+    let hl = gb.cpu.get_r16(RegisterR16::HL);
+    ld_r8_addr(gb, RegisterR8::A, hl);
+    gb.cpu.set_r16(RegisterR16::HL, hl - 1);
 }
 
 pub fn ld_b_hlptr(gb: &mut GameBoy) {
@@ -448,13 +450,15 @@ pub fn ld_hlptr_a(gb: &mut GameBoy) {
 }
 
 pub fn ld_hlptri_a(gb: &mut GameBoy) {
-    ld_r16ptr_r8(gb, RegisterR16::HL, RegisterR8::A);
-    gb.cpu.increment_r16(RegisterR16::HL);
+    let hl = gb.cpu.get_r16(RegisterR16::HL);
+    ld_addr_r8(gb, hl, RegisterR8::A);
+    gb.cpu.set_r16(RegisterR16::HL, hl + 1);
 }
 
 pub fn ld_hlptrd_a(gb: &mut GameBoy) {
-    ld_r16ptr_r8(gb, RegisterR16::HL, RegisterR8::A);
-    gb.cpu.decrement_r16(RegisterR16::HL);
+    let hl = gb.cpu.get_r16(RegisterR16::HL);
+    ld_addr_r8(gb, hl, RegisterR8::A);
+    gb.cpu.set_r16(RegisterR16::HL, hl - 1);
 }
 
 pub fn ld_hlptr_b(gb: &mut GameBoy) {
