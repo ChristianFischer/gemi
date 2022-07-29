@@ -21,6 +21,17 @@ use crate::memory::{MemoryRead, MemoryWrite};
 
 
 ////////////////////////////////////////////////
+//// Flag types
+
+enum ShiftOp {
+    ShiftLogical,
+    ShiftArithmetic,
+    Rotate,
+    RotateThroughCarry,
+}
+
+
+////////////////////////////////////////////////
 //// INC opcodes
 
 /// Increments a 8bit value.
@@ -519,68 +530,1312 @@ pub fn sub_hl_sp(gb: &mut GameBoy) {
 ////////////////////////////////////////////////
 //// RL / RLC opcodes
 
-/// Rotates the value of a register to the left through the carry flag.
-fn rl_r8(gb: &mut GameBoy, r8: RegisterR8) {
+/// Shifts or rotates a value to the left.
+fn shift_left_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
     let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
-    let value    = gb.cpu.get_r8(r8);
     let left_bit = (value >> 7) & 1;
-    let result   = (value << 1) | carry;
+
+    let result = (value << 1) | (match op {
+        ShiftOp::ShiftLogical       => (value << 1) | 0x0000,
+        ShiftOp::ShiftArithmetic    => (value << 1) | 0x0000,
+        ShiftOp::Rotate             => (value << 1) | left_bit,
+        ShiftOp::RotateThroughCarry => (value << 1) | carry,
+    });
+
     gb.cpu.set_flag(CpuFlag::Carry, left_bit != 0);
     gb.cpu.set_flag(CpuFlag::Zero,  result != 0);
+
+    result
+}
+
+/// Performs an arithmetic shift left of the value of a register.
+fn sla_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_left_u8v(gb, value, ShiftOp::ShiftArithmetic);
     gb.cpu.set_r8(r8, result);
+}
+
+/// Performs an arithmetic shift left of the value on a memory location.
+fn sla_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_left_u8v(gb, value, ShiftOp::ShiftArithmetic);
+    gb.mem.write_u8(address, result);
+}
+
+/// Rotates the value of a register to the left through the carry flag.
+fn rl_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_left_u8v(gb, value, ShiftOp::RotateThroughCarry);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Rotates the value on a memory location to the left through the carry flag.
+fn rl_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_left_u8v(gb, value, ShiftOp::RotateThroughCarry);
+    gb.mem.write_u8(address, result);
 }
 
 /// Rotates the value of a register to the left.
 fn rlc_r8(gb: &mut GameBoy, r8: RegisterR8) {
-    let value    = gb.cpu.get_r8(r8);
-    let left_bit = (value >> 7) & 1;
-    let result   = (value << 1) | left_bit;
-    gb.cpu.set_flag(CpuFlag::Carry, left_bit != 0);
-    gb.cpu.set_flag(CpuFlag::Zero,  result != 0);
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_left_u8v(gb, value, ShiftOp::Rotate);
     gb.cpu.set_r8(r8, result);
 }
 
+/// Rotates the value on a memory location to the left.
+fn rlc_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_left_u8v(gb, value, ShiftOp::Rotate);
+    gb.mem.write_u8(address, result);
+}
+
+
+pub fn sla_a(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::A);
+}
+
+pub fn sla_b(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::B);
+}
+
+pub fn sla_c(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::C);
+}
+
+pub fn sla_d(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::D);
+}
+
+pub fn sla_e(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::E);
+}
+
+pub fn sla_h(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::H);
+}
+
+pub fn sla_l(gb: &mut GameBoy) {
+    sla_r8(gb, RegisterR8::L);
+}
+
+pub fn sla_hlptr(gb: &mut GameBoy) {
+    sla_r16ptr(gb, RegisterR16::HL);
+}
+
+pub fn rla(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::A);
+}
 
 pub fn rl_a(gb: &mut GameBoy) {
     rl_r8(gb, RegisterR8::A);
+}
+
+pub fn rl_b(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::B);
+}
+
+pub fn rl_c(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::C);
+}
+
+pub fn rl_d(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::D);
+}
+
+pub fn rl_e(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::E);
+}
+
+pub fn rl_h(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::H);
+}
+
+pub fn rl_l(gb: &mut GameBoy) {
+    rl_r8(gb, RegisterR8::L);
+}
+
+pub fn rl_hlptr(gb: &mut GameBoy) {
+    rl_r16ptr(gb, RegisterR16::HL);
+}
+
+pub fn rlca(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::A);
 }
 
 pub fn rlc_a(gb: &mut GameBoy) {
     rlc_r8(gb, RegisterR8::A);
 }
 
+pub fn rlc_b(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::B);
+}
+
+pub fn rlc_c(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::C);
+}
+
+pub fn rlc_d(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::D);
+}
+
+pub fn rlc_e(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::E);
+}
+
+pub fn rlc_h(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::H);
+}
+
+pub fn rlc_l(gb: &mut GameBoy) {
+    rlc_r8(gb, RegisterR8::L);
+}
+
+pub fn rlc_hlptr(gb: &mut GameBoy) {
+    rlc_r16ptr(gb, RegisterR16::HL);
+}
+
 
 ////////////////////////////////////////////////
 //// RR / RRC opcodes
 
-/// Rotates the value of a register to the right through the carry flag.
-fn rr_r8(gb: &mut GameBoy, r8: RegisterR8) {
-    let carry     = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
-    let value     = gb.cpu.get_r8(r8);
-    let right_bit = value & 1;
-    let result    = (value >> 1) | (carry << 7);
+/// Shifts or rotates a value to the left.
+fn shift_right_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
+    let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
+    let left_bit = (value >> 7) & 1;
+    let right_bit= value & 1;
+
+    let result = (value << 1) | (match op {
+        ShiftOp::ShiftLogical       => (value >> 1) | 0x0000,
+        ShiftOp::ShiftArithmetic    => (value >> 1) | (left_bit << 7),
+        ShiftOp::Rotate             => (value >> 1) | (right_bit << 7),
+        ShiftOp::RotateThroughCarry => (value >> 1) | carry,
+    });
+
     gb.cpu.set_flag(CpuFlag::Carry, right_bit != 0);
     gb.cpu.set_flag(CpuFlag::Zero,  result != 0);
+
+    result
+}
+
+/// Performs an arithmetic shift right of the value of a register.
+fn sra_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_right_u8v(gb, value, ShiftOp::ShiftArithmetic);
     gb.cpu.set_r8(r8, result);
+}
+
+/// Performs an arithmetic shift right of the value on a memory location.
+fn sra_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_right_u8v(gb, value, ShiftOp::ShiftArithmetic);
+    gb.mem.write_u8(address, result);
+}
+
+/// Performs an arithmetic shift right of the value of a register.
+fn srl_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_right_u8v(gb, value, ShiftOp::ShiftLogical);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Performs an arithmetic shift right of the value on a memory location.
+fn srl_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_right_u8v(gb, value, ShiftOp::ShiftLogical);
+    gb.mem.write_u8(address, result);
+}
+
+/// Rotates the value of a register to the right through the carry flag.
+fn rr_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_right_u8v(gb, value, ShiftOp::RotateThroughCarry);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Rotates the value on a memory location to the right through the carry flag.
+fn rr_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_right_u8v(gb, value, ShiftOp::RotateThroughCarry);
+    gb.mem.write_u8(address, result);
 }
 
 /// Rotates the value of a register to the right.
 fn rrc_r8(gb: &mut GameBoy, r8: RegisterR8) {
-    let value     = gb.cpu.get_r8(r8);
-    let right_bit = value & 1;
-    let result    = (value >> 1) | (right_bit << 7);
-    gb.cpu.set_flag(CpuFlag::Carry, right_bit != 0);
-    gb.cpu.set_flag(CpuFlag::Zero,  result != 0);
+    let value  = gb.cpu.get_r8(r8);
+    let result = shift_right_u8v(gb, value, ShiftOp::Rotate);
     gb.cpu.set_r8(r8, result);
 }
 
+/// Rotates the value on a memory location to the right.
+fn rrc_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = shift_right_u8v(gb, value, ShiftOp::Rotate);
+    gb.mem.write_u8(address, result);
+}
+
+
+pub fn sra_a(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::A);
+}
+
+pub fn sra_b(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::B);
+}
+
+pub fn sra_c(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::C);
+}
+
+pub fn sra_d(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::D);
+}
+
+pub fn sra_e(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::E);
+}
+
+pub fn sra_h(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::H);
+}
+
+pub fn sra_l(gb: &mut GameBoy) {
+    sra_r8(gb, RegisterR8::L);
+}
+
+pub fn sra_hlptr(gb: &mut GameBoy) {
+    sra_r16ptr(gb, RegisterR16::HL);
+}
+
+pub fn srl_a(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::A);
+}
+
+pub fn srl_b(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::B);
+}
+
+pub fn srl_c(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::C);
+}
+
+pub fn srl_d(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::D);
+}
+
+pub fn srl_e(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::E);
+}
+
+pub fn srl_h(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::H);
+}
+
+pub fn srl_l(gb: &mut GameBoy) {
+    srl_r8(gb, RegisterR8::L);
+}
+
+pub fn srl_hlptr(gb: &mut GameBoy) {
+    srl_r16ptr(gb, RegisterR16::HL);
+}
+
+pub fn rra(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::A);
+}
 
 pub fn rr_a(gb: &mut GameBoy) {
     rr_r8(gb, RegisterR8::A);
 }
 
+pub fn rr_b(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::B);
+}
+
+pub fn rr_c(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::C);
+}
+
+pub fn rr_d(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::D);
+}
+
+pub fn rr_e(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::E);
+}
+
+pub fn rr_h(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::H);
+}
+
+pub fn rr_l(gb: &mut GameBoy) {
+    rr_r8(gb, RegisterR8::L);
+}
+
+pub fn rr_hlptr(gb: &mut GameBoy) {
+    rr_r16ptr(gb, RegisterR16::HL);
+}
+
+pub fn rrca(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::A);
+}
+
 pub fn rrc_a(gb: &mut GameBoy) {
     rrc_r8(gb, RegisterR8::A);
+}
+
+pub fn rrc_b(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::B);
+}
+
+pub fn rrc_c(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::C);
+}
+
+pub fn rrc_d(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::D);
+}
+
+pub fn rrc_e(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::E);
+}
+
+pub fn rrc_h(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::H);
+}
+
+pub fn rrc_l(gb: &mut GameBoy) {
+    rrc_r8(gb, RegisterR8::L);
+}
+
+pub fn rrc_hlptr(gb: &mut GameBoy) {
+    rrc_r16ptr(gb, RegisterR16::HL);
+}
+
+
+////////////////////////////////////////////////
+//// SWAP opcodes
+
+/// Swaps the low and high nibble of a byte.
+fn swap_nibbles_u8v(gb: &mut GameBoy, value: u8) -> u8 {
+    let low   = (value >> 0) & 0x0f;
+    let high  = (value >> 4) & 0x0f;
+    let result = (low << 4) | (high);
+
+    gb.cpu.clear_flags();
+    gb.cpu.set_flag(CpuFlag::Zero, result != 0);
+
+    result
+}
+
+/// Swaps the low and high nibble of a 8bit register.
+fn swap_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = swap_nibbles_u8v(gb, value);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Swaps the low and high nibble of a byte at the address of a 16bit register pointer.
+fn swap_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
+    let address = gb.cpu.get_r16(r16_ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = swap_nibbles_u8v(gb, value);
+    gb.mem.write_u8(address, result);
+}
+
+
+pub fn swap_a(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::A);
+}
+
+pub fn swap_b(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::B);
+}
+
+pub fn swap_c(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::C);
+}
+
+pub fn swap_d(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::D);
+}
+
+pub fn swap_e(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::E);
+}
+
+pub fn swap_h(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::H);
+}
+
+pub fn swap_l(gb: &mut GameBoy) {
+    swap_r8(gb, RegisterR8::L);
+}
+
+pub fn swap_hlptr(gb: &mut GameBoy) {
+    swap_r16ptr(gb, RegisterR16::HL);
+}
+
+
+////////////////////////////////////////////////
+//// Set Bit opcodes
+
+/// Set bit n of a given 8bit value.
+/// value | (1 << bit)
+fn set_bit_u8v(_gb: &mut GameBoy, value: u8, bit: u8) -> u8 {
+    let result = value | (1 << bit);
+    result
+}
+
+/// Set bit n of in the given register.
+/// r8 <- r8 | (1 << bit)
+fn set_bit_r8(gb: &mut GameBoy, r8: RegisterR8, bit: u8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = set_bit_u8v(gb, value, bit);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Set bit n on a memory address.
+/// (r16) <- (r16) | (1 << bit)
+fn set_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
+    let address = gb.cpu.get_r16(r16_ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = set_bit_u8v(gb, value, bit);
+    gb.mem.write_u8(address, result);
+}
+
+
+pub fn set_bit_0_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 0);
+}
+
+pub fn set_bit_0_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 0);
+}
+
+pub fn set_bit_0_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 0);
+}
+
+pub fn set_bit_0_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 0);
+}
+
+pub fn set_bit_0_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 0);
+}
+
+pub fn set_bit_0_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 0);
+}
+
+pub fn set_bit_0_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 0);
+}
+
+pub fn set_bit_0_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 0);
+}
+
+pub fn set_bit_1_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 1);
+}
+
+pub fn set_bit_1_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 1);
+}
+
+pub fn set_bit_1_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 1);
+}
+
+pub fn set_bit_1_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 1);
+}
+
+pub fn set_bit_1_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 1);
+}
+
+pub fn set_bit_1_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 1);
+}
+
+pub fn set_bit_1_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 1);
+}
+
+pub fn set_bit_1_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 1);
+}
+
+pub fn set_bit_2_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 2);
+}
+
+pub fn set_bit_2_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 2);
+}
+
+pub fn set_bit_2_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 2);
+}
+
+pub fn set_bit_2_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 2);
+}
+
+pub fn set_bit_2_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 2);
+}
+
+pub fn set_bit_2_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 2);
+}
+
+pub fn set_bit_2_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 2);
+}
+
+pub fn set_bit_2_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 2);
+}
+
+pub fn set_bit_3_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 3);
+}
+
+pub fn set_bit_3_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 3);
+}
+
+pub fn set_bit_3_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 3);
+}
+
+pub fn set_bit_3_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 3);
+}
+
+pub fn set_bit_3_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 3);
+}
+
+pub fn set_bit_3_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 3);
+}
+
+pub fn set_bit_3_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 3);
+}
+
+pub fn set_bit_3_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 3);
+}
+
+pub fn set_bit_4_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 4);
+}
+
+pub fn set_bit_4_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 4);
+}
+
+pub fn set_bit_4_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 4);
+}
+
+pub fn set_bit_4_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 4);
+}
+
+pub fn set_bit_4_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 4);
+}
+
+pub fn set_bit_4_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 4);
+}
+
+pub fn set_bit_4_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 4);
+}
+
+pub fn set_bit_4_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 4);
+}
+
+pub fn set_bit_5_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 5);
+}
+
+pub fn set_bit_5_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 5);
+}
+
+pub fn set_bit_5_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 5);
+}
+
+pub fn set_bit_5_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 5);
+}
+
+pub fn set_bit_5_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 5);
+}
+
+pub fn set_bit_5_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 5);
+}
+
+pub fn set_bit_5_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 5);
+}
+
+pub fn set_bit_5_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 5);
+}
+
+pub fn set_bit_6_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 6);
+}
+
+pub fn set_bit_6_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 6);
+}
+
+pub fn set_bit_6_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 6);
+}
+
+pub fn set_bit_6_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 6);
+}
+
+pub fn set_bit_6_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 6);
+}
+
+pub fn set_bit_6_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 6);
+}
+
+pub fn set_bit_6_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 6);
+}
+
+pub fn set_bit_6_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 6);
+}
+
+pub fn set_bit_7_a(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::A, 7);
+}
+
+pub fn set_bit_7_b(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::B, 7);
+}
+
+pub fn set_bit_7_c(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::C, 7);
+}
+
+pub fn set_bit_7_d(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::D, 7);
+}
+
+pub fn set_bit_7_e(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::E, 7);
+}
+
+pub fn set_bit_7_h(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::H, 7);
+}
+
+pub fn set_bit_7_l(gb: &mut GameBoy) {
+    set_bit_r8(gb, RegisterR8::L, 7);
+}
+
+pub fn set_bit_7_hlptr(gb: &mut GameBoy) {
+    set_bit_r16ptr(gb, RegisterR16::HL, 7);
+}
+
+
+////////////////////////////////////////////////
+//// Reset Bit opcodes
+
+/// Resets bit n of a given 8bit value.
+/// value & !(1 << bit)
+fn res_bit_u8v(_gb: &mut GameBoy, value: u8, bit: u8) -> u8 {
+    let result = value & !(1 << bit);
+    result
+}
+
+/// Resets bit n of in the given register.
+/// r8 <- r8 & !(1 << bit)
+fn res_bit_r8(gb: &mut GameBoy, r8: RegisterR8, bit: u8) {
+    let value  = gb.cpu.get_r8(r8);
+    let result = res_bit_u8v(gb, value, bit);
+    gb.cpu.set_r8(r8, result);
+}
+
+/// Resets bit n on a memory address.
+/// (r16) <- (r16) & !(1 << bit)
+fn res_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
+    let address = gb.cpu.get_r16(r16_ptr);
+    let value   = gb.mem.read_u8(address);
+    let result  = res_bit_u8v(gb, value, bit);
+    gb.mem.write_u8(address, result);
+}
+
+
+pub fn res_bit_0_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 0);
+}
+
+pub fn res_bit_0_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 0);
+}
+
+pub fn res_bit_0_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 0);
+}
+
+pub fn res_bit_0_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 0);
+}
+
+pub fn res_bit_0_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 0);
+}
+
+pub fn res_bit_0_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 0);
+}
+
+pub fn res_bit_0_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 0);
+}
+
+pub fn res_bit_0_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 0);
+}
+
+pub fn res_bit_1_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 1);
+}
+
+pub fn res_bit_1_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 1);
+}
+
+pub fn res_bit_1_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 1);
+}
+
+pub fn res_bit_1_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 1);
+}
+
+pub fn res_bit_1_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 1);
+}
+
+pub fn res_bit_1_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 1);
+}
+
+pub fn res_bit_1_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 1);
+}
+
+pub fn res_bit_1_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 1);
+}
+
+pub fn res_bit_2_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 2);
+}
+
+pub fn res_bit_2_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 2);
+}
+
+pub fn res_bit_2_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 2);
+}
+
+pub fn res_bit_2_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 2);
+}
+
+pub fn res_bit_2_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 2);
+}
+
+pub fn res_bit_2_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 2);
+}
+
+pub fn res_bit_2_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 2);
+}
+
+pub fn res_bit_2_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 2);
+}
+
+pub fn res_bit_3_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 3);
+}
+
+pub fn res_bit_3_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 3);
+}
+
+pub fn res_bit_3_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 3);
+}
+
+pub fn res_bit_3_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 3);
+}
+
+pub fn res_bit_3_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 3);
+}
+
+pub fn res_bit_3_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 3);
+}
+
+pub fn res_bit_3_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 3);
+}
+
+pub fn res_bit_3_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 3);
+}
+
+pub fn res_bit_4_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 4);
+}
+
+pub fn res_bit_4_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 4);
+}
+
+pub fn res_bit_4_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 4);
+}
+
+pub fn res_bit_4_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 4);
+}
+
+pub fn res_bit_4_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 4);
+}
+
+pub fn res_bit_4_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 4);
+}
+
+pub fn res_bit_4_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 4);
+}
+
+pub fn res_bit_4_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 4);
+}
+
+pub fn res_bit_5_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 5);
+}
+
+pub fn res_bit_5_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 5);
+}
+
+pub fn res_bit_5_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 5);
+}
+
+pub fn res_bit_5_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 5);
+}
+
+pub fn res_bit_5_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 5);
+}
+
+pub fn res_bit_5_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 5);
+}
+
+pub fn res_bit_5_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 5);
+}
+
+pub fn res_bit_5_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 5);
+}
+
+pub fn res_bit_6_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 6);
+}
+
+pub fn res_bit_6_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 6);
+}
+
+pub fn res_bit_6_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 6);
+}
+
+pub fn res_bit_6_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 6);
+}
+
+pub fn res_bit_6_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 6);
+}
+
+pub fn res_bit_6_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 6);
+}
+
+pub fn res_bit_6_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 6);
+}
+
+pub fn res_bit_6_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 6);
+}
+
+pub fn res_bit_7_a(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::A, 7);
+}
+
+pub fn res_bit_7_b(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::B, 7);
+}
+
+pub fn res_bit_7_c(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::C, 7);
+}
+
+pub fn res_bit_7_d(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::D, 7);
+}
+
+pub fn res_bit_7_e(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::E, 7);
+}
+
+pub fn res_bit_7_h(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::H, 7);
+}
+
+pub fn res_bit_7_l(gb: &mut GameBoy) {
+    res_bit_r8(gb, RegisterR8::L, 7);
+}
+
+pub fn res_bit_7_hlptr(gb: &mut GameBoy) {
+    res_bit_r16ptr(gb, RegisterR16::HL, 7);
+}
+
+
+////////////////////////////////////////////////
+//// Check Bit opcodes
+
+
+/// Checks if bit n of a value is set.
+/// Set the Zero flag, if the bit was 0.
+fn check_bit_u8v(gb: &mut GameBoy, value: u8, bit: u8) {
+    let result = value & (1 << bit);
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, true);
+}
+
+/// Checks if bit n of a register is set.
+/// Set the Zero flag, if the bit was 0.
+fn check_bit_r8(gb: &mut GameBoy, r8: RegisterR8, bit: u8) {
+    let value  = gb.cpu.get_r8(r8);
+    check_bit_u8v(gb, value, bit);
+}
+
+/// Checks if bit n on a memory address is set.
+/// Set the Zero flag, if the bit was 0.
+fn check_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
+    let address = gb.cpu.get_r16(r16_ptr);
+    let value   = gb.mem.read_u8(address);
+    check_bit_u8v(gb, value, bit);
+}
+
+
+pub fn check_bit_0_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 0);
+}
+
+pub fn check_bit_0_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 0);
+}
+
+pub fn check_bit_0_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 0);
+}
+
+pub fn check_bit_0_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 0);
+}
+
+pub fn check_bit_0_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 0);
+}
+
+pub fn check_bit_0_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 0);
+}
+
+pub fn check_bit_0_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 0);
+}
+
+pub fn check_bit_0_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 0);
+}
+
+pub fn check_bit_1_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 1);
+}
+
+pub fn check_bit_1_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 1);
+}
+
+pub fn check_bit_1_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 1);
+}
+
+pub fn check_bit_1_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 1);
+}
+
+pub fn check_bit_1_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 1);
+}
+
+pub fn check_bit_1_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 1);
+}
+
+pub fn check_bit_1_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 1);
+}
+
+pub fn check_bit_1_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 1);
+}
+
+pub fn check_bit_2_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 2);
+}
+
+pub fn check_bit_2_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 2);
+}
+
+pub fn check_bit_2_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 2);
+}
+
+pub fn check_bit_2_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 2);
+}
+
+pub fn check_bit_2_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 2);
+}
+
+pub fn check_bit_2_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 2);
+}
+
+pub fn check_bit_2_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 2);
+}
+
+pub fn check_bit_2_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 2);
+}
+
+pub fn check_bit_3_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 3);
+}
+
+pub fn check_bit_3_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 3);
+}
+
+pub fn check_bit_3_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 3);
+}
+
+pub fn check_bit_3_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 3);
+}
+
+pub fn check_bit_3_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 3);
+}
+
+pub fn check_bit_3_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 3);
+}
+
+pub fn check_bit_3_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 3);
+}
+
+pub fn check_bit_3_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 3);
+}
+
+pub fn check_bit_4_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 4);
+}
+
+pub fn check_bit_4_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 4);
+}
+
+pub fn check_bit_4_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 4);
+}
+
+pub fn check_bit_4_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 4);
+}
+
+pub fn check_bit_4_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 4);
+}
+
+pub fn check_bit_4_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 4);
+}
+
+pub fn check_bit_4_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 4);
+}
+
+pub fn check_bit_4_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 4);
+}
+
+pub fn check_bit_5_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 5);
+}
+
+pub fn check_bit_5_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 5);
+}
+
+pub fn check_bit_5_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 5);
+}
+
+pub fn check_bit_5_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 5);
+}
+
+pub fn check_bit_5_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 5);
+}
+
+pub fn check_bit_5_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 5);
+}
+
+pub fn check_bit_5_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 5);
+}
+
+pub fn check_bit_5_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 5);
+}
+
+pub fn check_bit_6_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 6);
+}
+
+pub fn check_bit_6_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 6);
+}
+
+pub fn check_bit_6_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 6);
+}
+
+pub fn check_bit_6_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 6);
+}
+
+pub fn check_bit_6_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 6);
+}
+
+pub fn check_bit_6_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 6);
+}
+
+pub fn check_bit_6_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 6);
+}
+
+pub fn check_bit_6_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 6);
+}
+
+pub fn check_bit_7_a(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::A, 7);
+}
+
+pub fn check_bit_7_b(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::B, 7);
+}
+
+pub fn check_bit_7_c(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::C, 7);
+}
+
+pub fn check_bit_7_d(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::D, 7);
+}
+
+pub fn check_bit_7_e(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::E, 7);
+}
+
+pub fn check_bit_7_h(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::H, 7);
+}
+
+pub fn check_bit_7_l(gb: &mut GameBoy) {
+    check_bit_r8(gb, RegisterR8::L, 7);
+}
+
+pub fn check_bit_7_hlptr(gb: &mut GameBoy) {
+    check_bit_r16ptr(gb, RegisterR16::HL, 7);
 }
 
 
