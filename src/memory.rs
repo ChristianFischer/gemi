@@ -18,7 +18,7 @@
 use std::cell::{Ref, RefCell, RefMut};
 use std::rc::Rc;
 use crate::Cartridge;
-use crate::cpu::{to_u16, to_u8};
+use crate::utils::{to_u16, to_u8};
 
 /// The memory object as the main owner of the emulator's memory.
 /// This object can be used to create additional handles which

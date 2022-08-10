@@ -25,8 +25,8 @@ type ProcessOpCode = fn(gb: &mut GameBoy);
 #[derive(Copy, Clone)]
 pub struct OpCode {
     pub name: &'static str,
-    pub bytes: usize,
-    pub cycles: usize,
+    pub bytes: u32,
+    pub cycles: u32,
     pub proc: ProcessOpCode,
 }
 

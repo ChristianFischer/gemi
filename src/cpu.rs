@@ -18,6 +18,7 @@
 use crate::opcode::{Instruction, OpCode};
 use crate::memory::{MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
+use crate::utils::{to_u16, to_u8};
 
 /// Definition for each supported 8 bit Register.
 #[derive(Copy, Clone)]
@@ -86,25 +87,6 @@ pub struct Cpu {
     flags: CpuFlags,
 }
 
-/// Combines a high and low byte into a 16 bit value.
-pub const fn to_u16(high: u8, low: u8) -> u16 {
-    ((high as u16) << 8) | (low as u16)
-}
-
-/// Splits a 16 bit value into it's high and low bytes.
-pub const fn to_u8(value: u16) -> (u8, u8) {
-    (get_high(value), get_low(value))
-}
-
-/// Get the high byte of a 16 bit value.
-pub const fn get_high(value: u16) -> u8 {
-    ((value >> 8) & 0xff) as u8
-}
-
-/// Get the low byte of a 16 bit value.
-pub const fn get_low(value: u16) -> u8 {
-    (value & 0xff) as u8
-}
 
 impl RegisterR16 {
     /// Get the 8 bit registers which contains the high and low bytes of a 16 bit register.

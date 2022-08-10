@@ -21,6 +21,9 @@ mod gameboy;
 mod memory;
 mod opcode;
 mod opcodes;
+mod ppu;
+mod utils;
+mod window;
 
 use cartridge::Cartridge;
 use cartridge::GameBoyColorSupport;
@@ -63,9 +66,10 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
 }
 
 fn run(cartridge: &Cartridge) {
-    let mut gb = GameBoy::new();
-    gb.insert_cart(cartridge);
-    gb.run();
+    if let Ok(mut gb) = GameBoy::new() {
+        gb.insert_cart(cartridge);
+        gb.run();
+    }
 }
 
 fn main() {

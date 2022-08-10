@@ -18,23 +18,32 @@
 use crate::cartridge::Cartridge;
 use crate::cpu::Cpu;
 use crate::memory::Memory;
+use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
+use crate::window::Window;
 
 /// The GameBoy object providing access to all it's emulated components.
 pub struct GameBoy {
     pub cpu: Cpu,
+    pub ppu: Ppu,
     pub mem: Memory,
+    pub window: Window,
 }
 
 
 impl GameBoy {
     /// Create a new GameBoy device.
-    pub fn new() -> GameBoy {
+    pub fn new() -> Result<GameBoy,String> {
         let mem = Memory::new();
+        let window = Window::create("GameBoy", SCREEN_W, SCREEN_H)?;
 
-        GameBoy {
-            cpu: Cpu::new(mem.create_read_write_handle()),
-            mem,
-        }
+        Ok(
+            GameBoy {
+                cpu: Cpu::new(mem.create_read_write_handle()),
+                ppu: Ppu::new(mem.create_read_write_handle()),
+                mem,
+                window,
+            }
+        )
     }
 
     /// Inserts a cartridge into the device and load ROM data into memory.
@@ -45,7 +54,7 @@ impl GameBoy {
     /// Runs the program located on a cartridge, starting on the
     /// current location of the instruction pointer.
     pub fn run(&mut self) {
-        while true {
+        loop {
             let instruction = self.cpu.fetch_next_instruction();
 
             println!(
@@ -55,12 +64,23 @@ impl GameBoy {
                 instruction
             );
 
-            if instruction.opcode.name == "???" {
-                println!("Invalid OpCode @ ${:04x}", instruction.opcode_address);
-                return;
-            }
-
             (instruction.opcode.proc)(self);
+
+            // take the number of cycles consumed by the last operation
+            let cycles = instruction.opcode.cycles;
+
+            // let the PPU run for the same amount of cycles
+            let ppu_state = self.ppu.update(cycles);
+
+            // When a frame completed, it should be presented
+            if let FrameState::FrameCompleted = ppu_state {
+                self.window.present(self.ppu.get_lcd());
+                self.window.poll_events();
+
+                if !self.window.is_opened() {
+                    return;
+                }
+            }
         }
     }
 }
