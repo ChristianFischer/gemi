@@ -17,6 +17,7 @@
 
 use std::cell::{Ref, RefCell, RefMut};
 use std::rc::Rc;
+use crate::boot_rom::BootRom;
 use crate::Cartridge;
 use crate::utils::{to_u16, to_u8};
 
@@ -43,7 +44,9 @@ pub struct MemoryReadWriteHandle {
 
 /// Shared internal object for multiple Memory and MemoryReadWrite instances.
 struct MemoryInternal {
-    memory: [u8; 0x10000]
+    memory:     Box<[u8; 0x10000]>,
+    boot_rom:   Option<BootRom>,
+    cartridge:  Option<Cartridge>,
 }
 
 /// Helper object to store a shared reference to the internal memory object.
@@ -117,7 +120,9 @@ impl Memory {
         Self {
             internal: MemoryInternalRef::new(
                 MemoryInternal {
-                    memory: [0; 0x10000],
+                    memory:     Box::new([0; 0x10000]),
+                    boot_rom:   None,
+                    cartridge:  None,
                 }
             )
         }
@@ -139,44 +144,54 @@ impl Memory {
         }
     }
 
-    /// Load ROM data from a cartridge into the memory.
-    pub fn load_rom_data(&mut self, cartridge: &Cartridge) {
-        let mut mem = self.internal.get_mut();
-
-        for address in 0..0x7fff {
-            let value = cartridge.get_rom_data_at(address);
-            mem.memory[address as usize] = value;
+    /// Checks whether a boot rom is active or not.
+    pub fn has_boot_rom(&self) -> bool {
+        match self.internal.get().boot_rom {
+            None    => false,
+            Some(_) => true,
         }
+    }
+
+    /// Load a boot ROM into the memory.
+    pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
+        let mut mem = self.internal.get_mut();
+        mem.boot_rom = Some(boot_rom)
+    }
+
+    /// Load ROM data from a cartridge into the memory.
+    pub fn set_cartridge(&mut self, cartridge: Cartridge) {
+        let mut mem = self.internal.get_mut();
+        mem.cartridge = Some(cartridge);
     }
 }
 
 impl MemoryRead for Memory {
     fn read_byte(&self, address: u16) -> u8 {
-        self.internal.get().memory[address as usize]
+        self.internal.get().read(address)
     }
 }
 
 impl MemoryWrite for Memory {
     fn write_byte(&mut self, address: u16, value: u8) {
-        self.internal.get_mut().memory[address as usize] = value;
+        self.internal.get_mut().write(address, value);
     }
 }
 
 impl MemoryRead for MemoryReadOnlyHandle {
     fn read_byte(&self, address: u16) -> u8 {
-        self.internal.get().memory[address as usize]
+        self.internal.get().read(address)
     }
 }
 
 impl MemoryRead for MemoryReadWriteHandle {
     fn read_byte(&self, address: u16) -> u8 {
-        self.internal.get().memory[address as usize]
+        self.internal.get().read(address)
     }
 }
 
 impl MemoryWrite for MemoryReadWriteHandle {
     fn write_byte(&mut self, address: u16, value: u8) {
-        self.internal.get_mut().memory[address as usize] = value;
+        self.internal.get_mut().write(address, value);
     }
 }
 
@@ -215,5 +230,48 @@ impl MemoryInternalRef {
     pub fn get_mut(&mut self) -> RefMut<MemoryInternal> {
         let ref_cell : &RefCell<MemoryInternal> = &(self.r);
         ref_cell.borrow_mut()
+    }
+}
+
+impl MemoryInternal {
+    /// Reads data from any memory location.
+    /// The request will be forwarded to the according device, depending
+    /// on the physical location of the data (like cartridge, ppu, etc)
+    pub fn read(&self, address: u16) -> u8 {
+        match address {
+            0x0000 ..= 0x00ff => self.read_boot_rom_or_cartridge(address),
+            0x0100 ..= 0x7fff => self.read_from_cartridge(address),
+            _                 => self.read_internal_memory(address),
+        }
+    }
+
+    /// Reads data from the boot rom, if any, otherwise from the cartridge.
+    fn read_boot_rom_or_cartridge(&self, address: u16) -> u8 {
+        if let Some(boot_rom) = &self.boot_rom {
+            return boot_rom.read(address);
+        }
+
+        self.read_from_cartridge(address)
+    }
+
+    /// Reads data from the cartridge.
+    fn read_from_cartridge(&self, address: u16) -> u8 {
+        if let Some(cartridge) = &self.cartridge {
+            return cartridge.get_rom_data_at(address);
+        }
+
+        self.read_internal_memory(address)
+    }
+
+    /// Reads data from the internal memory.
+    fn read_internal_memory(&self, address: u16) -> u8 {
+        self.memory[address as usize]
+    }
+
+    /// Writes data to any memory location.
+    /// The request will be forwarded to the according device, depending
+    /// on the physical location of the data (like cartridge, ppu, etc)
+    pub fn write(&mut self, address: u16, value: u8) {
+        self.memory[address as usize] = value;
     }
 }

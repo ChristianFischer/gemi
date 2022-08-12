@@ -394,7 +394,7 @@ pub fn add_hl_sp(gb: &mut GameBoy) {
 fn sub_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8, sub_carry: bool) {
     let carry      = sub_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
     let old_value = gb.cpu.get_r8(r8) as u32;
-    let result    = old_value - (value as u32) - (carry as u32);
+    let result    = ((old_value as i32) - (value as i32) - (carry as i32)) as u32;
     gb.cpu.set_flags_by_result(old_value, result);
     gb.cpu.set_r8(r8, result as u8);
 }
@@ -1844,7 +1844,7 @@ pub fn check_bit_7_hlptr(gb: &mut GameBoy) {
 
 /// Compares two values.
 fn cp_u8v_u8v(gb: &mut GameBoy, value1: u8, value2: u8) {
-    let result = value1 - value2;
+    let result = (value1 as i32) - (value2 as i32);
     gb.cpu.set_flags_by_result(value1 as u32, result as u32);
     gb.cpu.set_flag(CpuFlag::Negative, true);
 }

@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+mod boot_rom;
 mod cartridge;
 mod cpu;
 mod gameboy;
@@ -28,6 +29,7 @@ mod window;
 use cartridge::Cartridge;
 use cartridge::GameBoyColorSupport;
 use std::env;
+use crate::boot_rom::BootRom;
 use crate::gameboy::GameBoy;
 
 fn print_rom_info(filename: &String, cartridge: &Cartridge) {
@@ -65,22 +67,46 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
     println!("SuperGameBoy:  {}",     cartridge.supports_sgb());
 }
 
-fn run(cartridge: &Cartridge) {
-    if let Ok(mut gb) = GameBoy::new() {
-        gb.insert_cart(cartridge);
-        gb.run();
-    }
-}
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() >= 2 {
-        let file = &args[1];
+    let mut args = env::args().into_iter();
+    let mut gb = GameBoy::new().unwrap();
+    let mut cartridge: Option<Cartridge> = None;
 
-        let cartridge = Cartridge::load_file(file).expect("Unable to load ROM");
+    // skip first argument, which is the executable name
+    _ = args.next();
 
-        print_rom_info(file, &cartridge);
+    while let Some(arg) = args.next() {
+        println!("ARG: {}", arg);
 
-        run(&cartridge);
+        match arg.as_str() {
+            "--boot" => {
+                let filename = args.next()
+                    .expect("'--boot' needs to be followed by the path to a valid boot rom");
+
+                let boot_rom = BootRom::load_file(&filename).unwrap();
+                gb.set_boot_rom(boot_rom);
+            }
+
+            _ => {
+                let filename = arg;
+                let cart     = Cartridge::load_file(&filename).unwrap();
+                print_rom_info(&filename, &cart);
+
+                cartridge = Some(cart);
+            }
+        }
+    }
+
+    match cartridge {
+        Some(cart) => {
+            gb.insert_cart(cart);
+            gb.initialize();
+            gb.run();
+        }
+
+        None => {
+            println!("No ROM file specified");
+        }
     }
 }

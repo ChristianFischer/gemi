@@ -16,6 +16,7 @@
  */
 
 use std::fs::File;
+use std::io;
 use std::io::Read;
 
 
@@ -129,12 +130,12 @@ impl RomData {
 impl Cartridge {
     /// Load a cartridge from a file.
     /// * `filepath` - relative path to the file to be loaded
-    pub fn load_file(filepath: &String) -> Option<Cartridge> {
-        let mut file = File::open(filepath).expect("File not found");
-        let metadata = file.metadata().expect("Unable to read metadata");
+    pub fn load_file(filepath: &String) -> Result<Cartridge, io::Error> {
+        let mut file = File::open(filepath)?;
+        let metadata = file.metadata()?;
         let mut buffer = vec![0; metadata.len() as usize];
 
-        file.read(&mut buffer).expect("Buffer overflow");
+        file.read(&mut buffer)?;
 
         let rom = RomData {
             data: buffer
@@ -220,7 +221,7 @@ impl Cartridge {
             rom,
         };
 
-        return Some(cartridge);
+        Ok(cartridge)
     }
 
 

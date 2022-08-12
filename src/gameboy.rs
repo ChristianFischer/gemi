@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::cpu::Cpu;
 use crate::memory::Memory;
@@ -46,9 +47,19 @@ impl GameBoy {
         )
     }
 
+    /// Assign a boot rom to be executed on startup.
+    pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
+        self.mem.set_boot_rom(boot_rom);
+    }
+
     /// Inserts a cartridge into the device and load ROM data into memory.
-    pub fn insert_cart(&mut self, cartridge: &Cartridge) {
-        self.mem.load_rom_data(cartridge);
+    pub fn insert_cart(&mut self, cartridge: Cartridge) {
+        self.mem.set_cartridge(cartridge);
+    }
+
+    /// Boot the device, initializing the Boot ROM program.
+    pub fn initialize(&mut self) {
+        self.cpu.set_instruction_pointer(0x0000);
     }
 
     /// Runs the program located on a cartridge, starting on the
