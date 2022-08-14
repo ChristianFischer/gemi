@@ -124,10 +124,10 @@ impl Window {
         for i in 0..SCREEN_PIXELS {
             let color_index = lcd.get_pixels()[i];
             let color = match color_index {
-                3 => 0xffffffffu32,
-                2 => 0x808080ffu32,
-                1 => 0x404040ffu32,
-                _ => 0x000000ffu32,
+                3 => 0x00000000u32,
+                2 => 0x404040ffu32,
+                1 => 0x808080ffu32,
+                _ => 0xffffffffu32,
             };
 
             self.color_buffer[i * 4 + 0] = ((color >> 24) & 0xff) as u8;
@@ -151,7 +151,7 @@ impl Window {
         self.canvas
             .copy(
                 &self.texture,
-                None,
+                Rect::new(0, 0, SCREEN_W, SCREEN_H),
                 Rect::new(0, 0, SCREEN_W, SCREEN_H)
             )
             .unwrap()

@@ -272,6 +272,28 @@ impl MemoryInternal {
     /// The request will be forwarded to the according device, depending
     /// on the physical location of the data (like cartridge, ppu, etc)
     pub fn write(&mut self, address: u16, value: u8) {
+        match address {
+            0xff00 ..= 0xffff => self.write_io_registers(address, value),
+            _                 => self.write_internal_memory(address, value),
+        }
+    }
+
+    /// Writes data into IO registers
+    fn write_io_registers(&mut self, address: u16, value: u8) {
+        self.write_internal_memory(address, value);
+
+        match address {
+            0xff50 => {
+                if (value & 0x01) != 0 {
+                    self.boot_rom = None;
+                }
+            },
+            _ => { }
+        }
+    }
+
+    /// Writes data into the internal memory.
+    fn write_internal_memory(&mut self, address: u16, value: u8) {
         self.memory[address as usize] = value;
     }
 }
