@@ -33,7 +33,7 @@ pub static OPCODE_INVALID: OpCode = OpCode {
     name: "[INVALID]",
     bytes: 1,
     cycles: 0,
-    proc: |gb| {
+    proc: |_gb| {
         panic!();
     }
 };
@@ -44,7 +44,7 @@ pub static OPCODE_UNASSIGNED: OpCode = OpCode {
     name: "[NOT ASSIGNED]",
     bytes: 1,
     cycles: 0,
-    proc: |gb| {
+    proc: |_gb| {
         panic!();
     }
 };
@@ -118,7 +118,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0x3B*/ OpCode { name: "DEC SP",           bytes: 1, cycles:  8, proc: dec_sp              },
     /* 0x3C*/ OpCode { name: "INC A",            bytes: 1, cycles:  4, proc: inc_a               },
     /* 0x3D*/ OpCode { name: "DEC A",            bytes: 1, cycles:  4, proc: dec_a               },
-    /* 0x3E*/ OpCode { name: "LD A, ${x8}",      bytes: 2, cycles:  8, proc: ld_l_u8             },
+    /* 0x3E*/ OpCode { name: "LD A, ${x8}",      bytes: 2, cycles:  8, proc: ld_a_u8             },
     /* 0x3F*/ OpCode { name: "CCF",              bytes: 1, cycles:  4, proc: ccf                 },
 
     /* 0x40*/ OpCode { name: "LD B, B",          bytes: 1, cycles:  4, proc: ld_b_b              },

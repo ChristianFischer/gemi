@@ -324,7 +324,7 @@ impl Cpu {
     pub fn set_flags_by_result(&mut self, old_value: u32, new_value: u32) {
         let carry_bits = old_value ^ new_value;
         self.set_flag(CpuFlag::Negative,  false);
-        self.set_flag(CpuFlag::Zero,      new_value == 0);
+        self.set_flag(CpuFlag::Zero,      (new_value  & 0x00ff) == 0);
         self.set_flag(CpuFlag::Carry,     (carry_bits & 0x0100) != 0);
         self.set_flag(CpuFlag::HalfCarry, (carry_bits & 0x0010) != 0);
     }

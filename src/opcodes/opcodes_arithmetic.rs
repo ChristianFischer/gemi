@@ -421,22 +421,6 @@ fn sub_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16, sub_ca
     sub_r8_u8v(gb, dst, value, sub_carry);
 }
 
-/// Subtracts a value from another one and stores the result into a 8bit register.
-/// r16 <- r16 - value
-fn sub_r16_u16v(gb: &mut GameBoy, r16: RegisterR16, value: u16) {
-    let old_value = gb.cpu.get_r16(r16) as u32;
-    let result    = old_value - (value as u32);
-    gb.cpu.set_flags_by_result(old_value, result);
-    gb.cpu.set_r16(r16, result as u16);
-}
-
-/// Subtracts a value from another one and stores the result into a 8bit register.
-/// dst <- dst - src
-fn sub_r16_r16(gb: &mut GameBoy, dst: RegisterR16, src: RegisterR16) {
-    let value = gb.cpu.get_r16(src);
-    sub_r16_u16v(gb, dst, value);
-}
-
 
 pub fn sub_a_u8(gb: &mut GameBoy) {
     sub_r8_u8(gb, RegisterR8::A, false);
@@ -508,22 +492,6 @@ pub fn sbc_a_l(gb: &mut GameBoy) {
 
 pub fn sbc_a_hlptr(gb: &mut GameBoy) {
     sub_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL, true);
-}
-
-pub fn sub_hl_bc(gb: &mut GameBoy) {
-    sub_r16_r16(gb, RegisterR16::HL, RegisterR16::BC);
-}
-
-pub fn sub_hl_de(gb: &mut GameBoy) {
-    sub_r16_r16(gb, RegisterR16::HL, RegisterR16::DE);
-}
-
-pub fn sub_hl_hl(gb: &mut GameBoy) {
-    sub_r16_r16(gb, RegisterR16::HL, RegisterR16::HL);
-}
-
-pub fn sub_hl_sp(gb: &mut GameBoy) {
-    sub_r16_u16v(gb, RegisterR16::HL, gb.cpu.get_stack_pointer());
 }
 
 

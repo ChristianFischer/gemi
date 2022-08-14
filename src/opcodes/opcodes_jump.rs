@@ -100,28 +100,12 @@ pub fn jr_z_i8(gb: &mut GameBoy) {
     jr_if_i8(gb, CpuFlag::Zero, true);
 }
 
-pub fn jr_n_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::Negative, true);
-}
-
-pub fn jr_h_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::HalfCarry, true);
-}
-
 pub fn jr_c_i8(gb: &mut GameBoy) {
     jr_if_i8(gb, CpuFlag::Carry, true);
 }
 
 pub fn jr_nz_i8(gb: &mut GameBoy) {
     jr_if_i8(gb, CpuFlag::Zero, false);
-}
-
-pub fn jr_nn_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::Negative, false);
-}
-
-pub fn jr_nh_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::HalfCarry, false);
 }
 
 pub fn jr_nc_i8(gb: &mut GameBoy) {
@@ -132,28 +116,12 @@ pub fn jp_z_u16(gb: &mut GameBoy) {
     jp_if_u16(gb, CpuFlag::Zero, true);
 }
 
-pub fn jp_n_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::Negative, true);
-}
-
-pub fn jp_h_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::HalfCarry, true);
-}
-
 pub fn jp_c_u16(gb: &mut GameBoy) {
     jp_if_u16(gb, CpuFlag::Carry, true);
 }
 
 pub fn jp_nz_u16(gb: &mut GameBoy) {
     jp_if_u16(gb, CpuFlag::Zero, false);
-}
-
-pub fn jp_nn_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::Negative, false);
-}
-
-pub fn jp_nh_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::HalfCarry, false);
 }
 
 pub fn jp_nc_u16(gb: &mut GameBoy) {
@@ -168,28 +136,12 @@ pub fn call_z_u16(gb: &mut GameBoy) {
     call_u16_if(gb, CpuFlag::Zero, true);
 }
 
-pub fn call_n_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::Negative, true);
-}
-
-pub fn call_h_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::HalfCarry, true);
-}
-
 pub fn call_c_u16(gb: &mut GameBoy) {
     call_u16_if(gb, CpuFlag::Carry, true);
 }
 
 pub fn call_nz_u16(gb: &mut GameBoy) {
     call_u16_if(gb, CpuFlag::Zero, false);
-}
-
-pub fn call_nn_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::Negative, false);
-}
-
-pub fn call_nh_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::HalfCarry, false);
 }
 
 pub fn call_nc_u16(gb: &mut GameBoy) {
@@ -236,28 +188,12 @@ pub fn ret_z(gb: &mut GameBoy) {
     ret_if(gb, CpuFlag::Zero, true);
 }
 
-pub fn ret_n(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::Negative, true);
-}
-
-pub fn ret_h(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::HalfCarry, true);
-}
-
 pub fn ret_c(gb: &mut GameBoy) {
     ret_if(gb, CpuFlag::Carry, true);
 }
 
 pub fn ret_nz(gb: &mut GameBoy) {
     ret_if(gb, CpuFlag::Zero, false);
-}
-
-pub fn ret_nn(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::Negative, false);
-}
-
-pub fn ret_nh(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::HalfCarry, false);
 }
 
 pub fn ret_nc(gb: &mut GameBoy) {

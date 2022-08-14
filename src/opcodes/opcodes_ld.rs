@@ -394,7 +394,7 @@ pub fn ld_a_bcptr(gb: &mut GameBoy) {
 }
 
 pub fn ld_a_deptr(gb: &mut GameBoy) {
-    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::BC);
+    ld_r8_r16ptr(gb, RegisterR8::A, RegisterR16::DE);
 }
 
 pub fn ld_a_hlptr(gb: &mut GameBoy) {
