@@ -35,7 +35,7 @@ impl GameBoy {
     /// Create a new GameBoy device.
     pub fn new() -> Result<GameBoy,String> {
         let mem = Memory::new();
-        let window = Window::create("GameBoy", SCREEN_W, SCREEN_H)?;
+        let window = Window::create("GameBoy")?;
 
         Ok(
             GameBoy {
@@ -85,7 +85,7 @@ impl GameBoy {
 
             // When a frame completed, it should be presented
             if let FrameState::FrameCompleted = ppu_state {
-                self.window.present(self.ppu.get_lcd());
+                self.window.present(self.ppu.get_lcd(), &self.ppu);
                 self.window.poll_events();
 
                 if !self.window.is_opened() {

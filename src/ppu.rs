@@ -200,10 +200,15 @@ impl Ppu {
         self.current_line_cycles += 1;
         self.clock -= 1;
 
-        // get the current background pixel
-        let pixel = self.read_background_pixel(
+        let (background_x, background_y) = self.screen_to_background(
             self.current_line_pixel,
             self.ly
+        );
+
+        // get the current background pixel
+        let pixel = self.read_background_pixel(
+            background_x,
+            background_y
         );
 
         // write pixel into LCD buffer
@@ -326,11 +331,15 @@ impl Ppu {
         self.mem.read_u8(MEMORY_LOCATION_WY)
     }
 
-    /// Read the pixel value of the background on a given screen position
-    /// honoring the X and Y scroll values
-    pub fn read_background_pixel(&self, screen_x: u8, screen_y: u8) -> u8 {
-        let background_x = (screen_x as u32 + self.get_scroll_x() as u32) % 256;
-        let background_y = (screen_y as u32 + self.get_scroll_y() as u32) % 256;
+    /// Compute the background location of any screen pixel.
+    pub fn screen_to_background(&self, screen_x: u8, screen_y: u8) -> (u8, u8) {
+        let background_x = ((screen_x as u32 + self.get_scroll_x() as u32) & 0xff) as u8;
+        let background_y = ((screen_y as u32 + self.get_scroll_y() as u32) & 0xff) as u8;
+        (background_x, background_y)
+    }
+
+    /// Read the pixel value of the background on a given position.
+    pub fn read_background_pixel(&self, background_x: u8, background_y: u8) -> u8 {
         let tile_x       = (background_x / 8) as u16;
         let tile_y       = (background_y / 8) as u16;
         let tile_pixel_x = (background_x % 8) as u8;
@@ -340,15 +349,15 @@ impl Ppu {
         let sprite       = self.mem.read_u8(tile_address as u16);
 
         self.read_sprite_pixel(
-            sprite,
+            sprite as u16,
             tile_pixel_x,
             tile_pixel_y
         )
     }
 
     /// Read the pixel value of a sprite.
-    pub fn read_sprite_pixel(&self, sprite: u8, x: u8, y: u8) -> u8 {
-        let sprite_address      = MEMORY_LOCATION_SPRITES_BEGIN + (sprite as u16 * 16);
+    pub fn read_sprite_pixel(&self, sprite: u16, x: u8, y: u8) -> u8 {
+        let sprite_address      = MEMORY_LOCATION_SPRITES_BEGIN + (sprite * 16);
         let sprite_line_address = sprite_address + y as u16 * 2;
         let pixel_mask            = 1u8 << (7 - x);
         let byte0                 = self.mem.read_u8(sprite_line_address + 0);
