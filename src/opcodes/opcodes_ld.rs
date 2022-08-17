@@ -143,6 +143,14 @@ pub fn pop_r16(gb: &mut GameBoy, r16: RegisterR16) {
     gb.cpu.set_r16(r16, value);
 }
 
+/// Pops a 16bit value from the stack into a 16bit register.
+/// Applies a bitmask to the value before writing into the register.
+pub fn pop_r16_mask(gb: &mut GameBoy, r16: RegisterR16, mask: u16) {
+    let value = gb.cpu.pop_u16();
+    let value_masked = value & mask;
+    gb.cpu.set_r16(r16, value_masked);
+}
+
 
 pub fn ld_a_a(gb: &mut GameBoy) {
     ld_r8_r8(gb, RegisterR8::A, RegisterR8::A);
@@ -551,7 +559,7 @@ pub fn push_hl(gb: &mut GameBoy) {
 }
 
 pub fn pop_af(gb: &mut GameBoy) {
-    pop_r16(gb, RegisterR16::AF);
+    pop_r16_mask(gb, RegisterR16::AF, 0xfff0);
 }
 
 pub fn pop_bc(gb: &mut GameBoy) {

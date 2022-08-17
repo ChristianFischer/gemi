@@ -15,20 +15,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter};
 use crate::opcode::{Instruction, OpCode};
 use crate::memory::{MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
-use crate::utils::{to_u16, to_u8};
+use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
 /// Definition for each supported 8 bit Register.
 #[derive(Copy, Clone)]
 pub enum RegisterR8 {
     A,
+    F,
     B,
     C,
     D,
     E,
-    F,
     H,
     L,
 }
@@ -50,21 +51,6 @@ pub enum CpuFlag {
     Carry,
 }
 
-/// Current configuration of CPU flags.
-pub struct CpuFlags {
-    /// zero flag
-    z: bool,
-
-    /// negative flag
-    n: bool,
-
-    /// half-carry flag
-    h: bool,
-
-    /// carry flag
-    c: bool,
-}
-
 /// An object representing the gameboy's CPU
 pub struct Cpu {
     /// Handle to the device memory.
@@ -82,9 +68,6 @@ pub struct Cpu {
 
     /// Sets interrupts to be enabled.
     interrupts_enabled: bool,
-
-    /// Currently active CPU flags.
-    flags: CpuFlags,
 }
 
 
@@ -120,6 +103,19 @@ impl RegisterR16 {
     }
 }
 
+impl CpuFlag {
+    /// Get the bit inside the flags register which stores
+    /// the according CPU flag value.
+    pub fn bit(&self) -> u8 {
+        match self {
+            CpuFlag::Zero      => 7,
+            CpuFlag::Negative  => 6,
+            CpuFlag::HalfCarry => 5,
+            CpuFlag::Carry     => 4,
+        }
+    }
+}
+
 impl Cpu {
     /// Creates an empty CPU object.
     pub fn new(mem: MemoryReadWriteHandle) -> Cpu {
@@ -132,13 +128,6 @@ impl Cpu {
             stack_pointer: 0x0000,
 
             interrupts_enabled: false,
-
-            flags: CpuFlags {
-                z: false,
-                n: false,
-                h: false,
-                c: false,
-            },
         }
     }
 
@@ -294,30 +283,19 @@ impl Cpu {
 
     /// Checks whether a specific CPU flag is set.
     pub fn is_flag_set(&self, flag: CpuFlag) -> bool {
-        match flag {
-            CpuFlag::Zero      => self.flags.z,
-            CpuFlag::Negative  => self.flags.n,
-            CpuFlag::HalfCarry => self.flags.h,
-            CpuFlag::Carry     => self.flags.c,
-        }
+        get_bit(self.get_r8(RegisterR8::F), flag.bit())
     }
 
     /// Set the value of a CPU flag.
     pub fn set_flag(&mut self, flag: CpuFlag, value: bool) {
-        match flag {
-            CpuFlag::Zero      => self.flags.z = value,
-            CpuFlag::Negative  => self.flags.n = value,
-            CpuFlag::HalfCarry => self.flags.h = value,
-            CpuFlag::Carry     => self.flags.c = value,
-        }
+        let value_old = self.get_r8(RegisterR8::F);
+        let value_new = change_bit(value_old, flag.bit(), value);
+        self.set_r8(RegisterR8::F, value_new);
     }
 
     /// Clear all CPU flags.
     pub fn clear_flags(&mut self) {
-        self.flags.z = false;
-        self.flags.n = false;
-        self.flags.h = false;
-        self.flags.c = false;
+        self.set_r8(RegisterR8::F, 0x00);
     }
 
     /// Set CPU flags based on a calculation result.
@@ -362,5 +340,27 @@ impl Cpu {
     /// Set the current address of the stack pointer.
     pub fn set_stack_pointer(&mut self, address: u16) {
         self.stack_pointer = address;
+    }
+}
+
+
+impl Display for Cpu {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}{}{}{} A={:02x} F={:02x} B={:02x} C={:02x} D={:02x} E={:02x} H={:02x} L={:02x}",
+            if self.is_flag_set(CpuFlag::Zero)      { 'Z' } else { '-' },
+            if self.is_flag_set(CpuFlag::Negative)  { 'N' } else { '-' },
+            if self.is_flag_set(CpuFlag::HalfCarry) { 'H' } else { '-' },
+            if self.is_flag_set(CpuFlag::Carry)     { 'C' } else { '-' },
+            self.get_r8(RegisterR8::A),
+            self.get_r8(RegisterR8::F),
+            self.get_r8(RegisterR8::B),
+            self.get_r8(RegisterR8::C),
+            self.get_r8(RegisterR8::D),
+            self.get_r8(RegisterR8::E),
+            self.get_r8(RegisterR8::H),
+            self.get_r8(RegisterR8::L)
+        )
     }
 }

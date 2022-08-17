@@ -36,12 +36,12 @@ pub const fn get_low(value: u16) -> u8 {
 }
 
 /// Get the n'th bit of the given value.
-pub const fn get_bit(byte: u8, bit: usize) -> bool {
+pub const fn get_bit(byte: u8, bit: u8) -> bool {
     (byte & (1 << bit)) != 0
 }
 
 /// Set the n'th bit of the given value.
-pub const fn change_bit(byte: u8, bit: usize, value: bool) -> u8 {
+pub const fn change_bit(byte: u8, bit: u8, value: bool) -> u8 {
     if value {
         set_bit(byte, bit)
     }
@@ -51,11 +51,11 @@ pub const fn change_bit(byte: u8, bit: usize, value: bool) -> u8 {
 }
 
 /// Set the n'th bit of the given value to 0.
-pub const fn clear_bit(byte: u8, bit: usize) -> u8 {
+pub const fn clear_bit(byte: u8, bit: u8) -> u8 {
     byte & !((1 << bit) as u8)
 }
 
 /// Set the n'th bit of the given value to 1.
-pub const fn set_bit(byte: u8, bit: usize) -> u8 {
+pub const fn set_bit(byte: u8, bit: u8) -> u8 {
     byte | ((1 << bit) as u8)
 }

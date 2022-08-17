@@ -30,6 +30,11 @@ enum ShiftOp {
     RotateThroughCarry,
 }
 
+enum NullCheck {
+    Check,
+    ClearFlag
+}
+
 
 ////////////////////////////////////////////////
 //// INC opcodes
@@ -51,7 +56,7 @@ fn increment_u8v(gb: &mut GameBoy, value: u8) -> u8 {
 
 /// Increments a 16bit value.
 fn increment_u16v(gb: &mut GameBoy, value: u16) -> u16 {
-    let result = if value == 0xff {
+    let result = if value == 0xffff {
         0x00
     }
     else {
@@ -500,18 +505,28 @@ pub fn sbc_a_hlptr(gb: &mut GameBoy) {
 
 /// Shifts or rotates a value to the left.
 fn shift_left_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
+    shift_left_u8v_nc(gb, value, op, NullCheck::Check)
+}
+
+/// Shifts or rotates a value to the left.
+fn shift_left_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
     let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
     let left_bit = (value >> 7) & 1;
 
-    let result = (value << 1) | (match op {
+    let result = (match op {
         ShiftOp::ShiftLogical       => (value << 1) | 0x0000,
         ShiftOp::ShiftArithmetic    => (value << 1) | 0x0000,
         ShiftOp::Rotate             => (value << 1) | left_bit,
         ShiftOp::RotateThroughCarry => (value << 1) | carry,
     });
 
+    let null_bit = match nullcheck {
+        NullCheck::Check     => result == 0,
+        NullCheck::ClearFlag => false,
+    };
+
     gb.cpu.set_flag(CpuFlag::Carry, left_bit != 0);
-    gb.cpu.set_flag(CpuFlag::Zero,  result != 0);
+    gb.cpu.set_flag(CpuFlag::Zero,  null_bit);
 
     result
 }
@@ -533,8 +548,13 @@ fn sla_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
 
 /// Rotates the value of a register to the left through the carry flag.
 fn rl_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    rl_r8_nc(gb, r8, NullCheck::Check);
+}
+
+/// Rotates the value of a register to the left through the carry flag.
+fn rl_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
     let value  = gb.cpu.get_r8(r8);
-    let result = shift_left_u8v(gb, value, ShiftOp::RotateThroughCarry);
+    let result = shift_left_u8v_nc(gb, value, ShiftOp::RotateThroughCarry, nullcheck);
     gb.cpu.set_r8(r8, result);
 }
 
@@ -548,8 +568,13 @@ fn rl_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
 
 /// Rotates the value of a register to the left.
 fn rlc_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    rlc_r8_nc(gb, r8, NullCheck::Check);
+}
+
+/// Rotates the value of a register to the left.
+fn rlc_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
     let value  = gb.cpu.get_r8(r8);
-    let result = shift_left_u8v(gb, value, ShiftOp::Rotate);
+    let result = shift_left_u8v_nc(gb, value, ShiftOp::Rotate, nullcheck);
     gb.cpu.set_r8(r8, result);
 }
 
@@ -595,7 +620,7 @@ pub fn sla_hlptr(gb: &mut GameBoy) {
 }
 
 pub fn rla(gb: &mut GameBoy) {
-    rl_r8(gb, RegisterR8::A);
+    rl_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag);
 }
 
 pub fn rl_a(gb: &mut GameBoy) {
@@ -631,7 +656,7 @@ pub fn rl_hlptr(gb: &mut GameBoy) {
 }
 
 pub fn rlca(gb: &mut GameBoy) {
-    rlc_r8(gb, RegisterR8::A);
+    rlc_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag);
 }
 
 pub fn rlc_a(gb: &mut GameBoy) {
@@ -672,19 +697,29 @@ pub fn rlc_hlptr(gb: &mut GameBoy) {
 
 /// Shifts or rotates a value to the left.
 fn shift_right_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
+    shift_right_u8v_nc(gb, value, op, NullCheck::Check)
+}
+
+/// Shifts or rotates a value to the left.
+fn shift_right_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
     let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
     let left_bit = (value >> 7) & 1;
     let right_bit= value & 1;
 
-    let result = (value << 1) | (match op {
+    let result = (match op {
         ShiftOp::ShiftLogical       => (value >> 1) | 0x0000,
         ShiftOp::ShiftArithmetic    => (value >> 1) | (left_bit << 7),
         ShiftOp::Rotate             => (value >> 1) | (right_bit << 7),
         ShiftOp::RotateThroughCarry => (value >> 1) | carry,
     });
 
+    let null_bit = match nullcheck {
+        NullCheck::Check     => result == 0,
+        NullCheck::ClearFlag => false,
+    };
+
     gb.cpu.set_flag(CpuFlag::Carry, right_bit != 0);
-    gb.cpu.set_flag(CpuFlag::Zero,  result != 0);
+    gb.cpu.set_flag(CpuFlag::Zero,  null_bit);
 
     result
 }
@@ -721,8 +756,13 @@ fn srl_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
 
 /// Rotates the value of a register to the right through the carry flag.
 fn rr_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    rr_r8_nc(gb, r8, NullCheck::Check);
+}
+
+/// Rotates the value of a register to the right through the carry flag.
+fn rr_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
     let value  = gb.cpu.get_r8(r8);
-    let result = shift_right_u8v(gb, value, ShiftOp::RotateThroughCarry);
+    let result = shift_right_u8v_nc(gb, value, ShiftOp::RotateThroughCarry, nullcheck);
     gb.cpu.set_r8(r8, result);
 }
 
@@ -736,8 +776,13 @@ fn rr_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
 
 /// Rotates the value of a register to the right.
 fn rrc_r8(gb: &mut GameBoy, r8: RegisterR8) {
+    rrc_r8_nc(gb, r8, NullCheck::Check);
+}
+
+/// Rotates the value of a register to the right.
+fn rrc_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
     let value  = gb.cpu.get_r8(r8);
-    let result = shift_right_u8v(gb, value, ShiftOp::Rotate);
+    let result = shift_right_u8v_nc(gb, value, ShiftOp::Rotate, nullcheck);
     gb.cpu.set_r8(r8, result);
 }
 
@@ -815,7 +860,7 @@ pub fn srl_hlptr(gb: &mut GameBoy) {
 }
 
 pub fn rra(gb: &mut GameBoy) {
-    rr_r8(gb, RegisterR8::A);
+    rr_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag);
 }
 
 pub fn rr_a(gb: &mut GameBoy) {
@@ -851,7 +896,7 @@ pub fn rr_hlptr(gb: &mut GameBoy) {
 }
 
 pub fn rrca(gb: &mut GameBoy) {
-    rrc_r8(gb, RegisterR8::A);
+    rrc_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag);
 }
 
 pub fn rrc_a(gb: &mut GameBoy) {
@@ -897,7 +942,7 @@ fn swap_nibbles_u8v(gb: &mut GameBoy, value: u8) -> u8 {
     let result = (low << 4) | (high);
 
     gb.cpu.clear_flags();
-    gb.cpu.set_flag(CpuFlag::Zero, result != 0);
+    gb.cpu.set_flag(CpuFlag::Zero, result == 0);
 
     result
 }
@@ -1888,7 +1933,7 @@ pub fn cp_a_hlptr(gb: &mut GameBoy) {
 fn and_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
     let old_value = gb.cpu.get_r8(r8);
     let result    = old_value & value;
-    gb.cpu.set_flag(CpuFlag::Zero,      result != 0);
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
     gb.cpu.set_flag(CpuFlag::Negative,  false);
     gb.cpu.set_flag(CpuFlag::HalfCarry, true);
     gb.cpu.set_flag(CpuFlag::Carry,     false);
@@ -1963,7 +2008,7 @@ pub fn and_a_hlptr(gb: &mut GameBoy) {
 fn or_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
     let old_value = gb.cpu.get_r8(r8);
     let result    = old_value | value;
-    gb.cpu.set_flag(CpuFlag::Zero,      result != 0);
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
     gb.cpu.set_flag(CpuFlag::Negative,  false);
     gb.cpu.set_flag(CpuFlag::HalfCarry, false);
     gb.cpu.set_flag(CpuFlag::Carry,     false);
@@ -2038,7 +2083,7 @@ pub fn or_a_hlptr(gb: &mut GameBoy) {
 fn xor_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
     let old_value = gb.cpu.get_r8(r8);
     let result    = old_value ^ value;
-    gb.cpu.set_flag(CpuFlag::Zero,      result != 0);
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
     gb.cpu.set_flag(CpuFlag::Negative,  false);
     gb.cpu.set_flag(CpuFlag::HalfCarry, false);
     gb.cpu.set_flag(CpuFlag::Carry,     false);

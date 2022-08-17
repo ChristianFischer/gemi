@@ -68,14 +68,16 @@ impl GameBoy {
         loop {
             let instruction = self.cpu.fetch_next_instruction();
 
+            (instruction.opcode.proc)(self);
+
             println!(
-                "/* {:04x} [{:02x}] */ {}",
+                "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
                 instruction.opcode_address,
                 instruction.opcode_id,
-                instruction
+                if instruction.opcode_id <= 0xff { "  " } else { "" },
+                instruction.to_string(),
+                self.cpu
             );
-
-            (instruction.opcode.proc)(self);
 
             // take the number of cycles consumed by the last operation
             let cycles = instruction.opcode.cycles;

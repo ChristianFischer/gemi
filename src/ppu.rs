@@ -34,23 +34,23 @@ pub const MEMORY_LOCATION_LYC:                      u16 = 0xff45;
 pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
 pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
 
-pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        usize = 0;
-pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           usize = 1;
-pub const LCD_CONTROL_BIT_SPRITE_SIZE:              usize = 2;
-pub const LCD_CONTROL_BIT_BG_TILE_MAP_SELECT:       usize = 3;
-pub const LCD_CONTROL_BIT_TILE_DATA_SELECT:         usize = 4;
-pub const LCD_CONTROL_BIT_WINDOW_ENABLED:           usize = 5;
-pub const LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT:   usize = 6;
-pub const LCD_CONTROL_BIT_LCD_ENABLED:              usize = 7;
+pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        u8 = 0;
+pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           u8 = 1;
+pub const LCD_CONTROL_BIT_SPRITE_SIZE:              u8 = 2;
+pub const LCD_CONTROL_BIT_BG_TILE_MAP_SELECT:       u8 = 3;
+pub const LCD_CONTROL_BIT_TILE_DATA_SELECT:         u8 = 4;
+pub const LCD_CONTROL_BIT_WINDOW_ENABLED:           u8 = 5;
+pub const LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT:   u8 = 6;
+pub const LCD_CONTROL_BIT_LCD_ENABLED:              u8 = 7;
 
-pub const LCD_STATUS_BIT_PPU_MODE_0:                usize = 0;
-pub const LCD_STATUS_BIT_PPU_MODE_1:                usize = 1;
-pub const LCD_STATUS_BIT_FLAG_COINCIDENCE:          usize = 2;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_0:         usize = 3;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_1:         usize = 4;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_2:         usize = 5;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY:      usize = 6;
-pub const LCD_STATUS_BIT_UNUSED:                    usize = 7;
+pub const LCD_STATUS_BIT_PPU_MODE_0:                u8 = 0;
+pub const LCD_STATUS_BIT_PPU_MODE_1:                u8 = 1;
+pub const LCD_STATUS_BIT_FLAG_COINCIDENCE:          u8 = 2;
+pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_0:         u8 = 3;
+pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_1:         u8 = 4;
+pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_2:         u8 = 5;
+pub const LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY:      u8 = 6;
+pub const LCD_STATUS_BIT_UNUSED:                    u8 = 7;
 
 
 type PixelBuffer160x144 = [u8; SCREEN_PIXELS];
