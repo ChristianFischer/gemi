@@ -298,15 +298,6 @@ impl Cpu {
         self.set_r8(RegisterR8::F, 0x00);
     }
 
-    /// Set CPU flags based on a calculation result.
-    pub fn set_flags_by_result(&mut self, old_value: u32, new_value: u32) {
-        let carry_bits = old_value ^ new_value;
-        self.set_flag(CpuFlag::Negative,  false);
-        self.set_flag(CpuFlag::Zero,      (new_value  & 0x00ff) == 0);
-        self.set_flag(CpuFlag::Carry,     (carry_bits & 0x0100) != 0);
-        self.set_flag(CpuFlag::HalfCarry, (carry_bits & 0x0010) != 0);
-    }
-
     /// Moves the instruction pointer relative to it's current position.
     pub fn jump_relative(&mut self, offset: i16) {
         if offset < 0 {
@@ -341,18 +332,22 @@ impl Cpu {
     pub fn set_stack_pointer(&mut self, address: u16) {
         self.stack_pointer = address;
     }
-}
 
-
-impl Display for Cpu {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}{}{}{} A={:02x} F={:02x} B={:02x} C={:02x} D={:02x} E={:02x} H={:02x} L={:02x}",
+    /// Creates a string representation of the current CPU flags.
+    pub fn flags_to_string(&self) -> String {
+        format!(
+            "{}{}{}{}",
             if self.is_flag_set(CpuFlag::Zero)      { 'Z' } else { '-' },
             if self.is_flag_set(CpuFlag::Negative)  { 'N' } else { '-' },
             if self.is_flag_set(CpuFlag::HalfCarry) { 'H' } else { '-' },
-            if self.is_flag_set(CpuFlag::Carry)     { 'C' } else { '-' },
+            if self.is_flag_set(CpuFlag::Carry)     { 'C' } else { '-' }
+        )
+    }
+
+    /// Creates a string representation of the current CPU registers.
+    pub fn registers_to_string(&self) -> String {
+        format!(
+            "A={:02x} F={:02x} B={:02x} C={:02x} D={:02x} E={:02x} H={:02x} L={:02x} SP={:04x} IP={:04x}",
             self.get_r8(RegisterR8::A),
             self.get_r8(RegisterR8::F),
             self.get_r8(RegisterR8::B),
@@ -360,7 +355,21 @@ impl Display for Cpu {
             self.get_r8(RegisterR8::D),
             self.get_r8(RegisterR8::E),
             self.get_r8(RegisterR8::H),
-            self.get_r8(RegisterR8::L)
+            self.get_r8(RegisterR8::L),
+            self.get_stack_pointer(),
+            self.get_instruction_pointer()
+        )
+    }
+}
+
+
+impl Display for Cpu {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.flags_to_string(),
+            self.registers_to_string(),
         )
     }
 }

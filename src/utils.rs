@@ -59,3 +59,80 @@ pub const fn clear_bit(byte: u8, bit: u8) -> u8 {
 pub const fn set_bit(byte: u8, bit: u8) -> u8 {
     byte | ((1 << bit) as u8)
 }
+
+
+/// Add two numbers and the carry flag together.
+/// Returns the numeric result and the new carry flag
+pub const fn carrying_add_u8(a: u8, b: u8, carry: bool) -> (u8, bool, bool) {
+    let half_add   = (a & 0x0f).wrapping_add(b & 0x0f).wrapping_add(carry as u8);
+    let half_carry = (half_add & 0xf0) != 0;
+
+    let (result1, carry1) = a.overflowing_add(b);
+    let (result2, carry2) = result1.overflowing_add(carry as u8);
+    let carry = carry1 || carry2;
+
+    (result2, half_carry, carry)
+}
+
+/// Add two numbers and the carry flag together.
+/// Returns the numeric result and the new carry flag
+pub const fn carrying_add_u16(a: u16, b: u16, carry: bool) -> (u16, bool, bool) {
+    let half_add   = (a & 0x0fff).wrapping_add(b & 0x0fff).wrapping_add(carry as u16);
+    let half_carry = (half_add & 0xf000) != 0;
+
+    let (result1, carry1) = a.overflowing_add(b);
+    let (result2, carry2) = result1.overflowing_add(carry as u16);
+    let carry = carry1 || carry2;
+
+    (result2, half_carry, carry)
+}
+
+
+/// Subtracts two numbers and the carry flag.
+/// Returns the numeric result and the new carry flag
+pub const fn carrying_sub_u8(a: u8, b: u8, carry: bool) -> (u8, bool, bool) {
+    let half_sub   = (a & 0x0f).wrapping_sub(b & 0x0f).wrapping_sub(carry as u8);
+    let half_carry = (half_sub & 0xf0) != 0;
+
+    let (result1, carry1) = a.overflowing_sub(b);
+    let (result2, carry2) = result1.overflowing_sub(carry as u8);
+    let carry = carry1 || carry2;
+
+    (result2, half_carry, carry)
+}
+
+/// Subtracts two numbers and the carry flag.
+/// Returns the numeric result and the new carry flag
+pub const fn carrying_sub_u16(a: u16, b: u16, carry: bool) -> (u16, bool, bool) {
+    let half_sub   = (a & 0x0fff).wrapping_sub(b & 0x0fff).wrapping_sub(carry as u16);
+    let half_carry = (half_sub & 0xf000) != 0;
+
+    let (result1, carry1) = a.overflowing_sub(b);
+    let (result2, carry2) = result1.overflowing_sub(carry as u16);
+    let carry = carry1 || carry2;
+
+    (result2, !half_carry, !carry)
+}
+
+
+/// Adds a signed value to an unsigned value.
+pub const fn signed_overflow_add_u8(a: u8, b: i8) -> (u8, bool, bool) {
+    if b >= 0 {
+        carrying_add_u8(a, b as u8, false)
+    }
+    else {
+        let (result, half_carry, carry) = carrying_sub_u8(a, b.abs() as u8, false);
+        (result, !half_carry, !carry)
+    }
+}
+
+/// Adds a signed value to an unsigned value.
+pub const fn signed_overflow_add_u16(a: u16, b: i16) -> (u16, bool, bool) {
+    if b >= 0 {
+        carrying_add_u16(a, b as u16, false)
+    }
+    else {
+        let (result, half_carry, carry) = carrying_sub_u16(a, b.abs() as u16, false);
+        (result, !half_carry, !carry)
+    }
+}

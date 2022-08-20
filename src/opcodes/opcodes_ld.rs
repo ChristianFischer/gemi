@@ -18,6 +18,7 @@
 use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryWrite};
+use crate::utils::{signed_overflow_add_u16, signed_overflow_add_u8};
 
 /// Loads the content of a 8bit register into another one.
 fn ld_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
@@ -524,17 +525,17 @@ pub fn ldh_a_cptr(gb: &mut GameBoy) {
 pub fn ld_hl_sp_i8(gb: &mut GameBoy) {
     let offset = gb.cpu.fetch_i8();
     let sp     = gb.cpu.get_stack_pointer();
-    let value  = if offset >= 0 {
-        sp + (offset as u16)
-    }
-    else {
-        sp - (-offset as u16)
-    };
+    let (sp_new, _, _) = signed_overflow_add_u16(sp, offset as i16);
 
-    gb.cpu.set_flags_by_result(sp as u32, value as u32);
-    gb.cpu.set_flag(CpuFlag::Zero,     false);
-    gb.cpu.set_flag(CpuFlag::Negative, false);
-    gb.cpu.set_r16(RegisterR16::HL, value);
+    let carry_bits = sp ^ sp_new ^ (offset as u16);
+    let half_carry = (carry_bits & 0x0010) != 0;
+    let carry      = (carry_bits & 0x0100) != 0;
+
+    gb.cpu.set_flag(CpuFlag::Zero,      false);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
+    gb.cpu.set_r16(RegisterR16::HL, sp_new);
 }
 
 pub fn ld_sp_hl(gb: &mut GameBoy) {

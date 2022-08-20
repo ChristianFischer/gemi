@@ -17,6 +17,7 @@
 
 use crate::cpu::CpuFlag;
 use crate::gameboy::GameBoy;
+use crate::utils::{signed_overflow_add_u16, signed_overflow_add_u8};
 
 pub fn nop(gb: &mut GameBoy) {}
 
@@ -37,16 +38,15 @@ pub fn enable_interrupts(gb: &mut GameBoy) {
 pub fn add_sp_i8(gb: &mut GameBoy) {
     let offset = gb.cpu.fetch_i8();
     let sp     = gb.cpu.get_stack_pointer();
+    let (sp_new, _, _) = signed_overflow_add_u16(sp, offset as i16);
 
-    let sp_new = if offset >= 0 {
-        sp + (offset as u16)
-    }
-    else {
-        sp - (-offset as u16)
-    };
+    let carry_bits = sp ^ sp_new ^ (offset as u16);
+    let half_carry = (carry_bits & 0x0010) != 0;
+    let carry      = (carry_bits & 0x0100) != 0;
 
-    gb.cpu.set_flags_by_result(sp as u32, sp_new as u32);
-    gb.cpu.set_flag(CpuFlag::Zero,     false);
-    gb.cpu.set_flag(CpuFlag::Negative, false);
+    gb.cpu.set_flag(CpuFlag::Zero,      false);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
     gb.cpu.set_stack_pointer(sp_new);
 }

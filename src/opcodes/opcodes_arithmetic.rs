@@ -18,6 +18,7 @@
 use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryWrite};
+use crate::utils::{carrying_add_u16, carrying_add_u8, carrying_sub_u8};
 
 
 ////////////////////////////////////////////////
@@ -41,28 +42,18 @@ enum NullCheck {
 
 /// Increments a 8bit value.
 fn increment_u8v(gb: &mut GameBoy, value: u8) -> u8 {
-    let result = if value == 0xff {
-        0x00
-    }
-    else {
-        value + 1
-    };
+    let result = value.wrapping_add(1);
 
-    gb.cpu.set_flags_by_result(value as u32, result as u32);
-    gb.cpu.set_flag(CpuFlag::Negative, false);
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, (result & 0x0f) == 0);
 
     result
 }
 
 /// Increments a 16bit value.
-fn increment_u16v(gb: &mut GameBoy, value: u16) -> u16 {
-    let result = if value == 0xffff {
-        0x00
-    }
-    else {
-        value + 1
-    };
-
+fn increment_u16v(_gb: &mut GameBoy, value: u16) -> u16 {
+    let result = value.wrapping_add(1);
     result
 }
 
@@ -138,7 +129,7 @@ pub fn inc_hlptr(gb: &mut GameBoy) {
 
 pub fn inc_sp(gb: &mut GameBoy) {
     let sp_old = gb.cpu.get_stack_pointer();
-    let sp_new = sp_old + 1;
+    let sp_new = sp_old.wrapping_add(1);
     gb.cpu.set_stack_pointer(sp_new);
 }
 
@@ -148,28 +139,18 @@ pub fn inc_sp(gb: &mut GameBoy) {
 
 /// Decrements a 8bit value.
 fn decrement_u8v(gb: &mut GameBoy, value: u8) -> u8 {
-    let result = if value == 0x00 {
-        0xff
-    }
-    else {
-        value - 1
-    };
+    let result = value.wrapping_sub(1);
 
-    gb.cpu.set_flags_by_result(value as u32, result as u32);
-    gb.cpu.set_flag(CpuFlag::Negative, true);
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
+    gb.cpu.set_flag(CpuFlag::Negative,  true);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, (result & 0x0f) == 0x0f);
 
     result
 }
 
 /// Decrements a 16bit value.
-fn decrement_u16v(gb: &mut GameBoy, value: u16) -> u16 {
-    let result = if value == 0x00 {
-        0xff
-    }
-    else {
-        value - 1
-    };
-
+fn decrement_u16v(_gb: &mut GameBoy, value: u16) -> u16 {
+    let result = value.wrapping_sub(1);
     result
 }
 
@@ -245,7 +226,7 @@ pub fn dec_hlptr(gb: &mut GameBoy) {
 
 pub fn dec_sp(gb: &mut GameBoy) {
     let sp_old = gb.cpu.get_stack_pointer();
-    let sp_new = sp_old + 1;
+    let sp_new = sp_old.wrapping_sub(1);
     gb.cpu.set_stack_pointer(sp_new);
 }
 
@@ -256,10 +237,14 @@ pub fn dec_sp(gb: &mut GameBoy) {
 /// Adds two values and stores it into a 8bit register.
 /// r8 <- r8 + value + (carry flag, if add_carry)
 fn add_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8, add_carry: bool) {
-    let carry      = add_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
-    let old_value = gb.cpu.get_r8(r8) as u32;
-    let result    = old_value + (value as u32) + (carry as u32);
-    gb.cpu.set_flags_by_result(old_value, result);
+    let current_carry = add_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
+    let current_value = gb.cpu.get_r8(r8);
+    let (result, half_carry, carry) = carrying_add_u8(current_value, value, current_carry);
+
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
     gb.cpu.set_r8(r8, result as u8);
 }
 
@@ -288,9 +273,12 @@ fn add_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16, add_ca
 /// Adds two values and stores it into a 16bit register.
 /// r16 <- r16 + value
 fn add_r16_u16v(gb: &mut GameBoy, r16: RegisterR16, value: u16) {
-    let old_value = gb.cpu.get_r16(r16) as u32;
-    let result    = old_value + (value as u32);
-    gb.cpu.set_flags_by_result(old_value, result);
+    let current_value = gb.cpu.get_r16(r16);
+    let (result, half_carry, carry) = carrying_add_u16(current_value, value, false);
+
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
     gb.cpu.set_r16(r16, result as u16);
 }
 
@@ -397,10 +385,14 @@ pub fn add_hl_sp(gb: &mut GameBoy) {
 /// Subtracts a value from another one and stores the result into a 8bit register.
 /// r8 <- r8 - value - (carry flag, if sub_carry)
 fn sub_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8, sub_carry: bool) {
-    let carry      = sub_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
-    let old_value = gb.cpu.get_r8(r8) as u32;
-    let result    = ((old_value as i32) - (value as i32) - (carry as i32)) as u32;
-    gb.cpu.set_flags_by_result(old_value, result);
+    let current_carry = sub_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
+    let current_value = gb.cpu.get_r8(r8);
+    let (result, half_carry, carry) = carrying_sub_u8(current_value, value, current_carry);
+
+    gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
+    gb.cpu.set_flag(CpuFlag::Negative,  true);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
     gb.cpu.set_r8(r8, result as u8);
 }
 
@@ -525,8 +517,10 @@ fn shift_left_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullCh
         NullCheck::ClearFlag => false,
     };
 
-    gb.cpu.set_flag(CpuFlag::Carry, left_bit != 0);
-    gb.cpu.set_flag(CpuFlag::Zero,  null_bit);
+    gb.cpu.set_flag(CpuFlag::Zero,      null_bit);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, false);
+    gb.cpu.set_flag(CpuFlag::Carry,     left_bit != 0);
 
     result
 }
@@ -710,7 +704,7 @@ fn shift_right_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullC
         ShiftOp::ShiftLogical       => (value >> 1) | 0x0000,
         ShiftOp::ShiftArithmetic    => (value >> 1) | (left_bit << 7),
         ShiftOp::Rotate             => (value >> 1) | (right_bit << 7),
-        ShiftOp::RotateThroughCarry => (value >> 1) | carry,
+        ShiftOp::RotateThroughCarry => (value >> 1) | (carry << 7),
     });
 
     let null_bit = match nullcheck {
@@ -718,8 +712,10 @@ fn shift_right_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullC
         NullCheck::ClearFlag => false,
     };
 
-    gb.cpu.set_flag(CpuFlag::Carry, right_bit != 0);
-    gb.cpu.set_flag(CpuFlag::Zero,  null_bit);
+    gb.cpu.set_flag(CpuFlag::Zero,      null_bit);
+    gb.cpu.set_flag(CpuFlag::Negative,  false);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, false);
+    gb.cpu.set_flag(CpuFlag::Carry,     right_bit != 0);
 
     result
 }
@@ -1857,9 +1853,12 @@ pub fn check_bit_7_hlptr(gb: &mut GameBoy) {
 
 /// Compares two values.
 fn cp_u8v_u8v(gb: &mut GameBoy, value1: u8, value2: u8) {
-    let result = (value1 as i32) - (value2 as i32);
-    gb.cpu.set_flags_by_result(value1 as u32, result as u32);
-    gb.cpu.set_flag(CpuFlag::Negative, true);
+    let (_, half_carry, carry) = carrying_sub_u8(value1, value2, false);
+
+    gb.cpu.set_flag(CpuFlag::Zero,      value1 == value2);
+    gb.cpu.set_flag(CpuFlag::Negative,  true);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
 }
 
 /// Compares two values.
@@ -2107,10 +2106,8 @@ fn xor_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
 
 
 fn xor_r8_u8(gb: &mut GameBoy, r8: RegisterR8) {
-    let value1 = gb.cpu.get_r8(r8);
-    let value2 = gb.cpu.fetch_u8();
-    let result = value1 ^ value2;
-    gb.cpu.set_r8(r8, result);
+    let value = gb.cpu.fetch_u8();
+    xor_r8_u8v(gb, r8, value);
 }
 
 
@@ -2164,6 +2161,8 @@ pub fn cpl_a(gb: &mut GameBoy) {
     let value  = gb.cpu.get_r8(RegisterR8::A);
     let result = !value;
     gb.cpu.set_r8(RegisterR8::A, result);
+    gb.cpu.set_flag(CpuFlag::Negative,  true);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, true);
 }
 
 /// Set Carry flag.
