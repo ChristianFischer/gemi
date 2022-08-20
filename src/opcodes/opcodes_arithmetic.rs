@@ -2153,7 +2153,43 @@ pub fn xor_a_hlptr(gb: &mut GameBoy) {
 
 /// Convert a BCD Number.
 pub fn daa(gb: &mut GameBoy) {
-    todo!();
+    let mut a     = gb.cpu.get_r8(RegisterR8::A);
+    let mut half  = gb.cpu.is_flag_set(CpuFlag::HalfCarry);
+    let mut carry = gb.cpu.is_flag_set(CpuFlag::Carry);
+    let mut tmp_a = a as u16;
+
+    if gb.cpu.is_flag_set(CpuFlag::Negative) {
+        if half {
+            tmp_a = tmp_a.wrapping_sub(0x06);
+
+            if !carry {
+                tmp_a &= 0xff;
+            }
+        }
+
+        if carry {
+            tmp_a = tmp_a.wrapping_sub(0x60);
+        }
+    }
+    else {
+        if half || ((tmp_a & 0x0f) >= 0x0a) {
+            tmp_a = tmp_a.wrapping_add(0x06);
+        }
+
+        if carry || (tmp_a >= 0xa0) {
+            tmp_a = tmp_a.wrapping_add(0x60);
+        }
+    }
+
+    a      = (tmp_a & 0x00ff) as u8;
+    carry |= (tmp_a & 0x0100) != 0;
+    half   = false;
+
+    gb.cpu.set_flag(CpuFlag::Zero,      a == 0);
+    gb.cpu.set_flag(CpuFlag::HalfCarry, half);
+    gb.cpu.set_flag(CpuFlag::Carry,     carry);
+
+    gb.cpu.set_r8(RegisterR8::A, a);
 }
 
 /// Complement

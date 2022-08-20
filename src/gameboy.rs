@@ -17,7 +17,7 @@
 
 use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
-use crate::cpu::Cpu;
+use crate::cpu::{Cpu, RegisterR8};
 use crate::memory::Memory;
 use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
 use crate::window::Window;
@@ -59,7 +59,26 @@ impl GameBoy {
 
     /// Boot the device, initializing the Boot ROM program.
     pub fn initialize(&mut self) {
-        self.cpu.set_instruction_pointer(0x0000);
+        if self.mem.has_boot_rom() {
+            self.cpu.set_instruction_pointer(0x0000);
+        }
+        else {
+            self.setup_dmg();
+        }
+    }
+
+    /// setup values like expected after the boot rom was executed on the original GameBoy.
+    fn setup_dmg(&mut self) {
+        self.cpu.set_r8(RegisterR8::A, 0x01);
+        self.cpu.set_r8(RegisterR8::F, 0xB0);
+        self.cpu.set_r8(RegisterR8::B, 0x00);
+        self.cpu.set_r8(RegisterR8::C, 0x13);
+        self.cpu.set_r8(RegisterR8::D, 0x00);
+        self.cpu.set_r8(RegisterR8::E, 0xd8);
+        self.cpu.set_r8(RegisterR8::H, 0x01);
+        self.cpu.set_r8(RegisterR8::L, 0x4d);
+        self.cpu.set_instruction_pointer(0x0100);
+        self.cpu.set_stack_pointer(0xfffe);
     }
 
     /// Runs the program located on a cartridge, starting on the
