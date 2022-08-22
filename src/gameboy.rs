@@ -101,6 +101,9 @@ impl GameBoy {
             // take the number of cycles consumed by the last operation
             let cycles = instruction.opcode.cycles;
 
+            // let the CPU handle their state
+            self.cpu.update(cycles);
+
             // let the PPU run for the same amount of cycles
             let ppu_state = self.ppu.update(cycles);
 

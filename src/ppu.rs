@@ -15,24 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::memory::{MemoryRead, MemoryReadWriteHandle, MemoryWrite};
-use crate::utils::change_bit;
+use crate::cpu::Interrupt;
+use crate::memory::*;
+use crate::utils::{change_bit, get_bit};
 
 pub const SCREEN_W: u32 = 160;
 pub const SCREEN_H: u32 = 144;
 
 pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
-
-pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
-pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
-pub const MEMORY_LOCATION_LCD_CONTROL:              u16 = 0xff40;
-pub const MEMORY_LOCATION_LCD_STATUS:               u16 = 0xff41;
-pub const MEMORY_LOCATION_SCY:                      u16 = 0xff42;
-pub const MEMORY_LOCATION_SCX:                      u16 = 0xff43;
-pub const MEMORY_LOCATION_LY:                       u16 = 0xff44;
-pub const MEMORY_LOCATION_LYC:                      u16 = 0xff45;
-pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
-pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
 
 pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        u8 = 0;
 pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           u8 = 1;
@@ -262,11 +252,36 @@ impl Ppu {
     fn enter_mode(&mut self, mode: Mode) {
         self.mode = mode;
 
-        let mut lcdc = self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS);
-        lcdc = lcdc & 0b_1111_1100;
-        lcdc = lcdc | (self.mode as u8);
+        let mut lcd_stat = self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS);
+        lcd_stat = lcd_stat & 0b_1111_1100;
+        lcd_stat = lcd_stat | (self.mode as u8);
 
-        self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcdc);
+        self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcd_stat);
+
+        // request interrupt when entering VBlank
+        match mode {
+            Mode::HBlank => {
+                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_MODE_0) {
+                    self.mem.request_interrupt(Interrupt::LcdStat);
+                }
+            }
+
+            Mode::VBlank => {
+                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_MODE_1) {
+                    self.mem.request_interrupt(Interrupt::LcdStat);
+                }
+
+                self.mem.request_interrupt(Interrupt::VBlank)
+            },
+
+            Mode::OamScan => {
+                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_MODE_2) {
+                    self.mem.request_interrupt(Interrupt::LcdStat);
+                }
+            }
+
+            _ => { }
+        }
     }
 
 
@@ -290,9 +305,14 @@ impl Ppu {
         {
             let lyc = self.mem.read_u8(MEMORY_LOCATION_LYC);
             let coincidence = self.ly == lyc;
-            let mut lcdc = self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS);
-            lcdc = change_bit(lcdc, LCD_STATUS_BIT_FLAG_COINCIDENCE, coincidence);
-            self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcdc);
+            let mut lcd_stat = self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS);
+            lcd_stat = change_bit(lcd_stat, LCD_STATUS_BIT_FLAG_COINCIDENCE, coincidence);
+            self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcd_stat);
+
+            // fire interrupt, if enabled
+            if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY) {
+                self.mem.request_interrupt(Interrupt::LcdStat);
+            }
         }
 
         // enter vblank when beyond the last scanline

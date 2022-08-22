@@ -37,9 +37,7 @@ fn jr_if_i8(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address.
 fn call_addr(gb: &mut GameBoy, address: u16) {
-    let instruction_pointer = gb.cpu.get_instruction_pointer();
-    gb.cpu.push_u16(instruction_pointer);
-    gb.cpu.set_instruction_pointer(address);
+    gb.cpu.call_addr(address);
 }
 
 /// Calls a subroutine by storing the current instruction pointer on the stack
@@ -67,8 +65,7 @@ fn call_u16_if(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
 
 /// Returns from a subroutine by taking the previous instruction pointer address from the stack.
 fn ret_from_call(gb: &mut GameBoy) {
-    let instruction_pointer = gb.cpu.pop_u16();
-    gb.cpu.set_instruction_pointer(instruction_pointer);
+    gb.cpu.ret_from_call();
 }
 
 /// Returns from a subroutine by taking the previous instruction pointer address from the stack,

@@ -17,6 +17,7 @@
 
 use crate::cpu::CpuFlag;
 use crate::gameboy::GameBoy;
+use crate::opcodes::OPCODE_TABLE;
 use crate::utils::{signed_overflow_add_u16, signed_overflow_add_u8};
 
 pub fn nop(gb: &mut GameBoy) {}
@@ -27,11 +28,11 @@ pub fn stop(gb: &mut GameBoy) {
 pub fn halt(gb: &mut GameBoy) {
 }
 
-pub fn disable_interrupts(gb: &mut GameBoy) {
-    gb.cpu.enable_interrupts();
+pub fn enable_interrupts(gb: &mut GameBoy) {
+    gb.cpu.enable_interrupts_in(OPCODE_TABLE[0xfb].cycles + 1);
 }
 
-pub fn enable_interrupts(gb: &mut GameBoy) {
+pub fn disable_interrupts(gb: &mut GameBoy) {
     gb.cpu.disable_interrupts();
 }
 

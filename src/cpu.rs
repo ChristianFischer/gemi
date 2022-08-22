@@ -17,7 +17,7 @@
 
 use std::fmt::{Display, Formatter};
 use crate::opcode::{Instruction, OpCode};
-use crate::memory::{MemoryRead, MemoryReadWriteHandle, MemoryWrite};
+use crate::memory::{MEMORY_LOCATION_INTERRUPTS_ENABLED, MEMORY_LOCATION_INTERRUPTS_PENDING, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
@@ -51,8 +51,31 @@ pub enum CpuFlag {
     Carry,
 }
 
+/// An enumeration of all interrupts available.
+pub enum Interrupt {
+    VBlank,
+    LcdStat,
+    Timer,
+    Serial,
+    Input,
+}
+
+/// State of the interrupts enabled flag.
+pub enum ImeState {
+    /// Interrupts are globally disabled.
+    Disabled,
+
+    /// Interrupts are globally enabled.
+    Enabled,
+
+    /// Interrupts are disabled, but will be enabled after some CPU cycles.
+    EnabledInCycles(u32),
+}
+
 /// An object representing the gameboy's CPU
 pub struct Cpu {
+    clock: i32,
+
     /// Handle to the device memory.
     mem: MemoryReadWriteHandle,
 
@@ -66,8 +89,8 @@ pub struct Cpu {
     /// Offset where to read the next value from the stack.
     stack_pointer: u16,
 
-    /// Sets interrupts to be enabled.
-    interrupts_enabled: bool,
+    /// The state whether interrupts are enabled or not.
+    ime: ImeState,
 }
 
 
@@ -116,10 +139,48 @@ impl CpuFlag {
     }
 }
 
+
+impl Interrupt {
+    /// An array containing all possible interrupts for easier iteration.
+    const AllInterrupts : [Interrupt; 5] = [
+        Interrupt::VBlank,
+        Interrupt::LcdStat,
+        Interrupt::Timer,
+        Interrupt::Serial,
+        Interrupt::Input
+    ];
+
+    /// Get the bit inside the interrupts register which stores
+    /// the interrupt to be enabled or to be fired.
+    pub fn bit(&self) -> u8 {
+        match self {
+            Interrupt::VBlank   => 0,
+            Interrupt::LcdStat  => 1,
+            Interrupt::Timer    => 2,
+            Interrupt::Serial   => 3,
+            Interrupt::Input    => 4,
+        }
+    }
+
+    /// Get the address this interrupt will jump to when fired.
+    pub fn address(&self) -> u16 {
+        match self {
+            Interrupt::VBlank   => 0x0040,
+            Interrupt::LcdStat  => 0x0048,
+            Interrupt::Timer    => 0x0050,
+            Interrupt::Serial   => 0x0058,
+            Interrupt::Input    => 0x0060,
+        }
+    }
+}
+
+
 impl Cpu {
     /// Creates an empty CPU object.
     pub fn new(mem: MemoryReadWriteHandle) -> Cpu {
         Cpu {
+            clock: 0,
+
             mem,
 
             registers: [0; 8],
@@ -127,18 +188,95 @@ impl Cpu {
             instruction_pointer: 0x0100,
             stack_pointer: 0x0000,
 
-            interrupts_enabled: false,
+            ime: ImeState::Disabled,
         }
+    }
+
+    /// Let the CPU process their data.
+    /// This function takes the amount of ticks to be processed.
+    pub fn update(&mut self, cycles: u32) {
+        self.clock += cycles as i32;
+
+        while self.clock > 0 {
+            let cycles_to_process = 1;
+            let interrupt_fired = self.handle_interrupts(cycles_to_process);
+
+            if let None = interrupt_fired {
+            }
+
+            self.clock -= cycles_to_process as i32;
+        }
+    }
+
+    /// Handles any pending interrupts.
+    fn handle_interrupts(&mut self, cycles: u32) -> Option<Interrupt> {
+        match self.ime {
+            ImeState::Disabled => { },
+
+            ImeState::Enabled => {
+                let interrupts_pending = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_PENDING);
+                let interrupts_enabled = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_ENABLED);
+                let interrupts_to_fire = interrupts_pending & interrupts_enabled;
+
+                for interrupt in Interrupt::AllInterrupts {
+                    if get_bit(interrupts_to_fire, interrupt.bit()) {
+                        // disable further interrupts when a interrupt is being handled
+                        self.ime = ImeState::Disabled;
+
+                        // clear interrupt bit
+                        self.mem.clear_bit(MEMORY_LOCATION_INTERRUPTS_PENDING, interrupt.bit());
+
+                        // call the address of the interrupt
+                        self.call_addr(interrupt.address());
+
+                        // stop handling other interrupts
+                        return Some(interrupt);
+                    }
+                }
+            },
+
+            ImeState::EnabledInCycles(timeout) => {
+                let new_timeout = timeout.saturating_sub(cycles);
+
+                if new_timeout == 0 {
+                    self.ime = ImeState::Enabled;
+                }
+                else {
+                    self.ime = ImeState::EnabledInCycles(new_timeout);
+                }
+            }
+        }
+
+        None
     }
 
     /// Enables interrupts.
     pub fn enable_interrupts(&mut self) {
-        self.interrupts_enabled = true;
+        self.ime = ImeState::Enabled;
+    }
+
+    /// Enables interrupts after a number of cycles passed.
+    pub fn enable_interrupts_in(&mut self, cycles: u32) {
+        match self.ime {
+            ImeState::Disabled | ImeState::EnabledInCycles(_) => {
+                self.ime = ImeState::EnabledInCycles(cycles);
+            }
+
+            _ => { }
+        }
     }
 
     /// Disables interrupts.
     pub fn disable_interrupts(&mut self) {
-        self.interrupts_enabled = false;
+        self.ime = ImeState::Disabled;
+    }
+
+    /// Checks if interrupts are globally enabled.
+    pub fn is_interrupts_enabled(&self) -> bool {
+        match self.ime {
+            ImeState::Enabled => true,
+            _ => false,
+        }
     }
 
     /// Fetches the next opcode on the current location of the instruction pointer.
@@ -311,6 +449,22 @@ impl Cpu {
     /// Moves the instruction pointer to a fixed location.
     pub fn jump_to(&mut self, address: u16) {
         self.set_instruction_pointer(address);
+    }
+
+    /// Performs a call to a given address.
+    /// Saves the current instruction pointer on the stack and then moves
+    /// the instruction pointer to the new address.
+    pub fn call_addr(&mut self, address: u16) {
+        let instruction_pointer = self.get_instruction_pointer();
+        self.push_u16(instruction_pointer);
+        self.set_instruction_pointer(address);
+    }
+
+    /// Returns from a previous call.
+    /// Reads the value of the instruction pointer from the stack.
+    pub fn ret_from_call(&mut self) {
+        let instruction_pointer = self.pop_u16();
+        self.set_instruction_pointer(instruction_pointer);
     }
 
     /// Get the current address of the instruction pointer.

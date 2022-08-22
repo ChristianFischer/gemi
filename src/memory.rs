@@ -19,7 +19,22 @@ use std::cell::{Ref, RefCell, RefMut};
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::Cartridge;
-use crate::utils::{to_u16, to_u8};
+use crate::cpu::Interrupt;
+use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
+
+pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
+pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
+pub const MEMORY_LOCATION_LCD_CONTROL:              u16 = 0xff40;
+pub const MEMORY_LOCATION_LCD_STATUS:               u16 = 0xff41;
+pub const MEMORY_LOCATION_SCY:                      u16 = 0xff42;
+pub const MEMORY_LOCATION_SCX:                      u16 = 0xff43;
+pub const MEMORY_LOCATION_LY:                       u16 = 0xff44;
+pub const MEMORY_LOCATION_LYC:                      u16 = 0xff45;
+pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
+pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
+pub const MEMORY_LOCATION_INTERRUPTS_PENDING:       u16 = 0xff0f;
+pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
+
 
 /// The memory object as the main owner of the emulator's memory.
 /// This object can be used to create additional handles which
@@ -83,10 +98,16 @@ pub trait MemoryRead {
     fn read_i16(&self, address: u16) -> i16 {
         self.read_u16(address) as i16
     }
+
+    /// Get the n'th bit of a byte on the given address.
+    fn get_bit(&self, address: u16, bit: u8) -> bool {
+        let byte = self.read_u8(address);
+        get_bit(byte, bit)
+    }
 }
 
 /// A trait for memory objects allowing write access to the memory data.
-pub trait MemoryWrite {
+pub trait MemoryWrite : MemoryRead {
     /// Write a single byte into the device memory.
     fn write_byte(&mut self, address: u16, value: u8);
 
@@ -110,6 +131,30 @@ pub trait MemoryWrite {
     /// Writes an i16 value into the given address in the device memory.
     fn write_i16(&mut self, address: u16, value: i16) {
         self.write_u16(address, value as u16);
+    }
+
+    /// Set the n'th bit of a byte on the given address.
+    fn change_bit(&mut self, address: u16, bit: u8, value: bool) {
+        if value {
+            self.set_bit(address, bit);
+        }
+        else {
+            self.clear_bit(address, bit);
+        }
+    }
+
+    /// Set the n'th bit of a byte on the given address to 0.
+    fn clear_bit(&mut self, address: u16, bit: u8) {
+        let byte = self.read_u8(address);
+        let result = clear_bit(byte, bit);
+        self.write_byte(address, result);
+    }
+
+    /// Set the n'th bit of a byte on the given address to 1.
+    fn set_bit(&mut self, address: u16, bit: u8) {
+        let byte = self.read_u8(address);
+        let result = set_bit(byte, bit);
+        self.write_byte(address, result);
     }
 }
 
@@ -200,6 +245,14 @@ impl MemoryReadWriteHandle {
         MemoryReadOnlyHandle {
             internal: self.internal.clone()
         }
+    }
+
+    /// requests an interrupt to be fired.
+    /// This will set the according bit in the memory. If Interrupts
+    /// are enabled for the CPU, the instruction pointer will jump
+    /// to the according interrupt address, otherwise it will be ignored.
+    pub fn request_interrupt(&mut self, interrupt: Interrupt) {
+        self.set_bit(MEMORY_LOCATION_INTERRUPTS_PENDING, interrupt.bit());
     }
 }
 
