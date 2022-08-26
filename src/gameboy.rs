@@ -20,6 +20,7 @@ use crate::cartridge::Cartridge;
 use crate::cpu::{Cpu, RegisterR8};
 use crate::memory::Memory;
 use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
+use crate::timer::Timer;
 use crate::window::Window;
 
 /// The GameBoy object providing access to all it's emulated components.
@@ -27,6 +28,7 @@ pub struct GameBoy {
     pub cpu: Cpu,
     pub ppu: Ppu,
     pub mem: Memory,
+    pub timer: Timer,
     pub window: Window,
 }
 
@@ -41,6 +43,7 @@ impl GameBoy {
             GameBoy {
                 cpu: Cpu::new(mem.create_read_write_handle()),
                 ppu: Ppu::new(mem.create_read_write_handle()),
+                timer: Timer::new(mem.create_read_write_handle()),
                 mem,
                 window,
             }
@@ -103,6 +106,7 @@ impl GameBoy {
 
             // let the CPU handle their state
             self.cpu.update(cycles);
+            self.timer.update(cycles);
 
             // let the PPU run for the same amount of cycles
             let ppu_state = self.ppu.update(cycles);

@@ -24,6 +24,10 @@ use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
 pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
 pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
+pub const MEMORY_LOCATION_REGISTER_DIV:             u16 = 0xff04;
+pub const MEMORY_LOCATION_REGISTER_TIMA:            u16 = 0xff05;
+pub const MEMORY_LOCATION_REGISTER_TMA:             u16 = 0xff06;
+pub const MEMORY_LOCATION_REGISTER_TAC:             u16 = 0xff07;
 pub const MEMORY_LOCATION_LCD_CONTROL:              u16 = 0xff40;
 pub const MEMORY_LOCATION_LCD_STATUS:               u16 = 0xff41;
 pub const MEMORY_LOCATION_SCY:                      u16 = 0xff42;

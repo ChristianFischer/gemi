@@ -23,6 +23,7 @@ mod memory;
 mod opcode;
 mod opcodes;
 mod ppu;
+mod timer;
 mod utils;
 mod window;
 
