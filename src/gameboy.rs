@@ -104,7 +104,8 @@ impl GameBoy {
             // take the number of cycles consumed by the last operation
             let cycles = instruction.opcode.cycles;
 
-            // let the CPU handle their state
+            // let other components handle their state
+            self.mem.update(cycles);
             self.cpu.update(cycles);
             self.timer.update(cycles);
 

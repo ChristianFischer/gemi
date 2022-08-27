@@ -16,6 +16,7 @@
  */
 
 use std::cell::{Ref, RefCell, RefMut};
+use std::cmp::min;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::Cartridge;
@@ -24,6 +25,8 @@ use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
 pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
 pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
+pub const MEMORY_LOCATION_OAM_BEGIN:                u16 = 0xfe00;
+pub const MEMORY_LOCATION_OAM_END:                  u16 = 0xfe9f;
 pub const MEMORY_LOCATION_REGISTER_DIV:             u16 = 0xff04;
 pub const MEMORY_LOCATION_REGISTER_TIMA:            u16 = 0xff05;
 pub const MEMORY_LOCATION_REGISTER_TMA:             u16 = 0xff06;
@@ -34,10 +37,40 @@ pub const MEMORY_LOCATION_SCY:                      u16 = 0xff42;
 pub const MEMORY_LOCATION_SCX:                      u16 = 0xff43;
 pub const MEMORY_LOCATION_LY:                       u16 = 0xff44;
 pub const MEMORY_LOCATION_LYC:                      u16 = 0xff45;
+pub const MEMORY_LOCATION_DMA_ADDRESS:              u16 = 0xff46;
 pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
 pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
+pub const MEMORY_LOCATION_BOOT_ROM_DISABLE:         u16 = 0xff50;
 pub const MEMORY_LOCATION_INTERRUPTS_PENDING:       u16 = 0xff0f;
 pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
+
+
+/// Stores the information of an active OAM DMA transfer
+/// The DMA transfer copies data from the given address
+/// into OAM memory.
+/// In total, 160 bytes will be transferred, so it takes 
+/// 160 cycles to transfer for the transfer to be completed.
+pub struct DmaTransferInfo {
+    /// The address where to start copying the memory from.
+    start_address: u16,
+
+    /// The next byte to be copied.
+    next_byte: u16,
+}
+
+
+/// State of the OAM DMA transfer, whether it be disabled or
+/// in progress, including the time remaining.
+pub enum DmaTransferState {
+    /// No transfer is active.
+    Disabled,
+    
+    /// A transfer is currently in progress.
+    /// The attached struct stores information where 
+    /// the data should be taken from and how much data 
+    /// was already transferred.
+    Transferring(DmaTransferInfo),
+}
 
 
 /// The memory object as the main owner of the emulator's memory.
@@ -64,6 +97,7 @@ pub struct MemoryReadWriteHandle {
 /// Shared internal object for multiple Memory and MemoryReadWrite instances.
 struct MemoryInternal {
     memory:     Box<[u8; 0x10000]>,
+    dma:        DmaTransferState,
     boot_rom:   Option<BootRom>,
     cartridge:  Option<Cartridge>,
 }
@@ -170,12 +204,21 @@ impl Memory {
             internal: MemoryInternalRef::new(
                 MemoryInternal {
                     memory:     Box::new([0; 0x10000]),
+                    dma:        DmaTransferState::Disabled,
                     boot_rom:   None,
                     cartridge:  None,
                 }
             )
         }
     }
+
+    /// Let the memory controller handle it's tasks.
+    /// 'cycles' gives the number of ticks passed since 
+    /// the last call.
+    pub fn update(&mut self, cycles: u32) {
+        self.internal.get_mut().handle_dma_transfer(cycles);
+    }
+
 
     /// Creates a MemoryReadOnlyHandle from this Memory object.
     /// This will be used to provide read/write access to the device memory.
@@ -340,11 +383,21 @@ impl MemoryInternal {
         self.write_internal_memory(address, value);
 
         match address {
-            0xff50 => {
+            MEMORY_LOCATION_DMA_ADDRESS => {
+                let start_address = (value as u16) << 8;
+
+                self.dma = DmaTransferState::Transferring(DmaTransferInfo {
+                    start_address,
+                    next_byte: 0,
+                });
+            },
+
+            MEMORY_LOCATION_BOOT_ROM_DISABLE => {
                 if (value & 0x01) != 0 {
                     self.boot_rom = None;
                 }
             },
+
             _ => { }
         }
     }
@@ -352,5 +405,36 @@ impl MemoryInternal {
     /// Writes data into the internal memory.
     fn write_internal_memory(&mut self, address: u16, value: u8) {
         self.memory[address as usize] = value;
+    }
+
+    /// Handles an OAM DMA transfer, if any active.
+    fn handle_dma_transfer(&mut self, cycles: u32) {
+        match self.dma {
+            DmaTransferState::Disabled => {}
+
+            DmaTransferState::Transferring(ref transfer) => {
+                let oam_size       = MEMORY_LOCATION_OAM_END - MEMORY_LOCATION_OAM_BEGIN + 1;
+                let transfer_begin = transfer.next_byte;
+                let transfer_end   = min(transfer_begin.saturating_add(cycles as u16), oam_size);
+                
+                // Copy the amount of data the memory controller was able to handle  
+                for b in transfer_begin .. transfer_end {
+                    let src = transfer.start_address.saturating_add(b);
+                    let dst = MEMORY_LOCATION_OAM_BEGIN.saturating_add(b);
+                    self.memory[dst as usize] = self.memory[src as usize];
+                }
+
+                // store the current state or set the transfer state to 'Disabled'
+                if transfer_end == oam_size {
+                    self.dma = DmaTransferState::Disabled;
+                }
+                else {
+                    self.dma = DmaTransferState::Transferring(DmaTransferInfo {
+                        start_address: transfer.start_address,
+                        next_byte:     transfer_end,
+                    });
+                }
+            }
+        }
     }
 }

@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter};
 use crate::cpu::Interrupt;
 use crate::memory::*;
 use crate::utils::{change_bit, get_bit};
@@ -63,6 +64,37 @@ pub enum FrameState {
 }
 
 
+/// Stores the data of a single sprite entry, how
+/// it's stored in the OAM memory.
+#[derive(Copy, Clone)]
+pub struct Sprite {
+    /// The sprites position on Y axis.
+    pos_y: u8,
+
+    /// The sprites position on X axis.
+    pos_x: u8,
+
+    /// The tile number containing the sprites image data to be displayed.
+    tile: u8,
+
+    /// Flags to control the sprites behaviour.
+    flags: u8,
+}
+
+
+/// An object storing data of any scanline to be processed by the PPU.
+pub struct ScanlineData {
+    /// The line number stored in this object.
+    line: u8,
+
+    /// Stores the sprites to be displayed within the current scanline.
+    sprites: [Sprite; 10],
+
+    /// The number of sprites found.
+    sprites_found: u8,
+}
+
+
 /// An object representing the gameboy's picture processing unit.
 pub struct Ppu {
     clock: i32,
@@ -79,6 +111,9 @@ pub struct Ppu {
 
     /// The number of cycles being consumed for the current scanline.
     current_line_cycles: i32,
+
+    /// The cached data of the currently processed scanline.
+    current_scanline: ScanlineData,
 
     /// The data buffer to store the actual viewport content presented to the display.
     lcd_buffer: LcdBuffer,
@@ -124,6 +159,76 @@ impl LcdBuffer {
 }
 
 
+impl Sprite {
+    /// Creates an empty sprite with all values zero.
+    pub fn empty() -> Sprite {
+        Sprite {
+            pos_x: 0,
+            pos_y: 0,
+            tile:  0,
+            flags: 0,
+        }
+    }
+
+    /// Reads sprite data from it's OAM entry.
+    pub fn from_oam(mem: &dyn MemoryRead, index: u8) -> Sprite {
+        let address = MEMORY_LOCATION_OAM_BEGIN + ((index as u16) * 4);
+        Self::from_address(mem, address)
+    }
+
+    /// Reads sprite data from any memory address.
+    pub fn from_address(mem: &dyn MemoryRead, address: u16) -> Sprite {
+        Sprite {
+            pos_y: mem.read_u8(address + 0),
+            pos_x: mem.read_u8(address + 1),
+            tile:  mem.read_u8(address + 2),
+            flags: mem.read_u8(address + 3),
+        }
+    }
+
+    /// Checks whether the sprite is mirrored on X axis.
+    pub fn is_flip_x(&self) -> bool {
+        get_bit(self.flags, 5)
+    }
+
+    /// Checks whether the sprite is mirrored on Y axis.
+    pub fn is_flip_y(&self) -> bool {
+        get_bit(self.flags, 6)
+    }
+
+    /// Checks whether the sprite should always be drawn above background.
+    pub fn is_always_above_background(&self) -> bool {
+        get_bit(self.flags, 7)
+    }
+}
+
+
+impl Display for Sprite {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "tile #{} @ {}:{} flipX={} flipY={}",
+            self.tile,
+            self.pos_x as i32 - 8,
+            self.pos_y as i32 - 16,
+            self.is_flip_x(),
+            self.is_flip_y()
+        )
+    }
+}
+
+
+impl ScanlineData {
+    pub fn new() -> ScanlineData {
+        ScanlineData {
+            line: 0,
+            sprites: [Sprite::empty(); 10],
+            sprites_found: 0,
+        }
+    }
+}
+
+
 impl Ppu {
     /// Creates a new PPU object.
     pub fn new(mem: MemoryReadWriteHandle) -> Ppu {
@@ -134,6 +239,7 @@ impl Ppu {
             ly: 0,
             current_line_pixel: 0,
             current_line_cycles: 0,
+            current_scanline: ScanlineData::new(),
             lcd_buffer: LcdBuffer::alloc(),
             frame_completed: false,
         }
@@ -144,10 +250,6 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    ///
-    /// This is currently a mock implementation doing nothing
-    /// than counting clock cycles and writing the current
-    /// state into memory.
     pub fn update(&mut self, cycles: u32) -> FrameState {
         self.clock += cycles as i32;
 
@@ -176,6 +278,7 @@ impl Ppu {
     fn process_oam_scan(&mut self) {
         self.clock -= 80;
 
+        self.current_scanline    = self.do_oam_scan_for_line(self.ly);
         self.current_line_pixel  = 0;
         self.current_line_cycles = 0;
 
@@ -190,16 +293,33 @@ impl Ppu {
         self.current_line_cycles += 1;
         self.clock -= 1;
 
+        let lcdc            = self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL);
+        let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
+
         let (background_x, background_y) = self.screen_to_background(
             self.current_line_pixel,
             self.ly
         );
 
         // get the current background pixel
-        let pixel = self.read_background_pixel(
+        let pixel_background = self.read_background_pixel(
             background_x,
             background_y
         );
+
+        // get the foreground pixel by reading the color of any sprite on the current
+        // position within this scanline
+        let pixel_foreground = self.read_scanline_sprite_pixel(
+            &self.current_scanline,
+            self.current_line_pixel
+        );
+
+        let pixel = if pixel_foreground != 0 && sprites_enabled {
+            pixel_foreground
+        }
+        else {
+            pixel_background
+        };
 
         // write pixel into LCD buffer
         self.lcd_buffer.set_pixel(
@@ -271,7 +391,7 @@ impl Ppu {
                     self.mem.request_interrupt(Interrupt::LcdStat);
                 }
 
-                self.mem.request_interrupt(Interrupt::VBlank)
+                self.mem.request_interrupt(Interrupt::VBlank);
             },
 
             Mode::OamScan => {
@@ -356,6 +476,81 @@ impl Ppu {
         let background_x = ((screen_x as u32 + self.get_scroll_x() as u32) & 0xff) as u8;
         let background_y = ((screen_y as u32 + self.get_scroll_y() as u32) & 0xff) as u8;
         (background_x, background_y)
+    }
+
+    /// Performs an OAM scan and stores it's result in the 'scanline' object.
+    pub fn do_oam_scan_for_line(&self, line_number: u8) -> ScanlineData {
+        let mut scanline = ScanlineData::new();
+        scanline.line = line_number;
+
+        let lcdc        = self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL);
+        let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
+        let sprite_h    = if big_sprites { 16 } else { 8 };
+
+        // sprite position 0 is not on scanline 0, but 16 pixel above the screen to
+        // allow sprites being partially outside the screen.
+        // Adjust the value here to avoid doing it for each check.
+        let ly_plus_16 = line_number + 16;
+
+        // iterate through all OAM entries
+        for oam_entry in 0..40 {
+            let sprite = Sprite::from_oam(&self.mem, oam_entry);
+
+            // take a sprite if x > 0 and intersects the current scanline
+            if
+            sprite.pos_x > 0
+                &&  ly_plus_16 >= sprite.pos_y
+                &&  ly_plus_16 < (sprite.pos_y + sprite_h)
+            {
+                scanline.sprites[scanline.sprites_found as usize] = sprite;
+                scanline.sprites_found += 1;
+
+                if scanline.sprites_found >= 10 {
+                    break;
+                }
+            }
+        }
+
+        scanline
+    }
+
+    /// Reads a pixel from the current scanline sprite data on a given x position.
+    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8) -> u8 {
+        // screen position considering the border offset of -8 / -16
+        let screen_x = x + 8;
+        let screen_y = scanline.line + 16;
+
+        let lcdc        = self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL);
+        let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
+        let sprite_h    = if big_sprites { 16 } else { 8 };
+        let sprite_w    = 8;
+
+        for sprite_index in 0..scanline.sprites_found {
+            let sprite = &(scanline.sprites[sprite_index as usize]);
+
+            if screen_x >= sprite.pos_x && x < sprite.pos_x {
+                let mut sprite_pixel_x = screen_x - sprite.pos_x;
+                let mut sprite_pixel_y = screen_y - sprite.pos_y;
+
+                if sprite.is_flip_x() {
+                    sprite_pixel_x = sprite_w - sprite_pixel_x - 1;
+                }
+
+                if sprite.is_flip_y() {
+                    sprite_pixel_y = sprite_h - sprite_pixel_y - 1;
+                }
+
+                let pixel = self.read_sprite_pixel(
+                    sprite.tile as u16,
+                    sprite_pixel_x,
+                    sprite_pixel_y
+                );
+
+                return pixel;
+            }
+        }
+
+        0
     }
 
     /// Read the pixel value of the background on a given position.
