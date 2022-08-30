@@ -64,6 +64,27 @@ pub enum FrameState {
 }
 
 
+/// A list of possible tilesets the gameboy can handle.
+#[derive(Copy, Clone)]
+pub enum TileSet {
+    /// The tileset is based on the 0x8000 address plus tile index as unsigned integer.
+    H8000,
+
+    /// The tileset is based on the 0x8800 address plus tile index as signed integer.
+    H8800,
+}
+
+/// A list of possible tilemaps the gameboy can handle.
+#[derive(Copy, Clone)]
+pub enum TileMap {
+    /// This tilemap is stored in the video memory at 0x9800 - 0x9bff
+    H9800,
+
+    /// This tilemap is stored in the video memory at 0x9c00 - 0x9fff
+    H9C00,
+}
+
+
 /// Stores the data of a single sprite entry, how
 /// it's stored in the OAM memory.
 #[derive(Copy, Clone)]
@@ -155,6 +176,46 @@ impl LcdBuffer {
     /// Get the pixel data to be displayed.
     pub fn get_pixels(&self) -> &PixelBuffer160x144 {
         &self.pixels
+    }
+}
+
+
+impl TileSet {
+    /// Selects a TileSet based on the value of a selection bit from the LCD status register.
+    pub fn by_select_bit(bit: bool) -> TileSet {
+        match bit {
+            false => TileSet::H8800,
+            true  => TileSet::H8000,
+        }
+    }
+
+    /// Get the address of a tile when this tileset is used.
+    pub fn address_of_tile(&self, tile: u8) -> u16 {
+        let tile_u16 = tile as u16;
+
+        match *self {
+            TileSet::H8000 => 0x8000 + (tile_u16 << 4),
+            TileSet::H8800 => 0x9000 + (tile_u16 << 4) - ((tile_u16 & 0x80) << 5),
+        }
+    }
+}
+
+
+impl TileMap {
+    /// Selects a TileMap based on the value of a selection bit from the LCD status register.
+    pub fn by_select_bit(bit: bool) -> TileMap {
+        match bit {
+            false => TileMap::H9800,
+            true  => TileMap::H9C00,
+        }
+    }
+
+    /// Get the base address where the tilemap is stored.
+    pub fn base_address(&self) -> u16 {
+        match *self {
+            TileMap::H9800 => 0x9800,
+            TileMap::H9C00 => 0x9c00,
+        }
     }
 }
 
@@ -293,19 +354,56 @@ impl Ppu {
         self.current_line_cycles += 1;
         self.clock -= 1;
 
-        let lcdc            = self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL);
+        let lcdc            = self.get_lcdc();
+        let bg_enabled      = get_bit(lcdc, LCD_CONTROL_BIT_BG_WINDOW_ENABLED);
+        let window_enabled  = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_ENABLED);
         let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
+        let tileset_select  = get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT);
+        let tileset         = TileSet::by_select_bit(tileset_select);
 
-        let (background_x, background_y) = self.screen_to_background(
-            self.current_line_pixel,
-            self.ly
-        );
+        let pixel_background = {
+            // check if the flag for window/background is enabled
+            if bg_enabled {
+                let wx = self.get_window_x();
+                let wy = self.get_window_y();
 
-        // get the current background pixel
-        let pixel_background = self.read_background_pixel(
-            background_x,
-            background_y
-        );
+                // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
+                if window_enabled && (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
+                    let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
+                    let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
+                    let position_in_window_x  = self.current_line_pixel+7 - wx;
+                    let position_in_window_y  = self.ly - wy;
+
+                    self.read_tilemap_pixel(
+                        window_tilemap,
+                        tileset,
+                        position_in_window_x,
+                        position_in_window_y
+                    )
+                }
+                else {
+                    // otherwise just handle the normal background
+
+                    let bg_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT);
+                    let bg_tilemap        = TileMap::by_select_bit(bg_tilemap_select);
+
+                    let (background_x, background_y) = self.screen_to_background(
+                        self.current_line_pixel,
+                        self.ly
+                    );
+
+                    self.read_tilemap_pixel(
+                        bg_tilemap,
+                        tileset,
+                        background_x,
+                        background_y
+                    )
+                }
+            }
+            else {
+                0
+            }
+        };
 
         // get the foreground pixel by reading the color of any sprite on the current
         // position within this scanline
@@ -372,7 +470,7 @@ impl Ppu {
     fn enter_mode(&mut self, mode: Mode) {
         self.mode = mode;
 
-        let mut lcd_stat = self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS);
+        let mut lcd_stat = self.get_lcd_stat();
         lcd_stat = lcd_stat & 0b_1111_1100;
         lcd_stat = lcd_stat | (self.mode as u8);
 
@@ -425,7 +523,7 @@ impl Ppu {
         {
             let lyc = self.mem.read_u8(MEMORY_LOCATION_LYC);
             let coincidence = self.ly == lyc;
-            let mut lcd_stat = self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS);
+            let mut lcd_stat = self.get_lcd_stat();
             lcd_stat = change_bit(lcd_stat, LCD_STATUS_BIT_FLAG_COINCIDENCE, coincidence);
             self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcd_stat);
 
@@ -449,6 +547,16 @@ impl Ppu {
     /// Get the LCD buffer which contains the actual data sent to the device's display.
     pub fn get_lcd(&self) -> &LcdBuffer {
         &self.lcd_buffer
+    }
+
+    /// Get the value of the LCD Control register
+    pub fn get_lcdc(&self) -> u8 {
+        self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL)
+    }
+
+    /// Get the value of the LCD Status register
+    pub fn get_lcd_stat(&self) -> u8 {
+        self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS)
     }
 
     /// Get the display viewport offset on X axis.
@@ -483,7 +591,7 @@ impl Ppu {
         let mut scanline = ScanlineData::new();
         scanline.line = line_number;
 
-        let lcdc        = self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL);
+        let lcdc        = self.get_lcdc();
         let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
         let sprite_h    = if big_sprites { 16 } else { 8 };
 
@@ -520,7 +628,7 @@ impl Ppu {
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
 
-        let lcdc        = self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL);
+        let lcdc        = self.get_lcdc();
         let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
         let sprite_h    = if big_sprites { 16 } else { 8 };
         let sprite_w    = 8;
@@ -541,7 +649,8 @@ impl Ppu {
                 }
 
                 let pixel = self.read_sprite_pixel(
-                    sprite.tile as u16,
+                    TileSet::H8000,
+                    sprite.tile,
                     sprite_pixel_x,
                     sprite_pixel_y
                 );
@@ -554,25 +663,31 @@ impl Ppu {
     }
 
     /// Read the pixel value of the background on a given position.
-    pub fn read_background_pixel(&self, background_x: u8, background_y: u8) -> u8 {
-        let tile_x       = (background_x / 8) as u16;
-        let tile_y       = (background_y / 8) as u16;
-        let tile_pixel_x = (background_x % 8) as u8;
-        let tile_pixel_y = (background_y % 8) as u8;
+    pub fn read_tilemap_pixel(&self, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> u8 {
+        let tile_x       = (tilemap_x / 8) as u16;
+        let tile_y       = (tilemap_y / 8) as u16;
+        let tile_pixel_x = (tilemap_x % 8) as u8;
+        let tile_pixel_y = (tilemap_y % 8) as u8;
         let tile_index   = tile_y * 32 + tile_x;
-        let tile_address = MEMORY_LOCATION_BACKGROUND_MAP_BEGIN + tile_index;
+        let tile_address = tilemap.base_address() + tile_index;
         let sprite       = self.mem.read_u8(tile_address as u16);
 
         self.read_sprite_pixel(
-            sprite as u16,
+            tileset,
+            sprite,
             tile_pixel_x,
             tile_pixel_y
         )
     }
 
     /// Read the pixel value of a sprite.
-    pub fn read_sprite_pixel(&self, sprite: u16, x: u8, y: u8) -> u8 {
-        let sprite_address      = MEMORY_LOCATION_SPRITES_BEGIN + (sprite * 16);
+    pub fn read_sprite_pixel(&self, tileset: TileSet, sprite: u8, x: u8, y: u8) -> u8 {
+        let sprite_address      = tileset.address_of_tile(sprite);
+        self.read_sprite_pixel_from_address(sprite_address, x, y)
+    }
+
+    /// Read the pixel value of a sprite.
+    pub fn read_sprite_pixel_from_address(&self, sprite_address: u16 , x: u8, y: u8) -> u8 {
         let sprite_line_address = sprite_address + y as u16 * 2;
         let pixel_mask            = 1u8 << (7 - x);
         let byte0                 = self.mem.read_u8(sprite_line_address + 0);

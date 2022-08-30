@@ -21,7 +21,9 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
-use crate::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
+use crate::memory::{MEMORY_LOCATION_SPRITES_BEGIN, MemoryRead};
+use crate::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W, TileMap, TileSet};
+use crate::utils::get_bit;
 
 
 #[derive(PartialEq)]
@@ -281,10 +283,20 @@ impl Window {
     /// Present the whole background on the screen.
     /// This includes the whole content even outside of the scrolling viewport.
     pub fn present_background(&mut self, ppu: &Ppu) {
+        let lcdc = ppu.get_lcdc();
+        let tilemap = TileMap::by_select_bit(get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT));
+        let tileset = TileSet::by_select_bit(get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT));
+
         // convert palette based image data into RGBA
         for background_y in 0..255 {
             for background_x in 0..255 {
-                let color_index = ppu.read_background_pixel(background_x, background_y);
+                let color_index = ppu.read_tilemap_pixel(
+                    tilemap,
+                    tileset,
+                    background_x,
+                    background_y
+                );
+
                 let color = Window::color_index_to_rgba(color_index);
                 self.texture_background.set_rgba(background_x as u32, background_y as u32, color);
             }
@@ -311,12 +323,13 @@ impl Window {
 
         for object_y in 0..objects_rows {
             for object_x in 0..objects_per_row {
-                let object_index = object_x + (object_y * objects_per_row);
+                let object_index   = object_x + (object_y * objects_per_row);
+                let sprite_address = MEMORY_LOCATION_SPRITES_BEGIN + (object_index * 16);
 
                 for object_pixel_y in 0..8 {
                     for object_pixel_x in 0..8 {
-                        let pixel_color_index = ppu.read_sprite_pixel(
-                            object_index,
+                        let pixel_color_index = ppu.read_sprite_pixel_from_address(
+                            sprite_address,
                             object_pixel_x,
                             object_pixel_y
                         );
