@@ -17,10 +17,12 @@
 
 extern crate sdl2;
 
+use std::collections::HashMap;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
+use crate::input::{Input, InputButton};
 use crate::memory::{MEMORY_LOCATION_SPRITES_BEGIN, MemoryRead};
 use crate::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W, TileMap, TileSet};
 use crate::utils::get_bit;
@@ -60,6 +62,7 @@ pub struct Window {
     texture_objects:    BufferedTexture,
     state:              State,
     display_mode:       DisplayMode,
+    key_states:         HashMap<Keycode, bool>,
 }
 
 
@@ -169,6 +172,7 @@ impl Window {
             texture_objects,
             state: State::Open,
             display_mode: DisplayMode::Game,
+            key_states: HashMap::new(),
         })
     }
 
@@ -199,12 +203,18 @@ impl Window {
                     self.handle_key_down(keycode);
                 }
 
+                Event::KeyUp { keycode: Some(keycode), .. } => {
+                    self.handle_key_up(keycode);
+                }
+
                 _ => { }
             }
         }
     }
 
     fn handle_key_down(&mut self, keycode: Keycode) {
+        self.key_states.insert(keycode, true);
+
         match keycode {
             Keycode::Escape => { self.close(); },
             Keycode::F1     => { self.set_display_mode(DisplayMode::Game); }
@@ -212,6 +222,61 @@ impl Window {
             Keycode::F3     => { self.set_display_mode(DisplayMode::Objects); }
             _ => { }
         }
+    }
+
+    fn handle_key_up(&mut self, keycode: Keycode) {
+        self.key_states.insert(keycode, false);
+    }
+
+    /// Checks whether a particular key is currently pressed.
+    pub fn is_key_pressed(&self, keycode: Keycode) -> bool {
+        match self.key_states.get(&keycode) {
+            Some(value) => *value,
+            None        => false
+        }
+    }
+
+    /// Set the pressed state for gameboy buttons.
+    pub fn apply_key_states(&self, input: &mut Input) {
+        input.set_button_pressed(
+            InputButton::DPadLeft,
+            self.is_key_pressed(Keycode::A) || self.is_key_pressed(Keycode::Left)
+        );
+
+        input.set_button_pressed(
+            InputButton::DPadRight,
+            self.is_key_pressed(Keycode::D) || self.is_key_pressed(Keycode::Right)
+        );
+
+        input.set_button_pressed(
+            InputButton::DPadUp,
+            self.is_key_pressed(Keycode::W) || self.is_key_pressed(Keycode::Up)
+        );
+
+        input.set_button_pressed(
+            InputButton::DPadDown,
+            self.is_key_pressed(Keycode::S) || self.is_key_pressed(Keycode::Down)
+        );
+
+        input.set_button_pressed(
+            InputButton::A,
+            self.is_key_pressed(Keycode::E)
+        );
+
+        input.set_button_pressed(
+            InputButton::B,
+            self.is_key_pressed(Keycode::Q)
+        );
+
+        input.set_button_pressed(
+            InputButton::Select,
+            self.is_key_pressed(Keycode::Num1)
+        );
+
+        input.set_button_pressed(
+            InputButton::Start,
+            self.is_key_pressed(Keycode::Num2)
+        );
     }
 
 

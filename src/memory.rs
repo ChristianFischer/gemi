@@ -27,6 +27,7 @@ pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
 pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
 pub const MEMORY_LOCATION_OAM_BEGIN:                u16 = 0xfe00;
 pub const MEMORY_LOCATION_OAM_END:                  u16 = 0xfe9f;
+pub const MEMORY_LOCATION_JOYP:                     u16 = 0xff00;
 pub const MEMORY_LOCATION_REGISTER_DIV:             u16 = 0xff04;
 pub const MEMORY_LOCATION_REGISTER_TIMA:            u16 = 0xff05;
 pub const MEMORY_LOCATION_REGISTER_TMA:             u16 = 0xff06;
@@ -48,7 +49,7 @@ pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
 /// Stores the information of an active OAM DMA transfer
 /// The DMA transfer copies data from the given address
 /// into OAM memory.
-/// In total, 160 bytes will be transferred, so it takes 
+/// In total, 160 bytes will be transferred, so it takes
 /// 160 cycles to transfer for the transfer to be completed.
 pub struct DmaTransferInfo {
     /// The address where to start copying the memory from.
@@ -64,10 +65,10 @@ pub struct DmaTransferInfo {
 pub enum DmaTransferState {
     /// No transfer is active.
     Disabled,
-    
+
     /// A transfer is currently in progress.
-    /// The attached struct stores information where 
-    /// the data should be taken from and how much data 
+    /// The attached struct stores information where
+    /// the data should be taken from and how much data
     /// was already transferred.
     Transferring(DmaTransferInfo),
 }
@@ -213,7 +214,7 @@ impl Memory {
     }
 
     /// Let the memory controller handle it's tasks.
-    /// 'cycles' gives the number of ticks passed since 
+    /// 'cycles' gives the number of ticks passed since
     /// the last call.
     pub fn update(&mut self, cycles: u32) {
         self.internal.get_mut().handle_dma_transfer(cycles);
@@ -416,8 +417,8 @@ impl MemoryInternal {
                 let oam_size       = MEMORY_LOCATION_OAM_END - MEMORY_LOCATION_OAM_BEGIN + 1;
                 let transfer_begin = transfer.next_byte;
                 let transfer_end   = min(transfer_begin.saturating_add(cycles as u16), oam_size);
-                
-                // Copy the amount of data the memory controller was able to handle  
+
+                // Copy the amount of data the memory controller was able to handle
                 for b in transfer_begin .. transfer_end {
                     let src = transfer.start_address.saturating_add(b);
                     let dst = MEMORY_LOCATION_OAM_BEGIN.saturating_add(b);

@@ -18,6 +18,7 @@
 use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::cpu::{Cpu, RegisterR8};
+use crate::input::Input;
 use crate::memory::Memory;
 use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
 use crate::timer::Timer;
@@ -29,6 +30,7 @@ pub struct GameBoy {
     pub ppu: Ppu,
     pub mem: Memory,
     pub timer: Timer,
+    pub input: Input,
     pub window: Window,
 }
 
@@ -44,6 +46,7 @@ impl GameBoy {
                 cpu: Cpu::new(mem.create_read_write_handle()),
                 ppu: Ppu::new(mem.create_read_write_handle()),
                 timer: Timer::new(mem.create_read_write_handle()),
+                input: Input::new(mem.create_read_write_handle()),
                 mem,
                 window,
             }
@@ -108,14 +111,16 @@ impl GameBoy {
             self.mem.update(cycles);
             self.cpu.update(cycles);
             self.timer.update(cycles);
+            self.input.update();
 
             // let the PPU run for the same amount of cycles
             let ppu_state = self.ppu.update(cycles);
 
             // When a frame completed, it should be presented
             if let FrameState::FrameCompleted = ppu_state {
-                self.window.present(self.ppu.get_lcd(), &self.ppu);
                 self.window.poll_events();
+                self.window.apply_key_states(&mut self.input);
+                self.window.present(self.ppu.get_lcd(), &self.ppu);
 
                 if !self.window.is_opened() {
                     return;

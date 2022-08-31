@@ -19,6 +19,7 @@ mod boot_rom;
 mod cartridge;
 mod cpu;
 mod gameboy;
+mod input;
 mod memory;
 mod opcode;
 mod opcodes;
