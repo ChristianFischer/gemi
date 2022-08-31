@@ -130,6 +130,7 @@ impl Timer {
             self.mem.write_u8(MEMORY_LOCATION_REGISTER_DIV, div);
 
             self.div_clock = self.div_clock.saturating_sub(UPDATE_TIME_DIV);
+            self.div_previous = div;
         }
     }
 
