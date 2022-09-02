@@ -15,9 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io;
 use std::io::Read;
+use crate::mbc::MemoryBankController;
 
 
 /// Type of game boy color support
@@ -30,18 +32,6 @@ pub enum GameBoyColorSupport {
 
     /// CGB is required to run this cartridge
     Required
-}
-
-
-/// Type of memory bank controller to be used
-pub enum MemoryBankController {
-    None,
-    MBC1,
-    MBC2,
-    MBC3,
-    MBC5,
-    MBC6,
-    MBC7,
 }
 
 
@@ -226,8 +216,8 @@ impl Cartridge {
 
 
     /// get the plain data of this cartridge
-    pub fn get_rom_data_at(&self, offset: u16) -> u8 {
-        self.rom.data[offset as usize]
+    pub fn get_rom_data_at(&self, offset: usize) -> u8 {
+        self.rom.data[offset]
     }
 
 

@@ -15,11 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+extern crate core;
+
 mod boot_rom;
 mod cartridge;
 mod cpu;
 mod gameboy;
 mod input;
+mod mbc;
 mod memory;
 mod opcode;
 mod opcodes;
@@ -62,6 +65,7 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
     println!("ROM file: {}", filename);
     println!("Title:         {}",     cartridge.get_title());
     println!("Manufacturer:  {}",     cartridge.get_manufacturer_code());
+    println!("MBC:           {}",     cartridge.get_mbc());
     println!("Features:      {}",     features.join(", "));
     println!("ROM size:      {} kiB", cartridge.get_rom_size() / 1024);
     println!("RAM size:      {} kiB", cartridge.get_ram_size() / 1024);

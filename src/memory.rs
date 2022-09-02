@@ -21,6 +21,8 @@ use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::Cartridge;
 use crate::cpu::Interrupt;
+use crate::mbc::{create_mbc, Mbc};
+use crate::mbc::mbc_none::MbcNone;
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
 pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
@@ -98,6 +100,7 @@ pub struct MemoryReadWriteHandle {
 /// Shared internal object for multiple Memory and MemoryReadWrite instances.
 struct MemoryInternal {
     memory:     Box<[u8; 0x10000]>,
+    mbc:        Box<dyn Mbc>,
     dma:        DmaTransferState,
     boot_rom:   Option<BootRom>,
     cartridge:  Option<Cartridge>,
@@ -205,6 +208,7 @@ impl Memory {
             internal: MemoryInternalRef::new(
                 MemoryInternal {
                     memory:     Box::new([0; 0x10000]),
+                    mbc:        Box::new(MbcNone::new()),
                     dma:        DmaTransferState::Disabled,
                     boot_rom:   None,
                     cartridge:  None,
@@ -254,6 +258,7 @@ impl Memory {
     /// Load ROM data from a cartridge into the memory.
     pub fn set_cartridge(&mut self, cartridge: Cartridge) {
         let mut mem = self.internal.get_mut();
+        mem.mbc       = create_mbc(cartridge.get_mbc());
         mem.cartridge = Some(cartridge);
     }
 }
@@ -358,7 +363,7 @@ impl MemoryInternal {
     /// Reads data from the cartridge.
     fn read_from_cartridge(&self, address: u16) -> u8 {
         if let Some(cartridge) = &self.cartridge {
-            return cartridge.get_rom_data_at(address);
+            return self.mbc.read_byte(cartridge, address);
         }
 
         self.read_internal_memory(address)
@@ -374,8 +379,16 @@ impl MemoryInternal {
     /// on the physical location of the data (like cartridge, ppu, etc)
     pub fn write(&mut self, address: u16, value: u8) {
         match address {
+            0x0000 ..= 0x7fff => self.write_to_cartridge(address, value),
             0xff00 ..= 0xffff => self.write_io_registers(address, value),
             _                 => self.write_internal_memory(address, value),
+        }
+    }
+
+    /// Writes data to the cartridge.
+    fn write_to_cartridge(&mut self, address: u16, value: u8) {
+        if let Some(cartridge) = &self.cartridge {
+            self.mbc.write_byte(cartridge, address, value);
         }
     }
 
