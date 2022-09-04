@@ -15,10 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io;
-use std::io::Read;
+use std::io::{Read, Write};
+use std::ops::Add;
 use crate::mbc::MemoryBankController;
 
 
@@ -41,10 +41,21 @@ pub struct RomData {
 }
 
 
+/// This object holds the cartridge RAM banks.
+/// The RAM banks could be of size 0, if the cartridge does
+/// not support RAM.
+pub struct RamBanks {
+    ram: Vec<u8>,
+}
+
+
 /// This object represents a cartridge of a single game.
 pub struct Cartridge {
+    file: String,
+
     title: String,
     rom: RomData,
+    ram: RamBanks,
 
     manufacturer_code: String,
     licensee_code: u8,
@@ -80,6 +91,11 @@ const ROM_OFFSET_OLD_LICENSEE_CODE:     usize = 0x014B;
 
 
 impl RomData {
+    /// Get the ROM data on a particular address.
+    pub fn get_at(&self, address: usize) -> u8 {
+        self.data[address]
+    }
+
     /// Read the game title from the ROM data.
     pub fn read_title(self: &RomData) -> String {
         let mut title_length: usize = 0;
@@ -117,10 +133,73 @@ impl RomData {
 }
 
 
+impl RamBanks {
+    /// Allocates RAM banks of a certain size.
+    pub fn alloc(size: usize) -> RamBanks {
+        RamBanks {
+            ram: vec![0xff; size]
+        }
+    }
+
+    /// Determines the filename of the RAM image depending on the ROM file name.
+    pub fn cart_file_to_ram_file(filepath: &str) -> String {
+        let ram_file_ext = ".sav";
+
+        if filepath.ends_with(".gb") {
+            return filepath[0 .. filepath.len() - 3].to_string().add(ram_file_ext);
+        }
+
+        if filepath.ends_with(".gbc") {
+            return filepath[0 .. filepath.len() - 4].to_string().add(ram_file_ext);
+        }
+
+        return filepath.to_string().add(ram_file_ext);
+    }
+
+    /// Get the total RAM size.
+    pub fn size(&self) -> usize {
+        self.ram.len()
+    }
+
+    /// Read a single byte from the RAM image.
+    pub fn get_at(&self, address: usize) -> u8 {
+        if address < self.size() {
+            self.ram[address]
+        }
+        else {
+            0x00
+        }
+    }
+
+    /// Writes a single byte to the RAM image.
+    pub fn set_at(&mut self, address: usize, value: u8) {
+        if address < self.size() {
+            self.ram[address] = value;
+        }
+    }
+
+    /// Save the RAM image into a file.
+    pub fn save_to_file(&self, filepath: &str) -> io::Result<()> {
+        let mut file = File::create(filepath)?;
+        file.write(&self.ram)?;
+
+        Ok(())
+    }
+
+    /// Load the RAM image from a file.
+    pub fn read_from_file(&mut self, filepath: &str) -> io::Result<()> {
+        let mut file = File::open(filepath)?;
+        file.read(&mut self.ram)?;
+
+        Ok(())
+    }
+}
+
+
 impl Cartridge {
     /// Load a cartridge from a file.
     /// * `filepath` - relative path to the file to be loaded
-    pub fn load_file(filepath: &String) -> Result<Cartridge, io::Error> {
+    pub fn load_file(filepath: &str) -> Result<Cartridge, io::Error> {
         let mut file = File::open(filepath)?;
         let metadata = file.metadata()?;
         let mut buffer = vec![0; metadata.len() as usize];
@@ -147,6 +226,7 @@ impl Cartridge {
         let ram_size_type = rom.data[ROM_OFFSET_RAM_SIZE];
         let ram_size = match ram_size_type {
             0x00 =>   0,
+            0x01 =>   2 * 1024,
             0x02 =>   8 * 1024,
             0x03 =>  32 * 1024,
             0x04 => 128 * 1024,
@@ -189,7 +269,23 @@ impl Cartridge {
             _ => false,
         };
 
+        // allocate RAM banks for this cartridge
+        let mut ram = RamBanks::alloc(ram_size);
+
+        // if RAM is available and powered by a battery, it's persistent
+        // and we can try to load the RAM image from a file.
+        if has_ram && has_battery {
+            let ram_file = RamBanks::cart_file_to_ram_file(filepath);
+
+            if let Err(e) = ram.read_from_file(&ram_file) {
+                // don't fail when RAM could not be loaded, just print a message
+                println!("Failed to load Cartridge RAM: {}", e);
+            }
+        }
+
         let cartridge = Cartridge {
+            file: filepath.to_string(),
+
             title: rom.read_title(),
 
             manufacturer_code: rom.read_manufacturer_code(),
@@ -209,6 +305,7 @@ impl Cartridge {
             has_rumble,
 
             rom,
+            ram,
         };
 
         Ok(cartridge)
@@ -216,8 +313,28 @@ impl Cartridge {
 
 
     /// get the plain data of this cartridge
-    pub fn get_rom_data_at(&self, offset: usize) -> u8 {
-        self.rom.data[offset]
+    pub fn get_rom(&self) -> &RomData {
+        &self.rom
+    }
+
+    /// Get the RAM banks of this cartridge.
+    pub fn get_ram(&self) -> &RamBanks {
+        &self.ram
+    }
+
+    /// Get the mutable RAM banks of this cartridge.
+    pub fn get_mut_ram(&mut self) -> &mut RamBanks {
+        &mut self.ram
+    }
+
+    /// Saves the RAM to a file, if the cartridge has battery powered RAM.
+    pub fn save_ram_if_any(&self) -> io::Result<()> {
+        if self.has_ram && self.has_battery {
+            let ram_file = RamBanks::cart_file_to_ram_file(&self.file);
+            self.get_ram().save_to_file(&ram_file)?;
+        }
+
+        Ok(())
     }
 
 

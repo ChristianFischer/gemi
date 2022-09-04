@@ -17,6 +17,7 @@
 
 use std::cell::{Ref, RefCell, RefMut};
 use std::cmp::min;
+use std::io;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::Cartridge;
@@ -261,6 +262,17 @@ impl Memory {
         mem.mbc       = create_mbc(cartridge.get_mbc());
         mem.cartridge = Some(cartridge);
     }
+
+    /// Save the cartridge RAM, if any.
+    pub fn save_cartridge_ram_if_any(&self) -> io::Result<()> {
+        let mem = self.internal.get();
+
+        if let Some(cartridge) = &mem.cartridge {
+            cartridge.save_ram_if_any()?;
+        }
+
+        Ok(())
+    }
 }
 
 impl MemoryRead for Memory {
@@ -347,6 +359,7 @@ impl MemoryInternal {
         match address {
             0x0000 ..= 0x00ff => self.read_boot_rom_or_cartridge(address),
             0x0100 ..= 0x7fff => self.read_from_cartridge(address),
+            0xa000 ..= 0xbfff => self.read_from_cartridge(address),
             _                 => self.read_internal_memory(address),
         }
     }
@@ -380,6 +393,7 @@ impl MemoryInternal {
     pub fn write(&mut self, address: u16, value: u8) {
         match address {
             0x0000 ..= 0x7fff => self.write_to_cartridge(address, value),
+            0xa000 ..= 0xbfff => self.write_to_cartridge(address, value),
             0xff00 ..= 0xffff => self.write_io_registers(address, value),
             _                 => self.write_internal_memory(address, value),
         }
@@ -387,7 +401,7 @@ impl MemoryInternal {
 
     /// Writes data to the cartridge.
     fn write_to_cartridge(&mut self, address: u16, value: u8) {
-        if let Some(cartridge) = &self.cartridge {
+        if let Some(cartridge) = &mut self.cartridge {
             self.mbc.write_byte(cartridge, address, value);
         }
     }

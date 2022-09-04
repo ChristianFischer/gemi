@@ -38,7 +38,7 @@ pub trait Mbc {
     fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8;
 
     /// Write a single byte into the device memory.
-    fn write_byte(&mut self, cartridge: &Cartridge, address: u16, value: u8);
+    fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8);
 }
 
 
@@ -88,10 +88,10 @@ pub mod mbc_none {
 
     impl Mbc for MbcNone {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
-            cartridge.get_rom_data_at(address as usize)
+            cartridge.get_rom().get_at(address as usize)
         }
 
-        fn write_byte(&mut self, _cartridge: &Cartridge, _address: u16, _value: u8) {
+        fn write_byte(&mut self, _cartridge: &mut Cartridge, _address: u16, _value: u8) {
         }
     }
 }
@@ -190,16 +190,35 @@ mod mbc1 {
 
     impl Mbc for Mbc1 {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
-            let rom_address = match address {
-                0x0000 ..= 0x3fff => address as usize,
-                0x4000 ..= 0x7fff => ((address - 0x4000) as usize) + ((self.rom_bank_selected as usize) * 0x4000),
-                _                 => panic!("Unexpected read from address {}", address),
-            };
+            match address {
+                // read from fixed ROM bank, which is always bank 0.
+                0x0000 ..= 0x3fff => {
+                    let rom_address = address as usize;
+                    cartridge.get_rom().get_at(rom_address)
+                },
 
-            cartridge.get_rom_data_at(rom_address)
+                // read from the switchable ROM bank
+                0x4000 ..= 0x7fff => {
+                    let rom_address = (address as usize) + self.rom_bank_offset;
+                    cartridge.get_rom().get_at(rom_address)
+                },
+
+                // read from switchable RAM bank.
+                0xa000 ..= 0xbfff => {
+                    if cartridge.has_ram() && self.ram_enabled {
+                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                        cartridge.get_ram().get_at(ram_address)
+                    }
+                    else {
+                        0xff
+                    }
+                }
+
+                _ => unreachable!("Unexpected read from address {}", address),
+            }
         }
 
-        fn write_byte(&mut self, cartridge: &Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
             match (address >> 13) & 0x000f {
                 // 0x0000 - 0x1fff: enable or disable RAM
                 0x00 => {
@@ -224,7 +243,15 @@ mod mbc1 {
                     self.update_selected_banks();
                 },
 
-                _ => panic!("Unexpected write to address {}", address),
+                // 0xa000 - 0xbfff: Cartridge RAM
+                0x05 => {
+                    if cartridge.has_ram() && self.ram_enabled {
+                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                        cartridge.get_mut_ram().set_at(ram_address, value);
+                    }
+                },
+
+                _ => unreachable!("Unexpected write to address {}", address),
             }
         }
     }

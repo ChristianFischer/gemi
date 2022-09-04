@@ -123,6 +123,11 @@ impl GameBoy {
                 self.window.present(self.ppu.get_lcd(), &self.ppu);
 
                 if !self.window.is_opened() {
+                    // before exit, save the RAM image, if any
+                    if let Err(e) = self.mem.save_cartridge_ram_if_any() {
+                        println!("Failed to save cartridge RAM: {}", e);
+                    }
+
                     return;
                 }
             }
