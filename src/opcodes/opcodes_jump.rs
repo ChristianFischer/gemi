@@ -17,6 +17,7 @@
 
 use crate::cpu::{CpuFlag, RegisterR16};
 use crate::gameboy::GameBoy;
+use crate::opcode::{opcode, OpCodeContext};
 
 /// Performs a jump to an address if a condition is met.
 fn jp_if_u16(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
@@ -78,126 +79,55 @@ fn ret_if(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
 
 
 
-pub fn jr_i8(gb: &mut GameBoy) {
+opcode!(jr_i8, [gb] {
     let offset = gb.cpu.fetch_i8();
     gb.cpu.jump_relative(offset as i16);
-}
+});
 
-pub fn jp_u16(gb: &mut GameBoy) {
+opcode!(jp_u16, [gb] {
     let address = gb.cpu.fetch_u16();
     gb.cpu.jump_to(address);
-}
+});
 
-pub fn jp_hl(gb: &mut GameBoy) {
+opcode!(jp_hl, [gb] {
     let address = gb.cpu.get_r16(RegisterR16::HL);
     gb.cpu.jump_to(address);
-}
+});
 
-pub fn jr_z_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::Zero, true);
-}
+opcode!(jr_z_i8,  [gb] jr_if_i8(gb, CpuFlag::Zero,  true));
+opcode!(jr_c_i8,  [gb] jr_if_i8(gb, CpuFlag::Carry, true));
+opcode!(jr_nz_i8, [gb] jr_if_i8(gb, CpuFlag::Zero,  false));
+opcode!(jr_nc_i8, [gb] jr_if_i8(gb, CpuFlag::Carry, false));
 
-pub fn jr_c_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::Carry, true);
-}
+opcode!(jp_z_u16,  [gb] jp_if_u16(gb, CpuFlag::Zero,  true));
+opcode!(jp_c_u16,  [gb] jp_if_u16(gb, CpuFlag::Carry, true));
+opcode!(jp_nz_u16, [gb] jp_if_u16(gb, CpuFlag::Zero,  false));
+opcode!(jp_nc_u16, [gb] jp_if_u16(gb, CpuFlag::Carry, false));
 
-pub fn jr_nz_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::Zero, false);
-}
+opcode!(call_u16, [gb] call_addr_u16(gb));
 
-pub fn jr_nc_i8(gb: &mut GameBoy) {
-    jr_if_i8(gb, CpuFlag::Carry, false);
-}
+opcode!(call_z_u16,  [gb] call_u16_if(gb, CpuFlag::Zero, true));
+opcode!(call_c_u16,  [gb] call_u16_if(gb, CpuFlag::Carry, true));
+opcode!(call_nz_u16, [gb] call_u16_if(gb, CpuFlag::Zero, false));
+opcode!(call_nc_u16, [gb] call_u16_if(gb, CpuFlag::Carry, false));
 
-pub fn jp_z_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::Zero, true);
-}
+opcode!(rst_00h, [gb] call_addr(gb, 0x0000));
+opcode!(rst_08h, [gb] call_addr(gb, 0x0008));
+opcode!(rst_10h, [gb] call_addr(gb, 0x0010));
+opcode!(rst_18h, [gb] call_addr(gb, 0x0018));
+opcode!(rst_20h, [gb] call_addr(gb, 0x0020));
+opcode!(rst_28h, [gb] call_addr(gb, 0x0028));
+opcode!(rst_30h, [gb] call_addr(gb, 0x0030));
+opcode!(rst_38h, [gb] call_addr(gb, 0x0038));
 
-pub fn jp_c_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::Carry, true);
-}
+opcode!(ret, [gb] ret_from_call(gb));
 
-pub fn jp_nz_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::Zero, false);
-}
+opcode!(ret_z,  [gb] ret_if(gb, CpuFlag::Zero,  true));
+opcode!(ret_c,  [gb] ret_if(gb, CpuFlag::Carry, true));
+opcode!(ret_nz, [gb] ret_if(gb, CpuFlag::Zero,  false));
+opcode!(ret_nc, [gb] ret_if(gb, CpuFlag::Carry, false));
 
-pub fn jp_nc_u16(gb: &mut GameBoy) {
-    jp_if_u16(gb, CpuFlag::Carry, false);
-}
-
-pub fn call_u16(gb: &mut GameBoy) {
-    call_addr_u16(gb);
-}
-
-pub fn call_z_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::Zero, true);
-}
-
-pub fn call_c_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::Carry, true);
-}
-
-pub fn call_nz_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::Zero, false);
-}
-
-pub fn call_nc_u16(gb: &mut GameBoy) {
-    call_u16_if(gb, CpuFlag::Carry, false);
-}
-
-pub fn rst_00h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0000);
-}
-
-pub fn rst_08h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0008);
-}
-
-pub fn rst_10h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0010);
-}
-
-pub fn rst_18h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0018);
-}
-
-pub fn rst_20h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0020);
-}
-
-pub fn rst_28h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0028);
-}
-
-pub fn rst_30h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0030);
-}
-
-pub fn rst_38h(gb: &mut GameBoy) {
-    call_addr(gb, 0x0038);
-}
-
-pub fn ret(gb: &mut GameBoy) {
-    ret_from_call(gb);
-}
-
-pub fn ret_z(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::Zero, true);
-}
-
-pub fn ret_c(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::Carry, true);
-}
-
-pub fn ret_nz(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::Zero, false);
-}
-
-pub fn ret_nc(gb: &mut GameBoy) {
-    ret_if(gb, CpuFlag::Carry, false);
-}
-
-pub fn reti(gb: &mut GameBoy) {
+opcode!(reti, [gb] {
     ret_from_call(gb);
     gb.cpu.enable_interrupts();
-}
+});

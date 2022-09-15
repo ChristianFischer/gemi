@@ -23,6 +23,20 @@ mod opcodes_ld;
 use crate::opcode::OpCode;
 
 use crate::opcodes::opcodes_arithmetic::*;
+use crate::opcodes::opcodes_arithmetic::inc::*;
+use crate::opcodes::opcodes_arithmetic::dec::*;
+use crate::opcodes::opcodes_arithmetic::add::*;
+use crate::opcodes::opcodes_arithmetic::sub::*;
+use crate::opcodes::opcodes_arithmetic::and::*;
+use crate::opcodes::opcodes_arithmetic::xor::*;
+use crate::opcodes::opcodes_arithmetic::or::*;
+use crate::opcodes::opcodes_arithmetic::cp::*;
+use crate::opcodes::opcodes_arithmetic::rl::*;
+use crate::opcodes::opcodes_arithmetic::rr::*;
+use crate::opcodes::opcodes_arithmetic::swap::*;
+use crate::opcodes::opcodes_arithmetic::set_bit::*;
+use crate::opcodes::opcodes_arithmetic::res_bit::*;
+use crate::opcodes::opcodes_arithmetic::chk_bit::*;
 use crate::opcodes::opcodes_control::*;
 use crate::opcodes::opcodes_jump::*;
 use crate::opcodes::opcodes_ld::*;
@@ -33,7 +47,7 @@ pub static OPCODE_INVALID: OpCode = OpCode {
     name: "[INVALID]",
     bytes: 1,
     cycles: 0,
-    proc: |_gb| {
+    proc: |_ctx, _gb| {
         panic!();
     }
 };
@@ -44,7 +58,7 @@ pub static OPCODE_UNASSIGNED: OpCode = OpCode {
     name: "[NOT ASSIGNED]",
     bytes: 1,
     cycles: 0,
-    proc: |_gb| {
+    proc: |_ctx, _gb| {
         panic!();
     }
 };

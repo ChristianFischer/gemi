@@ -20,6 +20,7 @@ use crate::cartridge::Cartridge;
 use crate::cpu::{Cpu, RegisterR8};
 use crate::input::Input;
 use crate::memory::Memory;
+use crate::opcode::OpCodeContext;
 use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
 use crate::timer::Timer;
 use crate::window::Window;
@@ -92,8 +93,9 @@ impl GameBoy {
     pub fn run(&mut self) {
         loop {
             let instruction = self.cpu.fetch_next_instruction();
+            let mut context = OpCodeContext::for_instruction(&instruction);
 
-            (instruction.opcode.proc)(self);
+            (instruction.opcode.proc)(self, &mut context);
 
             println!(
                 "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",

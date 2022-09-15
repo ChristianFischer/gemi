@@ -17,26 +17,26 @@
 
 use crate::cpu::CpuFlag;
 use crate::gameboy::GameBoy;
-use crate::opcodes::OPCODE_TABLE;
+use crate::opcode::{opcode, OpCodeContext};
 use crate::utils::{signed_overflow_add_u16, signed_overflow_add_u8};
 
-pub fn nop(gb: &mut GameBoy) {}
+opcode!(nop, []);
 
-pub fn stop(gb: &mut GameBoy) {
-}
+opcode!(stop, [] {
+});
 
-pub fn halt(gb: &mut GameBoy) {
-}
+opcode!(halt, [] {
+});
 
-pub fn enable_interrupts(gb: &mut GameBoy) {
-    gb.cpu.enable_interrupts_in(OPCODE_TABLE[0xfb].cycles + 1);
-}
+opcode!(enable_interrupts, [gb, ctx] {
+    gb.cpu.enable_interrupts_in(ctx.get_opcode().cycles + 1);
+});
 
-pub fn disable_interrupts(gb: &mut GameBoy) {
+opcode!(disable_interrupts, [gb] {
     gb.cpu.disable_interrupts();
-}
+});
 
-pub fn add_sp_i8(gb: &mut GameBoy) {
+opcode!(add_sp_i8, [gb] {
     let offset = gb.cpu.fetch_i8();
     let sp     = gb.cpu.get_stack_pointer();
     let (sp_new, _, _) = signed_overflow_add_u16(sp, offset as i16);
@@ -50,4 +50,4 @@ pub fn add_sp_i8(gb: &mut GameBoy) {
     gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
     gb.cpu.set_flag(CpuFlag::Carry,     carry);
     gb.cpu.set_stack_pointer(sp_new);
-}
+});

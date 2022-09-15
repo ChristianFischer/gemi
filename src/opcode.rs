@@ -19,27 +19,94 @@ use std::fmt::{Display, Formatter};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryReadOnlyHandle};
 
-type ProcessOpCode = fn(gb: &mut GameBoy);
+type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext);
+
+
+/// A macro to generate an opcode implementation function.
+macro_rules! opcode {
+    ($(#[$meta:meta])? $name:ident, [$($bind_gb:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
+        $(#[$meta])?
+        pub fn $name(gb: &mut GameBoy, ctx: &mut OpCodeContext) {
+            // silence 'unused' warning for gb and ctx
+            { let _ = (&gb, &ctx); }
+
+            // make gb and ctx visible to 'body', if requested
+            $(let $bind_gb  = gb;)?
+            $(let $bind_ctx = ctx;)?
+
+            // paste 'body' statements
+            $($body)*;
+        }
+    };
+}
+
+pub(crate) use opcode;
+
 
 /// Data struct describing a single opcode.
 #[derive(Copy, Clone)]
 pub struct OpCode {
+    /// The opcode label, may contain placeholders to be replaced by
+    /// actual arguments read from the opcode data stream
     pub name: &'static str,
+
+    /// Total length of the opcode, including arguments,
+    /// but excluding the 0xcb prefix for the extended table.
     pub bytes: u32,
+
+    /// Number of T-Cycles the opcode takes to execute.
+    /// Does not include extra time when branches are taken.
     pub cycles: u32,
+
+    /// Function pointer to the actual opcode execution.
     pub proc: ProcessOpCode,
+}
+
+
+/// Context object to deliver additional information about the current context
+/// to the opcode implementation, but also allow the opcode implementation to
+/// deliver additional results to it's caller.
+pub struct OpCodeContext {
+    /// The currently executed opcode
+    opcode: &'static OpCode,
 }
 
 
 /// Stores a single instruction from ROM data.
 /// This contains the opcode and the address the opcode was read from.
 pub struct Instruction {
+    /// The opcode being executed by this instruction.
     pub opcode: &'static OpCode,
+
+    /// 16 Bit ID of the opcode being executed.
+    /// This includes the 0xCB prefix for extended opcodes.
     pub opcode_id: u16,
+
+    /// The address the opcode starts (or the location 0xCB prefix)
     pub opcode_address: u16,
+
+    /// The address, where the parameters are beginning.
     pub param_address: u16,
+
+    /// The memory where to read the opcode from.
     pub memory: MemoryReadOnlyHandle,
 }
+
+
+impl OpCodeContext {
+    /// Creates a context object for an instruction being executed.
+    pub fn for_instruction(instruction: &Instruction) -> OpCodeContext {
+        OpCodeContext {
+            opcode: instruction.opcode,
+        }
+    }
+
+    /// Get the opcode being executed within the current context.
+    pub fn get_opcode(&self) -> &'static OpCode {
+        self.opcode
+    }
+}
+
 
 fn get_arg(arg: &str, instruction: &Instruction) -> String {
     match arg {
