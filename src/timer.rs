@@ -20,11 +20,11 @@ use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, 
 use crate::utils::get_bit;
 
 
-const UPDATE_TIME_DIV:     u32 =  16 * 1024;
-const UPDATE_TIME_TIMA_00: u32 =   4 * 1024;
-const UPDATE_TIME_TIMA_01: u32 = 256 * 1024;
-const UPDATE_TIME_TIMA_02: u32 =  64 * 1024;
-const UPDATE_TIME_TIMA_03: u32 =  16 * 1024;
+const UPDATE_TIME_DIV:     u32 =    256;
+const UPDATE_TIME_TIMA_00: u32 =   1024;
+const UPDATE_TIME_TIMA_01: u32 =     16;
+const UPDATE_TIME_TIMA_02: u32 =     64;
+const UPDATE_TIME_TIMA_03: u32 =    256;
 
 
 /// An object handling the gameboys internal timers,

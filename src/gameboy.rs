@@ -107,7 +107,7 @@ impl GameBoy {
             );
 
             // take the number of cycles consumed by the last operation
-            let cycles = instruction.opcode.cycles;
+            let cycles = context.get_cycles_consumed();
 
             // let other components handle their state
             self.mem.update(cycles);

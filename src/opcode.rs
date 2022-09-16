@@ -69,6 +69,9 @@ pub struct OpCode {
 pub struct OpCodeContext {
     /// The currently executed opcode
     opcode: &'static OpCode,
+
+    /// Stores the number of cycles the execution of this opcode consumed
+    cycles: u32,
 }
 
 
@@ -98,12 +101,25 @@ impl OpCodeContext {
     pub fn for_instruction(instruction: &Instruction) -> OpCodeContext {
         OpCodeContext {
             opcode: instruction.opcode,
+            cycles: instruction.opcode.cycles,
         }
     }
 
     /// Get the opcode being executed within the current context.
     pub fn get_opcode(&self) -> &'static OpCode {
         self.opcode
+    }
+
+    /// Adds a number of cycles consumed by the current instruction.
+    pub fn add_cycles(&mut self, cycles: u32) {
+        self.cycles += cycles;
+    }
+
+    /// Get the total amount of cycles consumed for this instruction.
+    /// This includes the fetch and execution time of the opcode itself,
+    /// as well as the extra time consumed on branching.
+    pub fn get_cycles_consumed(&self) -> u32 {
+        self.cycles
     }
 }
 

@@ -19,18 +19,25 @@ use crate::cpu::{CpuFlag, RegisterR16};
 use crate::gameboy::GameBoy;
 use crate::opcode::{opcode, OpCodeContext};
 
+const BRANCH_CYCLES_JMP:    u32 =  4;
+const BRANCH_CYCLES_CALL:   u32 = 12;
+const BRANCH_CYCLES_RET:    u32 = 12;
+
+
 /// Performs a jump to an address if a condition is met.
-fn jp_if_u16(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
+fn jp_if_u16(gb: &mut GameBoy, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
     let address = gb.cpu.fetch_u16();
     if gb.cpu.is_flag_set(flag) == value {
+        ctx.add_cycles(BRANCH_CYCLES_JMP);
         gb.cpu.jump_to(address);
     }
 }
 
 /// Performs a relative jump if a condition is met.
-fn jr_if_i8(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
+fn jr_if_i8(gb: &mut GameBoy, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
     let offset = gb.cpu.fetch_i8();
     if gb.cpu.is_flag_set(flag) == value {
+        ctx.add_cycles(BRANCH_CYCLES_JMP);
         gb.cpu.jump_relative(offset as i16);
     }
 }
@@ -50,8 +57,9 @@ fn call_addr_u16(gb: &mut GameBoy) {
 
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address, if a condition is met.
-fn call_addr_if(gb: &mut GameBoy, flag: CpuFlag, value: bool, address: u16) {
+fn call_addr_if(gb: &mut GameBoy, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool, address: u16) {
     if gb.cpu.is_flag_set(flag) == value {
+        ctx.add_cycles(BRANCH_CYCLES_CALL);
         call_addr(gb, address);
     }
 }
@@ -59,9 +67,9 @@ fn call_addr_if(gb: &mut GameBoy, flag: CpuFlag, value: bool, address: u16) {
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address, taken from the current instruction pointer,
 /// if a condition is met.
-fn call_u16_if(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
+fn call_u16_if(gb: &mut GameBoy, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
     let address = gb.cpu.fetch_u16();
-    call_addr_if(gb, flag, value, address);
+    call_addr_if(gb, ctx, flag, value, address);
 }
 
 /// Returns from a subroutine by taking the previous instruction pointer address from the stack.
@@ -71,8 +79,9 @@ fn ret_from_call(gb: &mut GameBoy) {
 
 /// Returns from a subroutine by taking the previous instruction pointer address from the stack,
 /// if a condition is met.
-fn ret_if(gb: &mut GameBoy, flag: CpuFlag, value: bool) {
+fn ret_if(gb: &mut GameBoy, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
     if gb.cpu.is_flag_set(flag) == value {
+        ctx.add_cycles(BRANCH_CYCLES_RET);
         ret_from_call(gb);
     }
 }
@@ -94,22 +103,22 @@ opcode!(jp_hl, [gb] {
     gb.cpu.jump_to(address);
 });
 
-opcode!(jr_z_i8,  [gb] jr_if_i8(gb, CpuFlag::Zero,  true));
-opcode!(jr_c_i8,  [gb] jr_if_i8(gb, CpuFlag::Carry, true));
-opcode!(jr_nz_i8, [gb] jr_if_i8(gb, CpuFlag::Zero,  false));
-opcode!(jr_nc_i8, [gb] jr_if_i8(gb, CpuFlag::Carry, false));
+opcode!(jr_z_i8,  [gb, ctx] jr_if_i8(gb, ctx, CpuFlag::Zero,  true));
+opcode!(jr_c_i8,  [gb, ctx] jr_if_i8(gb, ctx, CpuFlag::Carry, true));
+opcode!(jr_nz_i8, [gb, ctx] jr_if_i8(gb, ctx, CpuFlag::Zero,  false));
+opcode!(jr_nc_i8, [gb, ctx] jr_if_i8(gb, ctx, CpuFlag::Carry, false));
 
-opcode!(jp_z_u16,  [gb] jp_if_u16(gb, CpuFlag::Zero,  true));
-opcode!(jp_c_u16,  [gb] jp_if_u16(gb, CpuFlag::Carry, true));
-opcode!(jp_nz_u16, [gb] jp_if_u16(gb, CpuFlag::Zero,  false));
-opcode!(jp_nc_u16, [gb] jp_if_u16(gb, CpuFlag::Carry, false));
+opcode!(jp_z_u16,  [gb, ctx] jp_if_u16(gb, ctx, CpuFlag::Zero,  true));
+opcode!(jp_c_u16,  [gb, ctx] jp_if_u16(gb, ctx, CpuFlag::Carry, true));
+opcode!(jp_nz_u16, [gb, ctx] jp_if_u16(gb, ctx, CpuFlag::Zero,  false));
+opcode!(jp_nc_u16, [gb, ctx] jp_if_u16(gb, ctx, CpuFlag::Carry, false));
 
 opcode!(call_u16, [gb] call_addr_u16(gb));
 
-opcode!(call_z_u16,  [gb] call_u16_if(gb, CpuFlag::Zero, true));
-opcode!(call_c_u16,  [gb] call_u16_if(gb, CpuFlag::Carry, true));
-opcode!(call_nz_u16, [gb] call_u16_if(gb, CpuFlag::Zero, false));
-opcode!(call_nc_u16, [gb] call_u16_if(gb, CpuFlag::Carry, false));
+opcode!(call_z_u16,  [gb, ctx] call_u16_if(gb, ctx, CpuFlag::Zero, true));
+opcode!(call_c_u16,  [gb, ctx] call_u16_if(gb, ctx, CpuFlag::Carry, true));
+opcode!(call_nz_u16, [gb, ctx] call_u16_if(gb, ctx, CpuFlag::Zero, false));
+opcode!(call_nc_u16, [gb, ctx] call_u16_if(gb, ctx, CpuFlag::Carry, false));
 
 opcode!(rst_00h, [gb] call_addr(gb, 0x0000));
 opcode!(rst_08h, [gb] call_addr(gb, 0x0008));
@@ -122,10 +131,10 @@ opcode!(rst_38h, [gb] call_addr(gb, 0x0038));
 
 opcode!(ret, [gb] ret_from_call(gb));
 
-opcode!(ret_z,  [gb] ret_if(gb, CpuFlag::Zero,  true));
-opcode!(ret_c,  [gb] ret_if(gb, CpuFlag::Carry, true));
-opcode!(ret_nz, [gb] ret_if(gb, CpuFlag::Zero,  false));
-opcode!(ret_nc, [gb] ret_if(gb, CpuFlag::Carry, false));
+opcode!(ret_z,  [gb, ctx] ret_if(gb, ctx, CpuFlag::Zero,  true));
+opcode!(ret_c,  [gb, ctx] ret_if(gb, ctx, CpuFlag::Carry, true));
+opcode!(ret_nz, [gb, ctx] ret_if(gb, ctx, CpuFlag::Zero,  false));
+opcode!(ret_nc, [gb, ctx] ret_if(gb, ctx, CpuFlag::Carry, false));
 
 opcode!(reti, [gb] {
     ret_from_call(gb);
