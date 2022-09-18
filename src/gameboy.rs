@@ -92,22 +92,31 @@ impl GameBoy {
     /// current location of the instruction pointer.
     pub fn run(&mut self) {
         loop {
-            let instruction = self.cpu.fetch_next_instruction();
-            let mut context = OpCodeContext::for_instruction(&instruction);
+            let cycles = if self.cpu.is_running() {
+                let instruction = self.cpu.fetch_next_instruction();
+                let mut context = OpCodeContext::for_instruction(&instruction);
 
-            (instruction.opcode.proc)(self, &mut context);
+                (instruction.opcode.proc)(self, &mut context);
 
-            println!(
-                "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
-                instruction.opcode_address,
-                instruction.opcode_id,
-                if instruction.opcode_id <= 0xff { "  " } else { "" },
-                instruction.to_string(),
-                self.cpu
-            );
+                println!(
+                    "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
+                    instruction.opcode_address,
+                    instruction.opcode_id,
+                    if instruction.opcode_id <= 0xff { "  " } else { "" },
+                    instruction.to_string(),
+                    self.cpu
+                );
 
-            // take the number of cycles consumed by the last operation
-            let cycles = context.get_cycles_consumed();
+                // take the number of cycles consumed by the last operation
+                let cycles = context.get_cycles_consumed();
+
+                cycles
+            }
+            else {
+                // when in HALT state just pass 4 cycles
+                // where the CPU idles
+                4
+            };
 
             // let other components handle their state
             self.mem.update(cycles);

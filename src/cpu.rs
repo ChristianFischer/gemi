@@ -17,7 +17,7 @@
 
 use std::fmt::{Display, Formatter};
 use crate::opcode::{Instruction, OpCode};
-use crate::memory::{MEMORY_LOCATION_INTERRUPTS_ENABLED, MEMORY_LOCATION_INTERRUPTS_PENDING, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
+use crate::memory::{MEMORY_LOCATION_INTERRUPTS_FLAGGED, MEMORY_LOCATION_INTERRUPTS_ENABLED, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
@@ -72,6 +72,15 @@ pub enum ImeState {
     EnabledInCycles(u32),
 }
 
+/// Determines the CPU's state, when suspended by the HALT instruction.
+pub enum HaltState {
+    /// The CPU is running normally.
+    Running,
+
+    /// The CPU was suspended by the HALT command.
+    Halt,
+}
+
 /// An object representing the gameboy's CPU
 pub struct Cpu {
     clock: i32,
@@ -91,6 +100,9 @@ pub struct Cpu {
 
     /// The state whether interrupts are enabled or not.
     ime: ImeState,
+
+    /// The state whether the CPU was suspended by the HALT command.
+    halt: HaltState,
 }
 
 
@@ -123,6 +135,32 @@ impl RegisterR16 {
             RegisterR16::DE => RegisterR8::E,
             RegisterR16::HL => RegisterR8::L,
         }
+    }
+}
+
+impl Display for RegisterR8 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            RegisterR8::A => "A",
+            RegisterR8::F => "F",
+            RegisterR8::B => "B",
+            RegisterR8::C => "C",
+            RegisterR8::D => "D",
+            RegisterR8::E => "E",
+            RegisterR8::H => "H",
+            RegisterR8::L => "L",
+        })
+    }
+}
+
+impl Display for RegisterR16 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            RegisterR16::AF => "AF",
+            RegisterR16::BC => "BC",
+            RegisterR16::DE => "DE",
+            RegisterR16::HL => "HL",
+        })
     }
 }
 
@@ -175,6 +213,17 @@ impl Interrupt {
 }
 
 
+impl HaltState {
+    /// Checks whether the CPU is running in the according state.
+    pub fn is_cpu_running(&self) -> bool {
+        match self {
+            HaltState::Running => true,
+            HaltState::Halt => false,
+        }
+    }
+}
+
+
 impl Cpu {
     /// Creates an empty CPU object.
     pub fn new(mem: MemoryReadWriteHandle) -> Cpu {
@@ -188,14 +237,22 @@ impl Cpu {
             instruction_pointer: 0x0100,
             stack_pointer: 0x0000,
 
-            ime: ImeState::Disabled,
+            ime:  ImeState::Disabled,
+            halt: HaltState::Running,
         }
+    }
+
+    /// Checks whether the CPU is currently running or being suspended by HALT state.
+    pub fn is_running(&self) -> bool {
+        self.halt.is_cpu_running()
     }
 
     /// Let the CPU process their data.
     /// This function takes the amount of ticks to be processed.
     pub fn update(&mut self, cycles: u32) {
         self.clock += cycles as i32;
+
+        self.handle_halt_state();
 
         while self.clock > 0 {
             let cycles_to_process = 1;
@@ -208,23 +265,35 @@ impl Cpu {
         }
     }
 
+    /// Checks the current HALT state and check
+    /// if the state will be left when interrupts are pending.
+    fn handle_halt_state(&mut self) {
+        match self.halt {
+            HaltState::Halt => {
+                if self.get_interrupts_pending() != 0 {
+                    self.halt = HaltState::Running;
+                }
+            },
+
+            _ => { }
+        }
+    }
+
     /// Handles any pending interrupts.
     fn handle_interrupts(&mut self, cycles: u32) -> Option<Interrupt> {
         match self.ime {
             ImeState::Disabled => { },
 
             ImeState::Enabled => {
-                let interrupts_pending = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_PENDING);
-                let interrupts_enabled = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_ENABLED);
-                let interrupts_to_fire = interrupts_pending & interrupts_enabled;
+                let interrupts_pending = self.get_interrupts_pending();
 
                 for interrupt in Interrupt::AllInterrupts {
-                    if get_bit(interrupts_to_fire, interrupt.bit()) {
+                    if get_bit(interrupts_pending, interrupt.bit()) {
                         // disable further interrupts when a interrupt is being handled
                         self.ime = ImeState::Disabled;
 
                         // clear interrupt bit
-                        self.mem.clear_bit(MEMORY_LOCATION_INTERRUPTS_PENDING, interrupt.bit());
+                        self.mem.clear_bit(MEMORY_LOCATION_INTERRUPTS_FLAGGED, interrupt.bit());
 
                         // call the address of the interrupt
                         self.call_addr(interrupt.address());
@@ -248,6 +317,15 @@ impl Cpu {
         }
 
         None
+    }
+
+    /// Get pending interrupts in form of an integer with each bit representing it's according interrupt.
+    pub fn get_interrupts_pending(&self) -> u8 {
+        let interrupts_flagged = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_FLAGGED);
+        let interrupts_enabled = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_ENABLED);
+        let interrupts_pending = interrupts_flagged & interrupts_enabled;
+
+        interrupts_pending
     }
 
     /// Enables interrupts.
@@ -276,6 +354,23 @@ impl Cpu {
         match self.ime {
             ImeState::Enabled => true,
             _ => false,
+        }
+    }
+
+    /// Enters the HALT mode.
+    pub fn enter_halt_mode(&mut self) {
+        match self.ime {
+            ImeState::EnabledInCycles(_) => {
+                // when interrupts are about to be enabled, enable them immediately
+                // and revert the program counter to repeat the HALT instruction
+                // after interrupts were handled.
+                self.ime = ImeState::Enabled;
+                self.instruction_pointer -= 1;
+            }
+
+            _ => {
+                self.halt = HaltState::Halt;
+            }
         }
     }
 

@@ -25,7 +25,8 @@ opcode!(nop, []);
 opcode!(stop, [] {
 });
 
-opcode!(halt, [] {
+opcode!(halt, [gb] {
+    gb.cpu.enter_halt_mode();
 });
 
 opcode!(enable_interrupts, [gb, ctx] {

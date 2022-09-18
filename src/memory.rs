@@ -45,7 +45,7 @@ pub const MEMORY_LOCATION_DMA_ADDRESS:              u16 = 0xff46;
 pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
 pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
 pub const MEMORY_LOCATION_BOOT_ROM_DISABLE:         u16 = 0xff50;
-pub const MEMORY_LOCATION_INTERRUPTS_PENDING:       u16 = 0xff0f;
+pub const MEMORY_LOCATION_INTERRUPTS_FLAGGED:       u16 = 0xff0f;
 pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
 
 
@@ -317,7 +317,7 @@ impl MemoryReadWriteHandle {
     /// are enabled for the CPU, the instruction pointer will jump
     /// to the according interrupt address, otherwise it will be ignored.
     pub fn request_interrupt(&mut self, interrupt: Interrupt) {
-        self.set_bit(MEMORY_LOCATION_INTERRUPTS_PENDING, interrupt.bit());
+        self.set_bit(MEMORY_LOCATION_INTERRUPTS_FLAGGED, interrupt.bit());
     }
 }
 
