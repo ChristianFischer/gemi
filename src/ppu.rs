@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::cmp::min;
 use std::fmt::{Display, Formatter};
 use crate::cpu::Interrupt;
 use crate::memory::*;
@@ -24,6 +25,9 @@ pub const SCREEN_W: u32 = 160;
 pub const SCREEN_H: u32 = 144;
 
 pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
+
+pub const CPU_CYCLES_PER_LINE:  u32 =    456;
+pub const CPU_CYCLES_PER_FRAME: u32 = 70_224;
 
 pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        u8 = 0;
 pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           u8 = 1;
@@ -118,7 +122,8 @@ pub struct ScanlineData {
 
 /// An object representing the gameboy's picture processing unit.
 pub struct Ppu {
-    clock: i32,
+    clock: u32,
+
     mem: MemoryReadWriteHandle,
 
     /// The PPU's current mode.
@@ -131,7 +136,7 @@ pub struct Ppu {
     current_line_pixel: u8,
 
     /// The number of cycles being consumed for the current scanline.
-    current_line_cycles: i32,
+    current_line_cycles: u32,
 
     /// The cached data of the currently processed scanline.
     current_scanline: ScanlineData,
@@ -312,47 +317,48 @@ impl Ppu {
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
     pub fn update(&mut self, cycles: u32) -> FrameState {
-        self.clock += cycles as i32;
+        self.clock += cycles;
 
-        while self.clock > 0 {
-            match self.mode {
-                Mode::OamScan  => self.process_oam_scan(),
-                Mode::DrawLine => self.process_draw_line(),
-                Mode::HBlank   => self.process_hblank(),
-                Mode::VBlank   => self.process_vblank(),
-            };
-
-            // return if 'frame completed'
-            if self.frame_completed {
-                self.frame_completed = false;
-                return FrameState::FrameCompleted;
-            }
+        match self.mode {
+            Mode::OamScan  => self.process_oam_scan(),
+            Mode::DrawLine => self.process_draw_line(),
+            Mode::HBlank   => self.process_hblank(),
+            Mode::VBlank   => self.process_vblank(),
         }
-
-        FrameState::Processing
     }
 
 
     /// Scans the object attribute memory for the current scanline
     /// to collect the objects to be drawn in this line.
     /// Enters Mode::DrawLine after the OAM scan was completed.
-    fn process_oam_scan(&mut self) {
-        self.clock -= 80;
+    fn process_oam_scan(&mut self) -> FrameState {
+        if self.clock > 80 {
+            self.clock -= 80;
 
-        self.current_scanline    = self.do_oam_scan_for_line(self.ly);
-        self.current_line_pixel  = 0;
-        self.current_line_cycles = 0;
+            self.current_scanline    = self.do_oam_scan_for_line(self.ly);
+            self.current_line_pixel  = 0;
+            self.current_line_cycles = 80;
 
-        self.enter_mode(Mode::DrawLine);
+            self.enter_mode(Mode::DrawLine);
+        }
+
+        FrameState::Processing
     }
 
 
     /// Draws pixels of the current scanline into the LCD buffer.
     /// Enters Mode::HBlank after the drawing was completed.
-    fn process_draw_line(&mut self) {
+    fn process_draw_line(&mut self) -> FrameState {
+        let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
+        let pixels_to_update = min(self.clock / 2, pixels_remaining);
+        if pixels_to_update == 0 {
+            return FrameState::Processing;
+        }
+
         // update clock
-        self.current_line_cycles += 1;
-        self.clock -= 1;
+        let cycles = pixels_to_update * 2;
+        self.current_line_cycles += cycles;
+        self.clock               -= cycles;
 
         let lcdc            = self.get_lcdc();
         let bg_enabled      = get_bit(lcdc, LCD_CONTROL_BIT_BG_WINDOW_ENABLED);
@@ -360,108 +366,112 @@ impl Ppu {
         let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
         let tileset_select  = get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT);
         let tileset         = TileSet::by_select_bit(tileset_select);
+        let wx              = self.get_window_x();
+        let wy              = self.get_window_y();
 
-        let pixel_background = {
-            // check if the flag for window/background is enabled
-            if bg_enabled {
-                let wx = self.get_window_x();
-                let wy = self.get_window_y();
+        for _ in 0..pixels_to_update {
+            let pixel_background = {
+                // check if the flag for window/background is enabled
+                if bg_enabled {
+                    // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
+                    if window_enabled && (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
+                        let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
+                        let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
+                        let position_in_window_x  = self.current_line_pixel+7 - wx;
+                        let position_in_window_y  = self.ly - wy;
 
-                // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
-                if window_enabled && (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
-                    let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
-                    let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
-                    let position_in_window_x  = self.current_line_pixel+7 - wx;
-                    let position_in_window_y  = self.ly - wy;
+                        self.read_tilemap_pixel(
+                            window_tilemap,
+                            tileset,
+                            position_in_window_x,
+                            position_in_window_y
+                        )
+                    }
+                    else {
+                        // otherwise just handle the normal background
 
-                    self.read_tilemap_pixel(
-                        window_tilemap,
-                        tileset,
-                        position_in_window_x,
-                        position_in_window_y
-                    )
+                        let bg_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT);
+                        let bg_tilemap        = TileMap::by_select_bit(bg_tilemap_select);
+
+                        let (background_x, background_y) = self.screen_to_background(
+                            self.current_line_pixel,
+                            self.ly
+                        );
+
+                        self.read_tilemap_pixel(
+                            bg_tilemap,
+                            tileset,
+                            background_x,
+                            background_y
+                        )
+                    }
                 }
                 else {
-                    // otherwise just handle the normal background
-
-                    let bg_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT);
-                    let bg_tilemap        = TileMap::by_select_bit(bg_tilemap_select);
-
-                    let (background_x, background_y) = self.screen_to_background(
-                        self.current_line_pixel,
-                        self.ly
-                    );
-
-                    self.read_tilemap_pixel(
-                        bg_tilemap,
-                        tileset,
-                        background_x,
-                        background_y
-                    )
+                    0
                 }
+            };
+
+            // get the foreground pixel by reading the color of any sprite on the current
+            // position within this scanline
+            let pixel_foreground = self.read_scanline_sprite_pixel(
+                &self.current_scanline,
+                self.current_line_pixel
+            );
+
+            let pixel = if pixel_foreground != 0 && sprites_enabled {
+                pixel_foreground
             }
             else {
-                0
-            }
-        };
+                pixel_background
+            };
 
-        // get the foreground pixel by reading the color of any sprite on the current
-        // position within this scanline
-        let pixel_foreground = self.read_scanline_sprite_pixel(
-            &self.current_scanline,
-            self.current_line_pixel
-        );
+            // write pixel into LCD buffer
+            self.lcd_buffer.set_pixel(
+                self.current_line_pixel as u32,
+                self.ly as u32,
+                pixel
+            );
 
-        let pixel = if pixel_foreground != 0 && sprites_enabled {
-            pixel_foreground
+            // set next pixel to compute
+            self.current_line_pixel += 1;
         }
-        else {
-            pixel_background
-        };
-
-        // write pixel into LCD buffer
-        self.lcd_buffer.set_pixel(
-            self.current_line_pixel as u32,
-            self.ly as u32,
-            pixel
-        );
-
-        // set next pixel to compute
-        self.current_line_pixel += 1;
 
         // when reached the end of the current scanline, enter HBlank mode
         if self.current_line_pixel as u32 >= SCREEN_W {
             self.enter_mode(Mode::HBlank);
         }
+
+        FrameState::Processing
     }
 
 
     /// Process the HBlank mode after each drawn scanline.
     /// Enters Mode::OamScan for the next line or
     /// Mode::VBlank if the current line was the last one.
-    fn process_hblank(&mut self) {
-        let max_cycles       = 456_i32;
-        let remaining_cycles = max_cycles - self.current_line_cycles;
+    fn process_hblank(&mut self) -> FrameState {
+        let remaining_cycles = CPU_CYCLES_PER_LINE - self.current_line_cycles;
 
-        self.clock -= remaining_cycles;
+        if self.clock >= remaining_cycles {
+            self.clock -= remaining_cycles;
 
-        self.next_ly();
+            return self.next_ly();
+        }
+
+        FrameState::Processing
     }
 
 
     /// Process the VBlank mode after all scanlines were drawn.
     /// Enters Mode::OamScan for the first scanline of the next frame,
     /// afters the VBlank was completed.
-    fn process_vblank(&mut self) {
-        let cycles_per_line = 456;
+    fn process_vblank(&mut self) -> FrameState {
+        if self.clock >= CPU_CYCLES_PER_LINE {
+            self.clock -= CPU_CYCLES_PER_LINE;
 
-        self.clock -= cycles_per_line;
-        self.next_ly();
-
-        // set the flag for 'frame completed' after switching back to scanline 0
-        if self.ly == 0 {
-            self.frame_completed = true;
+            return self.next_ly();
         }
+
+        FrameState::Processing
     }
 
 
@@ -508,7 +518,7 @@ impl Ppu {
     /// LCD status byte as well as the current LY byte in memory.
     /// Enters either Mode::OamScan or Mode::VBlank depending on
     /// the next scanline.
-    fn next_ly(&mut self) {
+    fn next_ly(&mut self) -> FrameState {
         if self.ly == 153 {
             self.ly = 0;
         }
@@ -528,18 +538,28 @@ impl Ppu {
             self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcd_stat);
 
             // fire interrupt, if enabled
-            if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY) {
-                self.mem.request_interrupt(Interrupt::LcdStat);
+            if coincidence {
+                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY) {
+                    self.mem.request_interrupt(Interrupt::LcdStat);
+                }
             }
         }
 
         // enter vblank when beyond the last scanline
         // enter OAM scan for next scanline otherwise
-        if self.ly >= 144 {
-            self.enter_mode(Mode::VBlank);
+        match self.ly {
+              0..=143 => self.enter_mode(Mode::OamScan),
+            144       => self.enter_mode(Mode::VBlank),
+            145..=153 => { /* remains in VBlank */ },
+            _         => unreachable!()
+        }
+
+        // notify FrameCompleted after switching back to line #0
+        if self.ly == 0 {
+            FrameState::FrameCompleted
         }
         else {
-            self.enter_mode(Mode::OamScan);
+            FrameState::Processing
         }
     }
 
@@ -606,7 +626,7 @@ impl Ppu {
 
             // take a sprite if x > 0 and intersects the current scanline
             if
-            sprite.pos_x > 0
+                    sprite.pos_x > 0
                 &&  ly_plus_16 >= sprite.pos_y
                 &&  ly_plus_16 < (sprite.pos_y + sprite_h)
             {
