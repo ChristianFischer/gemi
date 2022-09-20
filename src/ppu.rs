@@ -107,6 +107,16 @@ pub struct Sprite {
 }
 
 
+/// Delivers the result of obtaining pixel data from a sprite.
+pub struct SpritePixelData {
+    /// The color index of the pixel data.
+    color_index: u8,
+
+    /// The index of the palette to be used to obtain the pixel color.
+    palette_index: u8,
+}
+
+
 /// An object storing data of any scanline to be processed by the PPU.
 pub struct ScanlineData {
     /// The line number stored in this object.
@@ -262,8 +272,18 @@ impl Sprite {
         get_bit(self.flags, 6)
     }
 
+    /// Get the palette used by this sprite.
+    pub fn get_palette(&self) -> u8 {
+        if get_bit(self.flags, 4) {
+            1
+        }
+        else {
+            0
+        }
+    }
+
     /// Checks whether the sprite should always be drawn above background.
-    pub fn is_always_above_background(&self) -> bool {
+    pub fn is_bg_priority(&self) -> bool {
         get_bit(self.flags, 7)
     }
 }
@@ -366,6 +386,9 @@ impl Ppu {
         let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
         let tileset_select  = get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT);
         let tileset         = TileSet::by_select_bit(tileset_select);
+        let palette_bg      = self.mem.read_u8(MEMORY_LOCATION_PALETTE_BG);
+        let palette_obp0    = self.mem.read_u8(MEMORY_LOCATION_PALETTE_OBP0);
+        let palette_obp1    = self.mem.read_u8(MEMORY_LOCATION_PALETTE_OBP1);
         let wx              = self.get_window_x();
         let wy              = self.get_window_y();
 
@@ -413,23 +436,38 @@ impl Ppu {
 
             // get the foreground pixel by reading the color of any sprite on the current
             // position within this scanline
-            let pixel_foreground = self.read_scanline_sprite_pixel(
-                &self.current_scanline,
-                self.current_line_pixel
-            );
-
-            let pixel = if pixel_foreground != 0 && sprites_enabled {
-                pixel_foreground
+            let sprite_data = if sprites_enabled {
+                self.read_scanline_sprite_pixel(
+                    &self.current_scanline,
+                    self.current_line_pixel,
+                    pixel_background
+                )
             }
             else {
-                pixel_background
+                None
             };
+
+            let (pixel, palette) = if let Some(sprite_pixel_data) = sprite_data {
+                let sprite_palette = if sprite_pixel_data.palette_index == 0 {
+                    palette_obp0
+                }
+                else {
+                    palette_obp1
+                };
+
+                (sprite_pixel_data.color_index, sprite_palette)
+            }
+            else {
+                (pixel_background, palette_bg)
+            };
+
+            let pixel_color = (palette >> (pixel << 1)) & 0x03;
 
             // write pixel into LCD buffer
             self.lcd_buffer.set_pixel(
                 self.current_line_pixel as u32,
                 self.ly as u32,
-                pixel
+                pixel_color
             );
 
             // set next pixel to compute
@@ -643,7 +681,7 @@ impl Ppu {
     }
 
     /// Reads a pixel from the current scanline sprite data on a given x position.
-    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8) -> u8 {
+    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8, pixel_background: u8) -> Option<SpritePixelData> {
         // screen position considering the border offset of -8 / -16
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
@@ -653,33 +691,47 @@ impl Ppu {
         let sprite_h    = if big_sprites { 16 } else { 8 };
         let sprite_w    = 8;
 
+        // iterate over all sprite previously found by the OAM scan
         for sprite_index in 0..scanline.sprites_found {
             let sprite = &(scanline.sprites[sprite_index as usize]);
 
-            if screen_x >= sprite.pos_x && x < sprite.pos_x {
-                let mut sprite_pixel_x = screen_x - sprite.pos_x;
-                let mut sprite_pixel_y = screen_y - sprite.pos_y;
-
-                if sprite.is_flip_x() {
-                    sprite_pixel_x = sprite_w - sprite_pixel_x - 1;
-                }
-
-                if sprite.is_flip_y() {
-                    sprite_pixel_y = sprite_h - sprite_pixel_y - 1;
-                }
-
-                let pixel = self.read_sprite_pixel(
-                    TileSet::H8000,
-                    sprite.tile,
-                    sprite_pixel_x,
-                    sprite_pixel_y
-                );
-
-                return pixel;
+            // check if the sprite overlaps the current scanline pixel
+            if screen_x < sprite.pos_x || x >= sprite.pos_x {
+                continue;
             }
+
+            // calculate the position inside the sprite including x and y flip
+            let mut sprite_pixel_x = screen_x - sprite.pos_x;
+            let mut sprite_pixel_y = screen_y - sprite.pos_y;
+
+            if sprite.is_flip_x() {
+                sprite_pixel_x = sprite_w - sprite_pixel_x - 1;
+            }
+
+            if sprite.is_flip_y() {
+                sprite_pixel_y = sprite_h - sprite_pixel_y - 1;
+            }
+
+            // read the sprite pixel value
+            let pixel = self.read_sprite_pixel(
+                TileSet::H8000,
+                sprite.tile,
+                sprite_pixel_x,
+                sprite_pixel_y
+            );
+
+            // color index 0 is transparent; with bg priority, the sprite is behind the BG
+            if pixel == 0 || (sprite.is_bg_priority() && pixel_background != 0) {
+                continue;
+            }
+
+            return Some(SpritePixelData {
+                color_index: pixel,
+                palette_index: sprite.get_palette()
+            });
         }
 
-        0
+        None
     }
 
     /// Read the pixel value of the background on a given position.
