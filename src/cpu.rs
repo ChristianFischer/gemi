@@ -52,6 +52,7 @@ pub enum CpuFlag {
 }
 
 /// An enumeration of all interrupts available.
+#[derive(Copy, Clone)]
 pub enum Interrupt {
     VBlank,
     LcdStat,
@@ -83,8 +84,6 @@ pub enum HaltState {
 
 /// An object representing the gameboy's CPU
 pub struct Cpu {
-    clock: i32,
-
     /// Handle to the device memory.
     mem: MemoryReadWriteHandle,
 
@@ -228,8 +227,6 @@ impl Cpu {
     /// Creates an empty CPU object.
     pub fn new(mem: MemoryReadWriteHandle) -> Cpu {
         Cpu {
-            clock: 0,
-
             mem,
 
             registers: [0; 8],
@@ -250,19 +247,8 @@ impl Cpu {
     /// Let the CPU process their data.
     /// This function takes the amount of ticks to be processed.
     pub fn update(&mut self, cycles: u32) {
-        self.clock += cycles as i32;
-
         self.handle_halt_state();
-
-        while self.clock > 0 {
-            let cycles_to_process = 1;
-            let interrupt_fired = self.handle_interrupts(cycles_to_process);
-
-            if let None = interrupt_fired {
-            }
-
-            self.clock -= cycles_to_process as i32;
-        }
+        self.handle_interrupts(cycles);
     }
 
     /// Checks the current HALT state and check
@@ -287,7 +273,7 @@ impl Cpu {
             ImeState::Enabled => {
                 let interrupts_pending = self.get_interrupts_pending();
 
-                for interrupt in Interrupt::AllInterrupts {
+                for interrupt in &Interrupt::AllInterrupts {
                     if get_bit(interrupts_pending, interrupt.bit()) {
                         // disable further interrupts when a interrupt is being handled
                         self.ime = ImeState::Disabled;
@@ -299,7 +285,7 @@ impl Cpu {
                         self.call_addr(interrupt.address());
 
                         // stop handling other interrupts
-                        return Some(interrupt);
+                        return Some(*interrupt);
                     }
                 }
             },
