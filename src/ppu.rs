@@ -127,6 +127,9 @@ pub struct ScanlineData {
 
     /// The number of sprites found.
     sprites_found: u8,
+
+    /// Stores if the window was enabled for this scanline.
+    window_enabled: bool,
 }
 
 
@@ -151,11 +154,13 @@ pub struct Ppu {
     /// The cached data of the currently processed scanline.
     current_scanline: ScanlineData,
 
+    /// Stores the current line being processed for a window.
+    /// This in independent of the frame line counter (LY) and just updated
+    /// when window pixels were drawn for the current scanline.
+    window_line: u8,
+
     /// The data buffer to store the actual viewport content presented to the display.
     lcd_buffer: LcdBuffer,
-
-    /// Flag to be set after a frame was completed.
-    frame_completed: bool,
 }
 
 
@@ -310,6 +315,7 @@ impl ScanlineData {
             line: 0,
             sprites: [Sprite::empty(); 10],
             sprites_found: 0,
+            window_enabled: false,
         }
     }
 }
@@ -326,8 +332,8 @@ impl Ppu {
             current_line_pixel: 0,
             current_line_cycles: 0,
             current_scanline: ScanlineData::new(),
+            window_line: 0,
             lcd_buffer: LcdBuffer::alloc(),
-            frame_completed: false,
         }
     }
 
@@ -397,11 +403,18 @@ impl Ppu {
                 // check if the flag for window/background is enabled
                 if bg_enabled {
                     // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
-                    if window_enabled && (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
+                    if !self.current_scanline.window_enabled && window_enabled {
+                        if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
+                            self.current_scanline.window_enabled = true;
+                        }
+                    }
+
+                    // process window pixels instead of background, if the window was enabled for this scanline
+                    if self.current_scanline.window_enabled {
                         let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
                         let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
                         let position_in_window_x  = self.current_line_pixel+7 - wx;
-                        let position_in_window_y  = self.ly - wy;
+                        let position_in_window_y  = self.window_line;
 
                         self.read_tilemap_pixel(
                             window_tilemap,
@@ -564,6 +577,12 @@ impl Ppu {
             self.ly = self.ly + 1;
         }
 
+        // also progress window line counter,
+        // if the window was drawn in this line
+        if self.current_scanline.window_enabled {
+            self.window_line += 1;
+        }
+
         // update ly value in memory
         self.mem.write_u8(MEMORY_LOCATION_LY, self.ly);
 
@@ -594,11 +613,19 @@ impl Ppu {
 
         // notify FrameCompleted after switching back to line #0
         if self.ly == 0 {
+            self.on_new_frame();
+
             FrameState::FrameCompleted
         }
         else {
             FrameState::Processing
         }
+    }
+
+
+    /// Callback to reset data when starting a new frame
+    fn on_new_frame(&mut self) {
+        self.window_line = 0;
     }
 
 
@@ -677,6 +704,17 @@ impl Ppu {
             }
         }
 
+        // the ppu prioritizes sprites with lower x position over higher x position
+        // independent of their order in the OAM list, so we sort all found sprites
+        // by their x position
+        scanline.sprites[0 .. scanline.sprites_found as usize].sort_by(
+            |a, b| {
+                let ax = a.pos_x;
+                let bx = b.pos_x;
+                ax.cmp(&bx)
+            }
+        );
+
         scanline
     }
 
@@ -690,6 +728,12 @@ impl Ppu {
         let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
         let sprite_h    = if big_sprites { 16 } else { 8 };
         let sprite_w    = 8;
+
+        // when big sprites are enabled, the top sprite always has the least significant bit
+        // set to 0, and the bottom sprite is using the same sprite number with the LSB set to 1
+        // so we're just eliminating the LSB and continue reading with sprite data behind the
+        // top sprite memory location.
+        let sprite_mask = if big_sprites { 0xfe } else { 0xff };
 
         // iterate over all sprite previously found by the OAM scan
         for sprite_index in 0..scanline.sprites_found {
@@ -715,7 +759,7 @@ impl Ppu {
             // read the sprite pixel value
             let pixel = self.read_sprite_pixel(
                 TileSet::H8000,
-                sprite.tile,
+                sprite.tile & sprite_mask,
                 sprite_pixel_x,
                 sprite_pixel_y
             );
