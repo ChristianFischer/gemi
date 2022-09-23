@@ -16,10 +16,16 @@
  */
 
 use std::fmt::{Display, Formatter};
+use crate::gameboy::clock_t;
 use crate::opcode::{Instruction, OpCode};
 use crate::memory::{MEMORY_LOCATION_INTERRUPTS_FLAGGED, MEMORY_LOCATION_INTERRUPTS_ENABLED, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
+
+
+/// Number of cycles per second.
+pub const CPU_CLOCK_SPEED: clock_t = 4_194_304;
+
 
 /// Definition for each supported 8 bit Register.
 #[derive(Copy, Clone)]
@@ -70,7 +76,7 @@ pub enum ImeState {
     Enabled,
 
     /// Interrupts are disabled, but will be enabled after some CPU cycles.
-    EnabledInCycles(u32),
+    EnabledInCycles(clock_t),
 }
 
 /// Determines the CPU's state, when suspended by the HALT instruction.
@@ -246,7 +252,7 @@ impl Cpu {
 
     /// Let the CPU process their data.
     /// This function takes the amount of ticks to be processed.
-    pub fn update(&mut self, cycles: u32) {
+    pub fn update(&mut self, cycles: clock_t) {
         self.handle_halt_state();
         self.handle_interrupts(cycles);
     }
@@ -266,7 +272,7 @@ impl Cpu {
     }
 
     /// Handles any pending interrupts.
-    fn handle_interrupts(&mut self, cycles: u32) -> Option<Interrupt> {
+    fn handle_interrupts(&mut self, cycles: clock_t) -> Option<Interrupt> {
         match self.ime {
             ImeState::Disabled => { },
 
@@ -320,7 +326,7 @@ impl Cpu {
     }
 
     /// Enables interrupts after a number of cycles passed.
-    pub fn enable_interrupts_in(&mut self, cycles: u32) {
+    pub fn enable_interrupts_in(&mut self, cycles: clock_t) {
         match self.ime {
             ImeState::Disabled | ImeState::EnabledInCycles(_) => {
                 self.ime = ImeState::EnabledInCycles(cycles);

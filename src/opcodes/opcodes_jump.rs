@@ -16,12 +16,12 @@
  */
 
 use crate::cpu::{CpuFlag, RegisterR16};
-use crate::gameboy::GameBoy;
+use crate::gameboy::{clock_t, GameBoy};
 use crate::opcode::{opcode, OpCodeContext};
 
-const BRANCH_CYCLES_JMP:    u32 =  4;
-const BRANCH_CYCLES_CALL:   u32 = 12;
-const BRANCH_CYCLES_RET:    u32 = 12;
+const BRANCH_CYCLES_JMP:    clock_t =  4;
+const BRANCH_CYCLES_CALL:   clock_t = 12;
+const BRANCH_CYCLES_RET:    clock_t = 12;
 
 
 /// Performs a jump to an address if a condition is met.

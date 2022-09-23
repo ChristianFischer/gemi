@@ -18,6 +18,7 @@
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
 use crate::cpu::Interrupt;
+use crate::gameboy::clock_t;
 use crate::memory::*;
 use crate::utils::{change_bit, get_bit};
 
@@ -26,8 +27,8 @@ pub const SCREEN_H: u32 = 144;
 
 pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
 
-pub const CPU_CYCLES_PER_LINE:  u32 =    456;
-pub const CPU_CYCLES_PER_FRAME: u32 = 70_224;
+pub const CPU_CYCLES_PER_LINE:  clock_t =    456;
+pub const CPU_CYCLES_PER_FRAME: clock_t = 70_224;
 
 pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        u8 = 0;
 pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           u8 = 1;
@@ -135,7 +136,7 @@ pub struct ScanlineData {
 
 /// An object representing the gameboy's picture processing unit.
 pub struct Ppu {
-    clock: u32,
+    clock: clock_t,
 
     mem: MemoryReadWriteHandle,
 
@@ -149,7 +150,7 @@ pub struct Ppu {
     current_line_pixel: u8,
 
     /// The number of cycles being consumed for the current scanline.
-    current_line_cycles: u32,
+    current_line_cycles: clock_t,
 
     /// The cached data of the currently processed scanline.
     current_scanline: ScanlineData,
@@ -342,7 +343,7 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    pub fn update(&mut self, cycles: u32) -> FrameState {
+    pub fn update(&mut self, cycles: clock_t) -> FrameState {
         self.clock += cycles;
 
         match self.mode {
@@ -376,7 +377,7 @@ impl Ppu {
     /// Enters Mode::HBlank after the drawing was completed.
     fn process_draw_line(&mut self) -> FrameState {
         let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
-        let pixels_to_update = min(self.clock / 2, pixels_remaining);
+        let pixels_to_update = min(self.clock / 2, pixels_remaining as u64);
         if pixels_to_update == 0 {
             return FrameState::Processing;
         }

@@ -16,15 +16,16 @@
  */
 
 use crate::cpu::Interrupt;
+use crate::gameboy::clock_t;
 use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, MEMORY_LOCATION_REGISTER_TIMA, MEMORY_LOCATION_REGISTER_TMA, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::utils::get_bit;
 
 
-const UPDATE_TIME_DIV:     u32 =    256;
-const UPDATE_TIME_TIMA_00: u32 =   1024;
-const UPDATE_TIME_TIMA_01: u32 =     16;
-const UPDATE_TIME_TIMA_02: u32 =     64;
-const UPDATE_TIME_TIMA_03: u32 =    256;
+const UPDATE_TIME_DIV:     clock_t =    256;
+const UPDATE_TIME_TIMA_00: clock_t =   1024;
+const UPDATE_TIME_TIMA_01: clock_t =     16;
+const UPDATE_TIME_TIMA_02: clock_t =     64;
+const UPDATE_TIME_TIMA_03: clock_t =    256;
 
 
 /// An object handling the gameboys internal timers,
@@ -38,7 +39,7 @@ pub struct Timer {
 
     /// The clock which counts the cycles to increment the DIV register.
     /// DIV will be updated after the clock reaches UPDATE_TIME_DIV.
-    div_clock: u32,
+    div_clock: clock_t,
 
     /// Stores the previous value of the TAC register (0xff07)
     /// to check if it was written to.
@@ -50,10 +51,10 @@ pub struct Timer {
 
     /// The update clock selection defined by the value of the TAC register.
     /// Should be either 4kHz, 16kHz, 64kHz or 256kHz.
-    tima_update_time: u32,
+    tima_update_time: clock_t,
 
     /// The clock which counts the cycles to increment the TIMA register.
-    tima_clock: u32,
+    tima_clock: clock_t,
 }
 
 
@@ -76,7 +77,7 @@ impl Timer {
 
 
     /// Update timers for n CPU cycles.
-    pub fn update(&mut self, cycles: u32) {
+    pub fn update(&mut self, cycles: clock_t) {
         self.check_for_changed_registers();
         self.update_div(cycles);
         self.update_tima(cycles);
@@ -120,7 +121,7 @@ impl Timer {
 
 
     /// Update the DIV timer
-    fn update_div(&mut self, cycles: u32) {
+    fn update_div(&mut self, cycles: clock_t) {
         self.div_clock = self.div_clock.wrapping_add(cycles);
 
         while self.div_clock >= UPDATE_TIME_DIV {
@@ -136,7 +137,7 @@ impl Timer {
 
 
     /// Update the TIMA timer and handles the timer interrupt
-    fn update_tima(&mut self, cycles: u32) {
+    fn update_tima(&mut self, cycles: clock_t) {
         if self.tima_enabled {
             self.tima_clock = self.tima_clock.wrapping_add(cycles);
 

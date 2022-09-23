@@ -22,6 +22,7 @@ use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::Cartridge;
 use crate::cpu::Interrupt;
+use crate::gameboy::clock_t;
 use crate::mbc::{create_mbc, Mbc};
 use crate::mbc::mbc_none::MbcNone;
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
@@ -224,7 +225,7 @@ impl Memory {
     /// Let the memory controller handle it's tasks.
     /// 'cycles' gives the number of ticks passed since
     /// the last call.
-    pub fn update(&mut self, cycles: u32) {
+    pub fn update(&mut self, cycles: clock_t) {
         self.internal.get_mut().handle_dma_transfer(cycles);
     }
 
@@ -439,7 +440,7 @@ impl MemoryInternal {
     }
 
     /// Handles an OAM DMA transfer, if any active.
-    fn handle_dma_transfer(&mut self, cycles: u32) {
+    fn handle_dma_transfer(&mut self, cycles: clock_t) {
         match self.dma {
             DmaTransferState::Disabled => {}
 
