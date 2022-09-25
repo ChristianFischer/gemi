@@ -8,14 +8,13 @@ Feel free to make suggestions about missing features or games which are not supp
 
 # Feature List
 
-| DMG Features                             |     |
+|                                          |     |
 |:-----------------------------------------|:---:|
 | Memory Bank Controller                   | 🟢  |
 | *MBC 1*                                  | 🟢  |
 | *MBC 2*                                  | 🔴  |
 | *MBC 3*                                  | 🔴  |
-| *MBC 4*                                  | 🔴  |
-| *MBC 5*                                  | 🔴  |
+| *MBC 5*                                  | 🟢  |
 | Persistent Cartridge Memory              | 🟢  |
 | Save/Load Snapshots of the entire system | 🔴  |
 | Sound                                    | 🔴  |
@@ -28,31 +27,32 @@ Feel free to make suggestions about missing features or games which are not supp
 ## Acid 2 Test
 
 |                     |     |
-|---------------------|-----|
+|---------------------|:---:|
 | DMG Acid 2          | 🟢  |
-| DMG Acid 2 (on cgb) | 🔴  |
-| CGB Acid 2          | 🔴  |
+| DMG Acid 2 (on cgb) |  ❓  |
+| CGB Acid 2          |  ❓  |
 
 ## Blargg Test ROMs
 
-|                      | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   | 10  | 11  | 12  |
-|----------------------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
-| cgb_sound            | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   |
+|                      |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  | 10  | 11  | 12  |
+|----------------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| cgb_sound            |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |
 | cpu_instrs           | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  |     |
-| dmg_sound            | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   | ❓   |
+| dmg_sound            |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |
 | instr_timing         | 🔴  |     |     |     |     |     |     |     |     |     |     |     |
+| interrupt_time       | 🔴  |     |     |     |     |     |     |     |     |     |     |     |
 | mem_timing           | 🔴  | 🔴  | 🔴  |     |     |     |     |     |     |     |     |     |
 | mem_timing-2         | 🔴  | 🔴  | 🔴  |     |     |     |     |     |     |     |     |     |
 | oam_bug              | 🔴  | 🔴  | 🟢  | 🔴  | 🔴  | 🟢  | 🔴  | 🔴  |     |     |     |     |
-| halt_bug (dmg / cgb) | 🔴  | ❓   |     |     |     |     |     |     |     |     |     |     |
+| halt_bug (dmg / cgb) | 🔴  |  ❓  |     |     |     |     |     |     |     |     |     |     |
 
 ## Symbols
 
 |     |                                       |
-|-----|---------------------------------------|
+|:---:|:--------------------------------------|
 | 🟢  | completely implemented                |
 | 🟡  | partially implemented / needs testing |
 | 🔵  | currently work in progress            |
 | 🔴  | not implemented                       |
-| ⚪   | currently not planned                 |
-| ❓   | Unknown / not tested                  |
+|  ⚪  | currently not planned                 |
+|  ❓  | Unknown / not tested                  |

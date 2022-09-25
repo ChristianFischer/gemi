@@ -18,6 +18,7 @@
 use std::fmt::{Display, Formatter};
 use crate::Cartridge;
 use crate::mbc::mbc1::Mbc1;
+use crate::mbc::mbc5::Mbc5;
 use crate::mbc::mbc_none::MbcNone;
 
 /// Type of memory bank controller to be used
@@ -47,6 +48,7 @@ pub fn create_mbc(kind: &MemoryBankController) -> Box<dyn Mbc> {
     match kind {
         MemoryBankController::None => Box::new(MbcNone::new()),
         MemoryBankController::MBC1 => Box::new(Mbc1::new()),
+        MemoryBankController::MBC5 => Box::new(Mbc5::new()),
         _                          => panic!("Not implemented {}", kind)
     }
 }
@@ -245,6 +247,154 @@ mod mbc1 {
 
                 // 0xa000 - 0xbfff: Cartridge RAM
                 0x05 => {
+                    if cartridge.has_ram() && self.ram_enabled {
+                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                        cartridge.get_mut_ram().set_at(ram_address, value);
+                    }
+                },
+
+                _ => unreachable!("Unexpected write to address {}", address),
+            }
+        }
+    }
+}
+
+
+mod mbc5 {
+    use crate::Cartridge;
+    use crate::mbc::Mbc;
+
+    /// Type 5 Memory Bank Controller:
+    /// Supports up to 8MB ROMs and up to 128kB RAM.
+    pub struct Mbc5 {
+        /// The value written into the first bank selection register.
+        /// Contains the lower 8 bits of the selected ROM bank.
+        rom_bank_selection_0: u8,
+
+        /// The value written into the second bank selection register.
+        /// Contains the 9th bit of the selected ROM bank.
+        rom_bank_selection_1: u8,
+
+        /// The value written into the RAM bank selection register.
+        ram_bank_selection_0: u8,
+
+        /// The selected ROM bank number.
+        rom_bank_selected: u16,
+
+        /// The offset added to the address the game wants to read from,
+        /// to get the real address within the ROM file.
+        rom_bank_offset:   usize,
+
+        /// The selected RAM bank number.
+        ram_bank_selected: u16,
+
+        /// The offset added to the address the game wants to read/write,
+        /// to get the real address within the RAM image.
+        ram_bank_offset: usize,
+
+        /// Sets if the RAM bank is enabled or not.
+        ram_enabled: bool,
+    }
+
+    impl Mbc5 {
+        pub fn new() -> Self {
+            Self {
+                rom_bank_selection_0: 0x00,
+                rom_bank_selection_1: 0x00,
+                ram_bank_selection_0: 0x00,
+
+                rom_bank_selected: 1,
+                rom_bank_offset:   0x0000,
+
+                ram_bank_selected: 0,
+                ram_bank_offset:   0x0000,
+
+                ram_enabled: false,
+            }
+        }
+
+
+        /// After writing to one of the bank selection registers,
+        /// this function is used to calculate the actual RAM and ROM bank numbers
+        /// as well as the offsets to read and write inside the ROM and RAM images.
+        fn update_selected_banks(&mut self) {
+            let rom_bank =
+                (self.rom_bank_selection_0 as u16)
+              | ((self.rom_bank_selection_1 as u16 & 0x01) << 8)
+            ;
+
+            let ram_bank =
+                self.ram_bank_selection_0 as u16
+            ;
+
+            // store the rom bank and the offset to be added to all
+            // requested addresses, beginning with 0x4000
+            self.rom_bank_selected = rom_bank;
+            self.rom_bank_offset   = (rom_bank as usize) * 0x4000;
+
+            // store the ram bank and the offset to be added to all addresses
+            self.ram_bank_selected = ram_bank;
+            self.ram_bank_offset   = (ram_bank as usize) * 0x2000;
+        }
+    }
+
+    impl Mbc for Mbc5 {
+        fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+            match address {
+                // read from fixed ROM bank, which is always bank 0.
+                0x0000 ..= 0x3fff => {
+                    let rom_address = address as usize;
+                    cartridge.get_rom().get_at(rom_address)
+                },
+
+                // read from the switchable ROM bank
+                0x4000 ..= 0x7fff => {
+                    let rom_address = (address as usize) + self.rom_bank_offset - 0x4000;
+                    cartridge.get_rom().get_at(rom_address)
+                },
+
+                // read from switchable RAM bank.
+                0xa000 ..= 0xbfff => {
+                    if cartridge.has_ram() && self.ram_enabled {
+                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                        cartridge.get_ram().get_at(ram_address)
+                    }
+                    else {
+                        0xff
+                    }
+                }
+
+                _ => unreachable!("Unexpected read from address {}", address),
+            }
+        }
+
+        fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+            match address {
+                // enable or disable RAM
+                0x0000 ..= 0x1fff => {
+                    self.ram_enabled = (value & 0x0f) == 0x0a;
+                },
+
+                // ROM bank selection #0
+                0x2000 ..= 0x2fff => {
+                    self.rom_bank_selection_0 = value;
+                    self.update_selected_banks();
+                },
+
+                // ROM bank selection #1
+                0x3000 ..= 0x3fff => {
+                    self.rom_bank_selection_1 = value;
+                    self.update_selected_banks();
+                },
+
+                // RAM bank selection
+                0x4000 ..= 0x5fff => {
+                    self.ram_bank_selection_0 = value & 0x0f;
+                    self.update_selected_banks();
+                },
+
+                // Cartridge RAM
+                0xa000 ..= 0xbfff => {
                     if cartridge.has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
                         cartridge.get_mut_ram().set_at(ram_address, value);
