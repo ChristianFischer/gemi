@@ -24,6 +24,7 @@ mod gameboy;
 mod input;
 mod mbc;
 mod memory;
+mod memory_data;
 mod opcode;
 mod opcodes;
 mod ppu;

@@ -22,9 +22,11 @@ use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::Cartridge;
 use crate::cpu::Interrupt;
+use crate::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::gameboy::clock_t;
 use crate::mbc::{create_mbc, Mbc};
 use crate::mbc::mbc_none::MbcNone;
+use crate::memory_data::mapped::MemoryDataMapped;
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
 pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
@@ -51,6 +53,22 @@ pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
 pub const MEMORY_LOCATION_BOOT_ROM_DISABLE:         u16 = 0xff50;
 pub const MEMORY_LOCATION_INTERRUPTS_FLAGGED:       u16 = 0xff0f;
 pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
+
+
+/// Helper macro to map memory addresses into their distinct areas.
+macro_rules! memory_map {
+    ($addr:expr => { $($from:literal $(..= $to:literal)? => [$($param:ident)?] $code:expr),+ }) => {
+        match $addr {
+            $(
+                $from $(..= $to)? => {
+                    $(let $param: usize = ($addr as usize) - ($from as usize);)?
+                    $code
+                }
+            )+
+        }
+    }
+}
+
 
 
 /// Stores the information of an active OAM DMA transfer
@@ -102,9 +120,146 @@ pub struct MemoryReadWriteHandle {
     internal: MemoryInternalRef,
 }
 
+
+pub type VRamBank       = MemoryDataFixedSize<8192>;
+pub type WRamBank       = MemoryDataFixedSize<4096>;
+pub type OamRamBank     = MemoryDataFixedSize<160>;
+pub type HRamBank       = MemoryDataFixedSize<127>;
+pub type IoRegisterBank = MemoryDataMapped<IoRegister>;
+
+
+#[derive(Default)]
+#[allow(dead_code)]
+#[repr(packed(1))]
+pub struct IoRegister {
+    /// JoyPad input
+    joyp: u8,
+
+    /// Serial transfer data
+    sb: u8,
+
+    /// Serial transfer control
+    sc: u8,
+
+    _unused_0x03: u8,
+
+    /// Divider register
+    div: u8,
+
+    /// Timer counter
+    tima: u8,
+
+    /// Timer modulo
+    tma: u8,
+
+    /// Timer control
+    tac: u8,
+
+    _unused_0x08: [u8; 7],
+
+    /// IF: pending interrupts
+    interrupts_flagged: u8,
+
+    /// Sound control registers
+    _sound0: [u8; 0x10],
+    _sound1: [u8; 0x10],
+    _sound2: [u8; 0x10],
+
+    /// LCD control
+    lcdc: u8,
+
+    /// LCD status
+    lcd_stat: u8,
+
+    /// LCD scroll offset Y
+    scy: u8,
+
+    /// LCD scroll offset X
+    scx: u8,
+
+    /// LCD current line
+    ly: u8,
+
+    /// LCD current line comparison
+    lyc: u8,
+
+    /// OAM DMA transfer start address
+    dma_address: u8,
+
+    /// DMG background palette
+    bgp: u8,
+
+    /// DMG object palette #0
+    obp0: u8,
+
+    /// DMG object palette #1
+    obp1: u8,
+
+    /// LCD window Y coordinate
+    wy: u8,
+
+    /// LCD window X coordinate
+    wx: u8,
+
+    _unused_0x4c: [u8; 3],
+
+    /// GBC: VRAM bank select
+    vbk: u8,
+
+    boot_rom_disable: u8,
+
+    /// CGB VRAM DMA transfer
+    vram_dma: [u8; 5],
+
+    _unused_0x56: [u8; 18],
+
+    cgb_color_palettes: [u8; 2],
+
+    _unused_0x6a: [u8; 6],
+
+    /// CGB WRAM bank select
+    svbk: u8,
+
+    _unused_0x71: [u8; 0x0f],
+    _unused_0x80: [u8; 0x10],
+    _unused_0x90: [u8; 0x10],
+    _unused_0xa0: [u8; 0x10],
+    _unused_0xb0: [u8; 0x10],
+    _unused_0xc0: [u8; 0x10],
+    _unused_0xd0: [u8; 0x10],
+    _unused_0xe0: [u8; 0x10],
+    _unused_0xf0: [u8; 0x0f],
+
+    /// IE: interrupts enabled
+    interrupts_enabled: u8,
+}
+
+
 /// Shared internal object for multiple Memory and MemoryReadWrite instances.
 struct MemoryInternal {
-    memory:     Box<[u8; 0x10000]>,
+    /// Video RAM (DMG = 1 * 8kiB, GBC = 2 * 8kiB)
+    vram_banks: Vec<VRamBank>,
+
+    /// Active Video RAM Bank (0-1, CGB only)
+    vram_active_bank: u8,
+
+    /// Work RAM banks (DMG = 2 * 4kiB, GBC = 8 * 4kiB)
+    wram_banks: Vec<WRamBank>,
+
+    /// Active Work RAM banks.
+    /// Bank 0 is fixed, Bank 1 can be switched between 1-7 on GBC.
+    wram_active_bank_0: u8,
+    wram_active_bank_1: u8,
+
+    /// OAM memory: 40 sprites, 4 bytes each = 160B
+    oam: OamRamBank,
+
+    /// IO Registers
+    io_registers: IoRegisterBank,
+
+    /// High RAM
+    hram: HRamBank,
+
     mbc:        Box<dyn Mbc>,
     dma:        DmaTransferState,
     boot_rom:   Option<BootRom>,
@@ -209,10 +364,29 @@ pub trait MemoryWrite : MemoryRead {
 impl Memory {
     /// Create a new Memory object.
     pub fn new() -> Self {
+        let vram_banks = vec![
+            VRamBank::new(),
+        ];
+
+        let wram_banks = vec![
+            WRamBank::new(),
+            WRamBank::new(),
+        ];
+
         Self {
             internal: MemoryInternalRef::new(
                 MemoryInternal {
-                    memory:     Box::new([0; 0x10000]),
+                    vram_banks,
+                    vram_active_bank: 0,
+
+                    wram_banks,
+                    wram_active_bank_0: 0,
+                    wram_active_bank_1: 1,
+
+                    oam: OamRamBank::new(),
+                    hram: HRamBank::new(),
+                    io_registers: IoRegisterBank::new(IoRegister::default()),
+
                     mbc:        Box::new(MbcNone::new()),
                     dma:        DmaTransferState::Disabled,
                     boot_rom:   None,
@@ -360,12 +534,40 @@ impl MemoryInternal {
     /// The request will be forwarded to the according device, depending
     /// on the physical location of the data (like cartridge, ppu, etc)
     pub fn read(&self, address: u16) -> u8 {
-        match address {
-            0x0000 ..= 0x00ff => self.read_boot_rom_or_cartridge(address),
-            0x0100 ..= 0x7fff => self.read_from_cartridge(address),
-            0xa000 ..= 0xbfff => self.read_from_cartridge(address),
-            _                 => self.read_internal_memory(address),
-        }
+        memory_map!(
+            address => {
+                0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(address),
+                0x0100 ..= 0x7fff => [] self.read_from_cartridge(address),
+
+                0x8000 ..= 0x9fff => [mapped_address] {
+                    let bank = &self.vram_banks[self.vram_active_bank as usize];
+                    bank.get_at(mapped_address)
+                },
+
+                0xa000 ..= 0xbfff => [] self.read_from_cartridge(address),
+
+                0xc000 ..= 0xcfff => [mapped_address] {
+                    let bank = &self.wram_banks[self.wram_active_bank_0 as usize];
+                    bank.get_at(mapped_address)
+                },
+
+                0xd000 ..= 0xdfff => [mapped_address] {
+                    let bank = &self.wram_banks[self.wram_active_bank_1 as usize];
+                    bank.get_at(mapped_address)
+                },
+
+                0xe000 ..= 0xfdff => [mapped_address] {
+                    // echo RAM; mapped into WRAM (0xc000 - 0xddff)
+                    self.read((mapped_address + 0xc000) as u16)
+                },
+
+                0xfe00 ..= 0xfe9f => [mapped_address] self.oam.get_at(mapped_address),
+                0xfea0 ..= 0xfeff => []               unreachable!(), // unusable ram area
+                0xff00 ..= 0xff7f => [mapped_address] self.io_registers.get_at(mapped_address),
+                0xff80 ..= 0xfffe => [mapped_address] self.hram.get_at(mapped_address),
+                0xffff            => []               self.io_registers.get().interrupts_enabled
+            }
+        )
     }
 
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
@@ -383,24 +585,59 @@ impl MemoryInternal {
             return self.mbc.read_byte(cartridge, address);
         }
 
-        self.read_internal_memory(address)
-    }
-
-    /// Reads data from the internal memory.
-    fn read_internal_memory(&self, address: u16) -> u8 {
-        self.memory[address as usize]
+        0xff
     }
 
     /// Writes data to any memory location.
     /// The request will be forwarded to the according device, depending
     /// on the physical location of the data (like cartridge, ppu, etc)
     pub fn write(&mut self, address: u16, value: u8) {
-        match address {
-            0x0000 ..= 0x7fff => self.write_to_cartridge(address, value),
-            0xa000 ..= 0xbfff => self.write_to_cartridge(address, value),
-            0xff00 ..= 0xffff => self.write_io_registers(address, value),
-            _                 => self.write_internal_memory(address, value),
-        }
+        memory_map!(
+            address => {
+                0x0000 ..= 0x7fff => [] self.write_to_cartridge(address, value),
+
+                0x8000 ..= 0x9fff => [mapped_address] {
+                    let bank = &mut self.vram_banks[self.vram_active_bank as usize];
+                    bank.set_at(mapped_address, value)
+                },
+
+                0xa000 ..= 0xbfff => [] self.write_to_cartridge(address, value),
+
+                0xc000 ..= 0xcfff => [mapped_address] {
+                    let bank = &mut self.wram_banks[self.wram_active_bank_0 as usize];
+                    bank.set_at(mapped_address, value)
+                },
+
+                0xd000 ..= 0xdfff => [mapped_address] {
+                    let bank = &mut self.wram_banks[self.wram_active_bank_1 as usize];
+                    bank.set_at(mapped_address, value)
+                },
+
+                0xe000 ..= 0xfdff => [mapped_address] {
+                    // echo RAM; mapped into WRAM (0xc000 - 0xddff)
+                    self.write((mapped_address + 0xc000) as u16, value)
+                },
+
+                0xfe00 ..= 0xfe9f => [mapped_address] self.oam.set_at(mapped_address, value),
+                0xfea0 ..= 0xfeff => []               unreachable!(), // unusable ram area
+
+                0xff00 ..= 0xff7f => [mapped_address] {
+                    let old = self.io_registers.get_at(mapped_address);
+                    self.io_registers.set_at(mapped_address, value);
+                    self.on_io_registers_changed(address, old, value);
+                },
+
+                0xff80 ..= 0xfffe => [mapped_address] self.hram.set_at(mapped_address, value),
+
+                0xffff => [] {
+                    let ioreg = self.io_registers.get_mut();
+                    let old = ioreg.interrupts_enabled;
+                    ioreg.interrupts_enabled = value;
+
+                    self.on_io_registers_changed(address, old, value);
+                }
+            }
+        )
     }
 
     /// Writes data to the cartridge.
@@ -411,9 +648,7 @@ impl MemoryInternal {
     }
 
     /// Writes data into IO registers
-    fn write_io_registers(&mut self, address: u16, value: u8) {
-        self.write_internal_memory(address, value);
-
+    fn on_io_registers_changed(&mut self, address: u16, _old_value: u8, value: u8) {
         match address {
             MEMORY_LOCATION_DMA_ADDRESS => {
                 let start_address = (value as u16) << 8;
@@ -434,11 +669,6 @@ impl MemoryInternal {
         }
     }
 
-    /// Writes data into the internal memory.
-    fn write_internal_memory(&mut self, address: u16, value: u8) {
-        self.memory[address as usize] = value;
-    }
-
     /// Handles an OAM DMA transfer, if any active.
     fn handle_dma_transfer(&mut self, cycles: clock_t) {
         match self.dma {
@@ -452,8 +682,9 @@ impl MemoryInternal {
                 // Copy the amount of data the memory controller was able to handle
                 for b in transfer_begin .. transfer_end {
                     let src = transfer.start_address.saturating_add(b);
-                    let dst = MEMORY_LOCATION_OAM_BEGIN.saturating_add(b);
-                    self.memory[dst as usize] = self.memory[src as usize];
+                    let dst = b as usize;
+
+                    self.oam.set_at(dst, self.read(src));
                 }
 
                 // store the current state or set the transfer state to 'Disabled'
@@ -470,3 +701,54 @@ impl MemoryInternal {
         }
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! test_ioreg_struct_elem {
+        ($offset:expr => $item:ident) => {
+            {
+                let mut bank = IoRegisterBank::new(IoRegister::default());
+                let offset = ($offset - 0xff00) as usize;
+                let value = 0x12;
+
+                bank.set_at(offset, value);
+                assert_eq!(value, bank.get_at(offset));
+                assert_eq!(value, bank.get().$item);
+            }
+        }
+    }
+
+    #[test]
+    fn test_ioreg_struct_size() {
+        assert_eq!(256, std::mem::size_of::<IoRegister>());
+    }
+
+    #[test]
+    fn test_ioreg_struct_locations() {
+        test_ioreg_struct_elem!(MEMORY_LOCATION_JOYP                => joyp);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_DIV        => div);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TIMA       => tima);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TMA        => tma);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TAC        => tac);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_LCD_CONTROL         => lcdc);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_LCD_STATUS          => lcd_stat);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_SCY                 => scy);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_SCX                 => scx);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_LY                  => ly);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_LYC                 => lyc);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_DMA_ADDRESS         => dma_address);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_BG          => bgp);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP0        => obp0);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP1        => obp1);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_WY                  => wy);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_WX                  => wx);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_FLAGGED  => interrupts_flagged);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_ENABLED  => interrupts_enabled);
+
+    }
+}
+

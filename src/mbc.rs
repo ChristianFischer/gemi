@@ -101,6 +101,7 @@ pub mod mbc_none {
 
 mod mbc1 {
     use crate::Cartridge;
+    use crate::memory_data::MemoryData;
     use crate::mbc::Mbc;
 
     /// Type 1 Memory Bank Controller:
@@ -262,6 +263,7 @@ mod mbc1 {
 
 mod mbc5 {
     use crate::Cartridge;
+    use crate::memory_data::MemoryData;
     use crate::mbc::Mbc;
 
     /// Type 5 Memory Bank Controller:

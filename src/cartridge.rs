@@ -17,9 +17,16 @@
 
 use std::fs::File;
 use std::io;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::ops::Add;
+use crate::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::mbc::MemoryBankController;
+
+
+pub const FILE_EXT_GB:  &str = ".gb";
+pub const FILE_EXT_GBC: &str = ".gbc";
+pub const FILE_EXT_RAM: &str = ".sav";
+
 
 
 /// Type of game boy color support
@@ -41,21 +48,13 @@ pub struct RomData {
 }
 
 
-/// This object holds the cartridge RAM banks.
-/// The RAM banks could be of size 0, if the cartridge does
-/// not support RAM.
-pub struct RamBanks {
-    ram: Vec<u8>,
-}
-
-
 /// This object represents a cartridge of a single game.
 pub struct Cartridge {
     file: String,
 
     title: String,
     rom: RomData,
-    ram: RamBanks,
+    ram: MemoryDataDynamic,
 
     manufacturer_code: String,
     licensee_code: u8,
@@ -133,66 +132,19 @@ impl RomData {
 }
 
 
-impl RamBanks {
-    /// Allocates RAM banks of a certain size.
-    pub fn alloc(size: usize) -> RamBanks {
-        RamBanks {
-            ram: vec![0xff; size]
+/// Change the file extension of a filename.
+pub fn change_filename_ext(filepath: &str, ext: &str) -> String {
+    {
+        if filepath.ends_with(FILE_EXT_GB) {
+            &filepath[0 .. filepath.len() - 3]
         }
-    }
-
-    /// Determines the filename of the RAM image depending on the ROM file name.
-    pub fn cart_file_to_ram_file(filepath: &str) -> String {
-        let ram_file_ext = ".sav";
-
-        if filepath.ends_with(".gb") {
-            return filepath[0 .. filepath.len() - 3].to_string().add(ram_file_ext);
-        }
-
-        if filepath.ends_with(".gbc") {
-            return filepath[0 .. filepath.len() - 4].to_string().add(ram_file_ext);
-        }
-
-        return filepath.to_string().add(ram_file_ext);
-    }
-
-    /// Get the total RAM size.
-    pub fn size(&self) -> usize {
-        self.ram.len()
-    }
-
-    /// Read a single byte from the RAM image.
-    pub fn get_at(&self, address: usize) -> u8 {
-        if address < self.size() {
-            self.ram[address]
+        else if filepath.ends_with(FILE_EXT_GBC) {
+            &filepath[0 .. filepath.len() - 4]
         }
         else {
-            0x00
+            filepath
         }
-    }
-
-    /// Writes a single byte to the RAM image.
-    pub fn set_at(&mut self, address: usize, value: u8) {
-        if address < self.size() {
-            self.ram[address] = value;
-        }
-    }
-
-    /// Save the RAM image into a file.
-    pub fn save_to_file(&self, filepath: &str) -> io::Result<()> {
-        let mut file = File::create(filepath)?;
-        file.write(&self.ram)?;
-
-        Ok(())
-    }
-
-    /// Load the RAM image from a file.
-    pub fn read_from_file(&mut self, filepath: &str) -> io::Result<()> {
-        let mut file = File::open(filepath)?;
-        file.read(&mut self.ram)?;
-
-        Ok(())
-    }
+    }.to_string().add(ext)
 }
 
 
@@ -270,12 +222,12 @@ impl Cartridge {
         };
 
         // allocate RAM banks for this cartridge
-        let mut ram = RamBanks::alloc(ram_size);
+        let mut ram = MemoryDataDynamic::alloc(ram_size);
 
         // if RAM is available and powered by a battery, it's persistent
         // and we can try to load the RAM image from a file.
         if has_ram && has_battery {
-            let ram_file = RamBanks::cart_file_to_ram_file(filepath);
+            let ram_file = change_filename_ext(filepath, FILE_EXT_RAM);
 
             if let Err(e) = ram.read_from_file(&ram_file) {
                 // don't fail when RAM could not be loaded, just print a message
@@ -312,25 +264,31 @@ impl Cartridge {
     }
 
 
+    /// Get the cartridge filename with a different file extension.
+    pub fn get_filename_with_ext(&self, ext: &str) -> String {
+        change_filename_ext(&self.file, ext)
+    }
+
+
     /// get the plain data of this cartridge
     pub fn get_rom(&self) -> &RomData {
         &self.rom
     }
 
     /// Get the RAM banks of this cartridge.
-    pub fn get_ram(&self) -> &RamBanks {
+    pub fn get_ram(&self) -> &MemoryDataDynamic {
         &self.ram
     }
 
     /// Get the mutable RAM banks of this cartridge.
-    pub fn get_mut_ram(&mut self) -> &mut RamBanks {
+    pub fn get_mut_ram(&mut self) -> &mut MemoryDataDynamic {
         &mut self.ram
     }
 
     /// Saves the RAM to a file, if the cartridge has battery powered RAM.
     pub fn save_ram_if_any(&self) -> io::Result<()> {
         if self.has_ram && self.has_battery {
-            let ram_file = RamBanks::cart_file_to_ram_file(&self.file);
+            let ram_file = self.get_filename_with_ext(FILE_EXT_RAM);
             self.get_ram().save_to_file(&ram_file)?;
         }
 
