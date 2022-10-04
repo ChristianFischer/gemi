@@ -107,6 +107,7 @@ pub mod fixed_size {
 
 
     /// A data object storing data of fixed size.
+    #[derive(Clone)]
     pub struct MemoryDataFixedSize<const SIZE: usize> {
         arr: Box<[u8; SIZE]>,
     }

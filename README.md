@@ -19,7 +19,7 @@ Feel free to make suggestions about missing features or games which are not supp
 | Save/Load Snapshots of the entire system | 🔴  |
 | Sound                                    | 🔴  |
 | Serial Port / Multiplayer                |  ⚪  |
-| GameBoy Color Support                    | 🔴  |
+| GameBoy Color Support                    | 🔵  |
 
 
 # Test Results

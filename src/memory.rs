@@ -23,7 +23,7 @@ use crate::boot_rom::BootRom;
 use crate::Cartridge;
 use crate::cpu::Interrupt;
 use crate::memory_data::{MemoryData, MemoryDataFixedSize};
-use crate::gameboy::clock_t;
+use crate::gameboy::{clock_t, DeviceConfig, EmulationType};
 use crate::mbc::{create_mbc, Mbc};
 use crate::mbc::mbc_none::MbcNone;
 use crate::memory_data::mapped::MemoryDataMapped;
@@ -50,7 +50,14 @@ pub const MEMORY_LOCATION_PALETTE_OBP0:             u16 = 0xff48;
 pub const MEMORY_LOCATION_PALETTE_OBP1:             u16 = 0xff49;
 pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
 pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
+pub const MEMORY_LOCATION_VBK:                      u16 = 0xff4f;
 pub const MEMORY_LOCATION_BOOT_ROM_DISABLE:         u16 = 0xff50;
+pub const MEMORY_LOCATION_HDMA1:                    u16 = 0xff51;
+pub const MEMORY_LOCATION_HDMA2:                    u16 = 0xff52;
+pub const MEMORY_LOCATION_HDMA3:                    u16 = 0xff53;
+pub const MEMORY_LOCATION_HDMA4:                    u16 = 0xff54;
+pub const MEMORY_LOCATION_HDMA5:                    u16 = 0xff55;
+pub const MEMORY_LOCATION_SVBK:                     u16 = 0xff70;
 pub const MEMORY_LOCATION_INTERRUPTS_FLAGGED:       u16 = 0xff0f;
 pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
 
@@ -237,6 +244,9 @@ pub struct IoRegister {
 
 /// Shared internal object for multiple Memory and MemoryReadWrite instances.
 struct MemoryInternal {
+    /// The configuration of the running device
+    device_config: DeviceConfig,
+
     /// Video RAM (DMG = 1 * 8kiB, GBC = 2 * 8kiB)
     vram_banks: Vec<VRamBank>,
 
@@ -363,23 +373,21 @@ pub trait MemoryWrite : MemoryRead {
 
 impl Memory {
     /// Create a new Memory object.
-    pub fn new() -> Self {
-        let vram_banks = vec![
-            VRamBank::new(),
-        ];
-
-        let wram_banks = vec![
-            WRamBank::new(),
-            WRamBank::new(),
-        ];
+    pub fn new(device_config: DeviceConfig) -> Self {
+        let (num_vram_banks, num_wram_banks) = match device_config.emulation {
+            EmulationType::DMG => (1, 2),
+            EmulationType::GBC => (2, 8),
+        };
 
         Self {
             internal: MemoryInternalRef::new(
                 MemoryInternal {
-                    vram_banks,
+                    device_config,
+
+                    vram_banks: std::iter::repeat_with(|| VRamBank::new()).take(num_vram_banks).collect(),
                     vram_active_bank: 0,
 
-                    wram_banks,
+                    wram_banks: std::iter::repeat_with(|| WRamBank::new()).take(num_wram_banks).collect(),
                     wram_active_bank_0: 0,
                     wram_active_bank_1: 1,
 
@@ -439,6 +447,12 @@ impl Memory {
         let mut mem = self.internal.get_mut();
         mem.mbc       = create_mbc(cartridge.get_mbc());
         mem.cartridge = Some(cartridge);
+    }
+
+    /// Get a reference to the currently assigned cartridge, if any.
+    pub fn get_cartridge(&self) -> Ref<Option<Cartridge>> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| &mem.cartridge)
     }
 
     /// Save the cartridge RAM, if any.

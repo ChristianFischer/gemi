@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io;
 use std::io::Read;
@@ -42,6 +43,16 @@ pub enum GameBoyColorSupport {
 }
 
 
+/// Hold the licensee code (either it's old or new version)
+pub enum LicenseeCode {
+    /// old licensee code
+    Old(u8),
+
+    /// new licensee code
+    New(u8),
+}
+
+
 /// This object holds the plain data of a ROM.
 pub struct RomData {
     data: Vec<u8>,
@@ -57,7 +68,7 @@ pub struct Cartridge {
     ram: MemoryDataDynamic,
 
     manufacturer_code: String,
-    licensee_code: u8,
+    licensee_code: LicenseeCode,
 
     mbc: MemoryBankController,
 
@@ -235,13 +246,26 @@ impl Cartridge {
             }
         }
 
+        let licensee_code_old = rom.data[ROM_OFFSET_OLD_LICENSEE_CODE];
+
+        // get the new licensee code, which is only valid if the old code is '0x33'
+        let licensee_code = if licensee_code_old != 0x33 {
+            LicenseeCode::Old(licensee_code_old)
+        }
+        else {
+            LicenseeCode::New(
+                    ((rom.data[ROM_OFFSET_NEW_LICENSEE_CODE + 0] - '0' as u8) * 10)
+                 |  ((rom.data[ROM_OFFSET_NEW_LICENSEE_CODE + 1] - '0' as u8) *  1)
+            )
+        };
+
         let cartridge = Cartridge {
             file: filepath.to_string(),
 
             title: rom.read_title(),
 
             manufacturer_code: rom.read_manufacturer_code(),
-            licensee_code: 0x00,
+            licensee_code,
 
             mbc,
 
@@ -301,9 +325,25 @@ impl Cartridge {
         &self.title
     }
 
+    /// Computes the checksum of all 16 title bytes
+    pub fn compute_title_checksum(&self) -> u8 {
+        let mut checksum = 0u8;
+
+        for addr in 0x0134..=0x0143 {
+            checksum = checksum.wrapping_add(self.rom.get_at(addr));
+        }
+
+        checksum
+    }
+
     /// get the game's manufacturer code
     pub fn get_manufacturer_code(&self) -> &str {
         &self.manufacturer_code
+    }
+
+    /// Get the licensee code
+    pub fn get_licensee_code(&self) -> &LicenseeCode {
+        &self.licensee_code
     }
 
     /// get the kind of game boy color support
@@ -357,5 +397,15 @@ impl Cartridge {
     /// checks whether this cartridge has a rumble module
     pub fn has_rumble(&self) -> bool {
         self.has_rumble
+    }
+}
+
+
+impl Display for LicenseeCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LicenseeCode::Old(code) => write!(f, "{:02x} (old)", code),
+            LicenseeCode::New(code) => write!(f, "{:02x} (new)", code),
+        }
     }
 }

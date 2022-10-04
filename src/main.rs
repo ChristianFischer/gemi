@@ -36,7 +36,7 @@ use cartridge::Cartridge;
 use cartridge::GameBoyColorSupport;
 use std::env;
 use crate::boot_rom::BootRom;
-use crate::gameboy::GameBoy;
+use crate::gameboy::{DeviceType, GameBoy};
 
 fn print_rom_info(filename: &String, cartridge: &Cartridge) {
     let mut features: Vec<&str> = vec![];
@@ -66,6 +66,7 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
     println!("ROM file: {}", filename);
     println!("Title:         {}",     cartridge.get_title());
     println!("Manufacturer:  {}",     cartridge.get_manufacturer_code());
+    println!("Licensee:      {}",     cartridge.get_licensee_code());
     println!("MBC:           {}",     cartridge.get_mbc());
     println!("Features:      {}",     features.join(", "));
     println!("ROM size:      {} kiB", cartridge.get_rom_size() / 1024);
@@ -77,8 +78,7 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
 
 fn main() {
     let mut args = env::args().into_iter();
-    let mut gb = GameBoy::new().unwrap();
-    let mut cartridge: Option<Cartridge> = None;
+    let mut builder = GameBoy::build();
 
     // skip first argument, which is the executable name
     _ = args.next();
@@ -92,7 +92,31 @@ fn main() {
                     .expect("'--boot' needs to be followed by the path to a valid boot rom");
 
                 let boot_rom = BootRom::load_file(&filename).unwrap();
-                gb.set_boot_rom(boot_rom);
+                builder.set_boot_rom(boot_rom);
+            }
+
+            "--dmg" => {
+                builder.set_device_type(DeviceType::GameBoyDmg);
+            }
+
+            "--gbc" => {
+                builder.set_device_type(DeviceType::GameBoyColor);
+            }
+
+            "--gba" => {
+                builder.set_device_type(DeviceType::GameBoyAdvance);
+            }
+
+            "--sgb" => {
+                builder.set_device_type(DeviceType::SuperGameBoy);
+            }
+
+            "--sgb2" => {
+                builder.set_device_type(DeviceType::SuperGameBoy2);
+            }
+            
+            "--print-opcodes" => {
+                builder.set_print_opcodes(true);
             }
 
             _ => {
@@ -100,20 +124,19 @@ fn main() {
                 let cart     = Cartridge::load_file(&filename).unwrap();
                 print_rom_info(&filename, &cart);
 
-                cartridge = Some(cart);
+                builder.set_cartridge(cart);
             }
         }
     }
 
-    match cartridge {
-        Some(cart) => {
-            gb.insert_cart(cart);
+    match builder.finish() {
+        Ok(mut gb) => {
             gb.initialize();
             gb.run();
         }
 
-        None => {
-            println!("No ROM file specified");
+        Err(e) => {
+            println!("Failed: {}", e);
         }
     }
 }
