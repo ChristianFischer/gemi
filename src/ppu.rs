@@ -18,8 +18,11 @@
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
 use crate::cpu::Interrupt;
-use crate::gameboy::clock_t;
+use crate::gameboy::{clock_t, DeviceConfig, EmulationType};
+use crate::graphic_data::{Color, DmgDisplayPalette, DmgLcdPixel, DmgPalette, GbcPaletteData, Sprite, SpritePixelValue, TileMap, TileSet};
 use crate::memory::*;
+use crate::memory_data::mapped::MemoryDataMapped;
+use crate::memory_data::MemoryData;
 use crate::utils::{change_bit, get_bit};
 
 pub const SCREEN_W: u32 = 160;
@@ -48,8 +51,13 @@ pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_2:         u8 = 5;
 pub const LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY:      u8 = 6;
 pub const LCD_STATUS_BIT_UNUSED:                    u8 = 7;
 
+pub const TILE_ATTR_BIT_VRAM_BANK:                  u8 = 3;
+pub const TILE_ATTR_BIT_H_FLIP:                     u8 = 5;
+pub const TILE_ATTR_BIT_V_FLIP:                     u8 = 6;
+pub const TILE_ATTR_BIT_BG_TO_OAM_PRIO:             u8 = 7;
 
-type PixelBuffer160x144 = [u8; SCREEN_PIXELS];
+
+type PixelBuffer160x144 = MemoryDataMapped<[Color; SCREEN_PIXELS]>;
 
 pub struct LcdBuffer {
     pixels: PixelBuffer160x144,
@@ -69,55 +77,6 @@ pub enum FrameState {
 }
 
 
-/// A list of possible tilesets the gameboy can handle.
-#[derive(Copy, Clone)]
-pub enum TileSet {
-    /// The tileset is based on the 0x8000 address plus tile index as unsigned integer.
-    H8000,
-
-    /// The tileset is based on the 0x8800 address plus tile index as signed integer.
-    H8800,
-}
-
-/// A list of possible tilemaps the gameboy can handle.
-#[derive(Copy, Clone)]
-pub enum TileMap {
-    /// This tilemap is stored in the video memory at 0x9800 - 0x9bff
-    H9800,
-
-    /// This tilemap is stored in the video memory at 0x9c00 - 0x9fff
-    H9C00,
-}
-
-
-/// Stores the data of a single sprite entry, how
-/// it's stored in the OAM memory.
-#[derive(Copy, Clone)]
-pub struct Sprite {
-    /// The sprites position on Y axis.
-    pos_y: u8,
-
-    /// The sprites position on X axis.
-    pos_x: u8,
-
-    /// The tile number containing the sprites image data to be displayed.
-    tile: u8,
-
-    /// Flags to control the sprites behaviour.
-    flags: u8,
-}
-
-
-/// Delivers the result of obtaining pixel data from a sprite.
-pub struct SpritePixelData {
-    /// The color index of the pixel data.
-    color_index: u8,
-
-    /// The index of the palette to be used to obtain the pixel color.
-    palette_index: u8,
-}
-
-
 /// An object storing data of any scanline to be processed by the PPU.
 pub struct ScanlineData {
     /// The line number stored in this object.
@@ -134,10 +93,69 @@ pub struct ScanlineData {
 }
 
 
+/// The result of fetching a pixel from either background / window
+/// or OAM list.
+pub struct PixelFetchResult {
+    /// The color value from the tile being displayed.
+    /// This value is not a final color but needs to be
+    /// translated via color palette.
+    pub value: SpritePixelValue,
+
+    /// DMG: For sprites either 0 or 1 to switch between OBP0 and OBP1.
+    pub palette_dmg: u8,
+
+    /// GBC: The index of the palette being used (0-7)
+    pub palette_gbc: u8,
+
+    /// DMG: Unused.
+    /// CGB: The OAM index of the sprite being displayed.
+    pub sprite_priority: u8,
+
+    /// OBJ to BG priority bit
+    pub background_priority: bool,
+}
+
+
+/// Struct to temporarily store references to pixel data and their palettes
+/// to be used to resolve the actual color for a pixel.
+pub struct PixelFetchResultWithPalette<'a> {
+    pub data:        &'a PixelFetchResult,
+    pub palette_dmg: &'a DmgPalette,
+    pub palette_gbc: &'a GbcPaletteData,
+}
+
+
+/// Contains information where to read tile data.
+/// This information can be obtained by reading tile
+/// information from the PPU tile map.
+pub struct TileFetchProperties {
+    /// The TileMap where to read from
+    tilemap: TileMap,
+
+    /// The TileSet where to take the images from, which are referenced by the TileSet.
+    tileset: TileSet,
+
+    /// The tile index to be read from the tile map.
+    tile_index: u16,
+
+    /// The pixel on the X axis to read from the tile image.
+    /// This may get flipped depending on tile properties.
+    tile_pixel_x: u8,
+
+    /// The pixel on the Y axis to read from the tile image.
+    /// This may get flipped depending on tile properties.
+    tile_pixel_y: u8,
+}
+
+
 /// An object representing the gameboy's picture processing unit.
 pub struct Ppu {
     clock: clock_t,
 
+    /// Current device config
+    device_config: DeviceConfig,
+
+    /// Handle to read and write device memory.
     mem: MemoryReadWriteHandle,
 
     /// The PPU's current mode.
@@ -160,15 +178,34 @@ pub struct Ppu {
     /// when window pixels were drawn for the current scanline.
     window_line: u8,
 
+    /// If in DMG mode, a set of RGB colors to translate the LCD intensity values
+    /// into RGB colors to be displayed on color screens.
+    dmg_display_palette: DmgDisplayPalette,
+
     /// The data buffer to store the actual viewport content presented to the display.
     lcd_buffer: LcdBuffer,
+}
+
+
+impl PixelFetchResult {
+    /// Creates an empty PixelFetchResult containing '0' as the pixel value,
+    /// which has the lowest priority.
+    pub fn none() -> Self {
+        Self {
+            value: SpritePixelValue(0),
+            palette_dmg: 0,
+            palette_gbc: 0,
+            sprite_priority: 0,
+            background_priority: false,
+        }
+    }
 }
 
 
 impl LcdBuffer {
     pub fn alloc() -> LcdBuffer {
         LcdBuffer {
-            pixels: [0x00; SCREEN_PIXELS]
+            pixels: PixelBuffer160x144::new([Color::white(); SCREEN_PIXELS])
         }
     }
 
@@ -183,129 +220,20 @@ impl LcdBuffer {
     }
 
     /// Get the value of a specific pixel.
-    pub fn get_pixel(&self, x: u32, y: u32) -> u8 {
+    pub fn get_pixel(&self, x: u32, y: u32) -> &Color {
         let index = x + (y * SCREEN_W);
-        self.pixels[index as usize]
+        &self.pixels.get()[index as usize]
     }
 
     /// Set the value of a specific pixel.
-    pub fn set_pixel(&mut self, x: u32, y: u32, value: u8) {
+    pub fn set_pixel(&mut self, x: u32, y: u32, color: Color) {
         let index = x + (y * SCREEN_W);
-        self.pixels[index as usize] = value & 0x03;
+        self.pixels.get_mut()[index as usize] = color;
     }
 
     /// Get the pixel data to be displayed.
     pub fn get_pixels(&self) -> &PixelBuffer160x144 {
         &self.pixels
-    }
-}
-
-
-impl TileSet {
-    /// Selects a TileSet based on the value of a selection bit from the LCD status register.
-    pub fn by_select_bit(bit: bool) -> TileSet {
-        match bit {
-            false => TileSet::H8800,
-            true  => TileSet::H8000,
-        }
-    }
-
-    /// Get the address of a tile when this tileset is used.
-    pub fn address_of_tile(&self, tile: u8) -> u16 {
-        let tile_u16 = tile as u16;
-
-        match *self {
-            TileSet::H8000 => 0x8000 + (tile_u16 << 4),
-            TileSet::H8800 => 0x9000 + (tile_u16 << 4) - ((tile_u16 & 0x80) << 5),
-        }
-    }
-}
-
-
-impl TileMap {
-    /// Selects a TileMap based on the value of a selection bit from the LCD status register.
-    pub fn by_select_bit(bit: bool) -> TileMap {
-        match bit {
-            false => TileMap::H9800,
-            true  => TileMap::H9C00,
-        }
-    }
-
-    /// Get the base address where the tilemap is stored.
-    pub fn base_address(&self) -> u16 {
-        match *self {
-            TileMap::H9800 => 0x9800,
-            TileMap::H9C00 => 0x9c00,
-        }
-    }
-}
-
-
-impl Sprite {
-    /// Creates an empty sprite with all values zero.
-    pub fn empty() -> Sprite {
-        Sprite {
-            pos_x: 0,
-            pos_y: 0,
-            tile:  0,
-            flags: 0,
-        }
-    }
-
-    /// Reads sprite data from it's OAM entry.
-    pub fn from_oam(mem: &dyn MemoryRead, index: u8) -> Sprite {
-        let address = MEMORY_LOCATION_OAM_BEGIN + ((index as u16) * 4);
-        Self::from_address(mem, address)
-    }
-
-    /// Reads sprite data from any memory address.
-    pub fn from_address(mem: &dyn MemoryRead, address: u16) -> Sprite {
-        Sprite {
-            pos_y: mem.read_u8(address + 0),
-            pos_x: mem.read_u8(address + 1),
-            tile:  mem.read_u8(address + 2),
-            flags: mem.read_u8(address + 3),
-        }
-    }
-
-    /// Checks whether the sprite is mirrored on X axis.
-    pub fn is_flip_x(&self) -> bool {
-        get_bit(self.flags, 5)
-    }
-
-    /// Checks whether the sprite is mirrored on Y axis.
-    pub fn is_flip_y(&self) -> bool {
-        get_bit(self.flags, 6)
-    }
-
-    /// Get the palette used by this sprite.
-    pub fn get_palette(&self) -> u8 {
-        if get_bit(self.flags, 4) {
-            1
-        }
-        else {
-            0
-        }
-    }
-
-    /// Checks whether the sprite should always be drawn above background.
-    pub fn is_bg_priority(&self) -> bool {
-        get_bit(self.flags, 7)
-    }
-}
-
-
-impl Display for Sprite {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "tile #{} @ {}:{} flipX={} flipY={}",
-            self.tile,
-            self.pos_x as i32 - 8,
-            self.pos_y as i32 - 16,
-            self.is_flip_x(),
-            self.is_flip_y()
-        )
     }
 }
 
@@ -324,9 +252,10 @@ impl ScanlineData {
 
 impl Ppu {
     /// Creates a new PPU object.
-    pub fn new(mem: MemoryReadWriteHandle) -> Ppu {
+    pub fn new(device_config: DeviceConfig, mem: MemoryReadWriteHandle) -> Ppu {
         Ppu {
             clock: 0,
+            device_config,
             mem,
             mode: Mode::OamScan,
             ly: 0,
@@ -334,6 +263,7 @@ impl Ppu {
             current_line_cycles: 0,
             current_scanline: ScanlineData::new(),
             window_line: 0,
+            dmg_display_palette: DmgDisplayPalette::new_green(),
             lcd_buffer: LcdBuffer::alloc(),
         }
     }
@@ -387,105 +317,67 @@ impl Ppu {
         self.current_line_cycles += cycles;
         self.clock               -= cycles;
 
-        let lcdc            = self.get_lcdc();
-        let bg_enabled      = get_bit(lcdc, LCD_CONTROL_BIT_BG_WINDOW_ENABLED);
-        let window_enabled  = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_ENABLED);
-        let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
-        let tileset_select  = get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT);
-        let tileset         = TileSet::by_select_bit(tileset_select);
-        let palette_bg      = self.mem.read_u8(MEMORY_LOCATION_PALETTE_BG);
-        let palette_obp0    = self.mem.read_u8(MEMORY_LOCATION_PALETTE_OBP0);
-        let palette_obp1    = self.mem.read_u8(MEMORY_LOCATION_PALETTE_OBP1);
-        let wx              = self.get_window_x();
-        let wy              = self.get_window_y();
+        {
+            let io_regs          = self.mem.get_io_registers();
+            let lcdc             = self.get_lcdc();
+            let window_enabled   = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_ENABLED);
+            let palette_bg       = &io_regs.bgp;
+            let palette_obp      = &io_regs.obp;
+            let palettes_gbc_bg  = self.mem.get_gbc_background_palettes();
+            let palettes_gbc_obj = self.mem.get_gbc_object_palettes();
+            let wx               = self.get_window_x();
+            let wy               = self.get_window_y();
 
-        for _ in 0..pixels_to_update {
-            let pixel_background = {
-                // check if the flag for window/background is enabled
-                if bg_enabled {
-                    // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
-                    if !self.current_scanline.window_enabled && window_enabled {
-                        if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
-                            self.current_scanline.window_enabled = true;
-                        }
+            for _ in 0..pixels_to_update {
+                // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
+                if !self.current_scanline.window_enabled && window_enabled {
+                    if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
+                        self.current_scanline.window_enabled = true;
                     }
+                }
 
-                    // process window pixels instead of background, if the window was enabled for this scanline
-                    if self.current_scanline.window_enabled {
-                        let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
-                        let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
-                        let position_in_window_x  = self.current_line_pixel+7 - wx;
-                        let position_in_window_y  = self.window_line;
+                // fetch background and foreground pixels, if any
+                let pixel_background = self.fetch_background_pixel();
+                let pixel_foreground = self.fetch_foreground_pixel(&pixel_background.value);
 
-                        self.read_tilemap_pixel(
-                            window_tilemap,
-                            tileset,
-                            position_in_window_x,
-                            position_in_window_y
-                        )
-                    }
-                    else {
-                        // otherwise just handle the normal background
-
-                        let bg_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT);
-                        let bg_tilemap        = TileMap::by_select_bit(bg_tilemap_select);
-
-                        let (background_x, background_y) = self.screen_to_background(
-                            self.current_line_pixel,
-                            self.ly
-                        );
-
-                        self.read_tilemap_pixel(
-                            bg_tilemap,
-                            tileset,
-                            background_x,
-                            background_y
-                        )
+                // select background or foreground pixel with according palette data
+                let pixel = if let Some(pixel) = &pixel_foreground {
+                    PixelFetchResultWithPalette {
+                        data: pixel,
+                        palette_dmg: &palette_obp[pixel.palette_dmg as usize],
+                        palette_gbc: &palettes_gbc_obj[pixel.palette_gbc as usize]
                     }
                 }
                 else {
-                    0
-                }
-            };
-
-            // get the foreground pixel by reading the color of any sprite on the current
-            // position within this scanline
-            let sprite_data = if sprites_enabled {
-                self.read_scanline_sprite_pixel(
-                    &self.current_scanline,
-                    self.current_line_pixel,
-                    pixel_background
-                )
-            }
-            else {
-                None
-            };
-
-            let (pixel, palette) = if let Some(sprite_pixel_data) = sprite_data {
-                let sprite_palette = if sprite_pixel_data.palette_index == 0 {
-                    palette_obp0
-                }
-                else {
-                    palette_obp1
+                    PixelFetchResultWithPalette {
+                        data: &pixel_background,
+                        palette_dmg: &palette_bg,
+                        palette_gbc: &palettes_gbc_bg[pixel_background.palette_gbc as usize]
+                    }
                 };
 
-                (sprite_pixel_data.color_index, sprite_palette)
+                // resolve pixel color using the according palette
+                let pixel_color = match self.device_config.emulation {
+                    EmulationType::DMG => {
+                        let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
+                        *self.translate_dmg_color_index(&lcd_pixel)
+                    }
+
+                    EmulationType::GBC => {
+                        pixel.palette_gbc.get_color(&pixel.data.value)
+                    }
+                };
+
+                // write pixel into LCD buffer
+                self.lcd_buffer.set_pixel(
+                    self.current_line_pixel as u32,
+                    self.ly as u32,
+                    pixel_color
+                );
+
+                // set next pixel to compute
+                self.current_line_pixel += 1;
             }
-            else {
-                (pixel_background, palette_bg)
-            };
-
-            let pixel_color = (palette >> (pixel << 1)) & 0x03;
-
-            // write pixel into LCD buffer
-            self.lcd_buffer.set_pixel(
-                self.current_line_pixel as u32,
-                self.ly as u32,
-                pixel_color
-            );
-
-            // set next pixel to compute
-            self.current_line_pixel += 1;
         }
 
         // when reached the end of the current scanline, enter HBlank mode
@@ -494,6 +386,77 @@ impl Ppu {
         }
 
         FrameState::Processing
+    }
+
+
+    /// Fetch the data of the background or window layer on the current position in the active scanline.
+    fn fetch_background_pixel(&self) -> PixelFetchResult {
+        let io_regs = self.mem.get_io_registers();
+
+        let lcdc            = self.get_lcdc();
+        let bg_enabled      = get_bit(lcdc, LCD_CONTROL_BIT_BG_WINDOW_ENABLED);
+        let tileset_select  = get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT);
+        let tileset         = TileSet::by_select_bit(tileset_select);
+
+        // check if the flag for window/background is enabled
+        if bg_enabled {
+            // process window pixels instead of background, if the window was enabled for this scanline
+            let tile_info = if self.current_scanline.window_enabled {
+                let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
+                let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
+                let position_in_window_x  = self.current_line_pixel+7 - io_regs.wx;
+                let position_in_window_y  = self.window_line;
+
+                self.read_tilemap_properties(
+                    window_tilemap,
+                    tileset,
+                    position_in_window_x,
+                    position_in_window_y
+                )
+            }
+            else {
+                // otherwise just handle the normal background
+
+                let bg_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT);
+                let bg_tilemap        = TileMap::by_select_bit(bg_tilemap_select);
+
+                let (background_x, background_y) = self.screen_to_background(
+                    self.current_line_pixel,
+                    self.ly
+                );
+
+                self.read_tilemap_properties(
+                    bg_tilemap,
+                    tileset,
+                    background_x,
+                    background_y
+                )
+            };
+
+            self.read_tile_pixel(&tile_info)
+        }
+        else {
+            PixelFetchResult::none()
+        }
+    }
+
+
+    /// Fetch the foreground pixel by reading the color of any sprite on the current
+    /// position within the active scanline
+    pub fn fetch_foreground_pixel(&self, pixel_background: &SpritePixelValue) -> Option<PixelFetchResult> {
+        let lcdc            = self.get_lcdc();
+        let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
+
+        if sprites_enabled {
+            self.read_scanline_sprite_pixel(
+                &self.current_scanline,
+                self.current_line_pixel,
+                pixel_background
+            )
+        }
+        else {
+            None
+        }
     }
 
 
@@ -630,6 +593,16 @@ impl Ppu {
     }
 
 
+    /// Get the current palette to be used to translate DMG LCD color intensities into RGBA colors
+    pub fn get_dmg_display_palette(&self) -> &DmgDisplayPalette {
+        &self.dmg_display_palette
+    }
+
+    /// Get the RGBA color for any color color index.
+    pub fn translate_dmg_color_index(&self, pixel: &DmgLcdPixel) -> &Color {
+        self.get_dmg_display_palette().get_color(&pixel)
+    }
+
     /// Get the LCD buffer which contains the actual data sent to the device's display.
     pub fn get_lcd(&self) -> &LcdBuffer {
         &self.lcd_buffer
@@ -720,7 +693,7 @@ impl Ppu {
     }
 
     /// Reads a pixel from the current scanline sprite data on a given x position.
-    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8, pixel_background: u8) -> Option<SpritePixelData> {
+    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8, pixel_background: &SpritePixelValue) -> Option<PixelFetchResult> {
         // screen position considering the border offset of -8 / -16
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
@@ -746,16 +719,8 @@ impl Ppu {
             }
 
             // calculate the position inside the sprite including x and y flip
-            let mut sprite_pixel_x = screen_x - sprite.pos_x;
-            let mut sprite_pixel_y = screen_y - sprite.pos_y;
-
-            if sprite.is_flip_x() {
-                sprite_pixel_x = sprite_w - sprite_pixel_x - 1;
-            }
-
-            if sprite.is_flip_y() {
-                sprite_pixel_y = sprite_h - sprite_pixel_y - 1;
-            }
+            let sprite_pixel_x = flipped_if(screen_x - sprite.pos_x, sprite_w, sprite.is_flip_x());
+            let sprite_pixel_y = flipped_if(screen_y - sprite.pos_y, sprite_h, sprite.is_flip_y());
 
             // read the sprite pixel value
             let pixel = self.read_sprite_pixel(
@@ -766,45 +731,104 @@ impl Ppu {
             );
 
             // color index 0 is transparent; with bg priority, the sprite is behind the BG
-            if pixel == 0 || (sprite.is_bg_priority() && pixel_background != 0) {
+            if pixel.0 == 0 || (sprite.is_bg_priority() && pixel_background.0 != 0) {
                 continue;
             }
 
-            return Some(SpritePixelData {
-                color_index: pixel,
-                palette_index: sprite.get_palette()
+            return Some(PixelFetchResult {
+                value: pixel,
+                palette_dmg: sprite.get_dmg_palette(),
+                palette_gbc: sprite.get_color_palette(),
+                sprite_priority: 0,
+                background_priority: sprite.is_bg_priority(),
             });
         }
 
         None
     }
 
-    /// Read the pixel value of the background on a given position.
-    pub fn read_tilemap_pixel(&self, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> u8 {
+    /// Reads a single pixel from the tilemap.
+    pub fn read_tilemap_pixel(&self, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> PixelFetchResult {
+        let tile = self.read_tilemap_properties(tilemap, tileset, tilemap_x, tilemap_y);
+        self.read_tile_pixel(&tile)
+    }
+
+    /// Creates a set of tilemap fetch properties, which will be used for a further read operation
+    /// to read data from the tilemap.
+    pub fn read_tilemap_properties(&self, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> TileFetchProperties {
         let tile_x       = (tilemap_x / 8) as u16;
         let tile_y       = (tilemap_y / 8) as u16;
         let tile_pixel_x = (tilemap_x % 8) as u8;
         let tile_pixel_y = (tilemap_y % 8) as u8;
         let tile_index   = tile_y * 32 + tile_x;
-        let tile_address = tilemap.base_address() + tile_index;
-        let sprite       = self.mem.read_u8(tile_address as u16);
 
-        self.read_sprite_pixel(
+        TileFetchProperties {
+            tilemap,
             tileset,
-            sprite,
+            tile_index,
             tile_pixel_x,
-            tile_pixel_y
-        )
+            tile_pixel_y,
+        }
+    }
+
+    /// Read the pixel value from a tile using previously created TileFetchProperties.
+    pub fn read_tile_pixel(&self, tile: &TileFetchProperties) -> PixelFetchResult {
+        let tile_address = (tile.tilemap.base_address() + tile.tile_index - MEMORY_LOCATION_VRAM_BEGIN) as usize;
+        let vram0        = &self.mem.get_vram_banks()[0];
+        let sprite       = vram0.get_at(tile_address);
+
+        let mut fetch_position_x    = tile.tile_pixel_x;
+        let mut fetch_position_y    = tile.tile_pixel_y;
+        let mut tile_vram_bank      = 0;
+        let mut palette_gbc         = 0;
+        let mut background_priority = false;
+
+        if self.device_config.is_gbc_enabled() {
+            // read tile attributes from the same location in VRAM1
+            let vram1 = &self.mem.get_vram_banks()[1];
+            let tile_attr    = vram1.get_at(tile_address);
+
+            // read properties from the tile attribute byte
+            let bank_nr_bit   = get_bit(tile_attr, TILE_ATTR_BIT_VRAM_BANK);
+            let is_h_flip     = get_bit(tile_attr, TILE_ATTR_BIT_H_FLIP);
+            let is_v_flip     = get_bit(tile_attr, TILE_ATTR_BIT_V_FLIP);
+            let bg_to_oam_bit = get_bit(tile_attr, TILE_ATTR_BIT_BG_TO_OAM_PRIO);
+
+            // flip fetch coordinates on mirrored sprites
+            flip_if(&mut fetch_position_x, 8, is_h_flip);
+            flip_if(&mut fetch_position_y, 8, is_v_flip);
+
+            palette_gbc         = tile_attr & 0x07;
+            tile_vram_bank      = bank_nr_bit as u8;
+            background_priority = bg_to_oam_bit;
+        }
+
+        // todo: implement read from specified vram bank
+        // get the actual sprite pixel value
+        let pixel = self.read_sprite_pixel(
+            tile.tileset,
+            sprite,
+            fetch_position_x,
+            fetch_position_y
+        );
+
+        PixelFetchResult {
+            value: pixel,
+            palette_dmg: 0,
+            palette_gbc,
+            sprite_priority: 0,
+            background_priority,
+        }
     }
 
     /// Read the pixel value of a sprite.
-    pub fn read_sprite_pixel(&self, tileset: TileSet, sprite: u8, x: u8, y: u8) -> u8 {
+    pub fn read_sprite_pixel(&self, tileset: TileSet, sprite: u8, x: u8, y: u8) -> SpritePixelValue {
         let sprite_address      = tileset.address_of_tile(sprite);
         self.read_sprite_pixel_from_address(sprite_address, x, y)
     }
 
     /// Read the pixel value of a sprite.
-    pub fn read_sprite_pixel_from_address(&self, sprite_address: u16 , x: u8, y: u8) -> u8 {
+    pub fn read_sprite_pixel_from_address(&self, sprite_address: u16 , x: u8, y: u8) -> SpritePixelValue {
         let sprite_line_address = sprite_address + y as u16 * 2;
         let pixel_mask            = 1u8 << (7 - x);
         let byte0                 = self.mem.read_u8(sprite_line_address + 0);
@@ -815,6 +839,25 @@ impl Ppu {
             |   (if (byte1 & pixel_mask) != 0 { 0x02 } else { 0x00 })
         ;
 
-        pixel
+        SpritePixelValue(pixel)
+    }
+}
+
+
+/// Get the flipped value if a sprite is mirrored.
+fn flipped_if(value: u8, max_value: u8, flip: bool) -> u8 {
+    if flip {
+        max_value - value - 1
+    }
+    else {
+        value
+    }
+}
+
+
+/// Flips a value if a sprite is mirrored.
+fn flip_if(value: &mut u8, max_value: u8, flip: bool) {
+    if flip {
+        *value = max_value - *value - 1;
     }
 }

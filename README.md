@@ -26,11 +26,11 @@ Feel free to make suggestions about missing features or games which are not supp
 
 ## Acid 2 Test
 
-|                     |     |
-|---------------------|:---:|
-| DMG Acid 2          | 🟢  |
-| DMG Acid 2 (on cgb) |  ❓  |
-| CGB Acid 2          |  ❓  |
+|               |     |
+|---------------|:---:|
+| DMG Acid 2    | 🟢  |
+| CGB Acid 2    | 🔴  |
+| CGB Acid Hell | 🔴  |
 
 ## Blargg Test ROMs
 

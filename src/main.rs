@@ -21,6 +21,7 @@ mod boot_rom;
 mod cartridge;
 mod cpu;
 mod gameboy;
+mod graphic_data;
 mod input;
 mod mbc;
 mod memory;

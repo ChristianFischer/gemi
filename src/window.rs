@@ -22,9 +22,10 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
+use crate::graphic_data::{Color, DmgLcdPixel, TileMap, TileSet};
 use crate::input::{Input, InputButton};
-use crate::memory::{MEMORY_LOCATION_SPRITES_BEGIN, MemoryRead};
-use crate::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W, TileMap, TileSet};
+use crate::memory::MEMORY_LOCATION_SPRITES_BEGIN;
+use crate::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
 use crate::utils::get_bit;
 
 
@@ -102,14 +103,14 @@ impl BufferedTexture {
         &self.buffer
     }
 
-    /// Set a RGBA color value for any specific pixel.
-    pub fn set_rgba(&mut self, x: u32, y: u32, rgba: u32) {
+    /// Set a color value for any specific pixel.
+    pub fn set_color(&mut self, x: u32, y: u32, color: &Color) {
         let offset = ((x + (y * self.width)) * 4) as usize;
 
-        self.buffer[offset + 0] = ((rgba >> 24) & 0xff) as u8;
-        self.buffer[offset + 1] = ((rgba >> 16) & 0xff) as u8;
-        self.buffer[offset + 2] = ((rgba >>  8) & 0xff) as u8;
-        self.buffer[offset + 3] = ((rgba >>  0) & 0xff) as u8;
+        self.buffer[offset + 0] = color.b;
+        self.buffer[offset + 1] = color.g;
+        self.buffer[offset + 2] = color.r;
+        self.buffer[offset + 3] = color.a;
     }
 
     /// Updates the texture with the pixel data in the current buffer.
@@ -298,16 +299,6 @@ impl Window {
         }
     }
 
-    /// Get the RGBA color value for any color index produced by the GameBoy.
-    pub fn color_index_to_rgba(color_index: u8) -> u32 {
-        match color_index {
-            3 => 0x00000000u32,
-            2 => 0x404040ffu32,
-            1 => 0x808080ffu32,
-            _ => 0xffffffffu32,
-        }
-    }
-
     /// Presents the content of a LCD buffer on the window.
     pub fn present(&mut self, lcd: &LcdBuffer, ppu: &Ppu) {
         match self.display_mode {
@@ -324,10 +315,8 @@ impl Window {
         // convert palette based image data into RGBA
         for y in 0..SCREEN_H {
             for x in 0..SCREEN_W {
-                let color_index = lcd.get_pixel(x, y);
-                let color = Window::color_index_to_rgba(color_index);
-
-                self.texture_game.set_rgba(x, y, color);
+                let color = lcd.get_pixel(x, y);
+                self.texture_game.set_color(x, y, &color);
             }
         }
 
@@ -355,15 +344,17 @@ impl Window {
         // convert palette based image data into RGBA
         for background_y in 0..255 {
             for background_x in 0..255 {
-                let color_index = ppu.read_tilemap_pixel(
+                let sprite_pixel = ppu.read_tilemap_pixel(
                     tilemap,
                     tileset,
                     background_x,
                     background_y
                 );
 
-                let color = Window::color_index_to_rgba(color_index);
-                self.texture_background.set_rgba(background_x as u32, background_y as u32, color);
+                let pixel = DmgLcdPixel(sprite_pixel.value.0);
+                let color = ppu.translate_dmg_color_index(&pixel);
+
+                self.texture_background.set_color(background_x as u32, background_y as u32, color);
             }
         }
 
@@ -393,17 +384,19 @@ impl Window {
 
                 for object_pixel_y in 0..8 {
                     for object_pixel_x in 0..8 {
-                        let pixel_color_index = ppu.read_sprite_pixel_from_address(
+                        let sprite_pixel = ppu.read_sprite_pixel_from_address(
                             sprite_address,
                             object_pixel_x,
                             object_pixel_y
                         );
 
-                        let pixel_color = Window::color_index_to_rgba(pixel_color_index);
+                        let pixel = DmgLcdPixel(sprite_pixel.0);
+
+                        let pixel_color = ppu.translate_dmg_color_index(&pixel);
                         let texture_x   = (object_x as u32 * 8) + (object_pixel_x as u32);
                         let texture_y   = (object_y as u32 * 8) + (object_pixel_y as u32);
 
-                        self.texture_objects.set_rgba(texture_x, texture_y, pixel_color);
+                        self.texture_objects.set_color(texture_x, texture_y, pixel_color);
                     }
                 }
             }

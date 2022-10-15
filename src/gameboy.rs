@@ -107,6 +107,19 @@ pub struct GameBoy {
 }
 
 
+impl DeviceConfig {
+    /// Checks whether the current device is running with GameBoyColor support enabled.
+    /// The running device needs to be a GBC or GBA *and* running a cartridge
+    /// with GameBoy Color support.
+    pub fn is_gbc_enabled(&self) -> bool {
+        match self.emulation {
+            EmulationType::DMG => false,
+            EmulationType::GBC => true,
+        }
+    }
+}
+
+
 impl Builder {
     /// Creates a new empty GameBoy builder
     pub fn new() -> Self {
@@ -211,7 +224,7 @@ impl GameBoy {
                 device_config,
 
                 cpu: Cpu::new(mem.create_read_write_handle()),
-                ppu: Ppu::new(mem.create_read_write_handle()),
+                ppu: Ppu::new(device_config, mem.create_read_write_handle()),
                 timer: Timer::new(mem.create_read_write_handle()),
                 input: Input::new(mem.create_read_write_handle()),
                 mem,

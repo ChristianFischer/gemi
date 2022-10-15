@@ -16,7 +16,7 @@
  */
 
 use std::cell::{Ref, RefCell, RefMut};
-use std::cmp::min;
+use std::cmp::{max, min};
 use std::io;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
@@ -24,13 +24,17 @@ use crate::Cartridge;
 use crate::cpu::Interrupt;
 use crate::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::gameboy::{clock_t, DeviceConfig, EmulationType};
+use crate::graphic_data::{DmgPalette, GbcPaletteData};
 use crate::mbc::{create_mbc, Mbc};
 use crate::mbc::mbc_none::MbcNone;
 use crate::memory_data::mapped::MemoryDataMapped;
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
+pub const MEMORY_LOCATION_VRAM_BEGIN:               u16 = 0x8000;
 pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
 pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
+pub const MEMORY_LOCATION_WRAM_BANK_0_BEGIN:        u16 = 0xc000;
+pub const MEMORY_LOCATION_WRAM_BANK_1_BEGIN:        u16 = 0xc000;
 pub const MEMORY_LOCATION_OAM_BEGIN:                u16 = 0xfe00;
 pub const MEMORY_LOCATION_OAM_END:                  u16 = 0xfe9f;
 pub const MEMORY_LOCATION_JOYP:                     u16 = 0xff00;
@@ -57,6 +61,10 @@ pub const MEMORY_LOCATION_HDMA2:                    u16 = 0xff52;
 pub const MEMORY_LOCATION_HDMA3:                    u16 = 0xff53;
 pub const MEMORY_LOCATION_HDMA4:                    u16 = 0xff54;
 pub const MEMORY_LOCATION_HDMA5:                    u16 = 0xff55;
+pub const MEMORY_LOCATION_BCPS:                     u16 = 0xff68;
+pub const MEMORY_LOCATION_BCPD:                     u16 = 0xff69;
+pub const MEMORY_LOCATION_OCPS:                     u16 = 0xff6a;
+pub const MEMORY_LOCATION_OCPD:                     u16 = 0xff6b;
 pub const MEMORY_LOCATION_SVBK:                     u16 = 0xff70;
 pub const MEMORY_LOCATION_INTERRUPTS_FLAGGED:       u16 = 0xff0f;
 pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
@@ -132,6 +140,7 @@ pub type VRamBank       = MemoryDataFixedSize<8192>;
 pub type WRamBank       = MemoryDataFixedSize<4096>;
 pub type OamRamBank     = MemoryDataFixedSize<160>;
 pub type HRamBank       = MemoryDataFixedSize<127>;
+pub type GbcPaletteBank = MemoryDataMapped<[GbcPaletteData; 8]>;
 pub type IoRegisterBank = MemoryDataMapped<IoRegister>;
 
 
@@ -140,27 +149,27 @@ pub type IoRegisterBank = MemoryDataMapped<IoRegister>;
 #[repr(packed(1))]
 pub struct IoRegister {
     /// JoyPad input
-    joyp: u8,
+    pub joyp: u8,
 
     /// Serial transfer data
-    sb: u8,
+    pub sb: u8,
 
     /// Serial transfer control
-    sc: u8,
+    pub sc: u8,
 
     _unused_0x03: u8,
 
     /// Divider register
-    div: u8,
+    pub div: u8,
 
     /// Timer counter
-    tima: u8,
+    pub tima: u8,
 
     /// Timer modulo
-    tma: u8,
+    pub tma: u8,
 
     /// Timer control
-    tac: u8,
+    pub tac: u8,
 
     _unused_0x08: [u8; 7],
 
@@ -173,59 +182,68 @@ pub struct IoRegister {
     _sound2: [u8; 0x10],
 
     /// LCD control
-    lcdc: u8,
+    pub lcdc: u8,
 
     /// LCD status
-    lcd_stat: u8,
+    pub lcd_stat: u8,
 
     /// LCD scroll offset Y
-    scy: u8,
+    pub scy: u8,
 
     /// LCD scroll offset X
-    scx: u8,
+    pub scx: u8,
 
     /// LCD current line
-    ly: u8,
+    pub ly: u8,
 
     /// LCD current line comparison
-    lyc: u8,
+    pub lyc: u8,
 
     /// OAM DMA transfer start address
-    dma_address: u8,
+    pub dma_address: u8,
 
     /// DMG background palette
-    bgp: u8,
+    pub bgp: DmgPalette,
 
-    /// DMG object palette #0
-    obp0: u8,
-
-    /// DMG object palette #1
-    obp1: u8,
+    /// DMG object palettes
+    pub obp: [DmgPalette; 2],
 
     /// LCD window Y coordinate
-    wy: u8,
+    pub wy: u8,
 
     /// LCD window X coordinate
-    wx: u8,
+    pub wx: u8,
 
     _unused_0x4c: [u8; 3],
 
     /// GBC: VRAM bank select
-    vbk: u8,
+    pub vbk: u8,
 
-    boot_rom_disable: u8,
+    pub boot_rom_disable: u8,
 
     /// CGB VRAM DMA transfer
     vram_dma: [u8; 5],
 
     _unused_0x56: [u8; 18],
 
-    cgb_color_palettes: [u8; 2],
+    /// bit 0-6: address of the GBC background palette to read/write
+    /// bit 7: auto increment the address on write
+    pub bcps: u8,
 
-    _unused_0x6a: [u8; 6],
+    /// byte data to be read or written on the background palette memory
+    pub bcpd: u8,
+
+    /// bit 0-6: address of the GBC object palette to read/write
+    /// bit 7: auto increment the address on write
+    pub ocps: u8,
+
+    /// byte data to be read or written on the object palette memory
+    pub ocpd: u8,
+
+    _unused_0x6c: [u8; 4],
 
     /// CGB WRAM bank select
-    svbk: u8,
+    pub svbk: u8,
 
     _unused_0x71: [u8; 0x0f],
     _unused_0x80: [u8; 0x10],
@@ -269,6 +287,12 @@ struct MemoryInternal {
 
     /// High RAM
     hram: HRamBank,
+
+    /// GameBoy Color only: storage for background palettes
+    gbc_background_palette: GbcPaletteBank,
+
+    /// GameBoy Color only: storage for object palettes
+    gbc_object_palette: GbcPaletteBank,
 
     mbc:        Box<dyn Mbc>,
     dma:        DmaTransferState,
@@ -395,6 +419,9 @@ impl Memory {
                     hram: HRamBank::new(),
                     io_registers: IoRegisterBank::new(IoRegister::default()),
 
+                    gbc_background_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
+                    gbc_object_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
+
                     mbc:        Box::new(MbcNone::new()),
                     dma:        DmaTransferState::Disabled,
                     boot_rom:   None,
@@ -502,6 +529,38 @@ impl MemoryReadWriteHandle {
         MemoryReadOnlyHandle {
             internal: self.internal.clone()
         }
+    }
+
+    /// Get the list of Work RAM banks on this device.
+    /// DMG = 2 banks, GBC = 8 banks.
+    pub fn get_wram_banks(&self) -> Ref<Vec<WRamBank>> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| &mem.wram_banks)
+    }
+
+    /// Get the list of Video RAM banks on this device.
+    /// DMG = 1 bank, GBC = 2 banks.
+    pub fn get_vram_banks(&self) -> Ref<Vec<VRamBank>> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| &mem.vram_banks)
+    }
+
+    /// Get the color palette used by background tiles on GameBoy Color.
+    pub fn get_gbc_background_palettes(&self) -> Ref<[GbcPaletteData; 8]> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| mem.gbc_background_palette.get())
+    }
+
+    /// Get the color palette used by background tiles on GameBoy Color.
+    pub fn get_gbc_object_palettes(&self) -> Ref<[GbcPaletteData; 8]> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| mem.gbc_object_palette.get())
+    }
+
+    /// Get the IO Registers struct.
+    pub fn get_io_registers(&self) -> Ref<IoRegister> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| mem.io_registers.get())
     }
 
     /// requests an interrupt to be fired.
@@ -673,9 +732,71 @@ impl MemoryInternal {
                 });
             },
 
+            MEMORY_LOCATION_VBK => {
+                // on GBC: switch VRAM bank
+                if let EmulationType::GBC = self.device_config.emulation {
+                    let bank = value & 0x01;
+                    self.vram_active_bank = bank;
+
+                    // register will contain the active bank in bit #0
+                    // and all other bits set to 1
+                    self.io_registers.get_mut().vbk = 0b_1111_1110 | bank;
+                }
+            },
+
             MEMORY_LOCATION_BOOT_ROM_DISABLE => {
                 if (value & 0x01) != 0 {
                     self.boot_rom = None;
+                }
+            },
+
+            MEMORY_LOCATION_BCPS => {
+                // on writing background palette index load the according value into bcpd
+                let palette_address = (value & 0x3f) as usize;
+                self.io_registers.get_mut().bcpd = self.gbc_background_palette.get_at(palette_address);
+            },
+
+            MEMORY_LOCATION_BCPD => {
+                let io_reg  = self.io_registers.get_mut();
+
+                // get the address from BCPS
+                let palette_address = (io_reg.bcps & 0x3f) as usize;
+
+                // write palette data value
+                self.gbc_background_palette.set_at(palette_address, value);
+
+                // increment address, if auto increment is enabled
+                if get_bit(io_reg.bcps, 7) {
+                    io_reg.bcps = (((palette_address + 1) & 0x3f) | 0x80) as u8;
+                }
+            },
+
+            MEMORY_LOCATION_OCPS => {
+                // on writing object palette index load the according value into ocpd
+                let palette_address = (value & 0x07) as usize;
+                self.io_registers.get_mut().ocpd = self.gbc_object_palette.get_at(palette_address);
+            },
+
+            MEMORY_LOCATION_OCPD => {
+                let io_reg  = self.io_registers.get_mut();
+
+                // get the address from OCPS
+                let palette_address = (io_reg.ocps & 0x3f) as usize;
+
+                // write palette data value
+                self.gbc_object_palette.set_at(palette_address, value);
+
+                // increment address, if auto increment is enabled
+                if get_bit(io_reg.ocps, 7) {
+                    io_reg.ocps = (((palette_address + 1) & 0x3f) | 0x80) as u8;
+                }
+            },
+
+            MEMORY_LOCATION_SVBK => {
+                // on GBC: switch WRAM bank #1
+                if let EmulationType::GBC = self.device_config.emulation {
+                    let bank = value & 0x07;
+                    self.wram_active_bank_1 = max(1, bank);
                 }
             },
 
@@ -722,7 +843,7 @@ mod tests {
     use super::*;
 
     macro_rules! test_ioreg_struct_elem {
-        ($offset:expr => $item:ident) => {
+        ($offset:expr => $($tokens:tt)+) => {
             {
                 let mut bank = IoRegisterBank::new(IoRegister::default());
                 let offset = ($offset - 0xff00) as usize;
@@ -730,7 +851,7 @@ mod tests {
 
                 bank.set_at(offset, value);
                 assert_eq!(value, bank.get_at(offset));
-                assert_eq!(value, bank.get().$item);
+                assert_eq!(value, bank.get().$($tokens)+.into());
             }
         }
     }
@@ -755,11 +876,17 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_LYC                 => lyc);
         test_ioreg_struct_elem!(MEMORY_LOCATION_DMA_ADDRESS         => dma_address);
         test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_BG          => bgp);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP0        => obp0);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP1        => obp1);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP0        => obp[0]);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP1        => obp[1]);
         test_ioreg_struct_elem!(MEMORY_LOCATION_WY                  => wy);
         test_ioreg_struct_elem!(MEMORY_LOCATION_WX                  => wx);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_VBK                 => vbk);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_BCPS                => bcps);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_BCPD                => bcpd);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_OCPS                => ocps);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_OCPD                => ocpd);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
         test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_FLAGGED  => interrupts_flagged);
         test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_ENABLED  => interrupts_enabled);
 
