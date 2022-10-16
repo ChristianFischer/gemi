@@ -20,7 +20,7 @@ use std::cmp::{max, min};
 use std::io;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
-use crate::Cartridge;
+use crate::cartridge::Cartridge;
 use crate::cpu::Interrupt;
 use crate::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::gameboy::{clock_t, DeviceConfig, EmulationType};

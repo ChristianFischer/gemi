@@ -16,7 +16,7 @@
  */
 
 use std::fmt::{Display, Formatter};
-use crate::Cartridge;
+use crate::cartridge::Cartridge;
 use crate::mbc::mbc1::Mbc1;
 use crate::mbc::mbc5::Mbc5;
 use crate::mbc::mbc_none::MbcNone;
@@ -72,8 +72,7 @@ impl Display for MemoryBankController {
 
 
 pub mod mbc_none {
-    use crate::Cartridge;
-    use crate::mbc::Mbc;
+    use super::*;
 
 
     /// A default MBC handling ROMs which do not need bank switching.
@@ -100,9 +99,8 @@ pub mod mbc_none {
 
 
 mod mbc1 {
-    use crate::Cartridge;
     use crate::memory_data::MemoryData;
-    use crate::mbc::Mbc;
+    use super::*;
 
     /// Type 1 Memory Bank Controller:
     /// Supports up to 2MB ROMs or up to 32kB RAM.
@@ -262,9 +260,8 @@ mod mbc1 {
 
 
 mod mbc5 {
-    use crate::Cartridge;
     use crate::memory_data::MemoryData;
-    use crate::mbc::Mbc;
+    use super::*;
 
     /// Type 5 Memory Bank Controller:
     /// Supports up to 8MB ROMs and up to 128kB RAM.

@@ -17,16 +17,16 @@
 
 extern crate sdl2;
 
-use std::collections::HashMap;
+use gbemu_core::graphic_data::{Color, DmgLcdPixel, DmgPalette, TileMap, TileSet};
+use gbemu_core::input::{Input, InputButton};
+use gbemu_core::memory::MEMORY_LOCATION_SPRITES_BEGIN;
+use gbemu_core::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
+use gbemu_core::utils::get_bit;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
-use crate::graphic_data::{Color, DmgLcdPixel, DmgPalette, TileMap, TileSet};
-use crate::input::{Input, InputButton};
-use crate::memory::MEMORY_LOCATION_SPRITES_BEGIN;
-use crate::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
-use crate::utils::get_bit;
+use std::collections::HashMap;
 
 
 #[derive(PartialEq)]

@@ -33,8 +33,13 @@ dependencies = [
 name = "gbemu"
 version = "0.1.0"
 dependencies = [
+ "gbemu-core",
  "sdl2",
 ]
+
+[[package]]
+name = "gbemu-core"
+version = "0.1.0"
 
 [[package]]
 name = "lazy_static"

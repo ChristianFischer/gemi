@@ -18,16 +18,14 @@
 use std::time;
 use std::time::{Duration, SystemTime};
 use crate::boot_rom::BootRom;
-use crate::cartridge::{Cartridge, LicenseeCode};
+use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
 use crate::cpu::{Cpu, CPU_CLOCK_SPEED, CpuFlag, RegisterR8};
-use crate::GameBoyColorSupport;
 use crate::input::Input;
 use crate::memory::{Memory, MemoryRead};
 use crate::opcode::OpCodeContext;
 use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
 use crate::timer::Timer;
 use crate::utils::carrying_add_u8;
-use crate::window::Window;
 
 
 /// Type to measure clock ticks of the device.
@@ -103,7 +101,6 @@ pub struct GameBoy {
     pub mem: Memory,
     pub timer: Timer,
     pub input: Input,
-    pub window: Window,
 }
 
 
@@ -217,7 +214,6 @@ impl GameBoy {
     /// Create a new GameBoy device.
     pub fn new(device_config: DeviceConfig) -> Result<GameBoy,String> {
         let mem = Memory::new(device_config);
-        let window = Window::create("GameBoy")?;
 
         Ok(
             GameBoy {
@@ -228,7 +224,6 @@ impl GameBoy {
                 timer: Timer::new(mem.create_read_write_handle()),
                 input: Input::new(mem.create_read_write_handle()),
                 mem,
-                window,
             }
         )
     }
@@ -357,10 +352,9 @@ impl GameBoy {
         self.cpu.set_stack_pointer(sp);
     }
 
-    /// Runs the program located on a cartridge, starting on the
-    /// current location of the instruction pointer.
-    pub fn run(&mut self) {
-        let mut interval_begin  = time::Instant::now();
+    /// Continues running the program located on the cartridge,
+    /// until the PPU has completed one single frame.
+    pub fn process_frame(&mut self) -> clock_t {
         let mut interval_cycles = 0;
 
         loop {
@@ -406,40 +400,7 @@ impl GameBoy {
 
             // When a frame completed, it should be presented
             if let FrameState::FrameCompleted = ppu_state {
-                self.window.poll_events();
-                self.window.apply_key_states(&mut self.input);
-                self.window.present(self.ppu.get_lcd(), &self.ppu);
-
-                // handle frame times
-                {
-                    let frame_end_time = time::Instant::now();
-
-                    let interval_duration_ns = (frame_end_time - interval_begin).as_nanos() as u64;
-                    let expected_time_ns     = (1_000_000_000u64 * interval_cycles) / CPU_CLOCK_SPEED;
-
-                    // when the interval time was shorter than expected,
-                    // let the CPU sleep for the time difference
-                    if interval_duration_ns < expected_time_ns {
-                        let time_remaining = expected_time_ns - interval_duration_ns;
-                        std::thread::sleep(Duration::from_nanos(time_remaining));
-                    }
-
-                    // reset the interval after counting more than the number of cycles per second,
-                    // so we get a bit more precision than just counting per frame
-                    if interval_cycles >= CPU_CLOCK_SPEED {
-                        interval_cycles -= CPU_CLOCK_SPEED;
-                        interval_begin = frame_end_time;
-                    }
-                }
-
-                if !self.window.is_opened() {
-                    // before exit, save the RAM image, if any
-                    if let Err(e) = self.mem.save_cartridge_ram_if_any() {
-                        println!("Failed to save cartridge RAM: {}", e);
-                    }
-
-                    return;
-                }
+                return interval_cycles;
             }
         }
     }

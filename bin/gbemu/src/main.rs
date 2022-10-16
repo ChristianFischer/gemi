@@ -17,27 +17,17 @@
 
 extern crate core;
 
-mod boot_rom;
-mod cartridge;
-mod cpu;
-mod gameboy;
-mod graphic_data;
-mod input;
-mod mbc;
-mod memory;
-mod memory_data;
-mod opcode;
-mod opcodes;
-mod ppu;
-mod timer;
-mod utils;
 mod window;
 
-use cartridge::Cartridge;
-use cartridge::GameBoyColorSupport;
-use std::env;
-use crate::boot_rom::BootRom;
-use crate::gameboy::{DeviceType, GameBoy};
+use std::cell::Ref;
+use gbemu_core::cartridge::Cartridge;
+use gbemu_core::cartridge::GameBoyColorSupport;
+use gbemu_core::boot_rom::BootRom;
+use gbemu_core::gameboy::{DeviceType, GameBoy};
+use std::{env, time};
+use std::time::Duration;
+use gbemu_core::cpu::CPU_CLOCK_SPEED;
+use crate::window::Window;
 
 fn print_rom_info(filename: &String, cartridge: &Cartridge) {
     let mut features: Vec<&str> = vec![];
@@ -77,7 +67,47 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
 }
 
 
-fn main() {
+fn run(window: &mut Window, gb: &mut GameBoy) {
+    let mut interval_begin  = time::Instant::now();
+    let mut interval_cycles = 0;
+
+    while window.is_opened() {
+        let frame_cycles = gb.process_frame();
+        interval_cycles += frame_cycles;
+
+        // update window
+        {
+            window.poll_events();
+            window.apply_key_states(&mut gb.input);
+            window.present(gb.ppu.get_lcd(), &gb.ppu);
+        }
+
+        // handle frame times
+        {
+            let frame_end_time = time::Instant::now();
+
+            let interval_duration_ns = (frame_end_time - interval_begin).as_nanos() as u64;
+            let expected_time_ns     = (1_000_000_000u64 * interval_cycles) / CPU_CLOCK_SPEED;
+
+            // when the interval time was shorter than expected,
+            // let the CPU sleep for the time difference
+            if interval_duration_ns < expected_time_ns {
+                let time_remaining = expected_time_ns - interval_duration_ns;
+                std::thread::sleep(Duration::from_nanos(time_remaining));
+            }
+
+            // reset the interval after counting more than the number of cycles per second,
+            // so we get a bit more precision than just counting per frame
+            if interval_cycles >= CPU_CLOCK_SPEED {
+                interval_cycles -= CPU_CLOCK_SPEED;
+                interval_begin = frame_end_time;
+            }
+        }
+    }
+}
+
+
+fn make_gameboy_instance() -> Result<GameBoy, String> {
     let mut args = env::args().into_iter();
     let mut builder = GameBoy::build();
 
@@ -130,14 +160,35 @@ fn main() {
         }
     }
 
-    match builder.finish() {
-        Ok(mut gb) => {
-            gb.initialize();
-            gb.run();
-        }
-
-        Err(e) => {
-            println!("Failed: {}", e);
-        }
-    }
+    builder.finish()
 }
+
+
+fn main() -> Result<(), String> {
+    // create the gb instance using the current commandline arguments
+    let mut gb = make_gameboy_instance()?;
+    gb.initialize();
+
+    // determine the title based on the cartridge available
+    let title = match &*gb.mem.get_cartridge() {
+        Some(cartridge) => cartridge.get_title().to_string(),
+        None => "GameBoy".to_string(),
+    };
+
+    // create window
+    let mut window = Window::create(&title)?;
+
+    // run the game
+    run(&mut window, &mut gb);
+
+    // after running the cartridge, save it's on-chip-RAM, if any
+    gb.mem.save_cartridge_ram_if_any()
+        .map_err(|e| e.to_string())
+        ?
+    ;
+
+    // everything went ok
+    Ok(())
+}
+
+

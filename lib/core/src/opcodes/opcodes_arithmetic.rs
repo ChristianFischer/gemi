@@ -41,10 +41,7 @@ enum NullCheck {
 ////////////////////////////////////////////////
 //// INC opcodes
 pub mod inc {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Increments a 8bit value.
     fn increment_u8v(gb: &mut GameBoy, value: u8) -> u8 {
@@ -119,7 +116,7 @@ pub mod inc {
 //// DEC opcodes
 pub mod dec {
     use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
+    use crate::gameboy::GameBoy;
     use crate::memory::{MemoryRead, MemoryWrite};
     use crate::opcode::{opcode, OpCodeContext};
 
@@ -195,11 +192,7 @@ pub mod dec {
 ////////////////////////////////////////////////
 //// ADD / ADC opcodes
 pub mod add {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
-    use crate::utils::{carrying_add_u16, carrying_add_u8};
+    use super::*;
 
     /// Adds two values and stores it into a 8bit register.
     /// r8 <- r8 + value + (carry flag, if add_carry)
@@ -291,11 +284,7 @@ pub mod add {
 ////////////////////////////////////////////////
 //// SUB / SBC opcodes
 pub mod sub {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
-    use crate::utils::carrying_sub_u8;
+    use super::*;
 
     /// Subtracts a value from another one and stores the result into a 8bit register.
     /// r8 <- r8 - value - (carry flag, if sub_carry)
@@ -362,11 +351,7 @@ pub mod sub {
 ////////////////////////////////////////////////
 //// RL / RLC opcodes
 pub mod rl {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
-    use crate::opcodes::opcodes_arithmetic::{NullCheck, ShiftOp};
+    use super::*;
 
     /// Shifts or rotates a value to the left.
     fn shift_left_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
@@ -490,11 +475,7 @@ pub mod rl {
 ////////////////////////////////////////////////
 //// RR / RRC opcodes
 pub mod rr {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
-    use crate::opcodes::opcodes_arithmetic::{NullCheck, ShiftOp};
+    use super::*;
 
     /// Shifts or rotates a value to the left.
     fn shift_right_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
@@ -644,10 +625,7 @@ pub mod rr {
 ////////////////////////////////////////////////
 //// SWAP opcodes
 pub mod swap {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Swaps the low and high nibble of a byte.
     fn swap_nibbles_u8v(gb: &mut GameBoy, value: u8) -> u8 {
@@ -691,10 +669,7 @@ pub mod swap {
 ////////////////////////////////////////////////
 //// Set Bit opcodes
 pub mod set_bit {
-    use crate::cpu::{RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Set bit n of a given 8bit value.
     /// value | (1 << bit)
@@ -797,10 +772,7 @@ pub mod set_bit {
 ////////////////////////////////////////////////
 //// Reset Bit opcodes
 pub mod res_bit {
-    use crate::cpu::{RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Resets bit n of a given 8bit value.
     /// value & !(1 << bit)
@@ -903,10 +875,7 @@ pub mod res_bit {
 ////////////////////////////////////////////////
 //// Check Bit opcodes
 pub mod chk_bit {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Checks if bit n of a value is set.
     /// Set the Zero flag, if the bit was 0.
@@ -1009,11 +978,7 @@ pub mod chk_bit {
 ////////////////////////////////////////////////
 //// CP opcodes
 pub mod cp {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
-    use crate::utils::carrying_sub_u8;
+    use super::*;
 
     /// Compares two values.
     fn cp_u8v_u8v(gb: &mut GameBoy, value1: u8, value2: u8) {
@@ -1065,10 +1030,7 @@ pub mod cp {
 ////////////////////////////////////////////////
 //// AND opcodes
 pub mod and {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Computes a bitwise AND.
     /// r8 <- r8 & value
@@ -1119,10 +1081,7 @@ pub mod and {
 ////////////////////////////////////////////////
 //// OR opcodes
 pub mod or {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Computes a bitwise OR.
     /// r8 <- r8 | value
@@ -1173,10 +1132,7 @@ pub mod or {
 ////////////////////////////////////////////////
 //// XOR opcodes
 pub mod xor {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::GameBoy;
-    use crate::memory::MemoryRead;
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Computes a bitwise XOR.
     /// r8 <- r8 ^ value
