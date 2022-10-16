@@ -29,7 +29,7 @@ Feel free to make suggestions about missing features or games which are not supp
 |               |     |
 |---------------|:---:|
 | DMG Acid 2    | 🟢  |
-| CGB Acid 2    | 🔴  |
+| CGB Acid 2    | 🟢  |
 | CGB Acid Hell | 🔴  |
 
 ## Blargg Test ROMs

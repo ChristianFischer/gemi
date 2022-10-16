@@ -192,7 +192,7 @@ impl PixelFetchResult {
     /// which has the lowest priority.
     pub fn none() -> Self {
         Self {
-            value: SpritePixelValue(0),
+            value: SpritePixelValue::none(),
             palette_dmg: 0,
             palette_gbc: 0,
             sprite_priority: 0,
@@ -337,24 +337,28 @@ impl Ppu {
                 }
 
                 // fetch background and foreground pixels, if any
-                let pixel_background = self.fetch_background_pixel();
-                let pixel_foreground = self.fetch_foreground_pixel(&pixel_background.value);
+                let fetched_pixel_background = self.fetch_background_pixel();
+                let fetched_pixel_foreground = self.fetch_foreground_pixel();
 
-                // select background or foreground pixel with according palette data
-                let pixel = if let Some(pixel) = &pixel_foreground {
-                    PixelFetchResultWithPalette {
-                        data: pixel,
-                        palette_dmg: &palette_obp[pixel.palette_dmg as usize],
-                        palette_gbc: &palettes_gbc_obj[pixel.palette_gbc as usize]
-                    }
-                }
-                else {
-                    PixelFetchResultWithPalette {
-                        data: &pixel_background,
-                        palette_dmg: &palette_bg,
-                        palette_gbc: &palettes_gbc_bg[pixel_background.palette_gbc as usize]
-                    }
+                // select palettes for background pixel
+                let pixel_background = PixelFetchResultWithPalette {
+                    data: &fetched_pixel_background,
+                    palette_dmg: &palette_bg,
+                    palette_gbc: &palettes_gbc_bg[fetched_pixel_background.palette_gbc as usize]
                 };
+
+                // select palettes for foreground pixel
+                let pixel_foreground = PixelFetchResultWithPalette {
+                    data: &fetched_pixel_foreground,
+                    palette_dmg: &palette_obp[fetched_pixel_foreground.palette_dmg as usize],
+                    palette_gbc: &palettes_gbc_obj[fetched_pixel_foreground.palette_gbc as usize]
+                };
+
+                // select pixel to be displayed
+                let pixel = self.mix_pixels(
+                        &pixel_background,
+                        &pixel_foreground
+                );
 
                 // resolve pixel color using the according palette
                 let pixel_color = match self.device_config.emulation {
@@ -399,7 +403,9 @@ impl Ppu {
         let tileset         = TileSet::by_select_bit(tileset_select);
 
         // check if the flag for window/background is enabled
-        if bg_enabled {
+        // on CGB the background is always active, but their priority
+        // disabled by clearing the LCDC bit 0
+        if bg_enabled || self.device_config.is_gbc_enabled() {
             // process window pixels instead of background, if the window was enabled for this scanline
             let tile_info = if self.current_scanline.window_enabled {
                 let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
@@ -443,20 +449,54 @@ impl Ppu {
 
     /// Fetch the foreground pixel by reading the color of any sprite on the current
     /// position within the active scanline
-    pub fn fetch_foreground_pixel(&self, pixel_background: &SpritePixelValue) -> Option<PixelFetchResult> {
+    pub fn fetch_foreground_pixel(&self) -> PixelFetchResult {
         let lcdc            = self.get_lcdc();
         let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
 
         if sprites_enabled {
             self.read_scanline_sprite_pixel(
                 &self.current_scanline,
-                self.current_line_pixel,
-                pixel_background
+                self.current_line_pixel
             )
         }
         else {
-            None
+            PixelFetchResult::none()
         }
+    }
+
+
+    /// Selects whether to display background or foreground pixel depending on current priority bits
+    pub fn mix_pixels<'a>(
+            &self,
+            background: &'a PixelFetchResultWithPalette<'a>,
+            foreground: &'a PixelFetchResultWithPalette<'a>
+    ) -> &'a PixelFetchResultWithPalette<'a>
+    {
+        // on GBC the meaning of the BG enabled bit is changed into master priority, which
+        // disables the background priority flags, instead of disabling the whole background
+        let is_master_priority =
+                self.device_config.is_gbc_enabled()
+            &&  !get_bit(self.get_lcdc(), LCD_CONTROL_BIT_BG_WINDOW_ENABLED)
+        ;
+
+        // check for background priority, if not in master priority mode
+        if !is_master_priority {
+            if background.data.background_priority && background.data.value.is_opaque() {
+                return background;
+            }
+
+            if foreground.data.background_priority && background.data.value.is_opaque() {
+                return background;
+            }
+        }
+
+        // take object pixel, if not transparent
+        if foreground.data.value.is_opaque() {
+            return foreground;
+        }
+
+        // take background pixel otherwise
+        background
     }
 
 
@@ -681,19 +721,24 @@ impl Ppu {
         // the ppu prioritizes sprites with lower x position over higher x position
         // independent of their order in the OAM list, so we sort all found sprites
         // by their x position
-        scanline.sprites[0 .. scanline.sprites_found as usize].sort_by(
-            |a, b| {
-                let ax = a.pos_x;
-                let bx = b.pos_x;
-                ax.cmp(&bx)
-            }
-        );
+        // On GBC this behaviour can be switched by the object priority bit in 0xff6c
+        //  - 0 means OAM position has priority
+        //  - 1 means X position has priority
+        if !self.device_config.is_gbc_enabled() || get_bit(self.mem.get_io_registers().opri, 0) {
+            scanline.sprites[0 .. scanline.sprites_found as usize].sort_by(
+                |a, b| {
+                    let ax = a.pos_x;
+                    let bx = b.pos_x;
+                    ax.cmp(&bx)
+                }
+            );
+        }
 
         scanline
     }
 
     /// Reads a pixel from the current scanline sprite data on a given x position.
-    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8, pixel_background: &SpritePixelValue) -> Option<PixelFetchResult> {
+    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8) -> PixelFetchResult {
         // screen position considering the border offset of -8 / -16
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
@@ -726,25 +771,26 @@ impl Ppu {
             let pixel = self.read_sprite_pixel(
                 TileSet::H8000,
                 sprite.tile & sprite_mask,
+                sprite.get_gbc_vram_bank(),
                 sprite_pixel_x,
                 sprite_pixel_y
             );
 
-            // color index 0 is transparent; with bg priority, the sprite is behind the BG
-            if pixel.0 == 0 || (sprite.is_bg_priority() && pixel_background.0 != 0) {
+            // skip transparent pixels
+            if pixel.is_transparent() {
                 continue;
             }
 
-            return Some(PixelFetchResult {
+            return PixelFetchResult {
                 value: pixel,
                 palette_dmg: sprite.get_dmg_palette(),
                 palette_gbc: sprite.get_color_palette(),
                 sprite_priority: 0,
                 background_priority: sprite.is_bg_priority(),
-            });
+            };
         }
 
-        None
+        PixelFetchResult::none()
     }
 
     /// Reads a single pixel from the tilemap.
@@ -803,11 +849,11 @@ impl Ppu {
             background_priority = bg_to_oam_bit;
         }
 
-        // todo: implement read from specified vram bank
         // get the actual sprite pixel value
         let pixel = self.read_sprite_pixel(
             tile.tileset,
             sprite,
+            tile_vram_bank,
             fetch_position_x,
             fetch_position_y
         );
@@ -822,24 +868,25 @@ impl Ppu {
     }
 
     /// Read the pixel value of a sprite.
-    pub fn read_sprite_pixel(&self, tileset: TileSet, sprite: u8, x: u8, y: u8) -> SpritePixelValue {
+    pub fn read_sprite_pixel(&self, tileset: TileSet, sprite: u8, bank: u8, x: u8, y: u8) -> SpritePixelValue {
         let sprite_address      = tileset.address_of_tile(sprite);
-        self.read_sprite_pixel_from_address(sprite_address, x, y)
+        self.read_sprite_pixel_from_address(sprite_address, bank, x, y)
     }
 
     /// Read the pixel value of a sprite.
-    pub fn read_sprite_pixel_from_address(&self, sprite_address: u16 , x: u8, y: u8) -> SpritePixelValue {
-        let sprite_line_address = sprite_address + y as u16 * 2;
+    pub fn read_sprite_pixel_from_address(&self, sprite_address: u16, bank: u8, x: u8, y: u8) -> SpritePixelValue {
+        let vram                = &self.mem.get_vram_banks()[(bank & 0x01) as usize];
+        let sprite_line_address = (sprite_address + (y as u16 * 2) - MEMORY_LOCATION_VRAM_BEGIN) as usize;
         let pixel_mask            = 1u8 << (7 - x);
-        let byte0                 = self.mem.read_u8(sprite_line_address + 0);
-        let byte1                 = self.mem.read_u8(sprite_line_address + 1);
+        let byte0                 = vram.get_at(sprite_line_address + 0);
+        let byte1                 = vram.get_at(sprite_line_address + 1);
 
         let pixel =
                 (if (byte0 & pixel_mask) != 0 { 0x01 } else { 0x00 })
             |   (if (byte1 & pixel_mask) != 0 { 0x02 } else { 0x00 })
         ;
 
-        SpritePixelValue(pixel)
+        SpritePixelValue::new(pixel)
     }
 }
 

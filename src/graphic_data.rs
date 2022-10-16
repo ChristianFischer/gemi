@@ -39,19 +39,19 @@ pub struct Color {
 
 /// The pixel value read from a sprite.
 /// This value needs to be transformed into a color value using a color palette.
-pub struct SpritePixelValue(pub u8);
+pub struct SpritePixelValue(u8);
 
 /// A color palette of the classic GameBoy.
 /// This contains 4 Colors packed into one byte. Each color in the palette
 /// is meant as the brightness of a pixel on the LCD (0-3). This value
 /// may be transformed into a RGB color by a DmgDisplayPalette.
 #[derive(Copy, Clone, Debug)]
-pub struct DmgPalette(pub u8);
+pub struct DmgPalette(u8);
 
 /// A pixel value to be displayed on the LCD of a DMG GameBoy.
 /// The value represents the brightness of a LCD pixel and may be
 /// transformed into a RGB value using a palette to be displayed on modern screens.
-pub struct DmgLcdPixel(pub u8);
+pub struct DmgLcdPixel(u8);
 
 /// A palette to convert DmgLcdPixel values into RGB colors
 /// which can be represented on modern screens.
@@ -167,7 +167,35 @@ impl Display for Color {
 }
 
 
+impl SpritePixelValue {
+    /// Creates a sprite pixel with a given value.
+    pub fn new(value: u8) -> Self {
+        Self(value)
+    }
+
+    /// Creates a transparent pixel value.
+    pub fn none() -> Self {
+        Self(0)
+    }
+
+    /// Checks whether a pixel can be considered being transparent (pixel value is 0)
+    pub fn is_transparent(&self) -> bool {
+        self.0 == 0
+    }
+
+    /// Checks whether a pixel can be considered being opaque (pixel value is not 0)
+    pub fn is_opaque(&self) -> bool {
+        self.0 != 0
+    }
+}
+
+
 impl DmgPalette {
+    /// Creates a default palette which basically just takes the pixel value as color value.
+    pub fn create_default() -> Self {
+        Self(0b_11_10_01_00)
+    }
+
     /// Get the LCD value for a specific pixel value.
     pub fn get_color(&self, pixel: &SpritePixelValue) -> DmgLcdPixel {
         let palette_data = self.0;
@@ -328,6 +356,12 @@ impl Sprite {
     /// Checks whether the sprite is mirrored on Y axis.
     pub fn is_flip_y(&self) -> bool {
         get_bit(self.flags, 6)
+    }
+
+    /// Get the number of the VRAM bank, where to read the sprite data from.
+    /// Only valid when running a GameBoyColor emulation.
+    pub fn get_gbc_vram_bank(&self) -> u8 {
+        get_bit(self.flags, 3) as u8
     }
 
     /// Get the palette used by this sprite when in DMG mode (OBP0 or OBP1).

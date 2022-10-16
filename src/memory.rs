@@ -65,6 +65,7 @@ pub const MEMORY_LOCATION_BCPS:                     u16 = 0xff68;
 pub const MEMORY_LOCATION_BCPD:                     u16 = 0xff69;
 pub const MEMORY_LOCATION_OCPS:                     u16 = 0xff6a;
 pub const MEMORY_LOCATION_OCPD:                     u16 = 0xff6b;
+pub const MEMORY_LOCATION_OPRI:                     u16 = 0xff6c;
 pub const MEMORY_LOCATION_SVBK:                     u16 = 0xff70;
 pub const MEMORY_LOCATION_INTERRUPTS_FLAGGED:       u16 = 0xff0f;
 pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
@@ -240,7 +241,10 @@ pub struct IoRegister {
     /// byte data to be read or written on the object palette memory
     pub ocpd: u8,
 
-    _unused_0x6c: [u8; 4],
+    /// Object priority flag
+    pub opri: u8,
+
+    _unused_0x6d: [u8; 3],
 
     /// CGB WRAM bank select
     pub svbk: u8,
@@ -885,6 +889,7 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_BCPD                => bcpd);
         test_ioreg_struct_elem!(MEMORY_LOCATION_OCPS                => ocps);
         test_ioreg_struct_elem!(MEMORY_LOCATION_OCPD                => ocpd);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_OPRI                => opri);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
         test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_FLAGGED  => interrupts_flagged);

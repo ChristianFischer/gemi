@@ -22,7 +22,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
-use crate::graphic_data::{Color, DmgLcdPixel, TileMap, TileSet};
+use crate::graphic_data::{Color, DmgLcdPixel, DmgPalette, TileMap, TileSet};
 use crate::input::{Input, InputButton};
 use crate::memory::MEMORY_LOCATION_SPRITES_BEGIN;
 use crate::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
@@ -340,6 +340,7 @@ impl Window {
         let lcdc = ppu.get_lcdc();
         let tilemap = TileMap::by_select_bit(get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT));
         let tileset = TileSet::by_select_bit(get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT));
+        let palette = DmgPalette::create_default();
 
         // convert palette based image data into RGBA
         for background_y in 0..255 {
@@ -351,7 +352,7 @@ impl Window {
                     background_y
                 );
 
-                let pixel = DmgLcdPixel(sprite_pixel.value.0);
+                let pixel = palette.get_color(&sprite_pixel.value);
                 let color = ppu.translate_dmg_color_index(&pixel);
 
                 self.texture_background.set_color(background_x as u32, background_y as u32, color);
@@ -376,6 +377,7 @@ impl Window {
     pub fn present_objects(&mut self, ppu: &Ppu) {
         let objects_per_row = 16;
         let objects_rows    = 24;
+        let palette         = DmgPalette::create_default();
 
         for object_y in 0..objects_rows {
             for object_x in 0..objects_per_row {
@@ -386,11 +388,12 @@ impl Window {
                     for object_pixel_x in 0..8 {
                         let sprite_pixel = ppu.read_sprite_pixel_from_address(
                             sprite_address,
+                            0,
                             object_pixel_x,
                             object_pixel_y
                         );
 
-                        let pixel = DmgLcdPixel(sprite_pixel.0);
+                        let pixel = palette.get_color(&sprite_pixel);
 
                         let pixel_color = ppu.translate_dmg_color_index(&pixel);
                         let texture_x   = (object_x as u32 * 8) + (object_pixel_x as u32);
