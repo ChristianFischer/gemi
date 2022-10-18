@@ -633,6 +633,11 @@ impl Ppu {
     }
 
 
+    /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
+    pub fn set_dmg_display_palette(&mut self, palette: DmgDisplayPalette) {
+        self.dmg_display_palette = palette;
+    }
+
     /// Get the current palette to be used to translate DMG LCD color intensities into RGBA colors
     pub fn get_dmg_display_palette(&self) -> &DmgDisplayPalette {
         &self.dmg_display_palette

@@ -117,10 +117,6 @@ impl Color {
 
     /// Creates a color object from a 32bit uint.
     pub fn from_rgba32(rgba: u32) -> Self {
-        let r = (rgba >> 24) & 0xff;
-        let g = (rgba >> 16) & 0xff;
-        let b = (rgba >>  8) & 0xff;
-
         Self {
             r: ((rgba >> 24) & 0xff) as u8,
             g: ((rgba >> 16) & 0xff) as u8,
@@ -132,9 +128,9 @@ impl Color {
     /// Creates a color object from a 16 bit uint like read from GBC palettes.
     pub fn from_rgb_555(color: u16) -> Self {
         Self {
-            r: (((color >>  0) & 0x1f) << 3) as u8,
-            g: (((color >>  5) & 0x1f) << 3) as u8,
-            b: (((color >> 10) & 0x1f) << 3) as u8,
+            r: Self::u5_to_u8(((color >>  0) & 0x1f) as u8),
+            g: Self::u5_to_u8(((color >>  5) & 0x1f) as u8),
+            b: Self::u5_to_u8(((color >> 10) & 0x1f) as u8),
             a: 0xff,
         }
     }
@@ -145,6 +141,13 @@ impl Color {
          |  ((self.g as u32) << 16)
          |  ((self.b as u32) <<  8)
          |  ((self.a as u32) <<  0)
+    }
+
+    /// Converts a 5 bit color channel value from an GameBoyColor color palette
+    /// into a 8 bit value to be used on 32bit RGB displays
+    /// using the conversion as expected by GBC Acid 2 test.
+    fn u5_to_u8(v: u8) -> u8 {
+        v << 3 | v >> 2
     }
 }
 

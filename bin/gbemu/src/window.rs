@@ -165,7 +165,7 @@ impl Window {
         let texture_objects    = BufferedTexture::new(&texture_creator, 16*8, 24*8)?;
 
         Ok(Window {
-            display_scale: 4,
+            display_scale,
             event_pump,
             canvas,
             texture_game,

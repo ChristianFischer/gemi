@@ -2,4 +2,5 @@
 members = [
     "bin/gbemu",
     "lib/core",
+    "test_suite",
 ]

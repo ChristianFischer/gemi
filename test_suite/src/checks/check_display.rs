@@ -1,0 +1,126 @@
+/*
+ * Copyright (C) 2022 by Christian Fischer
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+use std::cmp::min;
+use gbemu_core::gameboy::GameBoy;
+use image::io::Reader as ImageReader;
+use image::{Rgba, RgbaImage};
+use gbemu_core::graphic_data::Color;
+use gbemu_core::ppu::LcdBuffer;
+use crate::util::get_test_file;
+
+
+/// Loads an image from any given file.
+/// Panics on Failure.
+pub fn load_image_from_file(image_path: &str) -> RgbaImage {
+    ImageReader::open(image_path)
+        .unwrap()
+        .decode()
+        .unwrap()
+        .to_rgba8()
+}
+
+
+/// Compares an image pixel with a color value from the emulator.
+pub fn compare_pixel(a: &Rgba<u8>, b: &Color) -> bool {
+        a.0[0] == b.r
+    &&  a.0[1] == b.g
+    &&  a.0[2] == b.b
+    &&  a.0[3] == b.a
+}
+
+
+/// Compares an image with a LCD screen buffer and returns whether they're identical or not.
+pub fn compare_images(expected_image: &RgbaImage, lcd_buffer: &LcdBuffer) -> bool {
+    let image_w = min(expected_image.width(),  lcd_buffer.get_width());
+    let image_h = min(expected_image.height(), lcd_buffer.get_height());
+
+    for y in 0..image_h {
+        for x in 0..image_w {
+            let expected_pixel = expected_image.get_pixel(x, y);
+            let lcd_pixel      = lcd_buffer.get_pixel(x, y);
+
+            if !compare_pixel(&expected_pixel, &lcd_pixel) {
+                return false;
+            }
+        }
+    }
+
+    true
+}
+
+
+/// Compares two images and prints a pattern which describes,
+/// which areas of the images are different.
+pub fn create_comparison_pattern(expected_image: &RgbaImage, lcd_buffer: &LcdBuffer) -> String {
+    let image_w    = min(expected_image.width(),  lcd_buffer.get_width());
+    let image_h    = min(expected_image.height(), lcd_buffer.get_height());
+    let block_size = 16;
+
+    let mut message = String::new();
+    message.push_str("     0  1  2  3  4  5  6  7  8  9\n");
+
+    for block_y in 0..(image_h / block_size) {
+        message.push_str(&format!(" {:2} ", block_y));
+
+        for block_x in 0..(image_w / block_size) {
+            let mut block_equal = true;
+
+            for inner_y in 0..block_size {
+                for inner_x in 0..block_size {
+                    let x = block_x * block_size + inner_x;
+                    let y = block_y * block_size + inner_y;
+
+                    let expected_pixel = expected_image.get_pixel(x, y);
+                    let lcd_pixel      = lcd_buffer.get_pixel(x, y);
+                    let pixel_equal    = compare_pixel(&expected_pixel, &lcd_pixel);
+
+                    block_equal &= pixel_equal;
+                }
+            }
+
+            message.push_str(&format!("{} ", if block_equal { ".." } else { "xx" }));
+        }
+
+        message.push_str("\n");
+    }
+
+    message
+}
+
+
+/// Compares the content of the emulators LCD buffer with a reference image.
+pub fn compare_display_with_image(gb: &GameBoy, image_path: &str) {
+    let image_res_path = get_test_file(image_path);
+    let expected_image = load_image_from_file(&image_res_path);
+    let lcd_buffer     = gb.ppu.get_lcd();
+
+    // check if both images have the same size
+    assert_eq!(expected_image.width(),  lcd_buffer.get_width());
+    assert_eq!(expected_image.height(), lcd_buffer.get_height());
+
+    // check for image equality
+    let images_identical = compare_images(&expected_image, &lcd_buffer);
+
+    // raise an error including a comparison pattern
+    assert!(
+        images_identical,
+        "Emulator Display different to reference image:\n{}",
+        create_comparison_pattern(&expected_image, &lcd_buffer)
+    );
+}
+
