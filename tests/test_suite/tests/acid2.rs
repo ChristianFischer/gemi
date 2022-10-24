@@ -17,7 +17,8 @@
 
 use gbemu_core::gameboy::DeviceType;
 use gbemu_core::graphic_data::{Color, DmgDisplayPalette};
-use testrunner::runner::{CheckResultConfig, EmulatorTestConfig, run_with_config, RunConfig, SetUpConfig};
+use testrunner::runner::run_with_config;
+use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 
 
 #[test]

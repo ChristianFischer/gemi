@@ -15,24 +15,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fs;
 use std::io::Cursor;
-use std::path::{Path, PathBuf};
-
-const BASE_PATH:    &str = "res/test_roms/";
-const SOURCE_URL:   &str = "https://github.com/c-sp/gameboy-test-roms/releases/download/v4.0/gameboy-test-roms-v4.0.zip";
-
+use std::path::Path;
 
 /// Download and unzip the archive containing test ROMs
-fn download_test_roms() {
-    let path = PathBuf::from(BASE_PATH);
-
+pub fn download_test_roms(path: &Path, url: &str) {
     // download archive
-    let archive = reqwest::blocking::get(SOURCE_URL)
+    let archive = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
         .unwrap()
         .to_vec()
     ;
+
+    // ensure the target directory exists
+    fs::create_dir_all(path).unwrap();
 
     // unzip into target dir
     zip_extract::extract(
@@ -40,13 +38,4 @@ fn download_test_roms() {
         &path,
         false
     ).unwrap();
-}
-
-
-fn main() {
-    let path = Path::new(BASE_PATH);
-
-    if !path.is_dir() {
-        download_test_roms();
-    }
 }

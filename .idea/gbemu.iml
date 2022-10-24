@@ -4,10 +4,12 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/bin/gbemu/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/lib/core/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test_suite/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test_suite/tests" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/test_suite/res/test_roms" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/gen/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/shared/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/test_suite/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/test_suite/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/test_suite/res/test_roms" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
