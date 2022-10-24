@@ -27,5 +27,6 @@ pub mod memory_data;
 pub mod opcode;
 pub mod opcodes;
 pub mod ppu;
+pub mod serial;
 pub mod timer;
 pub mod utils;

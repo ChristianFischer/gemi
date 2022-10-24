@@ -38,6 +38,8 @@ pub const MEMORY_LOCATION_WRAM_BANK_1_BEGIN:        u16 = 0xc000;
 pub const MEMORY_LOCATION_OAM_BEGIN:                u16 = 0xfe00;
 pub const MEMORY_LOCATION_OAM_END:                  u16 = 0xfe9f;
 pub const MEMORY_LOCATION_JOYP:                     u16 = 0xff00;
+pub const MEMORY_LOCATION_SB:                       u16 = 0xff01;
+pub const MEMORY_LOCATION_SC:                       u16 = 0xff02;
 pub const MEMORY_LOCATION_REGISTER_DIV:             u16 = 0xff04;
 pub const MEMORY_LOCATION_REGISTER_TIMA:            u16 = 0xff05;
 pub const MEMORY_LOCATION_REGISTER_TMA:             u16 = 0xff06;
@@ -868,6 +870,8 @@ mod tests {
     #[test]
     fn test_ioreg_struct_locations() {
         test_ioreg_struct_elem!(MEMORY_LOCATION_JOYP                => joyp);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_SB                  => sb);
+        test_ioreg_struct_elem!(MEMORY_LOCATION_SC                  => sc);
         test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_DIV        => div);
         test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TIMA       => tima);
         test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TMA        => tma);

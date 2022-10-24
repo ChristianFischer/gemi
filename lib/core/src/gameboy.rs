@@ -24,6 +24,7 @@ use crate::input::Input;
 use crate::memory::{Memory, MemoryRead};
 use crate::opcode::OpCodeContext;
 use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
+use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::carrying_add_u8;
 
@@ -101,6 +102,7 @@ pub struct GameBoy {
     pub mem: Memory,
     pub timer: Timer,
     pub input: Input,
+    pub serial: SerialPort,
 }
 
 
@@ -223,6 +225,7 @@ impl GameBoy {
                 ppu: Ppu::new(device_config, mem.create_read_write_handle()),
                 timer: Timer::new(mem.create_read_write_handle()),
                 input: Input::new(mem.create_read_write_handle()),
+                serial: SerialPort::new(mem.create_read_write_handle()),
                 mem,
             }
         )
@@ -390,6 +393,7 @@ impl GameBoy {
             self.mem.update(cycles);
             self.cpu.update(cycles);
             self.timer.update(cycles);
+            self.serial.update(cycles);
             self.input.update();
 
             // count the total cycles per interval
