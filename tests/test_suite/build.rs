@@ -48,6 +48,8 @@ fn main() {
             "blargg/mem_timing_2/",
             "blargg/oam_bug/",
             "blargg/halt_bug",
+            "mooneye_test_suite/acceptance/",
+            "mooneye_test_suite/emulator_only/",
         ]
     });
 }

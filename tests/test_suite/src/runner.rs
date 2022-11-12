@@ -19,6 +19,7 @@ use gbemu_core::boot_rom::BootRom;
 use gbemu_core::cartridge::Cartridge;
 use gbemu_core::gameboy::GameBoy;
 use gbemu_core::memory::MemoryRead;
+use gbemu_core::utils::to_u8;
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 use crate::checks::check_display::compare_display_with_image;
 use crate::util::get_test_file;
@@ -50,6 +51,9 @@ pub fn create_device_with_config(setup: SetUpConfig) -> GameBoy {
 
     // create the device emulator
     let mut gb = builder.finish().unwrap();
+
+    // initialize
+    gb.initialize();
 
     // enable serial data output queue
     if setup.enable_serial_output {
@@ -102,17 +106,24 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> u32 {
         // like JR -2
         if config.stop_on_infinite_loop {
             let current_address = gb.cpu.get_instruction_pointer();
-            let opcode          = gb.mem.read_u8(current_address + 0);
-            let param_i8         = gb.mem.read_i8(current_address + 1);
-            let param_u16        = gb.mem.read_u16(current_address + 1);
+            let (addr_high, addr_low) = to_u8(current_address);
 
             // check for JR -2
-            if opcode == 0x18 && param_i8 == -2 {
+            if check_for_opcode_sequence(gb, current_address, &[0x18, 0xfe]) {
+                stop_next_frame = true;
+            }
+
+            // check for NOP, JR -3
+            let seq_nop_jr = [0x00, 0x18, 0xfd];
+            if
+                    check_for_opcode_sequence(gb, current_address, &seq_nop_jr)
+                ||  check_for_opcode_sequence(gb, current_address.saturating_sub(1), &seq_nop_jr)
+            {
                 stop_next_frame = true;
             }
 
             // check for jump to self
-            if opcode == 0xC3 && param_u16 == current_address {
+            if check_for_opcode_sequence(gb, current_address, &[0xc3, addr_low, addr_high]) {
                 stop_next_frame = true;
             }
         }
@@ -126,6 +137,23 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> u32 {
     }
 
     frames
+}
+
+
+/// Checks for a sequence of bytes in the memory at the specified address
+fn check_for_opcode_sequence(gb: &GameBoy, address: u16, sequence: &[u8]) -> bool {
+    for i in 0..sequence.len() {
+        let i_addr = address + (i as u16);
+
+        let byte_expected = sequence[i];
+        let byte_read     = gb.mem.read_u8(i_addr);
+
+        if byte_read != byte_expected {
+            return false;
+        }
+    }
+
+    true
 }
 
 
