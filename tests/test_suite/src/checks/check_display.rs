@@ -21,6 +21,7 @@ use image::io::Reader as ImageReader;
 use image::{Rgba, RgbaImage};
 use gbemu_core::graphic_data::Color;
 use gbemu_core::ppu::LcdBuffer;
+use tests_shared::test_config::LcdColorMod;
 use crate::util::get_test_file;
 
 
@@ -41,6 +42,43 @@ pub fn compare_pixel(a: &Rgba<u8>, b: &Color) -> bool {
     &&  a.0[1] == b.g
     &&  a.0[2] == b.b
     &&  a.0[3] == b.a
+}
+
+
+/// Applies a color modification to a LCD content image.
+pub fn apply_color_mod(lcd: &LcdBuffer, color_mod: &LcdColorMod) -> LcdBuffer {
+    let mut new_buffer = LcdBuffer::alloc();
+
+    for y in 0..lcd.get_height() {
+        for x in 0..lcd.get_width() {
+            let original_color = lcd.get_pixel(x, y);
+
+            let modified_color = match color_mod {
+                LcdColorMod::None => original_color.clone(),
+
+                LcdColorMod::Gambatte => {
+                    let r = (original_color.r >> 3) as u32;
+                    let g = (original_color.g >> 3) as u32;
+                    let b = (original_color.b >> 3) as u32;
+
+                    let r2 = (r * 13 + g * 2 + b) / 2;
+                    let g2 = (g * 3 + b) * 2;
+                    let b2 = (r * 3 + g * 2 + b * 11) / 2;
+
+                    Color {
+                        r: r2 as u8,
+                        g: g2 as u8,
+                        b: b2 as u8,
+                        a: original_color.a
+                    }
+                }
+            };
+
+            new_buffer.set_pixel(x, y, modified_color);
+        }
+    }
+
+    new_buffer
 }
 
 
@@ -104,23 +142,24 @@ pub fn create_comparison_pattern(expected_image: &RgbaImage, lcd_buffer: &LcdBuf
 
 
 /// Compares the content of the emulators LCD buffer with a reference image.
-pub fn compare_display_with_image(gb: &GameBoy, image_path: &str) {
+pub fn compare_display_with_image(gb: &GameBoy, image_path: &str, color_mod: &LcdColorMod) {
     let image_res_path = get_test_file(image_path);
     let expected_image = load_image_from_file(&image_res_path);
     let lcd_buffer     = gb.ppu.get_lcd();
+    let compare_image  = apply_color_mod(&lcd_buffer, &color_mod);
 
     // check if both images have the same size
-    assert_eq!(expected_image.width(),  lcd_buffer.get_width());
-    assert_eq!(expected_image.height(), lcd_buffer.get_height());
+    assert_eq!(expected_image.width(),  compare_image.get_width());
+    assert_eq!(expected_image.height(), compare_image.get_height());
 
     // check for image equality
-    let images_identical = compare_images(&expected_image, &lcd_buffer);
+    let images_identical = compare_images(&expected_image, &compare_image);
 
     // raise an error including a comparison pattern
     assert!(
         images_identical,
         "Emulator Display different to reference image:\n{}",
-        create_comparison_pattern(&expected_image, &lcd_buffer)
+        create_comparison_pattern(&expected_image, &compare_image)
     );
 }
 

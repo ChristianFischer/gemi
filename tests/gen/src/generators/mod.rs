@@ -16,15 +16,18 @@
  */
 
 use crate::generators::blargg::generate_tests_blargg;
+use crate::generators::gambatte::generate_tests_gambatte;
 use crate::generators::mooneye::generate_tests_mooneye;
 use crate::test_generator::TestGenerator;
 
 mod blargg;
 mod common;
+mod gambatte;
 mod mooneye;
 
 
 pub fn generate_all_tests(gen: &TestGenerator) {
     generate_tests_blargg(gen);
+    generate_tests_gambatte(gen);
     generate_tests_mooneye(gen);
 }

@@ -22,6 +22,7 @@ use gbemu_core::memory::MemoryRead;
 use gbemu_core::utils::to_u8;
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 use crate::checks::check_display::compare_display_with_image;
+use crate::checks::gambatte_checks::check_gambatte_display_code;
 use crate::util::get_test_file;
 
 /// The maximum number of frames allowed per emulator run,
@@ -160,7 +161,11 @@ fn check_for_opcode_sequence(gb: &GameBoy, address: u16, sequence: &[u8]) -> boo
 /// After the emulator has been finished, run result checks on the current state.
 pub fn check_results(gb: &GameBoy, result: &CheckResultConfig) {
     if let Some(image_path) = &result.compare_lcd_with_image {
-        compare_display_with_image(gb, &image_path);
+        compare_display_with_image(gb, &image_path, &result.color_mod);
+    }
+    
+    if let Some(gambatte_display_result_code) = &result.gambatte_display_result_code {
+        check_gambatte_display_code(gb, &gambatte_display_result_code);
     }
 }
 

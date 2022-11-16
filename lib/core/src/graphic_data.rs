@@ -261,6 +261,11 @@ impl DmgDisplayPalette {
         ])
     }
 
+    /// Get the list of colors in this palette.
+    pub fn get_colors(&self) -> &[Color; 4] {
+        &self.palette
+    }
+
     /// Get the RGBA color for a specific pixel value.
     pub fn get_color(&self, pixel: &DmgLcdPixel) -> &Color {
         &self.palette[pixel.0 as usize]

@@ -17,7 +17,7 @@
 
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
-use tests_shared::test_config::{EmulatorTestConfig, RunConfig};
+use tests_shared::test_config::{EmulatorTestConfig, LcdColorMod, RunConfig};
 use crate::io_utils::IteratorState;
 
 
@@ -58,50 +58,95 @@ impl TestGenerator {
             test_code.push_str("#[ignore]\n");
         }
 
+        // test function body
         test_code.push_str(&format!("fn test_{name}() {{\n"));
         test_code.push_str("    let cfg = EmulatorTestConfig {\n");
-        test_code.push_str("        setup: SetUpConfig {\n");
 
-        if let Some(device_type) = test_cfg.setup.device {
-            let device_type_strval = match device_type {
-                DeviceType::GameBoyDmg     => "GameBoyDmg",
-                DeviceType::GameBoyColor   => "GameBoyColor",
-                DeviceType::GameBoyAdvance => "GameBoyAdvance",
-                DeviceType::SuperGameBoy   => "SuperGameBoy",
-                DeviceType::SuperGameBoy2  => "SuperGameBoy2",
-            };
+        // SetUpConfig
+        {
+            test_code.push_str("        setup: SetUpConfig {\n");
 
-            test_code.push_str(&format!("            device: Some(DeviceType::{device_type_strval}),\n"));
+            if let Some(device_type) = test_cfg.setup.device {
+                let device_type_strval = match device_type {
+                    DeviceType::GameBoyDmg     => "GameBoyDmg",
+                    DeviceType::GameBoyColor   => "GameBoyColor",
+                    DeviceType::GameBoyAdvance => "GameBoyAdvance",
+                    DeviceType::SuperGameBoy   => "SuperGameBoy",
+                    DeviceType::SuperGameBoy2  => "SuperGameBoy2",
+                };
+
+                test_code.push_str(&format!("            device: Some(DeviceType::{device_type_strval}),\n"));
+            }
+
+            if let Some(palette) = test_cfg.setup.dmg_display_palette {
+                let palette_colors = palette.get_colors();
+
+                test_code.push_str(&format!("            dmg_display_palette: Some(DmgDisplayPalette::new([\n"));
+                test_code.push_str(&format!("                Color::from_rgba32(0x{:08x}),\n", palette_colors[0].to_u32()));
+                test_code.push_str(&format!("                Color::from_rgba32(0x{:08x}),\n", palette_colors[1].to_u32()));
+                test_code.push_str(&format!("                Color::from_rgba32(0x{:08x}),\n", palette_colors[2].to_u32()));
+                test_code.push_str(&format!("                Color::from_rgba32(0x{:08x}),\n", palette_colors[3].to_u32()));
+                test_code.push_str(&format!("            ])),\n"));
+            }
+
+            if test_cfg.setup.enable_serial_output != false {
+                let enable_serial_output = test_cfg.setup.enable_serial_output;
+                test_code.push_str(&format!("            enable_serial_output: {enable_serial_output},\n"));
+            }
+
+            test_code.push_str(&format!("            .. SetUpConfig::with_rom_file(\"{rom_file}\")\n"));
+            test_code.push_str("        },\n");
         }
 
-        if test_cfg.setup.enable_serial_output != false {
-            let enable_serial_output = test_cfg.setup.enable_serial_output;
-            test_code.push_str(&format!("            enable_serial_output: {enable_serial_output},\n"));
+        // RunConfig
+        {
+            test_code.push_str("        run_config: RunConfig {\n");
+
+            if let Some(run_frames) = test_cfg.run_config.run_frames {
+                test_code.push_str(&format!("            run_frames: Some({run_frames}),\n"));
+            }
+
+            if test_cfg.run_config.stop_on_halt != RunConfig::default().stop_on_halt {
+                let stop_on_halt = test_cfg.run_config.stop_on_halt;
+                test_code.push_str(&format!("            stop_on_halt: {stop_on_halt},\n"));
+            }
+
+            if test_cfg.run_config.stop_on_infinite_loop != RunConfig::default().stop_on_infinite_loop {
+                let stop_on_infinite_loop = test_cfg.run_config.stop_on_infinite_loop;
+                test_code.push_str(&format!("            stop_on_infinite_loop: {stop_on_infinite_loop},\n"));
+            }
+
+            test_code.push_str("            .. RunConfig::default()\n");
+            test_code.push_str("        },\n");
         }
 
-        test_code.push_str(&format!("            .. SetUpConfig::with_rom_file(\"{rom_file}\")\n"));
-        test_code.push_str("        },\n");
-        test_code.push_str("        run_config: RunConfig {\n");
+        // CheckResultConfig
+        {
+            test_code.push_str("        result: CheckResultConfig {\n");
 
-        if let Some(run_frames) = test_cfg.run_config.run_frames {
-            test_code.push_str(&format!("            run_frames: Some({run_frames}),\n"));
+            if let Some(ref_image) = test_cfg.result.compare_lcd_with_image {
+                let ref_image_path = ref_image
+                    .replace('\\', "/")
+                    .replace(self.base_path_roms.to_str().unwrap(), "")
+                ;
+
+                test_code.push_str(&format!("            compare_lcd_with_image: Some(\"{ref_image_path}\".to_string()),\n"));
+            }
+
+            match test_cfg.result.color_mod {
+                LcdColorMod::None => {}
+                LcdColorMod::Gambatte => test_code.push_str("            color_mod: LcdColorMod::Gambatte,\n"),
+            }
+
+            if let Some(gambatte_display_code) = test_cfg.result.gambatte_display_result_code {
+                test_code.push_str(&format!("            gambatte_display_result_code: Some(\"{gambatte_display_code}\".to_string()),\n"));
+            }
+
+            test_code.push_str("            .. CheckResultConfig::default()\n");
+            test_code.push_str("        },\n");
         }
 
-        if test_cfg.run_config.stop_on_halt != RunConfig::default().stop_on_halt {
-            let stop_on_halt = test_cfg.run_config.stop_on_halt;
-            test_code.push_str(&format!("            stop_on_halt: {stop_on_halt},\n"));
-        }
-
-        if test_cfg.run_config.stop_on_infinite_loop != RunConfig::default().stop_on_infinite_loop {
-            let stop_on_infinite_loop = test_cfg.run_config.stop_on_infinite_loop;
-            test_code.push_str(&format!("            stop_on_infinite_loop: {stop_on_infinite_loop},\n"));
-        }
-
-        test_code.push_str("            .. RunConfig::default()\n");
-        test_code.push_str("        },\n");
-        test_code.push_str("        result: CheckResultConfig {\n");
-        test_code.push_str("            .. CheckResultConfig::default()\n");
-        test_code.push_str("        },\n");
+        // footer
         test_code.push_str("    };\n");
         test_code.push_str("\n");
 

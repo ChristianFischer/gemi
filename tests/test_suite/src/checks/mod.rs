@@ -16,3 +16,4 @@
  */
 
 pub mod check_display;
+pub mod gambatte_checks;

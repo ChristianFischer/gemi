@@ -19,6 +19,18 @@ use gbemu_core::gameboy::DeviceType;
 use gbemu_core::graphic_data::DmgDisplayPalette;
 
 
+/// A definition how to modify the colors of the emulator display
+/// to match any comparison images used in test cases.
+#[derive(Copy, Clone)]
+pub enum LcdColorMod {
+    /// No modification, takes colors as they're output by the emulator.
+    None,
+
+    /// Color modifications like created by the gambatte emulator.
+    Gambatte,
+}
+
+
 /// Configuration parameters on how to setup an emulator instance.
 pub struct SetUpConfig {
     /// Optional: Device type which kind of device to be emulated.
@@ -44,6 +56,7 @@ pub struct SetUpConfig {
 /// Configuration on how to run the emulator.
 /// Also contains stop conditions to stop the emulator after tests were finished.
 /// Any stop condition are only checked after a frame was completed.
+#[derive(Clone)]
 pub struct RunConfig {
     /// The number of frames to be processed.
     pub run_frames: Option<u32>,
@@ -58,11 +71,23 @@ pub struct RunConfig {
 
 
 /// Configuration how to check whether a test ROM was successful or not.
+#[derive(Clone)]
 pub struct CheckResultConfig {
     /// Compare the emulator display with a given image.
     /// If failed, the test will print a pattern to detect which areas
     /// of the screen were different to the comparison image.
     pub compare_lcd_with_image: Option<String>,
+
+    /// When comparing the LCD content with a reference image,
+    /// the LCD content may be modified first in order to get
+    /// the expected color values.
+    pub color_mod: LcdColorMod,
+
+    /// For gambatte test ROMs:
+    /// A result code which is displayed on the emulator screen.
+    /// Checks if the expected result code is the same as displayed
+    /// on the emulator screen.
+    pub gambatte_display_result_code: Option<String>,
 }
 
 
@@ -99,10 +124,28 @@ impl Default for RunConfig {
 }
 
 
+impl CheckResultConfig {
+    /// Checks if this CheckResultConfig has set up any checks.
+    pub fn has_any_checks(&self) -> bool {
+        if let Some(_) = self.compare_lcd_with_image {
+            return true;
+        }
+
+        if let Some(_) = self.gambatte_display_result_code {
+            return true;
+        }
+
+        false
+    }
+}
+
+
 impl Default for CheckResultConfig {
     fn default() -> Self {
         Self {
             compare_lcd_with_image: None,
+            color_mod: LcdColorMod::None,
+            gambatte_display_result_code: None,
         }
     }
 }

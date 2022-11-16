@@ -171,6 +171,28 @@ fn recursive_visit_directory_step(root_path: &PathBuf, state: &IteratorState, ca
 }
 
 
+/// Get the name of a file from a path object.
+/// Path and file extensions will be stripped from the filename.
+pub fn get_plain_filename(f: &PathBuf) -> String {
+    let mut filename = f.to_str().unwrap().to_string();
+
+    // replace \\ by /
+    filename = filename.replace('\\', "/");
+
+    // cut file extension
+    if let Some(pos) = filename.rfind('.') {
+        filename = filename[0 .. pos].to_string();
+    }
+
+    // cut path
+    if let Some(pos) = filename.rfind('/') {
+        filename = filename[pos+1 ..].to_string();
+    }
+
+    filename
+}
+
+
 /// Takes a filename and creates a symbol identifier,
 /// which may be used for function or module names.
 pub fn filename_to_symbol(filename: &str) -> String {
