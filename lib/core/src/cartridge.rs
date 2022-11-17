@@ -22,6 +22,7 @@ use std::io::Read;
 use std::ops::Add;
 use crate::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::mbc::MemoryBankController;
+use crate::utils::as_hex_digit;
 
 
 pub const FILE_EXT_GB:  &str = ".gb";
@@ -48,8 +49,11 @@ pub enum LicenseeCode {
     /// old licensee code
     Old(u8),
 
-    /// new licensee code
+    /// new licensee code with both characters representing a hex value
     New(u8),
+
+    /// new licensee code with two characters
+    NewExtended([char; 2]),
 }
 
 
@@ -253,10 +257,15 @@ impl Cartridge {
             LicenseeCode::Old(licensee_code_old)
         }
         else {
-            LicenseeCode::New(
-                    ((rom.data[ROM_OFFSET_NEW_LICENSEE_CODE + 0] - '0' as u8) * 10)
-                 |  ((rom.data[ROM_OFFSET_NEW_LICENSEE_CODE + 1] - '0' as u8) *  1)
-            )
+            let lc0    = rom.data[ROM_OFFSET_NEW_LICENSEE_CODE + 0] as char;
+            let lc1    = rom.data[ROM_OFFSET_NEW_LICENSEE_CODE + 1] as char;
+            let digit0 = as_hex_digit(lc0);
+            let digit1 = as_hex_digit(lc1);
+
+            match (digit0, digit1) {
+                (Some(d0), Some(d1)) => LicenseeCode::New(d0 * 10 | d1),
+                _                            => LicenseeCode::NewExtended([lc0, lc1]),
+            }
         };
 
         let cartridge = Cartridge {
@@ -404,8 +413,9 @@ impl Cartridge {
 impl Display for LicenseeCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            LicenseeCode::Old(code) => write!(f, "{:02x} (old)", code),
-            LicenseeCode::New(code) => write!(f, "{:02x} (new)", code),
+            LicenseeCode::Old(code)         => write!(f, "{:02x} (old)", code),
+            LicenseeCode::New(code)         => write!(f, "{:02x} (new)", code),
+            LicenseeCode::NewExtended(code) => write!(f, "{:}{:} (new)", code[0], code[1]),
         }
     }
 }

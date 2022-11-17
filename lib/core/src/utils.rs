@@ -60,6 +60,16 @@ pub const fn set_bit(byte: u8, bit: u8) -> u8 {
     byte | ((1 << bit) as u8)
 }
 
+/// Get the integer value of a character, if it matches a hex digit (0-9, a-f)
+pub fn as_hex_digit(c: char) -> Option<u8> {
+    match c {
+        '0' ..= '9' => Some((c as u8) - ('0' as u8)),
+        'a' ..= 'f' => Some((c as u8) - ('a' as u8)),
+        'A' ..= 'F' => Some((c as u8) - ('A' as u8)),
+        _           => None,
+    }
+}
+
 
 /// Add two numbers and the carry flag together.
 /// Returns the numeric result and the new carry flag
