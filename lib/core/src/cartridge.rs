@@ -19,7 +19,7 @@ use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io;
 use std::io::Read;
-use std::ops::Add;
+use std::ops::{Add, Range};
 use crate::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::mbc::MemoryBankController;
 use crate::utils::as_hex_digit;
@@ -76,7 +76,10 @@ pub struct Cartridge {
 
     mbc: MemoryBankController,
 
+    rom_bank_count: u8,
     rom_size: usize,
+
+    ram_bank_count: u8,
     ram_size: usize,
 
     supports_cgb: GameBoyColorSupport,
@@ -108,6 +111,17 @@ impl RomData {
     /// Get the ROM data on a particular address.
     pub fn get_at(&self, address: usize) -> u8 {
         self.data[address]
+    }
+
+    /// Get a data slice out of the ROM data.
+    /// If the data is not large enough, it will return 'None'
+    pub fn get_slice(&self, range: Range<usize>) -> Option<&[u8]> {
+        if self.data.len() >= range.end {
+            Some(&self.data[range])
+        }
+        else {
+            None
+        }
     }
 
     /// Read the game title from the ROM data.
@@ -144,6 +158,18 @@ impl RomData {
 
         return String::new();
     }
+}
+
+
+/// Compute a checksum by adding up the value of each byte in a sequence.
+pub fn compute_checksum(data: &[u8]) -> u8 {
+    let mut checksum = 0u8;
+
+    for b in data {
+        checksum = checksum.wrapping_add(*b);
+    }
+
+    checksum
 }
 
 
@@ -187,24 +213,30 @@ impl Cartridge {
         let sgb_flag_value = rom.data[ROM_OFFSET_FLAG_SGB];
         let supports_sgb = sgb_flag_value == 0x03;
 
-        let rom_size_type = rom.data[ROM_OFFSET_ROM_SIZE];
-        let rom_size = (32 * 1024) << rom_size_type;
+        let rom_size_type  = rom.data[ROM_OFFSET_ROM_SIZE];
+        let rom_bank_count = 2 << rom_size_type;
+        let rom_size       = (16 * 1024) * rom_bank_count as usize;
 
         let ram_size_type = rom.data[ROM_OFFSET_RAM_SIZE];
-        let ram_size = match ram_size_type {
-            0x00 =>   0,
-            0x01 =>   2 * 1024,
-            0x02 =>   8 * 1024,
-            0x03 =>  32 * 1024,
-            0x04 => 128 * 1024,
-            0x05 =>  64 * 1024,
-            _    =>   0,
+        let (ram_bank_count, ram_size) = match ram_size_type {
+            0x00 => ( 0,   0),
+            0x01 => ( 1,   2 * 1024),
+            0x02 => ( 1,   8 * 1024),
+            0x03 => ( 4,  32 * 1024),
+            0x04 => (16, 128 * 1024),
+            0x05 => ( 8,  64 * 1024),
+            _    => ( 0,   0),
         };
 
         let rom_type = rom.data[ROM_OFFSET_ROM_TYPE];
 
         let mbc = match rom_type {
-            0x01..=0x03 => MemoryBankController::MBC1,
+            0x01..=0x03 => if Self::check_is_mbc1m_multi_cart(&rom) {
+                                MemoryBankController::MBC1M
+                           }
+                           else {
+                                MemoryBankController::MBC1
+                           },
             0x05..=0x06 => MemoryBankController::MBC2,
             0x0F..=0x13 => MemoryBankController::MBC3,
             0x19..=0x1E => MemoryBankController::MBC5,
@@ -278,7 +310,10 @@ impl Cartridge {
 
             mbc,
 
+            rom_bank_count,
             rom_size,
+
+            ram_bank_count,
             ram_size,
 
             supports_cgb,
@@ -294,6 +329,21 @@ impl Cartridge {
         };
 
         Ok(cartridge)
+    }
+
+
+    /// Checks if a ROM is a MBC1 multi cart ROM
+    fn check_is_mbc1m_multi_cart(rom: &RomData) -> bool {
+        // A ROM will be considered as 'multi cartridge' if it contains a cartridge header with
+        // a nintendo logo, which is required for startup at address 0x40000, which is the
+        // expected location of the 2nd ROM.
+        if let Some(slice) = rom.get_slice(0x40104 .. 0x40134) {
+            let checksum = compute_checksum(slice);
+            checksum == 0x46
+        }
+        else {
+            false
+        }
     }
 
 
@@ -336,13 +386,13 @@ impl Cartridge {
 
     /// Computes the checksum of all 16 title bytes
     pub fn compute_title_checksum(&self) -> u8 {
-        let mut checksum = 0u8;
-
-        for addr in 0x0134..=0x0143 {
-            checksum = checksum.wrapping_add(self.rom.get_at(addr));
+        if let Some(title_seq) = self.rom.get_slice(0x0134 .. 0x0144) {
+            let checksum = compute_checksum(title_seq);
+            checksum
         }
-
-        checksum
+        else {
+            0x00
+        }
     }
 
     /// get the game's manufacturer code
@@ -378,9 +428,19 @@ impl Cartridge {
         &self.mbc
     }
 
+    /// get the number of ROM banks in this cartridge
+    pub fn get_rom_bank_count(&self) -> u8 {
+        self.rom_bank_count
+    }
+
     /// get the ROM size of this cartridge
     pub fn get_rom_size(&self) -> usize {
         self.rom_size
+    }
+
+    /// get the number of RAM banks in this cartridge
+    pub fn get_ram_bank_count(&self) -> u8 {
+        self.ram_bank_count
     }
 
     /// get the RAM size of this cartridge

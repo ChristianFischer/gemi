@@ -4041,7 +4041,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_bank1_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4068,7 +4067,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_bank1_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4095,7 +4093,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_bank2_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4122,7 +4119,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_bank2_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4149,7 +4145,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_mode_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4176,7 +4171,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_mode_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4203,7 +4197,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_ramg_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4230,7 +4223,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_bits_ramg_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4257,7 +4249,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_multicart_rom_8mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4284,7 +4275,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_multicart_rom_8mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4311,7 +4301,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_ram_256kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4338,7 +4327,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_ram_256kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4365,7 +4353,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_ram_64kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4392,7 +4379,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_ram_64kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4419,7 +4405,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_16mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4446,7 +4431,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_16mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4473,7 +4457,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_1mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4500,7 +4483,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_1mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4527,7 +4509,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_2mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4554,7 +4535,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_2mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4581,7 +4561,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_4mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4608,7 +4587,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_4mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4635,7 +4613,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_512kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4662,7 +4639,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_512kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4689,7 +4665,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_8mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -4716,7 +4691,6 @@ mod emulator_only {
 
 
         #[test]
-        #[ignore]
         fn test_rom_8mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {

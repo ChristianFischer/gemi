@@ -25,6 +25,7 @@ use crate::mbc::mbc_none::MbcNone;
 pub enum MemoryBankController {
     None,
     MBC1,
+    MBC1M,
     MBC2,
     MBC3,
     MBC5,
@@ -46,10 +47,11 @@ pub trait Mbc {
 /// Creates a memory bank controller object based on the type given.
 pub fn create_mbc(kind: &MemoryBankController) -> Box<dyn Mbc> {
     match kind {
-        MemoryBankController::None => Box::new(MbcNone::new()),
-        MemoryBankController::MBC1 => Box::new(Mbc1::new()),
-        MemoryBankController::MBC5 => Box::new(Mbc5::new()),
-        _                          => panic!("Not implemented {}", kind)
+        MemoryBankController::None  => Box::new(MbcNone::new()),
+        MemoryBankController::MBC1  => Box::new(Mbc1::new()),
+        MemoryBankController::MBC1M => Box::new(Mbc1::new_multicart()),
+        MemoryBankController::MBC5  => Box::new(Mbc5::new()),
+        _                           => panic!("Not implemented {}", kind)
     }
 }
 
@@ -57,13 +59,14 @@ pub fn create_mbc(kind: &MemoryBankController) -> Box<dyn Mbc> {
 impl Display for MemoryBankController {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let name = match *self {
-            MemoryBankController::None => "None",
-            MemoryBankController::MBC1 => "MBC1",
-            MemoryBankController::MBC2 => "MBC2",
-            MemoryBankController::MBC3 => "MBC3",
-            MemoryBankController::MBC5 => "MBC5",
-            MemoryBankController::MBC6 => "MBC6",
-            MemoryBankController::MBC7 => "MBC7",
+            MemoryBankController::None  => "None",
+            MemoryBankController::MBC1  => "MBC1",
+            MemoryBankController::MBC1M => "MBC1M",
+            MemoryBankController::MBC2  => "MBC2",
+            MemoryBankController::MBC3  => "MBC3",
+            MemoryBankController::MBC5  => "MBC5",
+            MemoryBankController::MBC6  => "MBC6",
+            MemoryBankController::MBC7  => "MBC7",
         };
 
         write!(f, "{:}", name)
@@ -105,6 +108,9 @@ mod mbc1 {
     /// Type 1 Memory Bank Controller:
     /// Supports up to 2MB ROMs or up to 32kB RAM.
     pub struct Mbc1 {
+        /// Flag whether to handle a multi cart ROM.
+        is_multicart: bool,
+
         /// Mode switch between Mode 0 = 128 ROM banks 1 RAM bank and Mode 1 = 32 ROM banks, 4 RAM banks.
         mode: u8,
 
@@ -117,12 +123,19 @@ mod mbc1 {
         /// or 2 bits for RAM bank selection, depending on the selected mode.
         bank_selection_1: u8,
 
-        /// The selected ROM bank number.
-        rom_bank_selected: u8,
+        /// The selected ROM bank slot #0 number.
+        rom_bank_0_selected: u8,
 
         /// The offset added to the address the game wants to read from,
         /// to get the real address within the ROM file.
-        rom_bank_offset:   usize,
+        rom_bank_0_offset: usize,
+
+        /// The selected ROM bank slot #1 number.
+        rom_bank_1_selected: u8,
+
+        /// The offset added to the address the game wants to read from,
+        /// to get the real address within the ROM file.
+        rom_bank_1_offset: usize,
 
         /// The selected RAM bank number.
         ram_bank_selected: u8,
@@ -138,13 +151,17 @@ mod mbc1 {
     impl Mbc1 {
         pub fn new() -> Mbc1 {
             Mbc1 {
+                is_multicart: false,
                 mode: 0,
 
                 bank_selection_0: 0x00,
                 bank_selection_1: 0x00,
 
-                rom_bank_selected: 1,
-                rom_bank_offset:   0x0000,
+                rom_bank_0_selected: 0,
+                rom_bank_0_offset:   0x0000,
+
+                rom_bank_1_selected: 1,
+                rom_bank_1_offset:   0x4000,
 
                 ram_bank_selected: 0,
                 ram_bank_offset:   0x0000,
@@ -154,38 +171,79 @@ mod mbc1 {
         }
 
 
+        pub fn new_multicart() -> Mbc1 {
+            Mbc1 {
+                is_multicart: true,
+                .. Self::new()
+            }
+        }
+
+
         /// After writing to one of the bank selection registers,
         /// this function is used to calculate the actual RAM and ROM bank numbers
         /// as well as the offsets to read and write inside the ROM and RAM images.
-        fn update_selected_banks(&mut self) {
-            let mut rom_bank = self.bank_selection_0;
-            let mut ram_bank = 0;
+        fn update_selected_banks(&mut self, cartridge: &Cartridge) {
+            let mut rom_bank_0 = 0;
+            let mut rom_bank_1 = 0;
+            let mut ram_bank   = 0;
+
+            // on MBC1M multi cart ROMs only 4 bits of the first selection register are used
+            // and the 2nd register will become bit 4+5 instead of bit 5+6
+            let (bank_selection_0_mask, bank_selection_1_offset) = if self.is_multicart {
+                (0b_0000_1111, 4)
+            }
+            else {
+                (0b_0001_1111, 5)
+            };
+
+            // Setting the first bank selection register to '0' will select bank '1' instead,
+            // so bank '0' should only be accessible on the 0x0000 - 0x3fff address range.
+            // Because this check is only done on the first register, not the bank number itself,
+            // this also causes bank 0x20, 0x40 and 0x60 to be inaccessible as well through the
+            // 2nd bank slot.
+            // The check for value 0 is always being done on the full 5 bit register, even if
+            // it's not fully used, either on MBC1M which is only using 4 bits, or when a cartridge
+            // has less than 16 banks, so less than 5 bits are required to encode the bank number.
+            if self.bank_selection_0 != 0 {
+                rom_bank_1 |= self.bank_selection_0 & bank_selection_0_mask;
+            }
+            else {
+                rom_bank_1 |= 1;
+            }
 
             if self.mode == 0 {
                 // in mode 0 the 2 bits of the 2nd register will be used as
                 // bit 5 and 6 of the rom bank selection
-                rom_bank |= self.bank_selection_1 << 4;
+                rom_bank_1 |= self.bank_selection_1 << bank_selection_1_offset;
             }
             else {
-                // in mode 1, the bits of the 2nd register will be used as RAM bank number
-                ram_bank = self.bank_selection_1;
+                // in mode 1, the bits of the 2nd register will be used
+                // for ROM bank selection on both ROM banks, and at the
+                // same time to select the RAM bank number
+                rom_bank_0 |= self.bank_selection_1 << bank_selection_1_offset;
+                rom_bank_1 |= self.bank_selection_1 << bank_selection_1_offset;
+                ram_bank    = self.bank_selection_1;
             }
 
-            // Bank 0 is only accessible in the 0x0000 - 0x1fff range
-            // Banks 0x20, 0x40 and 0x60 are inaccessible too and translated into the next bank
-            rom_bank = match rom_bank {
-                0x00 | 0x20 | 0x40 | 0x60 => rom_bank + 1,
-                _ => rom_bank,
-            };
+            // store the rom bank and the offset to be added to all requested addresses
+            if cartridge.get_rom_bank_count() != 0 {
+                rom_bank_0 = rom_bank_0 % cartridge.get_rom_bank_count();
+                rom_bank_1 = rom_bank_1 % cartridge.get_rom_bank_count();
 
-            // store the rom bank and the offset to be added to all
-            // requested addresses, beginning with 0x4000
-            self.rom_bank_selected = rom_bank;
-            self.rom_bank_offset   = ((rom_bank as usize) * 0x4000) - 0x4000;
+                self.rom_bank_0_selected = rom_bank_0;
+                self.rom_bank_0_offset   = (rom_bank_0 as usize) * 0x4000;
+
+                self.rom_bank_1_selected = rom_bank_1;
+                self.rom_bank_1_offset   = (rom_bank_1 as usize) * 0x4000;
+            }
 
             // store the ram bank and the offset to be added to all addresses
-            self.ram_bank_selected = ram_bank;
-            self.ram_bank_offset   = (ram_bank as usize) * 0x2000;
+            if cartridge.get_ram_bank_count() != 0 {
+                ram_bank = ram_bank % cartridge.get_ram_bank_count();
+
+                self.ram_bank_selected = ram_bank;
+                self.ram_bank_offset   = (ram_bank as usize) * 0x2000;
+            }
         }
     }
 
@@ -194,13 +252,13 @@ mod mbc1 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
-                    let rom_address = address as usize;
+                    let rom_address = (address as usize) + self.rom_bank_0_offset;
                     cartridge.get_rom().get_at(rom_address)
                 },
 
                 // read from the switchable ROM bank
                 0x4000 ..= 0x7fff => {
-                    let rom_address = (address as usize) + self.rom_bank_offset;
+                    let rom_address = (address as usize) + self.rom_bank_1_offset - 0x4000;
                     cartridge.get_rom().get_at(rom_address)
                 },
 
@@ -229,19 +287,19 @@ mod mbc1 {
                 // 0x2000 - 0x3fff: select ROM bank
                 0x01 => {
                     self.bank_selection_0 = value & 0x1f;
-                    self.update_selected_banks();
+                    self.update_selected_banks(cartridge);
                 },
 
                 // 0x4000 - 0x5fff: select RAM bank
                 0x02 => {
                     self.bank_selection_1 = value & 0x03;
-                    self.update_selected_banks();
+                    self.update_selected_banks(cartridge);
                 },
 
                 // 0x6000 - 0x7fff: switch ROM / RAM mode
                 0x03 => {
                     self.mode = value & 0x01;
-                    self.update_selected_banks();
+                    self.update_selected_banks(cartridge);
                 },
 
                 // 0xa000 - 0xbfff: Cartridge RAM
