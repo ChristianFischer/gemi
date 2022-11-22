@@ -76,10 +76,10 @@ pub struct Cartridge {
 
     mbc: MemoryBankController,
 
-    rom_bank_count: u8,
+    rom_bank_count: u32,
     rom_size: usize,
 
-    ram_bank_count: u8,
+    ram_bank_count: u32,
     ram_size: usize,
 
     supports_cgb: GameBoyColorSupport,
@@ -429,7 +429,7 @@ impl Cartridge {
     }
 
     /// get the number of ROM banks in this cartridge
-    pub fn get_rom_bank_count(&self) -> u8 {
+    pub fn get_rom_bank_count(&self) -> u32 {
         self.rom_bank_count
     }
 
@@ -439,7 +439,7 @@ impl Cartridge {
     }
 
     /// get the number of RAM banks in this cartridge
-    pub fn get_ram_bank_count(&self) -> u8 {
+    pub fn get_ram_bank_count(&self) -> u32 {
         self.ram_bank_count
     }
 

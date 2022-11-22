@@ -124,21 +124,21 @@ mod mbc1 {
         bank_selection_1: u8,
 
         /// The selected ROM bank slot #0 number.
-        rom_bank_0_selected: u8,
+        rom_bank_0_selected: u32,
 
         /// The offset added to the address the game wants to read from,
         /// to get the real address within the ROM file.
         rom_bank_0_offset: usize,
 
         /// The selected ROM bank slot #1 number.
-        rom_bank_1_selected: u8,
+        rom_bank_1_selected: u32,
 
         /// The offset added to the address the game wants to read from,
         /// to get the real address within the ROM file.
         rom_bank_1_offset: usize,
 
         /// The selected RAM bank number.
-        ram_bank_selected: u8,
+        ram_bank_selected: u32,
 
         /// The offset added to the address the game wants to read/write,
         /// to get the real address within the RAM image.
@@ -183,9 +183,9 @@ mod mbc1 {
         /// this function is used to calculate the actual RAM and ROM bank numbers
         /// as well as the offsets to read and write inside the ROM and RAM images.
         fn update_selected_banks(&mut self, cartridge: &Cartridge) {
-            let mut rom_bank_0 = 0;
-            let mut rom_bank_1 = 0;
-            let mut ram_bank   = 0;
+            let mut rom_bank_0 = 0u32;
+            let mut rom_bank_1 = 0u32;
+            let mut ram_bank   = 0u32;
 
             // on MBC1M multi cart ROMs only 4 bits of the first selection register are used
             // and the 2nd register will become bit 4+5 instead of bit 5+6
@@ -205,7 +205,7 @@ mod mbc1 {
             // it's not fully used, either on MBC1M which is only using 4 bits, or when a cartridge
             // has less than 16 banks, so less than 5 bits are required to encode the bank number.
             if self.bank_selection_0 != 0 {
-                rom_bank_1 |= self.bank_selection_0 & bank_selection_0_mask;
+                rom_bank_1 |= (self.bank_selection_0 & bank_selection_0_mask) as u32;
             }
             else {
                 rom_bank_1 |= 1;
@@ -214,15 +214,15 @@ mod mbc1 {
             if self.mode == 0 {
                 // in mode 0 the 2 bits of the 2nd register will be used as
                 // bit 5 and 6 of the rom bank selection
-                rom_bank_1 |= self.bank_selection_1 << bank_selection_1_offset;
+                rom_bank_1 |= (self.bank_selection_1 as u32) << bank_selection_1_offset;
             }
             else {
                 // in mode 1, the bits of the 2nd register will be used
                 // for ROM bank selection on both ROM banks, and at the
                 // same time to select the RAM bank number
-                rom_bank_0 |= self.bank_selection_1 << bank_selection_1_offset;
-                rom_bank_1 |= self.bank_selection_1 << bank_selection_1_offset;
-                ram_bank    = self.bank_selection_1;
+                rom_bank_0 |= (self.bank_selection_1 as u32) << bank_selection_1_offset;
+                rom_bank_1 |= (self.bank_selection_1 as u32) << bank_selection_1_offset;
+                ram_bank    = (self.bank_selection_1 as u32);
             }
 
             // store the rom bank and the offset to be added to all requested addresses
@@ -336,14 +336,14 @@ mod mbc5 {
         ram_bank_selection_0: u8,
 
         /// The selected ROM bank number.
-        rom_bank_selected: u16,
+        rom_bank_selected: u32,
 
         /// The offset added to the address the game wants to read from,
         /// to get the real address within the ROM file.
         rom_bank_offset:   usize,
 
         /// The selected RAM bank number.
-        ram_bank_selected: u16,
+        ram_bank_selected: u32,
 
         /// The offset added to the address the game wants to read/write,
         /// to get the real address within the RAM image.
@@ -361,7 +361,7 @@ mod mbc5 {
                 ram_bank_selection_0: 0x00,
 
                 rom_bank_selected: 1,
-                rom_bank_offset:   0x0000,
+                rom_bank_offset:   0x4000,
 
                 ram_bank_selected: 0,
                 ram_bank_offset:   0x0000,
@@ -374,24 +374,28 @@ mod mbc5 {
         /// After writing to one of the bank selection registers,
         /// this function is used to calculate the actual RAM and ROM bank numbers
         /// as well as the offsets to read and write inside the ROM and RAM images.
-        fn update_selected_banks(&mut self) {
+        fn update_selected_banks(&mut self, cartridge: &Cartridge) {
             let rom_bank =
-                (self.rom_bank_selection_0 as u16)
-              | ((self.rom_bank_selection_1 as u16 & 0x01) << 8)
+                (self.rom_bank_selection_0 as u32)
+              | ((self.rom_bank_selection_1 as u32 & 0x01) << 8)
             ;
 
             let ram_bank =
-                self.ram_bank_selection_0 as u16
+                self.ram_bank_selection_0 as u32
             ;
 
             // store the rom bank and the offset to be added to all
             // requested addresses, beginning with 0x4000
-            self.rom_bank_selected = rom_bank;
-            self.rom_bank_offset   = (rom_bank as usize) * 0x4000;
+            if cartridge.get_rom_bank_count() != 0 {
+                self.rom_bank_selected = rom_bank % cartridge.get_rom_bank_count();
+                self.rom_bank_offset   = (self.rom_bank_selected as usize) * 0x4000;
+            }
 
             // store the ram bank and the offset to be added to all addresses
-            self.ram_bank_selected = ram_bank;
-            self.ram_bank_offset   = (ram_bank as usize) * 0x2000;
+            if cartridge.get_ram_bank_count() != 0 {
+                self.ram_bank_selected = ram_bank % cartridge.get_ram_bank_count();
+                self.ram_bank_offset   = (self.ram_bank_offset as usize) * 0x2000;
+            }
         }
     }
 
@@ -413,7 +417,7 @@ mod mbc5 {
                 // read from switchable RAM bank.
                 0xa000 ..= 0xbfff => {
                     if cartridge.has_ram() && self.ram_enabled {
-                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                        let ram_address = (address as usize) + self.ram_bank_offset - 0xa000;
                         cartridge.get_ram().get_at(ram_address)
                     }
                     else {
@@ -435,19 +439,23 @@ mod mbc5 {
                 // ROM bank selection #0
                 0x2000 ..= 0x2fff => {
                     self.rom_bank_selection_0 = value;
-                    self.update_selected_banks();
+                    self.update_selected_banks(cartridge);
                 },
 
                 // ROM bank selection #1
                 0x3000 ..= 0x3fff => {
                     self.rom_bank_selection_1 = value;
-                    self.update_selected_banks();
+                    self.update_selected_banks(cartridge);
                 },
 
                 // RAM bank selection
                 0x4000 ..= 0x5fff => {
                     self.ram_bank_selection_0 = value & 0x0f;
-                    self.update_selected_banks();
+                    self.update_selected_banks(cartridge);
+                },
+
+                // invalid address
+                0x6000 ..= 0x7fff => {
                 },
 
                 // Cartridge RAM
