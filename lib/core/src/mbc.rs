@@ -18,6 +18,7 @@
 use std::fmt::{Display, Formatter};
 use crate::cartridge::Cartridge;
 use crate::mbc::mbc1::Mbc1;
+use crate::mbc::mbc2::Mbc2;
 use crate::mbc::mbc5::Mbc5;
 use crate::mbc::mbc_none::MbcNone;
 
@@ -50,6 +51,7 @@ pub fn create_mbc(kind: &MemoryBankController) -> Box<dyn Mbc> {
         MemoryBankController::None  => Box::new(MbcNone::new()),
         MemoryBankController::MBC1  => Box::new(Mbc1::new()),
         MemoryBankController::MBC1M => Box::new(Mbc1::new_multicart()),
+        MemoryBankController::MBC2  => Box::new(Mbc2::new()),
         MemoryBankController::MBC5  => Box::new(Mbc5::new()),
         _                           => panic!("Not implemented {}", kind)
     }
@@ -106,7 +108,7 @@ mod mbc1 {
     use super::*;
 
     /// Type 1 Memory Bank Controller:
-    /// Supports up to 2MB ROMs or up to 32kB RAM.
+    /// Supports up to 2MiB ROMs or up to 32kiB RAM.
     pub struct Mbc1 {
         /// Flag whether to handle a multi cart ROM.
         is_multicart: bool,
@@ -317,12 +319,148 @@ mod mbc1 {
 }
 
 
+mod mbc2 {
+    use crate::memory_data::{MemoryData, MemoryDataFixedSize};
+    use crate::utils::{get_bit, get_high};
+    use super::*;
+
+    /// Type 2 Memory Bank Controller:
+    /// Supports up to 256kiB ROMs and up to 128kB RAM.
+    pub struct Mbc2 {
+        /// The value written into the bank selection register.
+        /// Bits 0-3 are used to select the ROM bank number.
+        bank_selection_0: u8,
+
+        /// The selected ROM bank number.
+        rom_bank_selected: u32,
+
+        /// The offset added to the address the game wants to read from,
+        /// to get the real address within the ROM file.
+        rom_bank_offset:   usize,
+
+        /// 512 half-bytes Built-in RAM.
+        ram: MemoryDataFixedSize<512>,
+
+        /// Sets if the RAM bank is enabled or not.
+        ram_enabled: bool,
+    }
+
+    impl Mbc2 {
+        pub fn new() -> Self {
+            Self {
+                bank_selection_0: 0x00,
+
+                rom_bank_selected: 1,
+                rom_bank_offset:   0x4000,
+
+                ram: MemoryDataFixedSize::new(),
+
+                ram_enabled: false,
+            }
+        }
+
+
+        /// After writing to one of the bank selection registers,
+        /// this function is used to calculate the actual RAM and ROM bank numbers
+        /// as well as the offsets to read and write inside the ROM and RAM images.
+        fn update_selected_banks(&mut self, cartridge: &Cartridge) {
+            let rom_bank = if self.bank_selection_0 != 0 {
+                self.bank_selection_0 as u32
+            }
+            else {
+                1
+            };
+
+            // store the rom bank and the offset to be added to all
+            // requested addresses, beginning with 0x4000
+            if cartridge.get_rom_bank_count() != 0 {
+                self.rom_bank_selected = rom_bank % cartridge.get_rom_bank_count();
+                self.rom_bank_offset   = (self.rom_bank_selected as usize) * 0x4000;
+            }
+        }
+    }
+
+    impl Mbc for Mbc2 {
+        fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+            match address {
+                // read from fixed ROM bank, which is always bank 0.
+                0x0000 ..= 0x3fff => {
+                    let rom_address = address as usize;
+                    cartridge.get_rom().get_at(rom_address)
+                },
+
+                // read from the switchable ROM bank
+                0x4000 ..= 0x7fff => {
+                    let rom_address = (address as usize) + self.rom_bank_offset - 0x4000;
+                    cartridge.get_rom().get_at(rom_address)
+                },
+
+                // read from switchable RAM bank.
+                0xa000 ..= 0xbfff => {
+                    if self.ram_enabled {
+                        // only the lowest 9 bits of the address are used, so
+                        // 0xa200 to 0xbfff are mirroring the RAM area 15 times
+                        let ram_address = ((address - 0xa000) & 0x1ff) as usize;
+                        let ram_value   = self.ram.get_at(ram_address) & 0x0f;
+                        0xf0 | ram_value
+                    }
+                    else {
+                        0xff
+                    }
+                }
+
+                _ => unreachable!("Unexpected read from address {}", address),
+            }
+        }
+
+        fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+            match address {
+                // bank selection / RAM enable register
+                0x0000 ..= 0x3fff => {
+                    // if bit 8 of the address is set..
+                    if get_bit(get_high(address), 0) {
+                        // .. take the value to select the ROM bank number ..
+                        self.bank_selection_0 = value & 0x0f;
+                        self.update_selected_banks(cartridge);
+                    }
+                    else {
+                        // .. otherwise take the value to enable or disable RAM
+                        self.ram_enabled = (value & 0x0f) == 0x0a;
+                    }
+                },
+
+                // invalid address
+                0x4000 ..= 0x7fff => {
+                },
+
+                // Cartridge RAM
+                0xa000 ..= 0xbfff => {
+                    if self.ram_enabled {
+                        // only the lowest 9 bits of the address are used, so
+                        // 0xa200 to 0xbfff are mirroring the RAM area 15 times
+                        let ram_address = (address & 0x1ff) as usize;
+
+                        // the cartridge RAM only stores half-bytes,
+                        // so ignore the upper nibble
+                        let ram_value   = value & 0x0f;
+
+                        self.ram.set_at(ram_address, ram_value);
+                    }
+                },
+
+                _ => unreachable!("Unexpected write to address {}", address),
+            }
+        }
+    }
+}
+
+
 mod mbc5 {
     use crate::memory_data::MemoryData;
     use super::*;
 
     /// Type 5 Memory Bank Controller:
-    /// Supports up to 8MB ROMs and up to 128kB RAM.
+    /// Supports up to 8MiB ROMs and up to 128kiB RAM.
     pub struct Mbc5 {
         /// The value written into the first bank selection register.
         /// Contains the lower 8 bits of the selected ROM bank.

@@ -50,7 +50,7 @@ fn main() {
             "blargg/halt_bug",
             "gambatte/",
             "mooneye_test_suite/acceptance/",
-            "mooneye_test_suite/emulator_only/mbc2/",
+            // "mooneye_test_suite/emulator_only/mbc2/",
         ]
     });
 }
