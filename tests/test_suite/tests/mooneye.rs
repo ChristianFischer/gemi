@@ -5508,3 +5508,234 @@ mod emulator_only {
 
 }
 
+
+mod misc {
+    use super::*;
+
+    mod bits {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn test_unused_hwio_cgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/bits/unused_hwio-C.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn test_unused_hwio_agb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyAdvance),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/bits/unused_hwio-C.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn test_boot_div_agb() {
+        let cfg = EmulatorTestConfig {
+            setup: SetUpConfig {
+                device: Some(DeviceType::GameBoyAdvance),
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_div-A.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_with_config(cfg);
+
+        let test_result_message = gb.serial.take_output();
+        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn test_boot_hwio_cgb() {
+        let cfg = EmulatorTestConfig {
+            setup: SetUpConfig {
+                device: Some(DeviceType::GameBoyColor),
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_hwio-C.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_with_config(cfg);
+
+        let test_result_message = gb.serial.take_output();
+        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn test_boot_hwio_agb() {
+        let cfg = EmulatorTestConfig {
+            setup: SetUpConfig {
+                device: Some(DeviceType::GameBoyAdvance),
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_hwio-C.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_with_config(cfg);
+
+        let test_result_message = gb.serial.take_output();
+        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn test_boot_regs_agb() {
+        let cfg = EmulatorTestConfig {
+            setup: SetUpConfig {
+                device: Some(DeviceType::GameBoyAdvance),
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_regs-A.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_with_config(cfg);
+
+        let test_result_message = gb.serial.take_output();
+        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+    }
+
+
+    mod ppu {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn test_vblank_stat_intr_cgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/ppu/vblank_stat_intr-C.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn test_vblank_stat_intr_agb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyAdvance),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/ppu/vblank_stat_intr-C.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+    }
+
+}
+

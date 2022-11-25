@@ -237,7 +237,7 @@ pub fn generate_tests_mooneye(gen: &TestGenerator) {
             // open module for new directories
             on_handle_dir: Box::new(|d, _| {
                 match filename_to_symbol(d.file_name().unwrap().to_str().unwrap()).as_ref() {
-                    "madness" | "manual_only" | "misc" | "utils" => HandleDirectory::Ignore,
+                    "madness" | "manual_only" | "utils" => HandleDirectory::Ignore,
                     _ => HandleDirectory::CreateModule,
                 }
             }),

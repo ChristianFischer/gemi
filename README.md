@@ -12,7 +12,7 @@ Feel free to make suggestions about missing features or games which are not supp
 |:-----------------------------------------|:---:|
 | Memory Bank Controller                   | 🟢  |
 | *MBC 1*                                  | 🟢  |
-| *MBC 2*                                  | 🔴  |
+| *MBC 2*                                  | 🟢  |
 | *MBC 3*                                  | 🔴  |
 | *MBC 5*                                  | 🟢  |
 | Persistent Cartridge Memory              | 🟢  |
@@ -45,6 +45,80 @@ Feel free to make suggestions about missing features or games which are not supp
 | mem_timing-2         | 🔴  | 🔴  | 🔴  |     |     |     |     |     |     |     |     |     |
 | oam_bug              | 🔴  | 🔴  | 🟢  | 🔴  | 🔴  | 🟢  | 🔴  | 🔴  |     |     |     |     |
 | halt_bug (dmg / cgb) | 🔴  |  ❓  |     |     |     |     |     |     |     |     |     |     |
+
+## Gambatte Test ROMs
+
+|                      |     |
+|----------------------|:---:|
+| bgen                 | 🔴  |
+| bgtiledata           | 🔴  |
+| bgtilemap            | 🔴  |
+| cgbpal_m3            | 🟡  |
+| display_startstate   | 🔴  |
+| div                  | 🟡  |
+| dma                  | 🟡  |
+| dmgpalette_during_m3 | 🔴  |
+| enable_display       | 🟡  |
+| halt                 | 🟡  |
+| irq_precedence       | 🔴  |
+| lcd_offset           | 🔴  |
+| lcdirq_precedence    | 🟡  |
+| ly0                  | 🟡  |
+| lyc0int_m0irq        | 🟡  |
+| lyc153int_m2irq      | 🟡  |
+| lycenable            | 🟡  |
+| lycint_ly            | 🔴  |
+| lycint_lycflag       | 🔴  |
+| lycint_lycirq        | 🔴  |
+| lycint_m0stat        | 🟡  |
+| lycm2int             | 🟡  |
+| lywrite              | 🔴  |
+| m0enable             | 🟡  |
+| m0int_m0irq          | 🟡  |
+| m0int_m0stat         | 🔴  |
+| m0int_m3stat         | 🟡  |
+| m1                   | 🟡  |
+| m2enable             | 🟡  |
+| m2int_m0irq          | 🟡  |
+| m2int_m0stat         | 🟡  |
+| m2int_m2irq          | 🟡  |
+| m2int_m2stat         | 🟡  |
+| m2int_m3stat         | 🟡  |
+| miscmstatirq         | 🟡  |
+| oam_access           | 🟡  |
+| oamdma               | 🟡  |
+| scx_during_m3        | 🔴  |
+| scy                  | 🔴  |
+| serial               | 🔴  |
+| sound                | 🔴  |
+| speedchange          | 🔴  |
+| sprites              | 🟡  |
+| tima                 | 🟡  |
+| undef_ops            | 🔴  |
+| vram_m3              | 🟡  |
+| vramw_m3end          | 🟡  |
+| window               | 🟡  |
+
+## Mooneye Test ROMs
+
+|               |                |     |
+|---------------|----------------|:---:|
+| acceptance    | boot           | 🟡  |
+|               | bits           | 🟡  |
+|               | instr          | 🟢  |
+|               | interrupts     | 🔴  |
+|               | oam dma        | 🟡  |
+|               | ppu            | 🔴  |
+|               | serial         | 🔴  |
+|               | timer          | 🟡  |
+|               | opcode timings | 🔴  |
+| emulator only | MBC 1          | 🟢  |
+|               | MBC 2          | 🟢  |
+|               | MBC 5          | 🟢  |
+| misc          | bits           | 🔴  |
+|               | boot           | 🔴  |
+|               | ppu            | 🔴  |
+
 
 ## Symbols
 

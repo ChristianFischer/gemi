@@ -15,9 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::env;
 use gbemu_core::boot_rom::BootRom;
 use gbemu_core::cartridge::Cartridge;
-use gbemu_core::gameboy::GameBoy;
+use gbemu_core::gameboy::{DeviceType, GameBoy};
 use gbemu_core::memory::MemoryRead;
 use gbemu_core::utils::to_u8;
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
@@ -28,6 +29,45 @@ use crate::util::get_test_file;
 /// The maximum number of frames allowed per emulator run,
 /// before it's considered as an error.
 const MAX_FRAMES: u32 = 10_000;
+
+
+/// Print the commandline to re-run this test ROM normally.
+pub fn print_run_command(setup: &SetUpConfig) {
+    let mut cmd = String::new();
+
+    // command
+    cmd.push_str("cargo run --package gbemu --bin gbemu --");
+
+    // add argument for specific device type
+    if let Some(device_type) = &setup.device {
+        let device_type_arg = match device_type {
+            DeviceType::GameBoyDmg     => "--dmg",
+            DeviceType::GameBoyColor   => "--gbc",
+            DeviceType::GameBoyAdvance => "--gba",
+            DeviceType::SuperGameBoy   => "--sgb",
+            DeviceType::SuperGameBoy2  => "--sgb2",
+        };
+
+        cmd.push_str(&format!(" {}", device_type_arg));
+    }
+
+    // get the current working dir
+    let working_dir = if let Ok(wd) = env::current_dir() {
+        format!("{}/", wd.to_str().unwrap().to_string().replace("\\", "/"))
+    }
+    else {
+        String::new()
+    };
+
+    // add file reference to the ROM to be executed
+    cmd.push_str(&format!(
+        " {}{}",
+        working_dir,
+        get_test_file(&setup.cartridge_path)
+    ));
+
+    println!("#> {cmd}");
+}
 
 
 /// Creates the device emulator based on a setup configuration.
@@ -177,6 +217,9 @@ pub fn run_with_config(test_config: EmulatorTestConfig) -> GameBoy {
     let setup    = test_config.setup;
     let run_cfg = test_config.run_config;
     let result  = test_config.result;
+
+    // print commandline arg to easily re-run the test
+    print_run_command(&setup);
 
     // Construct
     let mut gb = create_device_with_config(setup);
