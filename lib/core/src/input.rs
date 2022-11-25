@@ -65,7 +65,7 @@ impl Input {
     /// Updates the JOYP register and fire the input interrupt depending on the current button states.
     pub fn update(&mut self) {
         let joyp = self.mem.read_u8(MEMORY_LOCATION_JOYP);
-        let keys_changed = (self.button_states != self.previous_button_states);
+        let keys_changed = self.button_states != self.previous_button_states;
 
         if keys_changed {
             let keys_pressed = self.button_states & !self.previous_button_states;

@@ -18,7 +18,7 @@
 use crate::cpu::CpuFlag;
 use crate::gameboy::GameBoy;
 use crate::opcode::{opcode, OpCodeContext};
-use crate::utils::{signed_overflow_add_u16, signed_overflow_add_u8};
+use crate::utils::signed_overflow_add_u16;
 
 opcode!(nop, []);
 

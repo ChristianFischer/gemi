@@ -23,7 +23,7 @@ use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::cpu::Interrupt;
 use crate::memory_data::{MemoryData, MemoryDataFixedSize};
-use crate::gameboy::{clock_t, DeviceConfig, EmulationType};
+use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::graphic_data::{DmgPalette, GbcPaletteData};
 use crate::mbc::{create_mbc, Mbc};
 use crate::mbc::mbc_none::MbcNone;
@@ -440,7 +440,7 @@ impl Memory {
     /// Let the memory controller handle it's tasks.
     /// 'cycles' gives the number of ticks passed since
     /// the last call.
-    pub fn update(&mut self, cycles: clock_t) {
+    pub fn update(&mut self, cycles: Clock) {
         self.internal.get_mut().handle_dma_transfer(cycles);
     }
 
@@ -811,7 +811,7 @@ impl MemoryInternal {
     }
 
     /// Handles an OAM DMA transfer, if any active.
-    fn handle_dma_transfer(&mut self, cycles: clock_t) {
+    fn handle_dma_transfer(&mut self, cycles: Clock) {
         match self.dma {
             DmaTransferState::Disabled => {}
 

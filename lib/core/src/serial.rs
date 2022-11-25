@@ -16,11 +16,11 @@
  */
 
 use crate::cpu::Interrupt;
-use crate::gameboy::{clock_t, DeviceConfig};
+use crate::gameboy::Clock;
 use crate::memory::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 
 
-const UPDATE_TIME_SERIAL_TRANSFER:      clock_t = 4096;
+const UPDATE_TIME_SERIAL_TRANSFER:      Clock = 4096;
 
 
 /// An implementation of the GameBoy's serial port.
@@ -33,7 +33,7 @@ const UPDATE_TIME_SERIAL_TRANSFER:      clock_t = 4096;
 /// enabled in order to store data sent.
 pub struct SerialPort {
     /// The SerialPort's clock to measure time between the transfer of each byte.
-    clock: clock_t,
+    clock: Clock,
 
     /// Access to the device memory.
     mem: MemoryReadWriteHandle,
@@ -59,7 +59,7 @@ impl SerialPort {
 
 
     /// Updates the SerialPort, perform data transfer if any data is pending.
-    pub fn update(&mut self, cycles: clock_t) {
+    pub fn update(&mut self, cycles: Clock) {
         self.clock += cycles;
 
         if self.clock >= UPDATE_TIME_SERIAL_TRANSFER {

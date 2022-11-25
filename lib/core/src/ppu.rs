@@ -16,9 +16,8 @@
  */
 
 use std::cmp::min;
-use std::fmt::{Display, Formatter};
 use crate::cpu::Interrupt;
-use crate::gameboy::{clock_t, DeviceConfig, EmulationType};
+use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::graphic_data::{Color, DmgDisplayPalette, DmgLcdPixel, DmgPalette, GbcPaletteData, Sprite, SpritePixelValue, TileMap, TileSet};
 use crate::memory::*;
 use crate::memory_data::mapped::MemoryDataMapped;
@@ -30,8 +29,8 @@ pub const SCREEN_H: u32 = 144;
 
 pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
 
-pub const CPU_CYCLES_PER_LINE:  clock_t =    456;
-pub const CPU_CYCLES_PER_FRAME: clock_t = 70_224;
+pub const CPU_CYCLES_PER_LINE:  Clock =    456;
+pub const CPU_CYCLES_PER_FRAME: Clock = 70_224;
 
 pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        u8 = 0;
 pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           u8 = 1;
@@ -150,7 +149,7 @@ pub struct TileFetchProperties {
 
 /// An object representing the gameboy's picture processing unit.
 pub struct Ppu {
-    clock: clock_t,
+    clock: Clock,
 
     /// Current device config
     device_config: DeviceConfig,
@@ -168,7 +167,7 @@ pub struct Ppu {
     current_line_pixel: u8,
 
     /// The number of cycles being consumed for the current scanline.
-    current_line_cycles: clock_t,
+    current_line_cycles: Clock,
 
     /// The cached data of the currently processed scanline.
     current_scanline: ScanlineData,
@@ -273,7 +272,7 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    pub fn update(&mut self, cycles: clock_t) -> FrameState {
+    pub fn update(&mut self, cycles: Clock) -> FrameState {
         self.clock += cycles;
 
         match self.mode {

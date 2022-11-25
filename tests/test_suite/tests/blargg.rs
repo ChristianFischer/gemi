@@ -747,7 +747,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_11_op_a__hl_() {
+        fn test_11_op_a_hl_() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),

@@ -363,12 +363,12 @@ pub mod rl {
         let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
         let left_bit = (value >> 7) & 1;
 
-        let result = (match op {
+        let result = match op {
             ShiftOp::ShiftLogical       => (value << 1) | 0x0000,
             ShiftOp::ShiftArithmetic    => (value << 1) | 0x0000,
             ShiftOp::Rotate             => (value << 1) | left_bit,
             ShiftOp::RotateThroughCarry => (value << 1) | carry,
-        });
+        };
 
         let null_bit = match nullcheck {
             NullCheck::Check     => result == 0,
@@ -488,12 +488,12 @@ pub mod rr {
         let left_bit = (value >> 7) & 1;
         let right_bit= value & 1;
 
-        let result = (match op {
+        let result = match op {
             ShiftOp::ShiftLogical       => (value >> 1) | 0x0000,
             ShiftOp::ShiftArithmetic    => (value >> 1) | (left_bit << 7),
             ShiftOp::Rotate             => (value >> 1) | (right_bit << 7),
             ShiftOp::RotateThroughCarry => (value >> 1) | (carry << 7),
-        });
+        };
 
         let null_bit = match nullcheck {
             NullCheck::Check     => result == 0,
@@ -1182,7 +1182,7 @@ pub mod xor {
 ////////////////////////////////////////////////
 //// other
 
-/// Convert a BCD Number.
+// Convert a BCD Number.
 opcode!(daa, [gb] {
     let mut a     = gb.cpu.get_r8(RegisterR8::A);
     let mut half  = gb.cpu.is_flag_set(CpuFlag::HalfCarry);
@@ -1223,7 +1223,7 @@ opcode!(daa, [gb] {
     gb.cpu.set_r8(RegisterR8::A, a);
 });
 
-/// Complement
+// Complement
 opcode!(cpl_a, [gb] {
     let value  = gb.cpu.get_r8(RegisterR8::A);
     let result = !value;
@@ -1232,14 +1232,14 @@ opcode!(cpl_a, [gb] {
     gb.cpu.set_flag(CpuFlag::HalfCarry, true);
 });
 
-/// Set Carry flag.
+// Set Carry flag.
 opcode!(scf, [gb] {
     gb.cpu.set_flag(CpuFlag::Negative,  false);
     gb.cpu.set_flag(CpuFlag::HalfCarry, false);
     gb.cpu.set_flag(CpuFlag::Carry,     true);
 });
 
-/// Change carry flag
+// Change carry flag
 opcode!(ccf, [gb] {
     gb.cpu.set_flag(CpuFlag::Negative,  false);
     gb.cpu.set_flag(CpuFlag::HalfCarry, false);

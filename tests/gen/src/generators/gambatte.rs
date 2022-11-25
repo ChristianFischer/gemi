@@ -27,7 +27,6 @@ use crate::test_generator::TestGenerator;
 
 const GAMBATTE_ADDITIONAL_SRC : &str = /* language=rust */
 r#"use gbemu_core::graphic_data::{Color, DmgDisplayPalette};
-use testrunner::checks::gambatte_checks::*;
 "#;
 
 

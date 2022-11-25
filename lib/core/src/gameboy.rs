@@ -15,15 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::time;
-use std::time::{Duration, SystemTime};
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
-use crate::cpu::{Cpu, CPU_CLOCK_SPEED, CpuFlag, RegisterR8};
+use crate::cpu::{Cpu, CpuFlag, RegisterR8};
 use crate::input::Input;
 use crate::memory::{Memory, MemoryRead};
 use crate::opcode::OpCodeContext;
-use crate::ppu::{FrameState, Ppu, SCREEN_H, SCREEN_W};
+use crate::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::carrying_add_u8;
@@ -31,7 +29,7 @@ use crate::utils::carrying_add_u8;
 
 /// Type to measure clock ticks of the device.
 /// Alias for unsigned 64bit integer.
-pub type clock_t = u64;
+pub type Clock = u64;
 
 
 /// The type of GameBoy device to be emulated.
@@ -357,7 +355,7 @@ impl GameBoy {
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
-    pub fn process_frame(&mut self) -> clock_t {
+    pub fn process_frame(&mut self) -> Clock {
         let mut interval_cycles = 0;
 
         loop {

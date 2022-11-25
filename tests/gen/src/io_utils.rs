@@ -15,7 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::min;
 use std::fs;
 use std::ops::Add;
 use std::path::PathBuf;
@@ -218,6 +217,17 @@ pub fn filename_to_symbol(filename: &str) -> String {
         '0' ..= '9' => c,
         _ => '_',
     }).collect();
+
+    // replace multiple occurrences of _ characters
+    loop {
+        let sym2 = sym.replace("__", "_");
+        if sym2 != sym {
+            sym = sym2;
+        }
+        else {
+            break;
+        }
+    }
 
     // convert into lowercase
     sym = sym.to_lowercase();

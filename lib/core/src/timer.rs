@@ -16,16 +16,16 @@
  */
 
 use crate::cpu::Interrupt;
-use crate::gameboy::clock_t;
+use crate::gameboy::Clock;
 use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, MEMORY_LOCATION_REGISTER_TIMA, MEMORY_LOCATION_REGISTER_TMA, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::utils::get_bit;
 
 
-const UPDATE_TIME_DIV:     clock_t =    256;
-const UPDATE_TIME_TIMA_00: clock_t =   1024;
-const UPDATE_TIME_TIMA_01: clock_t =     16;
-const UPDATE_TIME_TIMA_02: clock_t =     64;
-const UPDATE_TIME_TIMA_03: clock_t =    256;
+const UPDATE_TIME_DIV:     Clock =    256;
+const UPDATE_TIME_TIMA_00: Clock =   1024;
+const UPDATE_TIME_TIMA_01: Clock =     16;
+const UPDATE_TIME_TIMA_02: Clock =     64;
+const UPDATE_TIME_TIMA_03: Clock =    256;
 
 
 /// An object handling the gameboys internal timers,
@@ -39,7 +39,7 @@ pub struct Timer {
 
     /// The clock which counts the cycles to increment the DIV register.
     /// DIV will be updated after the clock reaches UPDATE_TIME_DIV.
-    div_clock: clock_t,
+    div_clock: Clock,
 
     /// Stores the previous value of the TAC register (0xff07)
     /// to check if it was written to.
@@ -51,10 +51,10 @@ pub struct Timer {
 
     /// The update clock selection defined by the value of the TAC register.
     /// Should be either 4kHz, 16kHz, 64kHz or 256kHz.
-    tima_update_time: clock_t,
+    tima_update_time: Clock,
 
     /// The clock which counts the cycles to increment the TIMA register.
-    tima_clock: clock_t,
+    tima_clock: Clock,
 }
 
 
@@ -77,7 +77,7 @@ impl Timer {
 
 
     /// Update timers for n CPU cycles.
-    pub fn update(&mut self, cycles: clock_t) {
+    pub fn update(&mut self, cycles: Clock) {
         self.check_for_changed_registers();
         self.update_div(cycles);
         self.update_tima(cycles);
@@ -121,7 +121,7 @@ impl Timer {
 
 
     /// Update the DIV timer
-    fn update_div(&mut self, cycles: clock_t) {
+    fn update_div(&mut self, cycles: Clock) {
         self.div_clock = self.div_clock.wrapping_add(cycles);
 
         while self.div_clock >= UPDATE_TIME_DIV {
@@ -137,7 +137,7 @@ impl Timer {
 
 
     /// Update the TIMA timer and handles the timer interrupt
-    fn update_tima(&mut self, cycles: clock_t) {
+    fn update_tima(&mut self, cycles: Clock) {
         if self.tima_enabled {
             self.tima_clock = self.tima_clock.wrapping_add(cycles);
 

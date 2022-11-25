@@ -19,7 +19,7 @@ use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryWrite};
 use crate::opcode::{opcode, OpCodeContext};
-use crate::utils::{signed_overflow_add_u16, signed_overflow_add_u8};
+use crate::utils::signed_overflow_add_u16;
 
 /// Loads the content of a 8bit register into another one.
 fn ld_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {

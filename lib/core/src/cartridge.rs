@@ -92,18 +92,18 @@ pub struct Cartridge {
 }
 
 
-const ROM_OFFSET_ENTRY_POINT:           usize = 0x0100;
-const ROM_OFFSET_LOGO_BITMAP:           usize = 0x0104;
-const ROM_OFFSET_TITLE_STRING:          usize = 0x0134;
-const ROM_OFFSET_MANUFACTURER_CODE:     usize = 0x013F;
-const ROM_OFFSET_FLAG_CGB:              usize = 0x0143;
-const ROM_OFFSET_NEW_LICENSEE_CODE:     usize = 0x0144;
-const ROM_OFFSET_FLAG_SGB:              usize = 0x0146;
-const ROM_OFFSET_ROM_TYPE:              usize = 0x0147;
-const ROM_OFFSET_ROM_SIZE:              usize = 0x0148;
-const ROM_OFFSET_RAM_SIZE:              usize = 0x0149;
-const ROM_OFFSET_DESTINATION_CODE:      usize = 0x014A;
-const ROM_OFFSET_OLD_LICENSEE_CODE:     usize = 0x014B;
+pub const ROM_OFFSET_ENTRY_POINT:           usize = 0x0100;
+pub const ROM_OFFSET_LOGO_BITMAP:           usize = 0x0104;
+pub const ROM_OFFSET_TITLE_STRING:          usize = 0x0134;
+pub const ROM_OFFSET_MANUFACTURER_CODE:     usize = 0x013F;
+pub const ROM_OFFSET_FLAG_CGB:              usize = 0x0143;
+pub const ROM_OFFSET_NEW_LICENSEE_CODE:     usize = 0x0144;
+pub const ROM_OFFSET_FLAG_SGB:              usize = 0x0146;
+pub const ROM_OFFSET_ROM_TYPE:              usize = 0x0147;
+pub const ROM_OFFSET_ROM_SIZE:              usize = 0x0148;
+pub const ROM_OFFSET_RAM_SIZE:              usize = 0x0149;
+pub const ROM_OFFSET_DESTINATION_CODE:      usize = 0x014A;
+pub const ROM_OFFSET_OLD_LICENSEE_CODE:     usize = 0x014B;
 
 
 

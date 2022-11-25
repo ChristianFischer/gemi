@@ -19,7 +19,6 @@ extern crate core;
 
 mod window;
 
-use std::cell::Ref;
 use gbemu_core::cartridge::Cartridge;
 use gbemu_core::cartridge::GameBoyColorSupport;
 use gbemu_core::boot_rom::BootRom;

@@ -16,7 +16,7 @@
  */
 
 use std::fmt::{Display, Formatter};
-use crate::gameboy::{clock_t, GameBoy};
+use crate::gameboy::{Clock, GameBoy};
 use crate::memory::{MemoryRead, MemoryReadOnlyHandle};
 
 type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext);
@@ -56,7 +56,7 @@ pub struct OpCode {
 
     /// Number of T-Cycles the opcode takes to execute.
     /// Does not include extra time when branches are taken.
-    pub cycles: clock_t,
+    pub cycles: Clock,
 
     /// Function pointer to the actual opcode execution.
     pub proc: ProcessOpCode,
@@ -71,7 +71,7 @@ pub struct OpCodeContext {
     opcode: &'static OpCode,
 
     /// Stores the number of cycles the execution of this opcode consumed
-    cycles: clock_t,
+    cycles: Clock,
 }
 
 
@@ -111,14 +111,14 @@ impl OpCodeContext {
     }
 
     /// Adds a number of cycles consumed by the current instruction.
-    pub fn add_cycles(&mut self, cycles: clock_t) {
+    pub fn add_cycles(&mut self, cycles: Clock) {
         self.cycles += cycles;
     }
 
     /// Get the total amount of cycles consumed for this instruction.
     /// This includes the fetch and execution time of the opcode itself,
     /// as well as the extra time consumed on branching.
-    pub fn get_cycles_consumed(&self) -> clock_t {
+    pub fn get_cycles_consumed(&self) -> Clock {
         self.cycles
     }
 }

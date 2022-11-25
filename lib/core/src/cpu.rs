@@ -16,7 +16,7 @@
  */
 
 use std::fmt::{Display, Formatter};
-use crate::gameboy::clock_t;
+use crate::gameboy::Clock;
 use crate::opcode::{Instruction, OpCode};
 use crate::memory::{MEMORY_LOCATION_INTERRUPTS_FLAGGED, MEMORY_LOCATION_INTERRUPTS_ENABLED, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
@@ -24,7 +24,7 @@ use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
 
 /// Number of cycles per second.
-pub const CPU_CLOCK_SPEED: clock_t = 4_194_304;
+pub const CPU_CLOCK_SPEED: Clock = 4_194_304;
 
 
 /// Definition for each supported 8 bit Register.
@@ -76,7 +76,7 @@ pub enum ImeState {
     Enabled,
 
     /// Interrupts are disabled, but will be enabled after some CPU cycles.
-    EnabledInCycles(clock_t),
+    EnabledInCycles(Clock),
 }
 
 /// Determines the CPU's state, when suspended by the HALT instruction.
@@ -185,7 +185,7 @@ impl CpuFlag {
 
 impl Interrupt {
     /// An array containing all possible interrupts for easier iteration.
-    const AllInterrupts : [Interrupt; 5] = [
+    const ALL_INTERRUPTS : [Interrupt; 5] = [
         Interrupt::VBlank,
         Interrupt::LcdStat,
         Interrupt::Timer,
@@ -252,7 +252,7 @@ impl Cpu {
 
     /// Let the CPU process their data.
     /// This function takes the amount of ticks to be processed.
-    pub fn update(&mut self, cycles: clock_t) {
+    pub fn update(&mut self, cycles: Clock) {
         self.handle_halt_state();
         self.handle_interrupts(cycles);
     }
@@ -272,14 +272,14 @@ impl Cpu {
     }
 
     /// Handles any pending interrupts.
-    fn handle_interrupts(&mut self, cycles: clock_t) -> Option<Interrupt> {
+    fn handle_interrupts(&mut self, cycles: Clock) -> Option<Interrupt> {
         match self.ime {
             ImeState::Disabled => { },
 
             ImeState::Enabled => {
                 let interrupts_pending = self.get_interrupts_pending();
 
-                for interrupt in &Interrupt::AllInterrupts {
+                for interrupt in &Interrupt::ALL_INTERRUPTS {
                     if get_bit(interrupts_pending, interrupt.bit()) {
                         // disable further interrupts when a interrupt is being handled
                         self.ime = ImeState::Disabled;
@@ -326,7 +326,7 @@ impl Cpu {
     }
 
     /// Enables interrupts after a number of cycles passed.
-    pub fn enable_interrupts_in(&mut self, cycles: clock_t) {
+    pub fn enable_interrupts_in(&mut self, cycles: Clock) {
         match self.ime {
             ImeState::Disabled | ImeState::EnabledInCycles(_) => {
                 self.ime = ImeState::EnabledInCycles(cycles);

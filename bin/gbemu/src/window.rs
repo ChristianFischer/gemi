@@ -17,7 +17,7 @@
 
 extern crate sdl2;
 
-use gbemu_core::graphic_data::{Color, DmgLcdPixel, DmgPalette, TileMap, TileSet};
+use gbemu_core::graphic_data::{Color, DmgPalette, TileMap, TileSet};
 use gbemu_core::input::{Input, InputButton};
 use gbemu_core::memory::MEMORY_LOCATION_SPRITES_BEGIN;
 use gbemu_core::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
@@ -96,11 +96,6 @@ impl BufferedTexture {
     /// Get the texture height.
     pub fn get_height(&self) -> u32 {
         self.height
-    }
-
-    /// Get the texture buffer containing all pixel data.
-    pub fn get_buffer(&self) -> &[u8] {
-        &self.buffer
     }
 
     /// Set a color value for any specific pixel.

@@ -224,7 +224,7 @@ mod mbc1 {
                 // same time to select the RAM bank number
                 rom_bank_0 |= (self.bank_selection_1 as u32) << bank_selection_1_offset;
                 rom_bank_1 |= (self.bank_selection_1 as u32) << bank_selection_1_offset;
-                ram_bank    = (self.bank_selection_1 as u32);
+                ram_bank    = (self.bank_selection_1 as u32) << 0;
             }
 
             // store the rom bank and the offset to be added to all requested addresses

@@ -20,7 +20,6 @@ use testrunner::runner::run_with_config;
 use tests_shared::test_config::*;
 
 use gbemu_core::graphic_data::{Color, DmgDisplayPalette};
-use testrunner::checks::gambatte_checks::*;
 
 mod bgen {
     use super::*;
@@ -34503,7 +34502,7 @@ mod m1 {
 
     #[test]
     #[ignore]
-    fn test_lyc147___ly148_push_m1irq_late_enable_out3_dmg() {
+    fn test_lyc147_ly148_push_m1irq_late_enable_out3_dmg() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
                 device: Some(DeviceType::GameBoyDmg),
@@ -34524,7 +34523,7 @@ mod m1 {
 
     #[test]
     #[ignore]
-    fn test_lyc147___ly148_push_m1irq_late_enable_out3_cgb() {
+    fn test_lyc147_ly148_push_m1irq_late_enable_out3_cgb() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
                 device: Some(DeviceType::GameBoyColor),
@@ -37485,7 +37484,7 @@ mod m1 {
 
     #[test]
     #[ignore]
-    fn test_vblankint_lcd147__int_m1irq_enable_1_out2_dmg() {
+    fn test_vblankint_lcd147_int_m1irq_enable_1_out2_dmg() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
                 device: Some(DeviceType::GameBoyDmg),
@@ -37506,7 +37505,7 @@ mod m1 {
 
     #[test]
     #[ignore]
-    fn test_vblankint_lcd147__int_m1irq_enable_1_out2_cgb() {
+    fn test_vblankint_lcd147_int_m1irq_enable_1_out2_cgb() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
                 device: Some(DeviceType::GameBoyColor),
