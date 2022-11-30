@@ -23,43 +23,13 @@ use tests_shared::test_config::*;
 mod cgb_sound {
     use super::*;
 
-
-    #[test]
-    #[ignore]
-    fn test_cgb_sound() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("blargg/cgb_sound/cgb_sound.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let output = gb.serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
-    }
-
-
     mod rom_singles {
         use super::*;
 
 
         #[test]
         #[ignore]
-        fn test_01_registers() {
+        fn rom_singles_01_registers() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -89,7 +59,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_02_len_ctr() {
+        fn rom_singles_02_len_ctr() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -119,7 +89,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_03_trigger() {
+        fn rom_singles_03_trigger() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -149,7 +119,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_04_sweep() {
+        fn rom_singles_04_sweep() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -179,7 +149,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_05_sweep_details() {
+        fn rom_singles_05_sweep_details() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -209,7 +179,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_06_overflow_on_trigger() {
+        fn rom_singles_06_overflow_on_trigger() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -239,7 +209,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_07_len_sweep_period_sync() {
+        fn rom_singles_07_len_sweep_period_sync() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -269,7 +239,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_08_len_ctr_during_power() {
+        fn rom_singles_08_len_ctr_during_power() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -299,7 +269,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_09_wave_read_while_on() {
+        fn rom_singles_09_wave_read_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -329,7 +299,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_10_wave_trigger_while_on() {
+        fn rom_singles_10_wave_trigger_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -359,7 +329,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_11_regs_after_power() {
+        fn rom_singles_11_regs_after_power() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -389,7 +359,7 @@ mod cgb_sound {
 
         #[test]
         #[ignore]
-        fn test_12_wave() {
+        fn rom_singles_12_wave() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -417,47 +387,52 @@ mod cgb_sound {
 
     }
 
+
+    mod cgb_sound_other {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn cgb_sound() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/cgb_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let output = gb.serial.take_output_as_text();
+            match output.trim().split('\n').into_iter().last() {
+                Some("Passed all tests") => { }
+                Some("Passed") => { }
+                _ => { panic!("Unexpected output:\n{}", output); }
+            }
+        }
+
+    }
 }
 
 
 mod cpu_instrs {
     use super::*;
 
-
-    #[test]
-    fn test_cpu_instrs() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let output = gb.serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
-    }
-
-
     mod individual {
         use super::*;
 
 
         #[test]
-        fn test_01_special() {
+        fn individual_01_special() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -486,7 +461,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_02_interrupts() {
+        fn individual_02_interrupts() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -515,7 +490,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_03_op_sp_hl() {
+        fn individual_03_op_sp_hl() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -544,7 +519,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_04_op_r_imm() {
+        fn individual_04_op_r_imm() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -573,7 +548,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_05_op_rp() {
+        fn individual_05_op_rp() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -602,7 +577,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_06_ld_r_r() {
+        fn individual_06_ld_r_r() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -631,7 +606,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_07_jr_jp_call_ret_rst() {
+        fn individual_07_jr_jp_call_ret_rst() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -660,7 +635,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_08_misc_instrs() {
+        fn individual_08_misc_instrs() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -689,7 +664,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_09_op_r_r() {
+        fn individual_09_op_r_r() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -718,7 +693,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_10_bit_ops() {
+        fn individual_10_bit_ops() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -747,7 +722,7 @@ mod cpu_instrs {
 
 
         #[test]
-        fn test_11_op_a_hl_() {
+        fn individual_11_op_a_hl() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -775,41 +750,44 @@ mod cpu_instrs {
 
     }
 
+
+    mod cpu_instrs_other {
+        use super::*;
+
+
+        #[test]
+        fn cpu_instrs() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let output = gb.serial.take_output_as_text();
+            match output.trim().split('\n').into_iter().last() {
+                Some("Passed all tests") => { }
+                Some("Passed") => { }
+                _ => { panic!("Unexpected output:\n{}", output); }
+            }
+        }
+
+    }
 }
 
 
 mod dmg_sound {
     use super::*;
-
-
-    #[test]
-    #[ignore]
-    fn test_dmg_sound() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let output = gb.serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
-    }
-
 
     mod rom_singles {
         use super::*;
@@ -817,7 +795,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_01_registers() {
+        fn rom_singles_01_registers() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -847,7 +825,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_02_len_ctr() {
+        fn rom_singles_02_len_ctr() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -877,7 +855,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_03_trigger() {
+        fn rom_singles_03_trigger() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -907,7 +885,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_04_sweep() {
+        fn rom_singles_04_sweep() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -937,7 +915,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_05_sweep_details() {
+        fn rom_singles_05_sweep_details() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -967,7 +945,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_06_overflow_on_trigger() {
+        fn rom_singles_06_overflow_on_trigger() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -997,7 +975,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_07_len_sweep_period_sync() {
+        fn rom_singles_07_len_sweep_period_sync() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1027,7 +1005,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_08_len_ctr_during_power() {
+        fn rom_singles_08_len_ctr_during_power() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1057,7 +1035,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_09_wave_read_while_on() {
+        fn rom_singles_09_wave_read_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1087,7 +1065,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_10_wave_trigger_while_on() {
+        fn rom_singles_10_wave_trigger_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1117,7 +1095,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_11_regs_after_power() {
+        fn rom_singles_11_regs_after_power() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1147,7 +1125,7 @@ mod dmg_sound {
 
         #[test]
         #[ignore]
-        fn test_12_wave_write_while_on() {
+        fn rom_singles_12_wave_write_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1175,35 +1153,39 @@ mod dmg_sound {
 
     }
 
-}
+
+    mod dmg_sound_other {
+        use super::*;
 
 
+        #[test]
+        #[ignore]
+        fn dmg_sound() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
 
-#[test]
-#[ignore]
-fn test_halt_bug() {
-    let cfg = EmulatorTestConfig {
-        setup: SetUpConfig {
-            device: Some(DeviceType::GameBoyDmg),
-            enable_serial_output: true,
-            .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
-        },
-        run_config: RunConfig {
-            stop_on_infinite_loop: true,
-            .. RunConfig::default()
-        },
-        result: CheckResultConfig {
-            .. CheckResultConfig::default()
-        },
-    };
+            let mut gb = run_with_config(cfg);
 
-    let mut gb = run_with_config(cfg);
+            let output = gb.serial.take_output_as_text();
+            match output.trim().split('\n').into_iter().last() {
+                Some("Passed all tests") => { }
+                Some("Passed") => { }
+                _ => { panic!("Unexpected output:\n{}", output); }
+            }
+        }
 
-    let output = gb.serial.take_output_as_text();
-    match output.trim().split('\n').into_iter().last() {
-        Some("Passed all tests") => { }
-        Some("Passed") => { }
-        _ => { panic!("Unexpected output:\n{}", output); }
     }
 }
 
@@ -1214,7 +1196,7 @@ mod instr_timing {
 
     #[test]
     #[ignore]
-    fn test_instr_timing() {
+    fn instr_timing() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
                 device: Some(DeviceType::GameBoyDmg),
@@ -1249,7 +1231,7 @@ mod interrupt_time {
 
     #[test]
     #[ignore]
-    fn test_interrupt_time() {
+    fn interrupt_time() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
                 device: Some(DeviceType::GameBoyDmg),
@@ -1287,7 +1269,7 @@ mod mem_timing {
 
         #[test]
         #[ignore]
-        fn test_01_read_timing() {
+        fn individual_01_read_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1317,7 +1299,7 @@ mod mem_timing {
 
         #[test]
         #[ignore]
-        fn test_02_write_timing() {
+        fn individual_02_write_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1347,7 +1329,7 @@ mod mem_timing {
 
         #[test]
         #[ignore]
-        fn test_03_modify_timing() {
+        fn individual_03_modify_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1376,70 +1358,44 @@ mod mem_timing {
     }
 
 
+    mod mem_timing_other {
+        use super::*;
 
-    #[test]
-    #[ignore]
-    fn test_mem_timing() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
 
-        let mut gb = run_with_config(cfg);
+        #[test]
+        #[ignore]
+        fn mem_timing() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
 
-        let output = gb.serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
+            let mut gb = run_with_config(cfg);
+
+            let output = gb.serial.take_output_as_text();
+            match output.trim().split('\n').into_iter().last() {
+                Some("Passed all tests") => { }
+                Some("Passed") => { }
+                _ => { panic!("Unexpected output:\n{}", output); }
+            }
         }
-    }
 
+    }
 }
 
 
 mod mem_timing_2 {
     use super::*;
-
-
-    #[test]
-    #[ignore]
-    fn test_mem_timing() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let output = gb.serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
-    }
-
 
     mod rom_singles {
         use super::*;
@@ -1447,7 +1403,7 @@ mod mem_timing_2 {
 
         #[test]
         #[ignore]
-        fn test_01_read_timing() {
+        fn rom_singles_01_read_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1477,7 +1433,7 @@ mod mem_timing_2 {
 
         #[test]
         #[ignore]
-        fn test_02_write_timing() {
+        fn rom_singles_02_write_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1507,7 +1463,7 @@ mod mem_timing_2 {
 
         #[test]
         #[ignore]
-        fn test_03_modify_timing() {
+        fn rom_singles_03_modify_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1535,41 +1491,45 @@ mod mem_timing_2 {
 
     }
 
+
+    mod mem_timing_2_other {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn mem_timing() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let output = gb.serial.take_output_as_text();
+            match output.trim().split('\n').into_iter().last() {
+                Some("Passed all tests") => { }
+                Some("Passed") => { }
+                _ => { panic!("Unexpected output:\n{}", output); }
+            }
+        }
+
+    }
 }
 
 
 mod oam_bug {
     use super::*;
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_bug() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let output = gb.serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
-    }
-
 
     mod rom_singles {
         use super::*;
@@ -1577,7 +1537,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_1_lcd_sync() {
+        fn rom_singles_1_lcd_sync() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1607,7 +1567,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_2_causes() {
+        fn rom_singles_2_causes() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1637,7 +1597,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_3_non_causes() {
+        fn rom_singles_3_non_causes() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1667,7 +1627,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_4_scanline_timing() {
+        fn rom_singles_4_scanline_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1697,7 +1657,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_5_timing_bug() {
+        fn rom_singles_5_timing_bug() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1727,7 +1687,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_6_timing_no_bug() {
+        fn rom_singles_6_timing_no_bug() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1757,7 +1717,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_7_timing_effect() {
+        fn rom_singles_7_timing_effect() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1787,7 +1747,7 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn test_8_instr_effect() {
+        fn rom_singles_8_instr_effect() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1815,5 +1775,73 @@ mod oam_bug {
 
     }
 
+
+    mod oam_bug_other {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn oam_bug() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let output = gb.serial.take_output_as_text();
+            match output.trim().split('\n').into_iter().last() {
+                Some("Passed all tests") => { }
+                Some("Passed") => { }
+                _ => { panic!("Unexpected output:\n{}", output); }
+            }
+        }
+
+    }
 }
 
+
+mod blargg_other {
+    use super::*;
+
+
+    #[test]
+    #[ignore]
+    fn halt_bug() {
+        let cfg = EmulatorTestConfig {
+            setup: SetUpConfig {
+                device: Some(DeviceType::GameBoyDmg),
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_with_config(cfg);
+
+        let output = gb.serial.take_output_as_text();
+        match output.trim().split('\n').into_iter().last() {
+            Some("Passed all tests") => { }
+            Some("Passed") => { }
+            _ => { panic!("Unexpected output:\n{}", output); }
+        }
+    }
+
+}

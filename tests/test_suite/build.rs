@@ -47,7 +47,7 @@ fn main() {
             "blargg/mem_timing/",
             "blargg/mem_timing_2/",
             "blargg/oam_bug/",
-            "blargg/halt_bug",
+            "blargg/blargg_other/halt_bug",
 
             "gambatte/bgen/",
             "gambatte/bgtiledata/",

@@ -27,67 +27,13 @@ const MOONEYE_RESULT_SEQ_FAIL : &[u8] = &[0x42, 0x42, 0x42, 0x42, 0x42, 0x42];
 mod acceptance {
     use super::*;
 
-
-    #[test]
-    #[ignore]
-    fn test_add_sp_e_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/add_sp_e_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_add_sp_e_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/add_sp_e_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
     mod bits {
         use super::*;
 
 
         #[test]
         #[ignore]
-        fn test_mem_oam_dmg() {
+        fn mem_oam_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -114,7 +60,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_mem_oam_sgb() {
+        fn mem_oam_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -141,7 +87,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_reg_f_dmg() {
+        fn reg_f_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -168,7 +114,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_reg_f_sgb() {
+        fn reg_f_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -195,7 +141,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_unused_hwio_dmg() {
+        fn unused_hwio_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -222,7 +168,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_unused_hwio_sgb() {
+        fn unused_hwio_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -249,7 +195,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_unused_hwio_sgb2() {
+        fn unused_hwio_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -275,1120 +221,13 @@ mod acceptance {
     }
 
 
-
-    #[test]
-    #[ignore]
-    fn test_boot_div_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-dmgABCmgb.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_div_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-S.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_div_sgb2() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy2),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-S.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_div2_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div2-S.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_div2_sgb2() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy2),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div2-S.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_hwio_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-dmgABCmgb.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_hwio_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-S.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_hwio_sgb2() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy2),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-S.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_regs_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-dmgABC.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_regs_mgb_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_regs_mgb_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_regs_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-sgb.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_regs_sgb2() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy2),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-sgb2.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_cc_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_cc_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_cc_timing2_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing2.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_cc_timing2_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing2.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_timing2_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing2.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_call_timing2_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing2.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_div_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/div_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_div_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/div_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_di_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_di_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_di_timing_sgb2() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy2),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ei_sequence_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_sequence.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ei_sequence_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_sequence.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ei_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ei_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime0_ei_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_ei.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime0_ei_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_ei.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime0_nointr_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_nointr_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime0_nointr_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_nointr_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime1_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime1_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime1_timing2_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime1_timing2_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_halt_ime1_timing2_sgb2() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy2),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_if_ie_registers_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/if_ie_registers.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_if_ie_registers_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/if_ie_registers.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
     mod instr {
         use super::*;
 
 
         #[test]
         #[ignore]
-        fn test_daa_dmg() {
+        fn daa_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1415,7 +254,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_daa_sgb() {
+        fn daa_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -1447,7 +286,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_ie_push_dmg() {
+        fn ie_push_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1474,7 +313,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_ie_push_sgb() {
+        fn ie_push_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -1497,222 +336,6 @@ mod acceptance {
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
 
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_intr_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/intr_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_intr_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/intr_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_jp_cc_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_cc_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_jp_cc_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_cc_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_jp_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_jp_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ld_hl_sp_e_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ld_hl_sp_e_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ld_hl_sp_e_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ld_hl_sp_e_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
     }
 
 
@@ -1722,7 +345,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_basic_dmg() {
+        fn basic_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1749,7 +372,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_basic_sgb() {
+        fn basic_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -1776,7 +399,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_reg_read_dmg() {
+        fn reg_read_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1803,7 +426,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_reg_read_sgb() {
+        fn reg_read_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -1830,7 +453,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_sources_dmg() {
+        fn sources_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -1857,7 +480,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_sources_sgb() {
+        fn sources_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -1884,7 +507,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_sources_sgb2() {
+        fn sources_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -1907,222 +530,6 @@ mod acceptance {
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
 
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_dma_restart_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_restart.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_dma_restart_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_restart.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_dma_start_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_start.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_dma_start_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_start.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_dma_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_oam_dma_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_pop_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/pop_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_pop_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/pop_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
     }
 
 
@@ -2132,7 +539,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_hblank_ly_scx_timing_dmg() {
+        fn hblank_ly_scx_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2159,7 +566,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_hblank_ly_scx_timing_sgb() {
+        fn hblank_ly_scx_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2186,7 +593,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_hblank_ly_scx_timing_sgb2() {
+        fn hblank_ly_scx_timing_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -2213,7 +620,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_1_2_timing_dmg() {
+        fn intr_1_2_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2240,7 +647,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_1_2_timing_sgb() {
+        fn intr_1_2_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2267,7 +674,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_1_2_timing_sgb2() {
+        fn intr_1_2_timing_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -2294,7 +701,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_0_timing_dmg() {
+        fn intr_2_0_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2321,7 +728,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_0_timing_sgb() {
+        fn intr_2_0_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2348,7 +755,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_mode0_timing_dmg() {
+        fn intr_2_mode0_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2375,7 +782,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_mode0_timing_sgb() {
+        fn intr_2_mode0_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2402,7 +809,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_mode0_timing_sprites_dmg() {
+        fn intr_2_mode0_timing_sprites_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2429,7 +836,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_mode0_timing_sprites_sgb() {
+        fn intr_2_mode0_timing_sprites_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2456,7 +863,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_mode3_timing_dmg() {
+        fn intr_2_mode3_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2483,7 +890,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_mode3_timing_sgb() {
+        fn intr_2_mode3_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2510,7 +917,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_oam_ok_timing_dmg() {
+        fn intr_2_oam_ok_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2537,7 +944,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_intr_2_oam_ok_timing_sgb() {
+        fn intr_2_oam_ok_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2564,7 +971,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_lcdon_timing_dmg() {
+        fn lcdon_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2591,7 +998,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_lcdon_timing_sgb() {
+        fn lcdon_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2618,7 +1025,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_lcdon_timing_sgb2() {
+        fn lcdon_timing_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -2645,7 +1052,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_lcdon_write_timing_dmg() {
+        fn lcdon_write_timing_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2672,7 +1079,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_lcdon_write_timing_sgb() {
+        fn lcdon_write_timing_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2699,7 +1106,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_lcdon_write_timing_sgb2() {
+        fn lcdon_write_timing_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -2726,7 +1133,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_stat_irq_blocking_dmg() {
+        fn stat_irq_blocking_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2753,7 +1160,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_stat_irq_blocking_sgb() {
+        fn stat_irq_blocking_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2780,7 +1187,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_stat_lyc_onoff_dmg() {
+        fn stat_lyc_onoff_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2807,7 +1214,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_stat_lyc_onoff_sgb() {
+        fn stat_lyc_onoff_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2834,7 +1241,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_vblank_stat_intr_dmg() {
+        fn vblank_stat_intr_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -2861,7 +1268,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_vblank_stat_intr_sgb() {
+        fn vblank_stat_intr_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -2888,7 +1295,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_vblank_stat_intr_sgb2() {
+        fn vblank_stat_intr_sgb2() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy2),
@@ -2911,384 +1318,6 @@ mod acceptance {
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
 
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_push_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/push_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_push_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/push_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_rapid_di_ei_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rapid_di_ei.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_rapid_di_ei_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rapid_di_ei.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_reti_intr_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_intr_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_reti_intr_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_intr_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_reti_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_reti_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ret_cc_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_cc_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ret_cc_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_cc_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ret_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_ret_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_rst_timing_dmg() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rst_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_rst_timing_sgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::SuperGameBoy),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rst_timing.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
     }
 
 
@@ -3298,7 +1327,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_boot_sclk_align_dmg() {
+        fn boot_sclk_align_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3330,7 +1359,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_div_write_dmg() {
+        fn div_write_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3357,7 +1386,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_div_write_sgb() {
+        fn div_write_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3384,7 +1413,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_rapid_toggle_dmg() {
+        fn rapid_toggle_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3411,7 +1440,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_rapid_toggle_sgb() {
+        fn rapid_toggle_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3438,7 +1467,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim00_dmg() {
+        fn tim00_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3465,7 +1494,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim00_sgb() {
+        fn tim00_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3492,7 +1521,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim00_div_trigger_dmg() {
+        fn tim00_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3519,7 +1548,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim00_div_trigger_sgb() {
+        fn tim00_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3546,7 +1575,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim01_dmg() {
+        fn tim01_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3573,7 +1602,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim01_sgb() {
+        fn tim01_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3600,7 +1629,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim01_div_trigger_dmg() {
+        fn tim01_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3627,7 +1656,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim01_div_trigger_sgb() {
+        fn tim01_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3654,7 +1683,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim10_dmg() {
+        fn tim10_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3681,7 +1710,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim10_sgb() {
+        fn tim10_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3708,7 +1737,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim10_div_trigger_dmg() {
+        fn tim10_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3735,7 +1764,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim10_div_trigger_sgb() {
+        fn tim10_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3762,7 +1791,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim11_dmg() {
+        fn tim11_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3789,7 +1818,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim11_sgb() {
+        fn tim11_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3816,7 +1845,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim11_div_trigger_dmg() {
+        fn tim11_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3843,7 +1872,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tim11_div_trigger_sgb() {
+        fn tim11_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3870,7 +1899,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tima_reload_dmg() {
+        fn tima_reload_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3897,7 +1926,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tima_reload_sgb() {
+        fn tima_reload_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3924,7 +1953,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tima_write_reloading_dmg() {
+        fn tima_write_reloading_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -3951,7 +1980,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tima_write_reloading_sgb() {
+        fn tima_write_reloading_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -3978,7 +2007,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tma_write_reloading_dmg() {
+        fn tma_write_reloading_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4005,7 +2034,7 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn test_tma_write_reloading_sgb() {
+        fn tma_write_reloading_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4030,6 +2059,1981 @@ mod acceptance {
 
     }
 
+
+    mod acceptance_other {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn add_sp_e_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/add_sp_e_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn add_sp_e_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/add_sp_e_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_div_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-S.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_div_sgb2() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy2),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-S.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_div_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-dmgABCmgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_div2_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div2-S.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_div2_sgb2() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy2),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div2-S.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_hwio_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-S.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_hwio_sgb2() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy2),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-S.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_hwio_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-dmgABCmgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_regs_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-dmgABC.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_regs_mgb_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_regs_mgb_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_regs_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-sgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_regs_sgb2() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy2),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-sgb2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_cc_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_cc_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_cc_timing2_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_cc_timing2_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_timing2_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn call_timing2_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn di_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn di_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn di_timing_sgb2() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy2),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn div_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/div_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn div_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/div_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ei_sequence_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_sequence.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ei_sequence_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_sequence.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ei_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ei_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime0_ei_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_ei.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime0_ei_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_ei.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime0_nointr_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_nointr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime0_nointr_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_nointr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime1_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime1_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime1_timing2_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime1_timing2_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime1_timing2_sgb2() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy2),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn if_ie_registers_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/if_ie_registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn if_ie_registers_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/if_ie_registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn intr_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/intr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn intr_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/intr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn jp_cc_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn jp_cc_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn jp_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn jp_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ld_hl_sp_e_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ld_hl_sp_e_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ld_hl_sp_e_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ld_hl_sp_e_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_restart_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_restart.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_restart_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_restart.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_start_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_start.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_start_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_start.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn pop_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/pop_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn pop_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/pop_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn push_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/push_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn push_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/push_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rapid_di_ei_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rapid_di_ei.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rapid_di_ei_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rapid_di_ei.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ret_cc_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ret_cc_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ret_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn ret_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn reti_intr_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_intr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn reti_intr_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_intr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn reti_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn reti_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rst_timing_dmg() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rst_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rst_timing_sgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::SuperGameBoy),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rst_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+    }
 }
 
 
@@ -4041,7 +4045,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_bank1_dmg() {
+        fn bits_bank1_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4067,7 +4071,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_bank1_sgb() {
+        fn bits_bank1_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4093,7 +4097,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_bank2_dmg() {
+        fn bits_bank2_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4119,7 +4123,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_bank2_sgb() {
+        fn bits_bank2_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4145,7 +4149,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_mode_dmg() {
+        fn bits_mode_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4171,7 +4175,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_mode_sgb() {
+        fn bits_mode_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4197,7 +4201,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_ramg_dmg() {
+        fn bits_ramg_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4223,7 +4227,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_ramg_sgb() {
+        fn bits_ramg_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4249,7 +4253,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_multicart_rom_8mb_dmg() {
+        fn multicart_rom_8mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4275,7 +4279,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_multicart_rom_8mb_sgb() {
+        fn multicart_rom_8mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4301,7 +4305,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_ram_256kb_dmg() {
+        fn ram_256kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4327,7 +4331,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_ram_256kb_sgb() {
+        fn ram_256kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4353,7 +4357,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_ram_64kb_dmg() {
+        fn ram_64kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4379,7 +4383,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_ram_64kb_sgb() {
+        fn ram_64kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4405,7 +4409,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_16mb_dmg() {
+        fn rom_16mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4431,7 +4435,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_16mb_sgb() {
+        fn rom_16mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4457,7 +4461,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_1mb_dmg() {
+        fn rom_1mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4483,7 +4487,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_1mb_sgb() {
+        fn rom_1mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4509,7 +4513,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_2mb_dmg() {
+        fn rom_2mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4535,7 +4539,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_2mb_sgb() {
+        fn rom_2mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4561,7 +4565,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_4mb_dmg() {
+        fn rom_4mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4587,7 +4591,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_4mb_sgb() {
+        fn rom_4mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4613,7 +4617,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_512kb_dmg() {
+        fn rom_512kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4639,7 +4643,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_512kb_sgb() {
+        fn rom_512kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4665,7 +4669,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_8mb_dmg() {
+        fn rom_8mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4691,7 +4695,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_8mb_sgb() {
+        fn rom_8mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4722,7 +4726,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_ramg_dmg() {
+        fn bits_ramg_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4748,7 +4752,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_ramg_sgb() {
+        fn bits_ramg_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4774,7 +4778,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_romb_dmg() {
+        fn bits_romb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4800,7 +4804,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_romb_sgb() {
+        fn bits_romb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4826,7 +4830,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_unused_dmg() {
+        fn bits_unused_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4852,7 +4856,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_bits_unused_sgb() {
+        fn bits_unused_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4878,7 +4882,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_ram_dmg() {
+        fn ram_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4904,7 +4908,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_ram_sgb() {
+        fn ram_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4930,7 +4934,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_1mb_dmg() {
+        fn rom_1mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -4956,7 +4960,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_1mb_sgb() {
+        fn rom_1mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -4982,7 +4986,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_2mb_dmg() {
+        fn rom_2mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5008,7 +5012,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_2mb_sgb() {
+        fn rom_2mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5034,7 +5038,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_512kb_dmg() {
+        fn rom_512kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5060,7 +5064,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_512kb_sgb() {
+        fn rom_512kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5091,7 +5095,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_16mb_dmg() {
+        fn rom_16mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5117,7 +5121,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_16mb_sgb() {
+        fn rom_16mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5143,7 +5147,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_1mb_dmg() {
+        fn rom_1mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5169,7 +5173,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_1mb_sgb() {
+        fn rom_1mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5195,7 +5199,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_2mb_dmg() {
+        fn rom_2mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5221,7 +5225,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_2mb_sgb() {
+        fn rom_2mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5247,7 +5251,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_32mb_dmg() {
+        fn rom_32mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5273,7 +5277,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_32mb_sgb() {
+        fn rom_32mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5299,7 +5303,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_4mb_dmg() {
+        fn rom_4mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5325,7 +5329,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_4mb_sgb() {
+        fn rom_4mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5351,7 +5355,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_512kb_dmg() {
+        fn rom_512kb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5377,7 +5381,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_512kb_sgb() {
+        fn rom_512kb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5403,7 +5407,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_64mb_dmg() {
+        fn rom_64mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5429,7 +5433,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_64mb_sgb() {
+        fn rom_64mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5455,7 +5459,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_8mb_dmg() {
+        fn rom_8mb_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyDmg),
@@ -5481,7 +5485,7 @@ mod emulator_only {
 
 
         #[test]
-        fn test_rom_8mb_sgb() {
+        fn rom_8mb_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::SuperGameBoy),
@@ -5518,7 +5522,7 @@ mod misc {
 
         #[test]
         #[ignore]
-        fn test_unused_hwio_cgb() {
+        fn unused_hwio_cgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyColor),
@@ -5545,7 +5549,7 @@ mod misc {
 
         #[test]
         #[ignore]
-        fn test_unused_hwio_agb() {
+        fn unused_hwio_agb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyAdvance),
@@ -5568,114 +5572,6 @@ mod misc {
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
 
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_div_agb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyAdvance),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_div-A.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_hwio_cgb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyColor),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_hwio-C.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_hwio_agb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyAdvance),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_hwio-C.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-    }
-
-
-
-    #[test]
-    #[ignore]
-    fn test_boot_regs_agb() {
-        let cfg = EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyAdvance),
-                enable_serial_output: true,
-                .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_regs-A.gb")
-            },
-            run_config: RunConfig {
-                stop_on_infinite_loop: true,
-                .. RunConfig::default()
-            },
-            result: CheckResultConfig {
-                .. CheckResultConfig::default()
-            },
-        };
-
-        let mut gb = run_with_config(cfg);
-
-        let test_result_message = gb.serial.take_output();
-        assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-        assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
     }
 
 
@@ -5685,7 +5581,7 @@ mod misc {
 
         #[test]
         #[ignore]
-        fn test_vblank_stat_intr_cgb() {
+        fn vblank_stat_intr_cgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyColor),
@@ -5712,7 +5608,7 @@ mod misc {
 
         #[test]
         #[ignore]
-        fn test_vblank_stat_intr_agb() {
+        fn vblank_stat_intr_agb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
                     device: Some(DeviceType::GameBoyAdvance),
@@ -5737,5 +5633,117 @@ mod misc {
 
     }
 
+
+    mod misc_other {
+        use super::*;
+
+
+        #[test]
+        #[ignore]
+        fn boot_div_agb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyAdvance),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_div-A.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_hwio_cgb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_hwio-C.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_hwio_agb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyAdvance),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_hwio-C.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn boot_regs_agb() {
+            let cfg = EmulatorTestConfig {
+                setup: SetUpConfig {
+                    device: Some(DeviceType::GameBoyAdvance),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/misc/boot_regs-A.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_with_config(cfg);
+
+            let test_result_message = gb.serial.take_output();
+            assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
+            assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+        }
+
+    }
 }
 

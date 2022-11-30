@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::borrow::Cow;
 use std::fs;
 use std::ops::Add;
 use std::path::PathBuf;
@@ -35,6 +36,7 @@ pub struct FindRomCallbacks<'a> {
 
 
 /// The current state while iterating through directories.
+#[derive(Clone)]
 pub struct IteratorState {
     /// The current indent expected when code is being generated.
     pub indent: String,
@@ -61,6 +63,26 @@ pub enum HandleDirectory {
 }
 
 
+impl IteratorState {
+    /// Creates an IteratorState for a submodule of the current one.
+    pub fn create_sub_state(&self, sub_state_name: &str) -> IteratorState {
+        let mut sub_stack = self.stack.clone();
+        sub_stack.push(sub_state_name.to_string());
+
+        IteratorState {
+            indent: self.indent.clone().add("    "),
+            path:   sub_stack.join("/"),
+            stack:  sub_stack,
+        }
+    }
+
+    /// Get the current module name.
+    pub fn get_top_module(&self) -> Option<&str> {
+        self.stack.last().map(|s| s as &str)
+    }
+}
+
+
 /// Recursively iterate through subdirectories to find ROM files.
 /// Invokes a callback for each directory and file found. Collects the generated code
 /// from each callback and creates file content with all generated tests.
@@ -81,7 +103,10 @@ pub fn recursive_visit_directory(root_path: PathBuf, callbacks: &FindRomCallback
 
 /// Internal part of recursive_find_roms which is called recursively.
 fn recursive_visit_directory_step(root_path: &PathBuf, state: &IteratorState, callbacks: &FindRomCallbacks) -> String {
-    let mut content = String::new();
+    let mut subdir_list : Vec<PathBuf> = Vec::new();
+    let mut files_list  : Vec<PathBuf> = Vec::new();
+    let mut content                    = String::new();
+    let mut had_submodules             = false;
 
     // iterate through all elements in the current path
     for paths in root_path.read_dir().unwrap() {
@@ -89,80 +114,126 @@ fn recursive_visit_directory_step(root_path: &PathBuf, state: &IteratorState, ca
             let path      = entry.path();
             let file_type = entry.file_type().unwrap();
 
-            // for each file..
             if file_type.is_file() {
-                // call the on_file_found callback
-                let str = (callbacks.on_file_found)(&path, state);
+                files_list.push(path);
+            }
+            else if file_type.is_dir() {
+                subdir_list.push(path);
+            }
+        }
+    }
 
-                // add the result to the content, if any code was generated
-                if !str.is_empty() {
-                    content.push('\n');
-                    content.push('\n');
-                    content.push_str(&str);
+    // sort by name
+    files_list.sort();
+    subdir_list.sort();
+
+    // for each directory..
+    for path in subdir_list {
+        // get a suitable module name
+        let module = filename_to_symbol(path.to_str().unwrap());
+
+        // check how to handle the directory
+        let handle_dir : HandleDirectory = (callbacks.on_handle_dir)(&path, state);
+
+        // recurse into subdirectory, if not skipped
+        match handle_dir {
+            HandleDirectory::Ignore => { }
+
+            HandleDirectory::Enter => {
+                // recurse into the subdirectory
+                let subdir_content = recursive_visit_directory_step(
+                    &path,
+                    &state,
+                    callbacks
+                );
+
+                // add the content, if the subdirectory contained any tests
+                if !subdir_content.is_empty() {
+                    content.push_str("\n");
+                    content.push_str(&subdir_content);
                 }
             }
 
-            // for each directory..
-            if file_type.is_dir() {
-                // get a suitable module name
-                let module = filename_to_symbol(path.to_str().unwrap());
+            HandleDirectory::CreateModule => {
+                // recurse into the subdirectory
+                let subdir_content = recursive_visit_directory_step(
+                    &path,
+                    &state.create_sub_state(&module),
+                    callbacks
+                );
 
-                // update the path stack to be used in the subdirectory
-                let mut next_stack = state.stack.clone();
-                next_stack.push(module);
+                // add the content, if the subdirectory contained any tests
+                if !subdir_content.is_empty() {
+                    content.push_str("\n");
 
-                // check how to handle the directory
-                let handle_dir : HandleDirectory = (callbacks.on_handle_dir)(&path, state);
+                    content.push_str(&format!(
+                        "{}mod {} {{\n{}    use super::*;\n",
+                        state.indent,
+                        filename_to_symbol(path.to_str().unwrap()),
+                        state.indent,
+                    ));
 
-                // recurse into subdirectory, if not skipped
-                match handle_dir {
-                    HandleDirectory::Ignore => { }
+                    content.push_str(&subdir_content);
 
-                    HandleDirectory::Enter => {
-                        // recurse into the subdirectory
-                        let subdir_content = recursive_visit_directory_step(
-                            &entry.path(),
-                            &state,
-                            callbacks
-                        );
+                    content.push_str(&format!("{}}}\n\n", state.indent));
 
-                        // add the content, if the subdirectory contained any tests
-                        if !subdir_content.is_empty() {
-                            content.push_str("\n");
-                            content.push_str(&subdir_content);
-                        }
-                    }
-
-                    HandleDirectory::CreateModule => {
-                        // recurse into the subdirectory
-                        let subdir_content = recursive_visit_directory_step(
-                            &entry.path(),
-                            &IteratorState {
-                                indent: state.indent.clone().add("    "),
-                                path:   next_stack.join("/"),
-                                stack:  next_stack,
-                            },
-                            callbacks
-                        );
-
-                        // add the content, if the subdirectory contained any tests
-                        if !subdir_content.is_empty() {
-                            content.push_str("\n");
-
-                            content.push_str(&format!(
-                                "{}mod {} {{\n{}    use super::*;\n",
-                                state.indent,
-                                filename_to_symbol(path.to_str().unwrap()),
-                                state.indent,
-                            ));
-
-                            content.push_str(&subdir_content);
-
-                            content.push_str(&format!("{}}}\n\n", state.indent));
-                        }
-                    }
-                };
+                    had_submodules = true;
+                }
             }
+        };
+    }
+
+    // for each file..
+    if files_list.len() > 0 {
+        let mut module_open = false;
+
+        // determine a module name for files, if there were already submodules present
+        let files_module = if had_submodules {
+            Some(
+                state.get_top_module()
+                .map(|n| format!("{n}_other"))
+                .unwrap_or("other".to_string())
+            )
+        }
+        else {
+            None
+        };
+
+        // create sub state if required
+        let files_state = if let Some(module_name) = &files_module {
+            Cow::Owned(state.create_sub_state(module_name))
+        }
+        else {
+            Cow::Borrowed(state)
+        };
+
+        // iterate through all files
+        for path in files_list {
+            // call the on_file_found callback
+            let str = (callbacks.on_file_found)(&path, &files_state);
+
+            // add the result to the content, if any code was generated
+            if !str.is_empty() {
+                // module begin, if mandatory and not yet done
+                if !module_open {
+                    if let Some(module_name) = &files_module {
+                        content.push_str("\n");
+                        content.push_str(&format!("{}mod {} {{\n", state.indent, module_name));
+                        content.push_str(&format!("{}    use super::*;\n", state.indent));
+
+                        module_open = true;
+                    }
+                }
+
+                content.push('\n');
+                content.push('\n');
+                content.push_str(&str);
+            }
+        }
+
+        // module end
+        if module_open {
+            content.push_str(&format!("{}}}\n", state.indent));
         }
     }
 
@@ -229,10 +300,34 @@ pub fn filename_to_symbol(filename: &str) -> String {
         }
     }
 
+    // remove leading _ characters
+    while sym.starts_with('_') {
+        sym = sym[1 ..].to_string();
+    }
+
+    // remove trailing _ characters
+    while sym.ends_with('_') {
+        sym = sym[.. sym.len() - 1].to_string();
+    }
+
     // convert into lowercase
     sym = sym.to_lowercase();
 
     sym
+}
+
+
+/// Checks if a string starts with a numeric character.
+pub fn starts_with_number(s: &str) -> bool {
+    if s.len() > 0 {
+        match s.chars().next().unwrap() {
+            '0' ..= '9' => true,
+            _ => false
+        }
+    }
+    else {
+        false
+    }
 }
 
 

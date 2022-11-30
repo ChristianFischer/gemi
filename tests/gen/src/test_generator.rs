@@ -18,7 +18,7 @@
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
 use tests_shared::test_config::{EmulatorTestConfig, LcdColorMod, RunConfig};
-use crate::io_utils::IteratorState;
+use crate::io_utils::{IteratorState, starts_with_number};
 
 
 /// Configuration for generating tests.
@@ -58,8 +58,21 @@ impl TestGenerator {
             test_code.push_str("#[ignore]\n");
         }
 
+        // prefix the test case, if it starts with a non-symbol character
+        let test_prefix = if starts_with_number(name) {
+            if let Some(last) = state.stack.last() {
+                format!("{last}_")
+            }
+            else {
+                "test_".to_string()
+            }
+        }
+        else {
+            String::new()
+        };
+
         // test function body
-        test_code.push_str(&format!("fn test_{name}() {{\n"));
+        test_code.push_str(&format!("fn {test_prefix}{name}() {{\n"));
         test_code.push_str("    let cfg = EmulatorTestConfig {\n");
 
         // SetUpConfig
