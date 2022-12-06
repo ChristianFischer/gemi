@@ -360,26 +360,31 @@ impl GameBoy {
 
         loop {
             let cycles = if self.cpu.is_running() {
-                let instruction = self.cpu.fetch_next_instruction();
-                let mut context = OpCodeContext::for_instruction(&instruction);
-
-                (instruction.opcode.proc)(self, &mut context);
-
-                if self.device_config.print_opcodes {
-                    println!(
-                        "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
-                        instruction.opcode_address,
-                        instruction.opcode_id,
-                        if instruction.opcode_id <= 0xff { "  " } else { "" },
-                        instruction.to_string(),
-                        self.cpu
-                    );
+                if let Some(cycles) = self.cpu.handle_interrupts() {
+                    cycles
                 }
+                else {
+                    let instruction = self.cpu.fetch_next_instruction();
+                    let mut context = OpCodeContext::for_instruction(&instruction);
 
-                // take the number of cycles consumed by the last operation
-                let cycles = context.get_cycles_consumed();
+                    (instruction.opcode.proc)(self, &mut context);
 
-                cycles
+                    if self.device_config.print_opcodes {
+                        println!(
+                            "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
+                            instruction.opcode_address,
+                            instruction.opcode_id,
+                            if instruction.opcode_id <= 0xff { "  " } else { "" },
+                            instruction.to_string(),
+                            self.cpu
+                        );
+                    }
+
+                    // take the number of cycles consumed by the last operation
+                    let cycles = context.get_cycles_consumed();
+
+                    cycles
+                }
             }
             else {
                 // when in HALT state just pass 4 cycles

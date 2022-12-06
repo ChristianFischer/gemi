@@ -43,7 +43,6 @@ fn main() {
             "blargg/cgb_sound/",
             "blargg/dmg_sound/",
             "blargg/interrupt_time/interrupt_time",
-            "blargg/instr_timing/",
             "blargg/mem_timing/",
             "blargg/mem_timing_2/",
             "blargg/oam_bug/",

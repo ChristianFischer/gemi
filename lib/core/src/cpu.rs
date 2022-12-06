@@ -254,7 +254,7 @@ impl Cpu {
     /// This function takes the amount of ticks to be processed.
     pub fn update(&mut self, cycles: Clock) {
         self.handle_halt_state();
-        self.handle_interrupts(cycles);
+        self.handle_ime_pending(cycles);
     }
 
     /// Checks the current HALT state and check
@@ -272,10 +272,8 @@ impl Cpu {
     }
 
     /// Handles any pending interrupts.
-    fn handle_interrupts(&mut self, cycles: Clock) -> Option<Interrupt> {
+    pub fn handle_interrupts(&mut self) -> Option<Clock> {
         match self.ime {
-            ImeState::Disabled => { },
-
             ImeState::Enabled => {
                 let interrupts_pending = self.get_interrupts_pending();
 
@@ -291,11 +289,20 @@ impl Cpu {
                         self.call_addr(interrupt.address());
 
                         // stop handling other interrupts
-                        return Some(*interrupt);
+                        return Some(20);
                     }
                 }
             },
 
+            _ => { },
+        }
+
+        None
+    }
+
+    /// Handles IME state.
+    fn handle_ime_pending(&mut self, cycles: Clock) -> Option<(Interrupt, Clock)> {
+        match self.ime {
             ImeState::EnabledInCycles(timeout) => {
                 let new_timeout = timeout.saturating_sub(cycles);
 
@@ -306,6 +313,8 @@ impl Cpu {
                     self.ime = ImeState::EnabledInCycles(new_timeout);
                 }
             }
+
+            _ => { }
         }
 
         None

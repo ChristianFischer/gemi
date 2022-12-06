@@ -1195,7 +1195,6 @@ mod instr_timing {
 
 
     #[test]
-    #[ignore]
     fn instr_timing() {
         let cfg = EmulatorTestConfig {
             setup: SetUpConfig {
