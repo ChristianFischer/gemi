@@ -450,7 +450,7 @@ impl Cartridge {
 
     /// checks whether this cartridge has RAM modules
     pub fn has_ram(&self) -> bool {
-        self.has_ram
+        self.has_ram && self.ram_size > 0
     }
 
     /// checks whether this cartridge has a timer

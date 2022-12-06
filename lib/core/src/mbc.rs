@@ -94,10 +94,23 @@ pub mod mbc_none {
 
     impl Mbc for MbcNone {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
-            cartridge.get_rom().get_at(address as usize)
+            match address {
+                // read from ROM address space
+                0x0000 ..= 0x7fff => {
+                    cartridge.get_rom().get_at(address as usize)
+                },
+
+                // RAM address space (not available on non-MBC)
+                0xa000 ..= 0xbfff => {
+                    0xff
+                }
+
+                _ => unreachable!("Unexpected read from address {}", address),
+            }
         }
 
         fn write_byte(&mut self, _cartridge: &mut Cartridge, _address: u16, _value: u8) {
+            // not writing any data
         }
     }
 }
