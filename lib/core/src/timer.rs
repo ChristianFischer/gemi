@@ -15,17 +15,45 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter};
 use crate::cpu::Interrupt;
 use crate::gameboy::Clock;
 use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, MEMORY_LOCATION_REGISTER_TIMA, MEMORY_LOCATION_REGISTER_TMA, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
-use crate::utils::get_bit;
+use crate::utils::{get_bit, get_high};
 
 
-const UPDATE_TIME_DIV:     Clock =    256;
-const UPDATE_TIME_TIMA_00: Clock =   1024;
-const UPDATE_TIME_TIMA_01: Clock =     16;
-const UPDATE_TIME_TIMA_02: Clock =     64;
-const UPDATE_TIME_TIMA_03: Clock =    256;
+/// Represents the internal counter which will be incremented with the system clock
+/// and triggers incrementing the TIMA counter each time a specific bit, which is
+/// configured by TAC falls from 1 to 0.
+/// - The usual case which triggers TIMA to be incremented will be when the counter
+/// reaches a specific threshold. For example when incrementing from ```0b00001111```
+/// to ```0b00010000```, bit 3 will fall from 1 to 0 and trigger the increment.
+/// - When the counter register will be reset on writing the DIV register, this may
+/// also trigger when the trigger bit was set to 1 before.
+/// There are also additional edge cases which may also trigger TIMA to be incremented,
+///
+/// The upper 8 bits of the counter stores the value which will be accessible via DIV register
+/// and therefor automatically be incremented each 256 ticks.
+struct InternalCounter {
+    /// The value of the counter
+    value: u16,
+
+    /// Stores the information whether the timer was enabled via TAC or not
+    timer_enabled: bool,
+
+    /// Number of the bit which will trigger the TIMA increment on fall
+    fall_bit: u8,
+
+    /// A bitmask to receive the value of the trigger bit
+    fall_bit_mask: u16,
+
+    /// A bitmask to receive the counter to the next increment of TIMA
+    fall_bit_remainder_mask: u16,
+
+    /// Flag which stores whether the fall bit was triggered on the last operation
+    fall_bit_triggered: bool,
+}
+
 
 
 /// An object handling the gameboys internal timers,
@@ -33,28 +61,122 @@ const UPDATE_TIME_TIMA_03: Clock =    256;
 pub struct Timer {
     mem: MemoryReadWriteHandle,
 
-    /// Stores the previous value of the DIV register (0xff04)
-    /// to check if it was written to and therefor need to be reset.
-    div_previous: u8,
+    /// The internal counter used to trigger TIMA increments
+    internal_counter: InternalCounter,
+}
 
-    /// The clock which counts the cycles to increment the DIV register.
-    /// DIV will be updated after the clock reaches UPDATE_TIME_DIV.
-    div_clock: Clock,
 
-    /// Stores the previous value of the TAC register (0xff07)
-    /// to check if it was written to.
-    tac_previous: u8,
+/// Get the bit which triggers the TIMA increment based on the value of the TAC register.
+fn get_trigger_bit(tac: u8) -> u8 {
+    match tac & 0b11 {
+        0b00 => 9,
+        0b01 => 3,
+        0b10 => 5,
+        0b11 => 7,
+        _    => unreachable!(),
+    }
+}
 
-    /// Flag to store whether the TIMA timer is enabled.
-    /// This flag will be set by changing bit 2 of the TAC register.
-    tima_enabled: bool,
 
-    /// The update clock selection defined by the value of the TAC register.
-    /// Should be either 4kHz, 16kHz, 64kHz or 256kHz.
-    tima_update_time: Clock,
+impl InternalCounter {
+    pub fn new() -> Self {
+        let mut counter = Self {
+            value: 0,
 
-    /// The clock which counts the cycles to increment the TIMA register.
-    tima_clock: Clock,
+            timer_enabled: false,
+
+            fall_bit: 0,
+            fall_bit_mask: 0x0000,
+            fall_bit_remainder_mask: 0x0000,
+
+            fall_bit_triggered: false,
+        };
+
+        // applies a 'zero' TAC value by default
+        counter.apply_tac(0x00);
+
+        counter
+    }
+
+
+    /// Applies the configuration of the TAC register.
+    pub fn apply_tac(&mut self, tac: u8) {
+        let bit_before = self.check_trigger_bit();
+
+        // get the trigger bit from TAC
+        let bit = get_trigger_bit(tac);
+        let enabled = get_bit(tac, 2);
+
+        // store the bit and mask values
+        self.fall_bit                = bit;
+        self.fall_bit_mask           = 1u16 << bit;
+        self.fall_bit_remainder_mask = (1u16 << bit) - 1;
+        self.timer_enabled           = enabled;
+
+        // get the new value of the trigger bit
+        let bit_after = self.check_trigger_bit();
+
+        self.fall_bit_triggered = bit_before && !bit_after;
+    }
+
+
+    /// Get the value of the current trigger bit.
+    /// This is basically the implementation of the circuit connecting TAC with the internal counter.
+    /// The result will be true, if
+    /// - The bit of the internal counter, selected by the first two bits in TAC, is 1
+    /// - AND The TAC bit 2 (timer enabled) is 1
+    pub fn check_trigger_bit(&self) -> bool {
+        self.timer_enabled && (self.value & self.fall_bit_mask) != 0
+    }
+
+
+    /// Returns true, when the fall bit was triggered on the last operation.
+    pub fn is_fall_bit_triggered(&self) -> bool {
+        self.fall_bit_triggered
+    }
+
+
+    /// Reset the internal counter, setting it's value to 0.
+    /// This may trigger the fall bit to cause a TIMA increment.
+    pub fn reset(&mut self) {
+        let bit_before = self.check_trigger_bit();
+
+        self.value = 0;
+
+        // resetting the counter will also trigger the fall bit,
+        // if the relevant bit was set to 1 before
+        self.fall_bit_triggered = bit_before;
+    }
+
+
+    /// Increments the counter by 1.
+    /// This may trigger the fall bit to cause a TIMA increment.
+    pub fn increment(&mut self) {
+        // get the trigger bit before incrementing
+        let bit_before = self.check_trigger_bit();
+
+        // increment
+        self.value = self.value.wrapping_add(1);
+
+        // get the new value of the trigger bit
+        let bit_after = self.check_trigger_bit();
+
+        // fall bit will be triggered, when the trigger bit switched from 1 to 0
+        self.fall_bit_triggered = bit_before && !bit_after;
+    }
+
+
+    /// Get the value of the DIV register.
+    pub fn get_div(&self) -> u8 {
+        get_high(self.value)
+    }
+}
+
+
+impl Display for InternalCounter {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:04x}", self.value)
+    }
 }
 
 
@@ -64,14 +186,7 @@ impl Timer {
         Timer {
             mem,
 
-            div_previous: 0x00,
-            tac_previous: 0x00,
-
-            tima_enabled: false,
-            tima_update_time: UPDATE_TIME_TIMA_00,
-
-            div_clock: 0,
-            tima_clock: 0,
+            internal_counter: InternalCounter::new(),
         }
     }
 
@@ -79,87 +194,79 @@ impl Timer {
     /// Update timers for n CPU cycles.
     pub fn update(&mut self, cycles: Clock) {
         self.check_for_changed_registers();
-        self.update_div(cycles);
-        self.update_tima(cycles);
+        self.increment_counter(cycles);
     }
 
 
     /// check for changed values (should be moved into a callback instead)
     fn check_for_changed_registers(&mut self) {
-        let div = self.mem.read_u8(MEMORY_LOCATION_REGISTER_DIV);
-        let tac = self.mem.read_u8(MEMORY_LOCATION_REGISTER_TAC);
-
         // check if DIV changed
-        if self.div_previous != div {
+        if let Some(_) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_DIV) {
             // if DIV was written to, it always resets to zero
-            self.mem.write_u8(MEMORY_LOCATION_REGISTER_DIV, 0);
+            self.mem.get_io_registers_mut().div = 0;
 
-            self.div_previous = 0;
-            self.div_clock = 0;
-        }
+            // writing to DIV will reset the counter
+            self.internal_counter.reset();
 
-        // check if TAC changed
-        if self.tac_previous != tac {
-            self.tac_previous = tac;
-
-            // check whether the timer is enabled
-            self.tima_enabled = get_bit(tac, 2);
-
-            // select the desired update frequency
-            self.tima_update_time = match tac & 0x03 {
-                0 => UPDATE_TIME_TIMA_00,
-                1 => UPDATE_TIME_TIMA_01,
-                2 => UPDATE_TIME_TIMA_02,
-                3 => UPDATE_TIME_TIMA_03,
-                _ => panic!("Unexpected value")
-            };
-
-            // reset clock on change
-            self.tima_clock = 0;
-        }
-    }
-
-
-    /// Update the DIV timer
-    fn update_div(&mut self, cycles: Clock) {
-        self.div_clock = self.div_clock.wrapping_add(cycles);
-
-        while self.div_clock >= UPDATE_TIME_DIV {
-            let mut div = self.mem.read_u8(MEMORY_LOCATION_REGISTER_DIV);
-            div = div.wrapping_add(1);
-
-            self.mem.write_u8(MEMORY_LOCATION_REGISTER_DIV, div);
-
-            self.div_clock = self.div_clock.saturating_sub(UPDATE_TIME_DIV);
-            self.div_previous = div;
-        }
-    }
-
-
-    /// Update the TIMA timer and handles the timer interrupt
-    fn update_tima(&mut self, cycles: Clock) {
-        if self.tima_enabled {
-            self.tima_clock = self.tima_clock.wrapping_add(cycles);
-
-            while self.tima_clock >= self.tima_update_time {
-                let mut tima = self.mem.read_u8(MEMORY_LOCATION_REGISTER_TIMA);
-                tima = match tima.checked_add(1) {
-                    Some(v) => v,
-                    None => {
-                        // overflow, raise interrupt
-                        self.mem.request_interrupt(Interrupt::Timer);
-
-                        // reset TIMA to the value of TMA
-                        self.mem.read_u8(MEMORY_LOCATION_REGISTER_TMA)
-                    }
-                };
-
-                self.mem.write_u8(MEMORY_LOCATION_REGISTER_TIMA, tima);
-
-                self.tima_clock = self.tima_clock.saturating_sub(self.tima_update_time);
+            // resetting the counter may trigger an increment on TIMA,
+            // if the trigger bit was falling from 1 to 0
+            if self.internal_counter.is_fall_bit_triggered() {
+                self.increment_tima();
             }
         }
 
+        // check if TAC changed
+        if let Some(tac) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_TAC) {
+            // apply the new value of TAC
+            self.internal_counter.apply_tac(tac);
+
+            // changing the value may cause the fall bit detection to trigger
+            if self.internal_counter.is_fall_bit_triggered() {
+                self.increment_tima();
+            }
+        }
+    }
+
+
+    /// Increment the internal counter by the clock ticks passed since last call.
+    /// Also increments TIMA when triggered.
+    fn increment_counter(&mut self, cycles: Clock) {
+        let div_before = self.internal_counter.get_div();
+
+        for _ in 0..cycles {
+            self.internal_counter.increment();
+
+            if self.internal_counter.is_fall_bit_triggered() {
+                self.increment_tima();
+            }
+        }
+
+        // Check if DIV changed
+        let div_after = self.internal_counter.get_div();
+        if div_before != div_after {
+            self.mem.get_io_registers_mut().div = div_after;
+        }
+    }
+
+
+    /// Increments TIMA when enabled.
+    /// On overflow, this will trigger the timer interrupt
+    /// and reset the TIMA value to the value specified by TMA.
+    fn increment_tima(&mut self) {
+        let tima_current = self.mem.read_u8(MEMORY_LOCATION_REGISTER_TIMA);
+
+        let tima = match tima_current.checked_add(1) {
+            Some(v) => v,
+            None => {
+                // overflow, raise interrupt
+                self.mem.request_interrupt(Interrupt::Timer);
+
+                // reset TIMA to the value of TMA
+                self.mem.read_u8(MEMORY_LOCATION_REGISTER_TMA)
+            }
+        };
+
+        self.mem.write_u8(MEMORY_LOCATION_REGISTER_TIMA, tima);
     }
 
 }

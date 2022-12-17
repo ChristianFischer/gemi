@@ -291,6 +291,10 @@ struct MemoryInternal {
     /// IO Registers
     io_registers: IoRegisterBank,
 
+    /// Holds a bit for each IO register, which is set once
+    /// the according register was written to.
+    io_registers_written: [bool; 256],
+
     /// High RAM
     hram: HRamBank,
 
@@ -424,6 +428,7 @@ impl Memory {
                     oam: OamRamBank::new(),
                     hram: HRamBank::new(),
                     io_registers: IoRegisterBank::new(IoRegister::default()),
+                    io_registers_written: [false; 256],
 
                     gbc_background_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
                     gbc_object_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
@@ -569,6 +574,47 @@ impl MemoryReadWriteHandle {
         Ref::map(mem, |mem| mem.io_registers.get())
     }
 
+    /// Get the IO Registers struct as a mutable reference.
+    pub fn get_io_registers_mut(&mut self) -> RefMut<IoRegister> {
+        let mem = self.internal.get_mut();
+        RefMut::map(mem, |mem| mem.io_registers.get_mut())
+    }
+
+    /// Checks whether a specific IO register was written to. The flag will be kept until
+    /// acknowledged by calling ```acknowledge_io_register_written```.
+    pub fn was_io_register_written(&self, address: u16) -> bool {
+        assert!(address >= 0xff00, "Address is not an IO register");
+        let mem = self.internal.get();
+        mem.io_registers_written[(address & 0xff) as usize]
+    }
+
+    /// Acknowledges the 'written to' flag for a specific IO register. This will set the
+    /// flag to false until being written again.
+    pub fn acknowledge_io_register_written(&mut self, address: u16) {
+        assert!(address >= 0xff00, "Address is not an IO register");
+        let mut mem = self.internal.get_mut();
+        mem.io_registers_written[(address & 0xff) as usize] = false;
+    }
+
+    /// A convenience function which combines the functionality of ```was_io_register_written```,
+    /// ```acknowledge_io_register_written``` and reading the value of the given register.
+    /// If the requested IO register was changed, it acknowledges the writing operation
+    /// and returns it's new value. Otherwise, it will return ```None```.
+    pub fn take_changed_io_register(&mut self, address: u16) -> Option<u8> {
+        assert!(address >= 0xff00, "Address is not an IO register");
+        let mut mem = self.internal.get_mut();
+        let index = (address & 0xff) as usize;
+
+        if mem.io_registers_written[index] {
+            mem.io_registers_written[index] = false;
+
+            Some(mem.io_registers.get_at(index))
+        }
+        else {
+            None
+        }
+    }
+
     /// requests an interrupt to be fired.
     /// This will set the according bit in the memory. If Interrupts
     /// are enabled for the CPU, the instruction pointer will jump
@@ -703,6 +749,7 @@ impl MemoryInternal {
                 0xff00 ..= 0xff7f => [mapped_address] {
                     let old = self.io_registers.get_at(mapped_address);
                     self.io_registers.set_at(mapped_address, value);
+                    self.io_registers_written[mapped_address] = true;
                     self.on_io_registers_changed(address, old, value);
                 },
 
@@ -712,6 +759,8 @@ impl MemoryInternal {
                     let ioreg = self.io_registers.get_mut();
                     let old = ioreg.interrupts_enabled;
                     ioreg.interrupts_enabled = value;
+
+                    self.io_registers_written[0xff] = true;
 
                     self.on_io_registers_changed(address, old, value);
                 }
@@ -898,7 +947,6 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
         test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_FLAGGED  => interrupts_flagged);
         test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_ENABLED  => interrupts_enabled);
-
     }
 }
 
