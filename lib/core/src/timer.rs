@@ -15,10 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::cmp::min;
 use std::fmt::{Display, Formatter};
+use std::ops::Sub;
 use crate::cpu::Interrupt;
 use crate::gameboy::Clock;
-use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, MEMORY_LOCATION_REGISTER_TIMA, MEMORY_LOCATION_REGISTER_TMA, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
+use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, MEMORY_LOCATION_REGISTER_TIMA, MemoryReadWriteHandle};
 use crate::utils::{get_bit, get_high};
 
 
@@ -55,6 +57,28 @@ struct InternalCounter {
 }
 
 
+/// State of the TIMA counter.
+/// When TIMA overflows from incrementing at 0xff, it will not immediately reset to TMA
+/// and fire the interrupt. Instead, it will remain in an overflow state for 4 cycles.
+/// In this state, TIMA will have the value of 0x00. After 4 cycles it will reset into
+/// the value stored in TMA as intended and the timer interrupt will be fired.
+/// Writing to TIMA during the overflow state will cancel the overflow and let TIMA
+/// continue counting with the new value. Writing to TIMA when it's value is reloaded
+/// from TMA will ignore the written TIMA value and keep the value from TMA.
+enum TimaState {
+    /// TIMA is counting normally.
+    Normal,
+
+    /// TIMA was wrapping from 0xff into 0x00 and remains in overflow state
+    /// until next update.
+    Overflow,
+
+    /// The overflow was processed recently and TIMA holds the value of TMA.
+    /// If TIMA will be written in this state, the written value has to be ignored.
+    OverflowProcessed,
+}
+
+
 
 /// An object handling the gameboys internal timers,
 /// which are controlled by TIMA, TMA, TAC and DIV registers.
@@ -63,6 +87,10 @@ pub struct Timer {
 
     /// The internal counter used to trigger TIMA increments
     internal_counter: InternalCounter,
+
+    /// Internal state of the TIMA counter.
+    /// See documentation of ```TimaState```
+    tima_state: TimaState,
 }
 
 
@@ -149,20 +177,34 @@ impl InternalCounter {
     }
 
 
-    /// Increments the counter by 1.
+    /// Increments the counter by a given amount.
     /// This may trigger the fall bit to cause a TIMA increment.
-    pub fn increment(&mut self) {
+    pub fn increment(&mut self, count: u16) {
         // get the trigger bit before incrementing
         let bit_before = self.check_trigger_bit();
 
         // increment
-        self.value = self.value.wrapping_add(1);
+        self.value = self.value.wrapping_add(count);
 
         // get the new value of the trigger bit
         let bit_after = self.check_trigger_bit();
 
         // fall bit will be triggered, when the trigger bit switched from 1 to 0
         self.fall_bit_triggered = bit_before && !bit_after;
+    }
+
+
+    /// Get the value of the counter.
+    pub fn get_value(&self) -> u16 {
+        self.value
+    }
+
+
+    /// Get the number of cycles remaining until the fall bit will be triggered.
+    pub fn get_remaining_cycles_to_trigger(&self) -> u16 {
+        // take the complement of the timer value and leave out bits
+        // not part of the value range of the trigger counter
+        ((!self.get_value()) & self.fall_bit_remainder_mask) + 1
     }
 
 
@@ -187,6 +229,7 @@ impl Timer {
             mem,
 
             internal_counter: InternalCounter::new(),
+            tima_state: TimaState::Normal,
         }
     }
 
@@ -194,6 +237,7 @@ impl Timer {
     /// Update timers for n CPU cycles.
     pub fn update(&mut self, cycles: Clock) {
         self.check_for_changed_registers();
+        self.handle_overflow();
         self.increment_counter(cycles);
     }
 
@@ -215,6 +259,19 @@ impl Timer {
             }
         }
 
+        // handle TIMA writing during overflow state
+        if let Some(_) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_TIMA) {
+            match self.tima_state {
+                // TIMA was written during the overflow state, which will
+                // cancel the overflow state and let TIMA continue counting as usual
+                TimaState::Overflow => {
+                    self.tima_state = TimaState::Normal;
+                }
+
+                _ => {}
+            }
+        }
+
         // check if TAC changed
         if let Some(tac) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_TAC) {
             // apply the new value of TAC
@@ -232,10 +289,19 @@ impl Timer {
     /// Also increments TIMA when triggered.
     fn increment_counter(&mut self, cycles: Clock) {
         let div_before = self.internal_counter.get_div();
+        let mut cycles_remaining = cycles;
 
-        for _ in 0..cycles {
-            self.internal_counter.increment();
+        while cycles_remaining > 0 {
+            // compute how much we can increment, until we hit the trigger value
+            let cycles_until_trigger = self.internal_counter.get_remaining_cycles_to_trigger();
+            let increment            = min(cycles_remaining, cycles_until_trigger as Clock);
 
+            cycles_remaining = cycles_remaining.sub(increment);
+
+            // do the increment
+            self.internal_counter.increment(increment as u16);
+
+            // check if we hit the fall bit trigger
             if self.internal_counter.is_fall_bit_triggered() {
                 self.increment_tima();
             }
@@ -249,24 +315,62 @@ impl Timer {
     }
 
 
-    /// Increments TIMA when enabled.
-    /// On overflow, this will trigger the timer interrupt
-    /// and reset the TIMA value to the value specified by TMA.
+    /// Increments the TIMA counter.
+    /// On overflow, TIMA will remain in it's overflow state, which means it's value stays on
+    /// zero for 4 cycles and the interrupt is delayed until the overflow state ends.
     fn increment_tima(&mut self) {
-        let tima_current = self.mem.read_u8(MEMORY_LOCATION_REGISTER_TIMA);
+        // handle pending overflow, if any
+        self.handle_overflow();
 
-        let tima = match tima_current.checked_add(1) {
-            Some(v) => v,
-            None => {
+        // perform the increment
+        {
+            let mut io_regs = self.mem.get_io_registers_mut();
+            let (tima, overflow) = io_regs.tima.overflowing_add(1);
+
+            // store the incremented value
+            io_regs.tima = tima;
+
+            if overflow {
+                self.tima_state = TimaState::Overflow;
+            }
+        }
+    }
+
+
+    /// Handle the TIMA overflow state.
+    fn handle_overflow(&mut self) {
+        match self.tima_state {
+            TimaState::Overflow => {
                 // overflow, raise interrupt
                 self.mem.request_interrupt(Interrupt::Timer);
 
-                // reset TIMA to the value of TMA
-                self.mem.read_u8(MEMORY_LOCATION_REGISTER_TMA)
-            }
-        };
+                // reset value
+                self.reset_tima_to_tma();
 
-        self.mem.write_u8(MEMORY_LOCATION_REGISTER_TIMA, tima);
+                // switch into processed state to handle the situation of
+                // simultaneously writing TIMA on overflow
+                self.tima_state = TimaState::OverflowProcessed;
+            },
+
+            TimaState::OverflowProcessed => {
+                // reset TIMA to the value of TMA
+                self.reset_tima_to_tma();
+
+                // switch back into normal counting state
+                self.tima_state = TimaState::Normal;
+            },
+
+            _ => {}
+        }
+    }
+
+
+    /// Reset TIMA by loading the value of TMA
+    fn reset_tima_to_tma(&mut self) {
+        let mut io_regs = self.mem.get_io_registers_mut();
+
+        let tma = io_regs.tma;
+        io_regs.tima = tma;
     }
 
 }

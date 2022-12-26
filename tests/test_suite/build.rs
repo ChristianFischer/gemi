@@ -97,7 +97,12 @@ fn main() {
             "gambatte/vramw_m3end/",
             "gambatte/window/",
 
-            "mooneye_test_suite/acceptance/",
+            "mooneye_test_suite/acceptance/bits",
+            "mooneye_test_suite/acceptance/interrupts/",
+            "mooneye_test_suite/acceptance/oam_dma/",
+            "mooneye_test_suite/acceptance/ppu/",
+            "mooneye_test_suite/acceptance/serial/",
+            "mooneye_test_suite/acceptance/acceptance_other/",
             "mooneye_test_suite/misc/",
         ]
     });

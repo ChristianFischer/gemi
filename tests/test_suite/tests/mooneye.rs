@@ -226,7 +226,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn daa_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -253,7 +252,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn daa_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1358,7 +1356,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn div_write_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1385,7 +1382,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn div_write_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1412,7 +1408,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn rapid_toggle_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1439,7 +1434,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn rapid_toggle_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1466,7 +1460,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim00_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1493,7 +1486,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim00_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1520,7 +1512,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim00_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1547,7 +1538,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim00_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1574,7 +1564,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim01_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1601,7 +1590,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim01_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1628,7 +1616,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim01_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1655,7 +1642,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim01_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1682,7 +1668,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim10_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1709,7 +1694,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim10_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1736,7 +1720,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim10_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1763,7 +1746,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim10_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1790,7 +1772,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim11_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1817,7 +1798,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim11_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1844,7 +1824,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim11_div_trigger_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1871,7 +1850,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tim11_div_trigger_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1898,7 +1876,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tima_reload_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1925,7 +1902,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tima_reload_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1952,7 +1928,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tima_write_reloading_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1979,7 +1954,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tima_write_reloading_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -2006,7 +1980,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tma_write_reloading_dmg() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -2033,7 +2006,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn tma_write_reloading_sgb() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {

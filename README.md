@@ -110,7 +110,7 @@ Feel free to make suggestions about missing features or games which are not supp
 |               | oam dma        | 🟡  |
 |               | ppu            | 🔴  |
 |               | serial         | 🔴  |
-|               | timer          | 🟡  |
+|               | timer          | 🟢  |
 |               | opcode timings | 🔴  |
 | emulator only | MBC 1          | 🟢  |
 |               | MBC 2          | 🟢  |
