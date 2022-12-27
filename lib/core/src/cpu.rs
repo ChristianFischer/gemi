@@ -103,6 +103,10 @@ pub struct Cpu {
     /// Offset where to read the next value from the stack.
     stack_pointer: u16,
 
+    /// Temporary storage to store intermediate results for
+    /// opcodes, which need to be processed in multiple stages.
+    intermediate_value: u8,
+
     /// The state whether interrupts are enabled or not.
     ime: ImeState,
 
@@ -239,6 +243,7 @@ impl Cpu {
 
             instruction_pointer: 0x0100,
             stack_pointer: 0x0000,
+            intermediate_value: 0x0000,
 
             ime:  ImeState::Disabled,
             halt: HaltState::Running,
@@ -581,6 +586,16 @@ impl Cpu {
     /// Set the current address of the stack pointer.
     pub fn set_stack_pointer(&mut self, address: u16) {
         self.stack_pointer = address;
+    }
+
+    /// Get the intermediate value.
+    pub fn get_intermediate_value(&self) -> u8 {
+        self.intermediate_value
+    }
+
+    /// Set the intermediate value.
+    pub fn set_intermediate_value(&mut self, value: u8) {
+        self.intermediate_value = value;
     }
 
     /// Creates a string representation of the current CPU flags.

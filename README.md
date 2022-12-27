@@ -39,10 +39,10 @@ Feel free to make suggestions about missing features or games which are not supp
 | cgb_sound            |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |
 | cpu_instrs           | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  | 🟢  |     |
 | dmg_sound            |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |  ❓  |
-| instr_timing         | 🔴  |     |     |     |     |     |     |     |     |     |     |     |
+| instr_timing         | 🟢  |     |     |     |     |     |     |     |     |     |     |     |
 | interrupt_time       | 🔴  |     |     |     |     |     |     |     |     |     |     |     |
-| mem_timing           | 🔴  | 🔴  | 🔴  |     |     |     |     |     |     |     |     |     |
-| mem_timing-2         | 🔴  | 🔴  | 🔴  |     |     |     |     |     |     |     |     |     |
+| mem_timing           | 🟢  | 🟢  | 🟢  |     |     |     |     |     |     |     |     |     |
+| mem_timing-2         | 🟢  | 🟢  | 🟢  |     |     |     |     |     |     |     |     |     |
 | oam_bug              | 🔴  | 🔴  | 🟢  | 🔴  | 🔴  | 🟢  | 🔴  | 🔴  |     |     |     |     |
 | halt_bug (dmg / cgb) | 🔴  |  ❓  |     |     |     |     |     |     |     |     |     |     |
 

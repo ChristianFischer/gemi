@@ -20,7 +20,7 @@ use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
 use crate::cpu::{Cpu, CpuFlag, RegisterR8};
 use crate::input::Input;
 use crate::memory::{Memory, MemoryRead};
-use crate::opcode::OpCodeContext;
+use crate::opcode::{OpCodeContext, OpCodeResult};
 use crate::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
@@ -353,51 +353,14 @@ impl GameBoy {
         self.cpu.set_stack_pointer(sp);
     }
 
+
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
     pub fn process_frame(&mut self) -> Clock {
         let mut interval_cycles = 0;
 
         loop {
-            let cycles = if self.cpu.is_running() {
-                if let Some(cycles) = self.cpu.handle_interrupts() {
-                    cycles
-                }
-                else {
-                    let instruction = self.cpu.fetch_next_instruction();
-                    let mut context = OpCodeContext::for_instruction(&instruction);
-
-                    (instruction.opcode.proc)(self, &mut context);
-
-                    if self.device_config.print_opcodes {
-                        println!(
-                            "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
-                            instruction.opcode_address,
-                            instruction.opcode_id,
-                            if instruction.opcode_id <= 0xff { "  " } else { "" },
-                            instruction.to_string(),
-                            self.cpu
-                        );
-                    }
-
-                    // take the number of cycles consumed by the last operation
-                    let cycles = context.get_cycles_consumed();
-
-                    cycles
-                }
-            }
-            else {
-                // when in HALT state just pass 4 cycles
-                // where the CPU idles
-                4
-            };
-
-            // let other components handle their state
-            self.mem.update(cycles);
-            self.cpu.update(cycles);
-            self.timer.update(cycles);
-            self.serial.update(cycles);
-            self.input.update();
+            let cycles = self.process_next();
 
             // count the total cycles per interval
             interval_cycles += cycles;
@@ -410,5 +373,92 @@ impl GameBoy {
                 return interval_cycles;
             }
         }
+    }
+
+
+    /// Continues processing the next pending operation.
+    fn process_next(&mut self) -> Clock {
+        if self.cpu.is_running() {
+            if let Some(cycles) = self.cpu.handle_interrupts() {
+                self.update_components(cycles);
+                cycles
+            }
+            else {
+                self.process_next_opcode()
+            }
+        }
+        else {
+            // when in HALT state just pass 4 cycles
+            // where the CPU idles
+            let halt_cycle = 4;
+            self.update_components(halt_cycle);
+            halt_cycle
+        }
+    }
+
+
+    /// Process the next opcode.
+    fn process_next_opcode(&mut self) -> Clock {
+        let instruction = self.cpu.fetch_next_instruction();
+        let mut context = OpCodeContext::for_instruction(&instruction);
+        let mut total_step_cycles : Clock = 0;
+
+        // process cycles ahead of the actual opcode execution to get read/write operations
+        // to be invoked on their expected cycle
+        if instruction.opcode.cycles_ahead != 0 {
+            let cycles_ahead = instruction.opcode.cycles_ahead;
+            total_step_cycles += cycles_ahead;
+            self.update_components(cycles_ahead);
+        }
+
+        loop {
+            // invoke opcode execution
+            let result = (instruction.opcode.proc)(self, &mut context);
+
+            match result {
+                // the opcode was partially executed and needs time to pass on other components
+                // to update timer or memory operations.
+                OpCodeResult::StageDone(step_cycles) => {
+                    total_step_cycles += step_cycles;
+                    self.update_components(step_cycles);
+                    context.enter_next_stage();
+                }
+
+                // the opcode is completed. the remaining time needs to be applied on components.
+                OpCodeResult::Done => {
+                    // get the total amount of cycles consumed by this opcode and subtract the
+                    // number of cycles already applied to components
+                    let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
+
+                    self.update_components(remaining_cycles);
+
+                    break;
+                }
+            }
+        }
+
+        // print opcode and CPU state if enabled
+        if self.device_config.print_opcodes {
+            println!(
+                "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
+                instruction.opcode_address,
+                instruction.opcode_id,
+                if instruction.opcode_id <= 0xff { "  " } else { "" },
+                instruction.to_string(),
+                self.cpu
+            );
+        }
+
+        context.get_cycles_consumed()
+    }
+
+
+    /// Applies the time passed during CPU execution to other components as well.
+    fn update_components(&mut self, cycles: Clock) {
+        self.mem.update(cycles);
+        self.cpu.update(cycles);
+        self.timer.update(cycles);
+        self.serial.update(cycles);
+        self.input.update();
     }
 }

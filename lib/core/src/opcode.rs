@@ -19,14 +19,14 @@ use std::fmt::{Display, Formatter};
 use crate::gameboy::{Clock, GameBoy};
 use crate::memory::{MemoryRead, MemoryReadOnlyHandle};
 
-type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext);
+type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> OpCodeResult;
 
 
 /// A macro to generate an opcode implementation function.
 macro_rules! opcode {
     ($(#[$meta:meta])? $name:ident, [$($bind_gb:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
         $(#[$meta])?
-        pub fn $name(gb: &mut GameBoy, ctx: &mut OpCodeContext) {
+        pub fn $name(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> crate::opcode::OpCodeResult {
             // silence 'unused' warning for gb and ctx
             { let _ = (&gb, &ctx); }
 
@@ -35,7 +35,12 @@ macro_rules! opcode {
             $(let $bind_ctx = ctx;)?
 
             // paste 'body' statements
-            $($body)*;
+            let result = {
+                $($body)*
+            };
+
+            // convert return value into OpCodeResult
+            crate::opcode::OpCodeResult::from(result)
         }
     };
 }
@@ -53,6 +58,14 @@ pub struct OpCode {
     /// Total length of the opcode, including arguments,
     /// but excluding the 0xcb prefix for the extended table.
     pub bytes: u32,
+
+    /// Number of cycles to pass before the actual opcode execution.
+    /// This may be relevant for opcodes which are writing or reading memory to ensure
+    /// the actual read/write operation will happen at the same time as expected
+    /// on the real device.
+    /// The number of cycles ahead of the opcode are intended to be already included in
+    /// the total number of cycles in ```cycles``` and not added additionally.
+    pub cycles_ahead: Clock,
 
     /// Number of T-Cycles the opcode takes to execute.
     /// Does not include extra time when branches are taken.
@@ -72,6 +85,21 @@ pub struct OpCodeContext {
 
     /// Stores the number of cycles the execution of this opcode consumed
     cycles: Clock,
+
+    /// The stage an opcode is in, used for opcodes which will be processed in multiple steps
+    stage: u8,
+}
+
+
+/// Result code of an opcode execution.
+pub enum OpCodeResult {
+    /// A single stage of the opcode was completed. The same opcode need to be executed
+    /// at least one more time in order to be completed.
+    /// The number passed represents the number of cycles consumed by this stage.
+    StageDone(Clock),
+
+    /// The opcode was fully completed.
+    Done,
 }
 
 
@@ -102,12 +130,23 @@ impl OpCodeContext {
         OpCodeContext {
             opcode: instruction.opcode,
             cycles: instruction.opcode.cycles,
+            stage:  0,
         }
     }
 
     /// Get the opcode being executed within the current context.
     pub fn get_opcode(&self) -> &'static OpCode {
         self.opcode
+    }
+
+    /// Increase the stage index to be executed when invoking the opcode implementation.
+    pub fn enter_next_stage(&mut self) {
+        self.stage = self.stage + 1;
+    }
+
+    /// Get the opcodes current stage.
+    pub fn get_stage(&self) -> u8 {
+        self.stage
     }
 
     /// Adds a number of cycles consumed by the current instruction.
@@ -122,6 +161,16 @@ impl OpCodeContext {
         self.cycles
     }
 }
+
+
+/// Implements the conversion from () to OpCodeResult in order to generate
+/// a default value for opcode implementations without specific result code.
+impl From<()> for OpCodeResult {
+    fn from(_: ()) -> Self {
+        OpCodeResult::Done
+    }
+}
+
 
 
 fn get_arg(arg: &str, instruction: &Instruction) -> String {

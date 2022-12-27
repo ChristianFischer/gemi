@@ -19,7 +19,7 @@ use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
 use crate::memory::{MemoryRead, MemoryWrite};
 use crate::utils::{carrying_add_u16, carrying_add_u8, carrying_sub_u8};
-use crate::opcode::{opcode, OpCodeContext};
+use crate::opcode::{opcode, OpCodeContext, OpCodeResult};
 
 
 ////////////////////////////////////////////////
@@ -78,11 +78,27 @@ pub mod inc {
 
     /// Increments a value.
     /// (r16) <- (r16) + 1
-    fn increment_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = increment_u8v(gb, value);
-        gb.mem.write_u8(address, result);
+    fn increment_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            }
+
+            1 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.cpu.get_intermediate_value();
+                let result  = increment_u8v(gb, value);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            }
+
+            _ => unreachable!()
+        }
     }
 
 
@@ -101,7 +117,7 @@ pub mod inc {
     opcode!(inc_hl, [gb] increment_r16(gb, RegisterR16::HL));
 
     // INC (r16)
-    opcode!(inc_hlptr, [gb] increment_r16ptr(gb, RegisterR16::HL));
+    opcode!(inc_hlptr, [gb, ctx] increment_r16ptr(gb, ctx, RegisterR16::HL));
 
     // INC SP
     opcode!(inc_sp, [gb] {
@@ -115,10 +131,7 @@ pub mod inc {
 ////////////////////////////////////////////////
 //// DEC opcodes
 pub mod dec {
-    use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
-    use crate::gameboy::GameBoy;
-    use crate::memory::{MemoryRead, MemoryWrite};
-    use crate::opcode::{opcode, OpCodeContext};
+    use super::*;
 
     /// Decrements a 8bit value.
     fn decrement_u8v(gb: &mut GameBoy, value: u8) -> u8 {
@@ -155,11 +168,27 @@ pub mod dec {
     
     /// Decrements a value.
     /// (r16) <- (r16) - 1
-    fn decrement_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = decrement_u8v(gb, value);
-        gb.mem.write_u8(address, result);
+    fn decrement_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            },
+
+            1 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value = gb.cpu.get_intermediate_value();
+                let result  = decrement_u8v(gb, value);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            },
+
+            _ => unreachable!()
+        }
     }
     
 
@@ -178,7 +207,7 @@ pub mod dec {
     opcode!(dec_hl, [gb] decrement_r16(gb, RegisterR16::HL));
 
     // DEC (r16)
-    opcode!(dec_hlptr, [gb] decrement_r16ptr(gb, RegisterR16::HL));    
+    opcode!(dec_hlptr, [gb, ctx] decrement_r16ptr(gb, ctx, RegisterR16::HL));
 
     // DEC SP
     opcode!(dec_sp, [gb] {
@@ -383,6 +412,30 @@ pub mod rl {
         result
     }
 
+    /// Shifts or rotates a value on a 16bit pointer to the left.
+    fn shift_left_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16, op: ShiftOp) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            }
+
+            1 => {
+                let address = gb.cpu.get_r16(r16ptr);
+                let value   = gb.cpu.get_intermediate_value();
+                let result  = shift_left_u8v(gb, value, op);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            }
+
+            _ => unreachable!()
+        }
+    }
+
     /// Performs an arithmetic shift left of the value of a register.
     fn sla_r8(gb: &mut GameBoy, r8: RegisterR8) {
         let value  = gb.cpu.get_r8(r8);
@@ -391,11 +444,8 @@ pub mod rl {
     }
 
     /// Performs an arithmetic shift left of the value on a memory location.
-    fn sla_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_left_u8v(gb, value, ShiftOp::ShiftArithmetic);
-        gb.mem.write_u8(address, result);
+    fn sla_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_left_r16ptr(gb, ctx, r16ptr, ShiftOp::ShiftArithmetic)
     }
 
     /// Rotates the value of a register to the left through the carry flag.
@@ -411,11 +461,8 @@ pub mod rl {
     }
 
     /// Rotates the value on a memory location to the left through the carry flag.
-    fn rl_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_left_u8v(gb, value, ShiftOp::RotateThroughCarry);
-        gb.mem.write_u8(address, result);
+    fn rl_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_left_r16ptr(gb, ctx, r16ptr, ShiftOp::RotateThroughCarry)
     }
 
     /// Rotates the value of a register to the left.
@@ -431,11 +478,8 @@ pub mod rl {
     }
 
     /// Rotates the value on a memory location to the left.
-    fn rlc_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_left_u8v(gb, value, ShiftOp::Rotate);
-        gb.mem.write_u8(address, result);
+    fn rlc_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_left_r16ptr(gb, ctx, r16ptr, ShiftOp::Rotate)
     }
 
 
@@ -447,7 +491,6 @@ pub mod rl {
     opcode!(sla_e,     [gb] sla_r8(gb, RegisterR8::E));
     opcode!(sla_h,     [gb] sla_r8(gb, RegisterR8::H));
     opcode!(sla_l,     [gb] sla_r8(gb, RegisterR8::L));
-    opcode!(sla_hlptr, [gb] sla_r16ptr(gb, RegisterR16::HL));
 
     // rotate left through carry flag
     opcode!(rla,      [gb] rl_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
@@ -458,7 +501,6 @@ pub mod rl {
     opcode!(rl_e,     [gb] rl_r8(gb, RegisterR8::E));
     opcode!(rl_h,     [gb] rl_r8(gb, RegisterR8::H));
     opcode!(rl_l,     [gb] rl_r8(gb, RegisterR8::L));
-    opcode!(rl_hlptr, [gb] rl_r16ptr(gb, RegisterR16::HL));
 
     // rotate left (carry flag just set)
     opcode!(rlca,      [gb] rlc_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
@@ -469,7 +511,10 @@ pub mod rl {
     opcode!(rlc_e,     [gb] rlc_r8(gb, RegisterR8::E));
     opcode!(rlc_h,     [gb] rlc_r8(gb, RegisterR8::H));
     opcode!(rlc_l,     [gb] rlc_r8(gb, RegisterR8::L));
-    opcode!(rlc_hlptr, [gb] rlc_r16ptr(gb, RegisterR16::HL));
+
+    opcode!(sla_hlptr, [gb, ctx] sla_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(rl_hlptr,  [gb, ctx] rl_r16ptr (gb, ctx, RegisterR16::HL));
+    opcode!(rlc_hlptr, [gb, ctx] rlc_r16ptr(gb, ctx, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -477,12 +522,12 @@ pub mod rl {
 pub mod rr {
     use super::*;
 
-    /// Shifts or rotates a value to the left.
+    /// Shifts or rotates a value to the right.
     fn shift_right_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
         shift_right_u8v_nc(gb, value, op, NullCheck::Check)
     }
 
-    /// Shifts or rotates a value to the left.
+    /// Shifts or rotates a value to the right.
     fn shift_right_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
         let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
         let left_bit = (value >> 7) & 1;
@@ -508,6 +553,31 @@ pub mod rr {
         result
     }
 
+    /// Shifts or rotates a value on a 16bit pointer to the right.
+    fn shift_right_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16, op: ShiftOp) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            }
+
+            1 => {
+                let address = gb.cpu.get_r16(r16ptr);
+                let value   = gb.cpu.get_intermediate_value();
+                let result  = shift_right_u8v(gb, value, op);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            }
+
+            _ => unreachable!()
+        }
+    }
+
+
     /// Performs an arithmetic shift right of the value of a register.
     fn sra_r8(gb: &mut GameBoy, r8: RegisterR8) {
         let value  = gb.cpu.get_r8(r8);
@@ -516,11 +586,8 @@ pub mod rr {
     }
 
     /// Performs an arithmetic shift right of the value on a memory location.
-    fn sra_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_right_u8v(gb, value, ShiftOp::ShiftArithmetic);
-        gb.mem.write_u8(address, result);
+    fn sra_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::ShiftArithmetic)
     }
 
     /// Performs an arithmetic shift right of the value of a register.
@@ -531,11 +598,8 @@ pub mod rr {
     }
 
     /// Performs an arithmetic shift right of the value on a memory location.
-    fn srl_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_right_u8v(gb, value, ShiftOp::ShiftLogical);
-        gb.mem.write_u8(address, result);
+    fn srl_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::ShiftLogical)
     }
 
     /// Rotates the value of a register to the right through the carry flag.
@@ -551,11 +615,8 @@ pub mod rr {
     }
 
     /// Rotates the value on a memory location to the right through the carry flag.
-    fn rr_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_right_u8v(gb, value, ShiftOp::RotateThroughCarry);
-        gb.mem.write_u8(address, result);
+    fn rr_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::RotateThroughCarry)
     }
 
     /// Rotates the value of a register to the right.
@@ -571,11 +632,8 @@ pub mod rr {
     }
 
     /// Rotates the value on a memory location to the right.
-    fn rrc_r16ptr(gb: &mut GameBoy, r16ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = shift_right_u8v(gb, value, ShiftOp::Rotate);
-        gb.mem.write_u8(address, result);
+    fn rrc_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::Rotate)
     }
 
 
@@ -587,7 +645,6 @@ pub mod rr {
     opcode!(sra_e,     [gb] sra_r8(gb, RegisterR8::E));
     opcode!(sra_h,     [gb] sra_r8(gb, RegisterR8::H));
     opcode!(sra_l,     [gb] sra_r8(gb, RegisterR8::L));
-    opcode!(sra_hlptr, [gb] sra_r16ptr(gb, RegisterR16::HL));
 
     // logical shift right
     opcode!(srl_a,     [gb] srl_r8(gb, RegisterR8::A));
@@ -597,7 +654,6 @@ pub mod rr {
     opcode!(srl_e,     [gb] srl_r8(gb, RegisterR8::E));
     opcode!(srl_h,     [gb] srl_r8(gb, RegisterR8::H));
     opcode!(srl_l,     [gb] srl_r8(gb, RegisterR8::L));
-    opcode!(srl_hlptr, [gb] srl_r16ptr(gb, RegisterR16::HL));
 
     // rotate right through carry flag
     opcode!(rra,      [gb] rr_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
@@ -608,7 +664,6 @@ pub mod rr {
     opcode!(rr_e,     [gb] rr_r8(gb, RegisterR8::E));
     opcode!(rr_h,     [gb] rr_r8(gb, RegisterR8::H));
     opcode!(rr_l,     [gb] rr_r8(gb, RegisterR8::L));
-    opcode!(rr_hlptr, [gb] rr_r16ptr(gb, RegisterR16::HL));
 
     // rotate right (carry flag just set)
     opcode!(rrca,      [gb] rrc_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
@@ -619,7 +674,11 @@ pub mod rr {
     opcode!(rrc_e,     [gb] rrc_r8(gb, RegisterR8::E));
     opcode!(rrc_h,     [gb] rrc_r8(gb, RegisterR8::H));
     opcode!(rrc_l,     [gb] rrc_r8(gb, RegisterR8::L));
-    opcode!(rrc_hlptr, [gb] rrc_r16ptr(gb, RegisterR16::HL));
+
+    opcode!(sra_hlptr, [gb, ctx] sra_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(srl_hlptr, [gb, ctx] srl_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(rr_hlptr,  [gb, ctx] rr_r16ptr (gb, ctx, RegisterR16::HL));
+    opcode!(rrc_hlptr, [gb, ctx] rrc_r16ptr(gb, ctx, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -647,11 +706,27 @@ pub mod swap {
     }
 
     /// Swaps the low and high nibble of a byte at the address of a 16bit register pointer.
-    fn swap_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = swap_nibbles_u8v(gb, value);
-        gb.mem.write_u8(address, result);
+    fn swap_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            }
+
+            1 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.cpu.get_intermediate_value();
+                let result  = swap_nibbles_u8v(gb, value);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            }
+
+            _ => unreachable!()
+        }
     }
 
 
@@ -663,7 +738,8 @@ pub mod swap {
     opcode!(swap_e,     [gb] swap_r8(gb, RegisterR8::E));
     opcode!(swap_h,     [gb] swap_r8(gb, RegisterR8::H));
     opcode!(swap_l,     [gb] swap_r8(gb, RegisterR8::L));
-    opcode!(swap_hlptr, [gb] swap_r16ptr(gb, RegisterR16::HL));
+
+    opcode!(swap_hlptr, [gb, ctx] swap_r16ptr(gb, ctx, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -688,85 +764,102 @@ pub mod set_bit {
 
     /// Set bit n on a memory address.
     /// (r16) <- (r16) | (1 << bit)
-    fn set_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
-        let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = set_bit_u8v(gb, value, bit);
-        gb.mem.write_u8(address, result);
+    fn set_bit_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16, bit: u8) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            }
+
+            1 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.cpu.get_intermediate_value();
+                let result  = set_bit_u8v(gb, value, bit);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            }
+
+            _ => unreachable!()
+        }
     }
 
 
-    opcode!(set_bit_0_a,     [gb] set_bit_r8(gb, RegisterR8::A, 0));
-    opcode!(set_bit_0_b,     [gb] set_bit_r8(gb, RegisterR8::B, 0));
-    opcode!(set_bit_0_c,     [gb] set_bit_r8(gb, RegisterR8::C, 0));
-    opcode!(set_bit_0_d,     [gb] set_bit_r8(gb, RegisterR8::D, 0));
-    opcode!(set_bit_0_e,     [gb] set_bit_r8(gb, RegisterR8::E, 0));
-    opcode!(set_bit_0_h,     [gb] set_bit_r8(gb, RegisterR8::H, 0));
-    opcode!(set_bit_0_l,     [gb] set_bit_r8(gb, RegisterR8::L, 0));
-    opcode!(set_bit_0_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 0));
+    opcode!(set_bit_0_a, [gb] set_bit_r8(gb, RegisterR8::A, 0));
+    opcode!(set_bit_0_b, [gb] set_bit_r8(gb, RegisterR8::B, 0));
+    opcode!(set_bit_0_c, [gb] set_bit_r8(gb, RegisterR8::C, 0));
+    opcode!(set_bit_0_d, [gb] set_bit_r8(gb, RegisterR8::D, 0));
+    opcode!(set_bit_0_e, [gb] set_bit_r8(gb, RegisterR8::E, 0));
+    opcode!(set_bit_0_h, [gb] set_bit_r8(gb, RegisterR8::H, 0));
+    opcode!(set_bit_0_l, [gb] set_bit_r8(gb, RegisterR8::L, 0));
 
-    opcode!(set_bit_1_a,     [gb] set_bit_r8(gb, RegisterR8::A, 1));
-    opcode!(set_bit_1_b,     [gb] set_bit_r8(gb, RegisterR8::B, 1));
-    opcode!(set_bit_1_c,     [gb] set_bit_r8(gb, RegisterR8::C, 1));
-    opcode!(set_bit_1_d,     [gb] set_bit_r8(gb, RegisterR8::D, 1));
-    opcode!(set_bit_1_e,     [gb] set_bit_r8(gb, RegisterR8::E, 1));
-    opcode!(set_bit_1_h,     [gb] set_bit_r8(gb, RegisterR8::H, 1));
-    opcode!(set_bit_1_l,     [gb] set_bit_r8(gb, RegisterR8::L, 1));
-    opcode!(set_bit_1_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 1));
+    opcode!(set_bit_1_a, [gb] set_bit_r8(gb, RegisterR8::A, 1));
+    opcode!(set_bit_1_b, [gb] set_bit_r8(gb, RegisterR8::B, 1));
+    opcode!(set_bit_1_c, [gb] set_bit_r8(gb, RegisterR8::C, 1));
+    opcode!(set_bit_1_d, [gb] set_bit_r8(gb, RegisterR8::D, 1));
+    opcode!(set_bit_1_e, [gb] set_bit_r8(gb, RegisterR8::E, 1));
+    opcode!(set_bit_1_h, [gb] set_bit_r8(gb, RegisterR8::H, 1));
+    opcode!(set_bit_1_l, [gb] set_bit_r8(gb, RegisterR8::L, 1));
 
-    opcode!(set_bit_2_a,     [gb] set_bit_r8(gb, RegisterR8::A, 2));
-    opcode!(set_bit_2_b,     [gb] set_bit_r8(gb, RegisterR8::B, 2));
-    opcode!(set_bit_2_c,     [gb] set_bit_r8(gb, RegisterR8::C, 2));
-    opcode!(set_bit_2_d,     [gb] set_bit_r8(gb, RegisterR8::D, 2));
-    opcode!(set_bit_2_e,     [gb] set_bit_r8(gb, RegisterR8::E, 2));
-    opcode!(set_bit_2_h,     [gb] set_bit_r8(gb, RegisterR8::H, 2));
-    opcode!(set_bit_2_l,     [gb] set_bit_r8(gb, RegisterR8::L, 2));
-    opcode!(set_bit_2_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 2));
+    opcode!(set_bit_2_a, [gb] set_bit_r8(gb, RegisterR8::A, 2));
+    opcode!(set_bit_2_b, [gb] set_bit_r8(gb, RegisterR8::B, 2));
+    opcode!(set_bit_2_c, [gb] set_bit_r8(gb, RegisterR8::C, 2));
+    opcode!(set_bit_2_d, [gb] set_bit_r8(gb, RegisterR8::D, 2));
+    opcode!(set_bit_2_e, [gb] set_bit_r8(gb, RegisterR8::E, 2));
+    opcode!(set_bit_2_h, [gb] set_bit_r8(gb, RegisterR8::H, 2));
+    opcode!(set_bit_2_l, [gb] set_bit_r8(gb, RegisterR8::L, 2));
 
-    opcode!(set_bit_3_a,     [gb] set_bit_r8(gb, RegisterR8::A, 3));
-    opcode!(set_bit_3_b,     [gb] set_bit_r8(gb, RegisterR8::B, 3));
-    opcode!(set_bit_3_c,     [gb] set_bit_r8(gb, RegisterR8::C, 3));
-    opcode!(set_bit_3_d,     [gb] set_bit_r8(gb, RegisterR8::D, 3));
-    opcode!(set_bit_3_e,     [gb] set_bit_r8(gb, RegisterR8::E, 3));
-    opcode!(set_bit_3_h,     [gb] set_bit_r8(gb, RegisterR8::H, 3));
-    opcode!(set_bit_3_l,     [gb] set_bit_r8(gb, RegisterR8::L, 3));
-    opcode!(set_bit_3_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 3));
+    opcode!(set_bit_3_a, [gb] set_bit_r8(gb, RegisterR8::A, 3));
+    opcode!(set_bit_3_b, [gb] set_bit_r8(gb, RegisterR8::B, 3));
+    opcode!(set_bit_3_c, [gb] set_bit_r8(gb, RegisterR8::C, 3));
+    opcode!(set_bit_3_d, [gb] set_bit_r8(gb, RegisterR8::D, 3));
+    opcode!(set_bit_3_e, [gb] set_bit_r8(gb, RegisterR8::E, 3));
+    opcode!(set_bit_3_h, [gb] set_bit_r8(gb, RegisterR8::H, 3));
+    opcode!(set_bit_3_l, [gb] set_bit_r8(gb, RegisterR8::L, 3));
 
-    opcode!(set_bit_4_a,     [gb] set_bit_r8(gb, RegisterR8::A, 4));
-    opcode!(set_bit_4_b,     [gb] set_bit_r8(gb, RegisterR8::B, 4));
-    opcode!(set_bit_4_c,     [gb] set_bit_r8(gb, RegisterR8::C, 4));
-    opcode!(set_bit_4_d,     [gb] set_bit_r8(gb, RegisterR8::D, 4));
-    opcode!(set_bit_4_e,     [gb] set_bit_r8(gb, RegisterR8::E, 4));
-    opcode!(set_bit_4_h,     [gb] set_bit_r8(gb, RegisterR8::H, 4));
-    opcode!(set_bit_4_l,     [gb] set_bit_r8(gb, RegisterR8::L, 4));
-    opcode!(set_bit_4_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 4));
+    opcode!(set_bit_4_a, [gb] set_bit_r8(gb, RegisterR8::A, 4));
+    opcode!(set_bit_4_b, [gb] set_bit_r8(gb, RegisterR8::B, 4));
+    opcode!(set_bit_4_c, [gb] set_bit_r8(gb, RegisterR8::C, 4));
+    opcode!(set_bit_4_d, [gb] set_bit_r8(gb, RegisterR8::D, 4));
+    opcode!(set_bit_4_e, [gb] set_bit_r8(gb, RegisterR8::E, 4));
+    opcode!(set_bit_4_h, [gb] set_bit_r8(gb, RegisterR8::H, 4));
+    opcode!(set_bit_4_l, [gb] set_bit_r8(gb, RegisterR8::L, 4));
 
-    opcode!(set_bit_5_a,     [gb] set_bit_r8(gb, RegisterR8::A, 5));
-    opcode!(set_bit_5_b,     [gb] set_bit_r8(gb, RegisterR8::B, 5));
-    opcode!(set_bit_5_c,     [gb] set_bit_r8(gb, RegisterR8::C, 5));
-    opcode!(set_bit_5_d,     [gb] set_bit_r8(gb, RegisterR8::D, 5));
-    opcode!(set_bit_5_e,     [gb] set_bit_r8(gb, RegisterR8::E, 5));
-    opcode!(set_bit_5_h,     [gb] set_bit_r8(gb, RegisterR8::H, 5));
-    opcode!(set_bit_5_l,     [gb] set_bit_r8(gb, RegisterR8::L, 5));
-    opcode!(set_bit_5_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 5));
+    opcode!(set_bit_5_a, [gb] set_bit_r8(gb, RegisterR8::A, 5));
+    opcode!(set_bit_5_b, [gb] set_bit_r8(gb, RegisterR8::B, 5));
+    opcode!(set_bit_5_c, [gb] set_bit_r8(gb, RegisterR8::C, 5));
+    opcode!(set_bit_5_d, [gb] set_bit_r8(gb, RegisterR8::D, 5));
+    opcode!(set_bit_5_e, [gb] set_bit_r8(gb, RegisterR8::E, 5));
+    opcode!(set_bit_5_h, [gb] set_bit_r8(gb, RegisterR8::H, 5));
+    opcode!(set_bit_5_l, [gb] set_bit_r8(gb, RegisterR8::L, 5));
 
-    opcode!(set_bit_6_a,     [gb] set_bit_r8(gb, RegisterR8::A, 6));
-    opcode!(set_bit_6_b,     [gb] set_bit_r8(gb, RegisterR8::B, 6));
-    opcode!(set_bit_6_c,     [gb] set_bit_r8(gb, RegisterR8::C, 6));
-    opcode!(set_bit_6_d,     [gb] set_bit_r8(gb, RegisterR8::D, 6));
-    opcode!(set_bit_6_e,     [gb] set_bit_r8(gb, RegisterR8::E, 6));
-    opcode!(set_bit_6_h,     [gb] set_bit_r8(gb, RegisterR8::H, 6));
-    opcode!(set_bit_6_l,     [gb] set_bit_r8(gb, RegisterR8::L, 6));
-    opcode!(set_bit_6_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 6));
+    opcode!(set_bit_6_a, [gb] set_bit_r8(gb, RegisterR8::A, 6));
+    opcode!(set_bit_6_b, [gb] set_bit_r8(gb, RegisterR8::B, 6));
+    opcode!(set_bit_6_c, [gb] set_bit_r8(gb, RegisterR8::C, 6));
+    opcode!(set_bit_6_d, [gb] set_bit_r8(gb, RegisterR8::D, 6));
+    opcode!(set_bit_6_e, [gb] set_bit_r8(gb, RegisterR8::E, 6));
+    opcode!(set_bit_6_h, [gb] set_bit_r8(gb, RegisterR8::H, 6));
+    opcode!(set_bit_6_l, [gb] set_bit_r8(gb, RegisterR8::L, 6));
 
-    opcode!(set_bit_7_a,     [gb] set_bit_r8(gb, RegisterR8::A, 7));
-    opcode!(set_bit_7_b,     [gb] set_bit_r8(gb, RegisterR8::B, 7));
-    opcode!(set_bit_7_c,     [gb] set_bit_r8(gb, RegisterR8::C, 7));
-    opcode!(set_bit_7_d,     [gb] set_bit_r8(gb, RegisterR8::D, 7));
-    opcode!(set_bit_7_e,     [gb] set_bit_r8(gb, RegisterR8::E, 7));
-    opcode!(set_bit_7_h,     [gb] set_bit_r8(gb, RegisterR8::H, 7));
-    opcode!(set_bit_7_l,     [gb] set_bit_r8(gb, RegisterR8::L, 7));
-    opcode!(set_bit_7_hlptr, [gb] set_bit_r16ptr(gb, RegisterR16::HL, 7));
+    opcode!(set_bit_7_a, [gb] set_bit_r8(gb, RegisterR8::A, 7));
+    opcode!(set_bit_7_b, [gb] set_bit_r8(gb, RegisterR8::B, 7));
+    opcode!(set_bit_7_c, [gb] set_bit_r8(gb, RegisterR8::C, 7));
+    opcode!(set_bit_7_d, [gb] set_bit_r8(gb, RegisterR8::D, 7));
+    opcode!(set_bit_7_e, [gb] set_bit_r8(gb, RegisterR8::E, 7));
+    opcode!(set_bit_7_h, [gb] set_bit_r8(gb, RegisterR8::H, 7));
+    opcode!(set_bit_7_l, [gb] set_bit_r8(gb, RegisterR8::L, 7));
+
+    opcode!(set_bit_0_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 0));
+    opcode!(set_bit_1_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 1));
+    opcode!(set_bit_2_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 2));
+    opcode!(set_bit_3_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 3));
+    opcode!(set_bit_4_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 4));
+    opcode!(set_bit_5_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 5));
+    opcode!(set_bit_6_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 6));
+    opcode!(set_bit_7_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 7));
 }
 
 ////////////////////////////////////////////////
@@ -791,85 +884,102 @@ pub mod res_bit {
 
     /// Resets bit n on a memory address.
     /// (r16) <- (r16) & !(1 << bit)
-    fn res_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
-        let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.mem.read_u8(address);
-        let result  = res_bit_u8v(gb, value, bit);
-        gb.mem.write_u8(address, result);
+    fn res_bit_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16, bit: u8) -> OpCodeResult {
+        match ctx.get_stage() {
+            0 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.mem.read_u8(address);
+                gb.cpu.set_intermediate_value(value);
+
+                OpCodeResult::StageDone(4)
+            }
+
+            1 => {
+                let address = gb.cpu.get_r16(r16_ptr);
+                let value   = gb.cpu.get_intermediate_value();
+                let result  = res_bit_u8v(gb, value, bit);
+                gb.mem.write_u8(address, result);
+
+                OpCodeResult::Done
+            }
+
+            _ => unreachable!()
+        }
     }
 
 
-    opcode!(res_bit_0_a,     [gb] res_bit_r8(gb, RegisterR8::A, 0));
-    opcode!(res_bit_0_b,     [gb] res_bit_r8(gb, RegisterR8::B, 0));
-    opcode!(res_bit_0_c,     [gb] res_bit_r8(gb, RegisterR8::C, 0));
-    opcode!(res_bit_0_d,     [gb] res_bit_r8(gb, RegisterR8::D, 0));
-    opcode!(res_bit_0_e,     [gb] res_bit_r8(gb, RegisterR8::E, 0));
-    opcode!(res_bit_0_h,     [gb] res_bit_r8(gb, RegisterR8::H, 0));
-    opcode!(res_bit_0_l,     [gb] res_bit_r8(gb, RegisterR8::L, 0));
-    opcode!(res_bit_0_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 0));
+    opcode!(res_bit_0_a, [gb] res_bit_r8(gb, RegisterR8::A, 0));
+    opcode!(res_bit_0_b, [gb] res_bit_r8(gb, RegisterR8::B, 0));
+    opcode!(res_bit_0_c, [gb] res_bit_r8(gb, RegisterR8::C, 0));
+    opcode!(res_bit_0_d, [gb] res_bit_r8(gb, RegisterR8::D, 0));
+    opcode!(res_bit_0_e, [gb] res_bit_r8(gb, RegisterR8::E, 0));
+    opcode!(res_bit_0_h, [gb] res_bit_r8(gb, RegisterR8::H, 0));
+    opcode!(res_bit_0_l, [gb] res_bit_r8(gb, RegisterR8::L, 0));
 
-    opcode!(res_bit_1_a,     [gb] res_bit_r8(gb, RegisterR8::A, 1));
-    opcode!(res_bit_1_b,     [gb] res_bit_r8(gb, RegisterR8::B, 1));
-    opcode!(res_bit_1_c,     [gb] res_bit_r8(gb, RegisterR8::C, 1));
-    opcode!(res_bit_1_d,     [gb] res_bit_r8(gb, RegisterR8::D, 1));
-    opcode!(res_bit_1_e,     [gb] res_bit_r8(gb, RegisterR8::E, 1));
-    opcode!(res_bit_1_h,     [gb] res_bit_r8(gb, RegisterR8::H, 1));
-    opcode!(res_bit_1_l,     [gb] res_bit_r8(gb, RegisterR8::L, 1));
-    opcode!(res_bit_1_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 1));
+    opcode!(res_bit_1_a, [gb] res_bit_r8(gb, RegisterR8::A, 1));
+    opcode!(res_bit_1_b, [gb] res_bit_r8(gb, RegisterR8::B, 1));
+    opcode!(res_bit_1_c, [gb] res_bit_r8(gb, RegisterR8::C, 1));
+    opcode!(res_bit_1_d, [gb] res_bit_r8(gb, RegisterR8::D, 1));
+    opcode!(res_bit_1_e, [gb] res_bit_r8(gb, RegisterR8::E, 1));
+    opcode!(res_bit_1_h, [gb] res_bit_r8(gb, RegisterR8::H, 1));
+    opcode!(res_bit_1_l, [gb] res_bit_r8(gb, RegisterR8::L, 1));
 
-    opcode!(res_bit_2_a,     [gb] res_bit_r8(gb, RegisterR8::A, 2));
-    opcode!(res_bit_2_b,     [gb] res_bit_r8(gb, RegisterR8::B, 2));
-    opcode!(res_bit_2_c,     [gb] res_bit_r8(gb, RegisterR8::C, 2));
-    opcode!(res_bit_2_d,     [gb] res_bit_r8(gb, RegisterR8::D, 2));
-    opcode!(res_bit_2_e,     [gb] res_bit_r8(gb, RegisterR8::E, 2));
-    opcode!(res_bit_2_h,     [gb] res_bit_r8(gb, RegisterR8::H, 2));
-    opcode!(res_bit_2_l,     [gb] res_bit_r8(gb, RegisterR8::L, 2));
-    opcode!(res_bit_2_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 2));
+    opcode!(res_bit_2_a, [gb] res_bit_r8(gb, RegisterR8::A, 2));
+    opcode!(res_bit_2_b, [gb] res_bit_r8(gb, RegisterR8::B, 2));
+    opcode!(res_bit_2_c, [gb] res_bit_r8(gb, RegisterR8::C, 2));
+    opcode!(res_bit_2_d, [gb] res_bit_r8(gb, RegisterR8::D, 2));
+    opcode!(res_bit_2_e, [gb] res_bit_r8(gb, RegisterR8::E, 2));
+    opcode!(res_bit_2_h, [gb] res_bit_r8(gb, RegisterR8::H, 2));
+    opcode!(res_bit_2_l, [gb] res_bit_r8(gb, RegisterR8::L, 2));
 
-    opcode!(res_bit_3_a,     [gb] res_bit_r8(gb, RegisterR8::A, 3));
-    opcode!(res_bit_3_b,     [gb] res_bit_r8(gb, RegisterR8::B, 3));
-    opcode!(res_bit_3_c,     [gb] res_bit_r8(gb, RegisterR8::C, 3));
-    opcode!(res_bit_3_d,     [gb] res_bit_r8(gb, RegisterR8::D, 3));
-    opcode!(res_bit_3_e,     [gb] res_bit_r8(gb, RegisterR8::E, 3));
-    opcode!(res_bit_3_h,     [gb] res_bit_r8(gb, RegisterR8::H, 3));
-    opcode!(res_bit_3_l,     [gb] res_bit_r8(gb, RegisterR8::L, 3));
-    opcode!(res_bit_3_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 3));
+    opcode!(res_bit_3_a, [gb] res_bit_r8(gb, RegisterR8::A, 3));
+    opcode!(res_bit_3_b, [gb] res_bit_r8(gb, RegisterR8::B, 3));
+    opcode!(res_bit_3_c, [gb] res_bit_r8(gb, RegisterR8::C, 3));
+    opcode!(res_bit_3_d, [gb] res_bit_r8(gb, RegisterR8::D, 3));
+    opcode!(res_bit_3_e, [gb] res_bit_r8(gb, RegisterR8::E, 3));
+    opcode!(res_bit_3_h, [gb] res_bit_r8(gb, RegisterR8::H, 3));
+    opcode!(res_bit_3_l, [gb] res_bit_r8(gb, RegisterR8::L, 3));
 
-    opcode!(res_bit_4_a,     [gb] res_bit_r8(gb, RegisterR8::A, 4));
-    opcode!(res_bit_4_b,     [gb] res_bit_r8(gb, RegisterR8::B, 4));
-    opcode!(res_bit_4_c,     [gb] res_bit_r8(gb, RegisterR8::C, 4));
-    opcode!(res_bit_4_d,     [gb] res_bit_r8(gb, RegisterR8::D, 4));
-    opcode!(res_bit_4_e,     [gb] res_bit_r8(gb, RegisterR8::E, 4));
-    opcode!(res_bit_4_h,     [gb] res_bit_r8(gb, RegisterR8::H, 4));
-    opcode!(res_bit_4_l,     [gb] res_bit_r8(gb, RegisterR8::L, 4));
-    opcode!(res_bit_4_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 4));
+    opcode!(res_bit_4_a, [gb] res_bit_r8(gb, RegisterR8::A, 4));
+    opcode!(res_bit_4_b, [gb] res_bit_r8(gb, RegisterR8::B, 4));
+    opcode!(res_bit_4_c, [gb] res_bit_r8(gb, RegisterR8::C, 4));
+    opcode!(res_bit_4_d, [gb] res_bit_r8(gb, RegisterR8::D, 4));
+    opcode!(res_bit_4_e, [gb] res_bit_r8(gb, RegisterR8::E, 4));
+    opcode!(res_bit_4_h, [gb] res_bit_r8(gb, RegisterR8::H, 4));
+    opcode!(res_bit_4_l, [gb] res_bit_r8(gb, RegisterR8::L, 4));
 
-    opcode!(res_bit_5_a,     [gb] res_bit_r8(gb, RegisterR8::A, 5));
-    opcode!(res_bit_5_b,     [gb] res_bit_r8(gb, RegisterR8::B, 5));
-    opcode!(res_bit_5_c,     [gb] res_bit_r8(gb, RegisterR8::C, 5));
-    opcode!(res_bit_5_d,     [gb] res_bit_r8(gb, RegisterR8::D, 5));
-    opcode!(res_bit_5_e,     [gb] res_bit_r8(gb, RegisterR8::E, 5));
-    opcode!(res_bit_5_h,     [gb] res_bit_r8(gb, RegisterR8::H, 5));
-    opcode!(res_bit_5_l,     [gb] res_bit_r8(gb, RegisterR8::L, 5));
-    opcode!(res_bit_5_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 5));
+    opcode!(res_bit_5_a, [gb] res_bit_r8(gb, RegisterR8::A, 5));
+    opcode!(res_bit_5_b, [gb] res_bit_r8(gb, RegisterR8::B, 5));
+    opcode!(res_bit_5_c, [gb] res_bit_r8(gb, RegisterR8::C, 5));
+    opcode!(res_bit_5_d, [gb] res_bit_r8(gb, RegisterR8::D, 5));
+    opcode!(res_bit_5_e, [gb] res_bit_r8(gb, RegisterR8::E, 5));
+    opcode!(res_bit_5_h, [gb] res_bit_r8(gb, RegisterR8::H, 5));
+    opcode!(res_bit_5_l, [gb] res_bit_r8(gb, RegisterR8::L, 5));
 
-    opcode!(res_bit_6_a,     [gb] res_bit_r8(gb, RegisterR8::A, 6));
-    opcode!(res_bit_6_b,     [gb] res_bit_r8(gb, RegisterR8::B, 6));
-    opcode!(res_bit_6_c,     [gb] res_bit_r8(gb, RegisterR8::C, 6));
-    opcode!(res_bit_6_d,     [gb] res_bit_r8(gb, RegisterR8::D, 6));
-    opcode!(res_bit_6_e,     [gb] res_bit_r8(gb, RegisterR8::E, 6));
-    opcode!(res_bit_6_h,     [gb] res_bit_r8(gb, RegisterR8::H, 6));
-    opcode!(res_bit_6_l,     [gb] res_bit_r8(gb, RegisterR8::L, 6));
-    opcode!(res_bit_6_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 6));
+    opcode!(res_bit_6_a, [gb] res_bit_r8(gb, RegisterR8::A, 6));
+    opcode!(res_bit_6_b, [gb] res_bit_r8(gb, RegisterR8::B, 6));
+    opcode!(res_bit_6_c, [gb] res_bit_r8(gb, RegisterR8::C, 6));
+    opcode!(res_bit_6_d, [gb] res_bit_r8(gb, RegisterR8::D, 6));
+    opcode!(res_bit_6_e, [gb] res_bit_r8(gb, RegisterR8::E, 6));
+    opcode!(res_bit_6_h, [gb] res_bit_r8(gb, RegisterR8::H, 6));
+    opcode!(res_bit_6_l, [gb] res_bit_r8(gb, RegisterR8::L, 6));
 
-    opcode!(res_bit_7_a,     [gb] res_bit_r8(gb, RegisterR8::A, 7));
-    opcode!(res_bit_7_b,     [gb] res_bit_r8(gb, RegisterR8::B, 7));
-    opcode!(res_bit_7_c,     [gb] res_bit_r8(gb, RegisterR8::C, 7));
-    opcode!(res_bit_7_d,     [gb] res_bit_r8(gb, RegisterR8::D, 7));
-    opcode!(res_bit_7_e,     [gb] res_bit_r8(gb, RegisterR8::E, 7));
-    opcode!(res_bit_7_h,     [gb] res_bit_r8(gb, RegisterR8::H, 7));
-    opcode!(res_bit_7_l,     [gb] res_bit_r8(gb, RegisterR8::L, 7));
-    opcode!(res_bit_7_hlptr, [gb] res_bit_r16ptr(gb, RegisterR16::HL, 7));
+    opcode!(res_bit_7_a, [gb] res_bit_r8(gb, RegisterR8::A, 7));
+    opcode!(res_bit_7_b, [gb] res_bit_r8(gb, RegisterR8::B, 7));
+    opcode!(res_bit_7_c, [gb] res_bit_r8(gb, RegisterR8::C, 7));
+    opcode!(res_bit_7_d, [gb] res_bit_r8(gb, RegisterR8::D, 7));
+    opcode!(res_bit_7_e, [gb] res_bit_r8(gb, RegisterR8::E, 7));
+    opcode!(res_bit_7_h, [gb] res_bit_r8(gb, RegisterR8::H, 7));
+    opcode!(res_bit_7_l, [gb] res_bit_r8(gb, RegisterR8::L, 7));
+
+    opcode!(res_bit_0_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 0));
+    opcode!(res_bit_1_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 1));
+    opcode!(res_bit_2_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 2));
+    opcode!(res_bit_3_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 3));
+    opcode!(res_bit_4_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 4));
+    opcode!(res_bit_5_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 5));
+    opcode!(res_bit_6_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 6));
+    opcode!(res_bit_7_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 7));
 }
 
 ////////////////////////////////////////////////

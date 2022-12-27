@@ -1267,7 +1267,6 @@ mod mem_timing {
 
 
         #[test]
-        #[ignore]
         fn individual_01_read_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1297,7 +1296,6 @@ mod mem_timing {
 
 
         #[test]
-        #[ignore]
         fn individual_02_write_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1327,7 +1325,6 @@ mod mem_timing {
 
 
         #[test]
-        #[ignore]
         fn individual_03_modify_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1362,7 +1359,6 @@ mod mem_timing {
 
 
         #[test]
-        #[ignore]
         fn mem_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
