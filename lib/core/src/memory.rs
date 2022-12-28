@@ -442,6 +442,18 @@ impl Memory {
         }
     }
 
+
+    /// Initializes the values of all IO registers.
+    pub fn initialize_io_registers(&mut self, initial_values: [u8; 256]) {
+        let mut mem = self.internal.get_mut();
+        let io_regs = &mut mem.io_registers;
+
+        for i in 0..256 {
+            io_regs.set_at(i, initial_values[i]);
+        }
+    }
+
+
     /// Let the memory controller handle it's tasks.
     /// 'cycles' gives the number of ticks passed since
     /// the last call.

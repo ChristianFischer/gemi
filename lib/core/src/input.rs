@@ -16,7 +16,7 @@
  */
 
 use crate::cpu::Interrupt;
-use crate::memory::{MEMORY_LOCATION_JOYP, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
+use crate::memory::{MEMORY_LOCATION_JOYP, MemoryReadWriteHandle};
 use crate::utils::{change_bit, get_bit};
 
 
@@ -43,10 +43,6 @@ pub struct Input {
     /// The pressed state of each button last time;
     /// used to detect changes in the pressed state of each button
     previous_button_states: u8,
-
-    /// The previous state of the JOYP register.
-    /// Used to detect changes done by the running ROM.
-    previous_joyp: u8,
 }
 
 
@@ -57,14 +53,12 @@ impl Input {
             mem,
             button_states:          0x00,
             previous_button_states: 0x00,
-            previous_joyp:          0xff,
         }
     }
 
 
     /// Updates the JOYP register and fire the input interrupt depending on the current button states.
     pub fn update(&mut self) {
-        let joyp = self.mem.read_u8(MEMORY_LOCATION_JOYP);
         let keys_changed = self.button_states != self.previous_button_states;
 
         if keys_changed {
@@ -78,7 +72,11 @@ impl Input {
             self.previous_button_states = self.button_states;
         }
 
-        if (joyp != self.previous_joyp) || keys_changed {
+        if self.mem.was_io_register_written(MEMORY_LOCATION_JOYP) || keys_changed {
+            self.mem.acknowledge_io_register_written(MEMORY_LOCATION_JOYP);
+            let mut io_regs = self.mem.get_io_registers_mut();
+            let joyp = io_regs.joyp;
+
             let select = joyp & 0x30;
             let value = match select {
                 0x00 => 0x00,
@@ -88,9 +86,7 @@ impl Input {
             };
 
             let new_joyp = select | value;
-
-            self.mem.write_u8(MEMORY_LOCATION_JOYP, new_joyp);
-            self.previous_joyp = new_joyp;
+            io_regs.joyp = new_joyp;
         }
     }
 

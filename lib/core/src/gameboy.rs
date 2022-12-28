@@ -24,7 +24,7 @@ use crate::opcode::{OpCodeContext, OpCodeResult};
 use crate::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
-use crate::utils::carrying_add_u8;
+use crate::utils::{carrying_add_u8, get_high};
 
 
 /// Type to measure clock ticks of the device.
@@ -170,20 +170,33 @@ impl Builder {
         DeviceType::GameBoyDmg
     }
 
+    /// Check the emulation type based on the selected device and GameBoyColor
+    /// support of the selected cartridge.
+    pub fn select_emulation_type(&self, device_type: &DeviceType) -> EmulationType {
+        match device_type {
+            DeviceType::GameBoyDmg => {}
+            _ => {
+                if let Some(cartridge) = &self.cartridge {
+                    if cartridge.supports_cgb() {
+                        return EmulationType::GBC;
+                    }
+                }
+            }
+        }
+
+        EmulationType::DMG
+    }
+
     /// Build the GameBoy device emulator based on the properties specified with this builder.
     pub fn finish(mut self) -> Result<GameBoy, String> {
         // select the preferred device type based on the current config and cartridge
-        let device_type = self.select_preferred_device_type();
+        let device_type    = self.select_preferred_device_type();
+        let emulation_type = self.select_emulation_type(&device_type);
 
         // setup device config based on the current configuration
         let device_config = DeviceConfig {
             device: device_type,
-
-            emulation: match device_type {
-                DeviceType::GameBoyDmg => EmulationType::DMG,
-                _                      => EmulationType::GBC,
-            },
-
+            emulation: emulation_type,
             print_opcodes: self.print_opcodes
         };
 
@@ -351,6 +364,55 @@ impl GameBoy {
         self.cpu.set_r8(RegisterR8::L, l);
         self.cpu.set_instruction_pointer(pc);
         self.cpu.set_stack_pointer(sp);
+
+        // initialize IO registers
+        {
+            // placeholder for unknown/unused entries
+            const X : u8 = 0xff;
+
+            let dma = match self.device_config.device {
+                DeviceType::GameBoyColor | DeviceType::GameBoyAdvance => 0x00,
+                _ => 0xff,
+            };
+
+            // GBC prefers object priority by OAM index, DMG by sprite x position
+            let opri = match self.device_config.emulation {
+                EmulationType::DMG => 0xff,
+                EmulationType::GBC => 0xfe,
+            };
+
+            // Timer, LCD-STAT and LY depends on how long the boot rom took for execution
+            let (timer_counter, tac, lcds, ly) = match self.device_config.device {
+                _ => (0xabf0, 0xf8, 0x85, 0x00)
+            };
+
+            // div depends on the high byte of the timer counter
+            let div = get_high(timer_counter);
+
+            let io_reg_data : [u8; 256] = [
+                /*          0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f */
+                /* 00 */ 0xcf, 0x00, 0x7e,    X,  div, 0x00, 0x00,  tac,    X,    X,    X,    X,    X,    X,    X, 0xe1,
+                /* 10 */ 0x80, 0xbf, 0xf3, 0xff, 0xbf,    X, 0x3f, 0x00, 0xff, 0xbf, 0x7f, 0xff, 0x9f, 0xff, 0xbf,    X,
+                /* 20 */ 0xff, 0x00, 0x00, 0xbf, 0x77, 0xf3, 0xf1,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* 30 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* 40 */ 0x91, lcds, 0x00, 0x00,   ly, 0x00,  dma, 0xfc, 0x00, 0x00, 0x00, 0x00,    X, 0xff,    X, 0xff,
+                /* 50 */    X, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* 60 */    X,    X,    X,    X,    X,    X,    X,    X, 0xff, 0xff, 0xff, 0xff, opri,    X,    X,    X,
+                /* 70 */ 0xff,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* 80 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* 90 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* a0 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* b0 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* c0 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* d0 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* e0 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
+                /* f0 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X, 0x00,
+            ];
+
+            // apply selected values
+            self.mem.initialize_io_registers(io_reg_data);
+            self.timer.initialize_counter(timer_counter, tac);
+        }
     }
 
 

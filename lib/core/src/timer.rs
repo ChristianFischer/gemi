@@ -107,9 +107,16 @@ fn get_trigger_bit(tac: u8) -> u8 {
 
 
 impl InternalCounter {
+    /// Creates a new counter with default value.
     pub fn new() -> Self {
+        Self::with_value(0x0000, 0x00)
+    }
+
+
+    /// Creates a new counter with a specific initial value.
+    pub fn with_value(value: u16, tac: u8) -> Self {
         let mut counter = Self {
-            value: 0,
+            value,
 
             timer_enabled: false,
 
@@ -121,7 +128,7 @@ impl InternalCounter {
         };
 
         // applies a 'zero' TAC value by default
-        counter.apply_tac(0x00);
+        counter.apply_tac(tac);
 
         counter
     }
@@ -231,6 +238,12 @@ impl Timer {
             internal_counter: InternalCounter::new(),
             tima_state: TimaState::Normal,
         }
+    }
+
+
+    /// (Re)initializes the internal counter with specific initial values.
+    pub fn initialize_counter(&mut self, counter: u16, tac: u8) {
+        self.internal_counter = InternalCounter::with_value(counter, tac);
     }
 
 
