@@ -21,6 +21,7 @@ pub mod cpu;
 pub mod gameboy;
 pub mod graphic_data;
 pub mod input;
+pub mod io_registers;
 pub mod mbc;
 pub mod memory;
 pub mod memory_data;
