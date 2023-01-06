@@ -27,6 +27,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
 use std::collections::HashMap;
+use crate::sound_queue::SoundQueue;
 
 
 #[derive(PartialEq)]
@@ -64,6 +65,7 @@ pub struct Window {
     state:              State,
     display_mode:       DisplayMode,
     key_states:         HashMap<Keycode, bool>,
+    audio:              SoundQueue,
 }
 
 
@@ -159,6 +161,8 @@ impl Window {
         let texture_background = BufferedTexture::new(&texture_creator, 256, 256)?;
         let texture_objects    = BufferedTexture::new(&texture_creator, 16*8, 24*8)?;
 
+        let audio = SoundQueue::create(&sdl)?;
+
         Ok(Window {
             display_scale,
             event_pump,
@@ -169,6 +173,7 @@ impl Window {
             state: State::Open,
             display_mode: DisplayMode::Game,
             key_states: HashMap::new(),
+            audio,
         })
     }
 
@@ -411,5 +416,11 @@ impl Window {
 
         // present the framebuffer
         self.canvas.present();
+    }
+
+
+    pub fn push_audio_samples(&mut self, samples: Vec<i16>) {
+        self.audio.push_audio_samples(samples);
+
     }
 }

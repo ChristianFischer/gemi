@@ -17,6 +17,7 @@
 
 extern crate core;
 
+mod sound_queue;
 mod window;
 
 use gbemu_core::cartridge::Cartridge;
@@ -79,6 +80,7 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
             window.poll_events();
             window.apply_key_states(&mut gb.input);
             window.present(gb.ppu.get_lcd(), &gb.ppu);
+            window.push_audio_samples(gb.apu.take_samples());
         }
 
         // handle frame times

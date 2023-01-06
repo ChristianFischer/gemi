@@ -16,19 +16,9 @@
  */
 
 pub mod apu;
-pub mod boot_rom;
-pub mod cartridge;
-pub mod cpu;
-pub mod gameboy;
-pub mod graphic_data;
-pub mod input;
-pub mod io_registers;
-pub mod mbc;
-pub mod memory;
-pub mod memory_data;
-pub mod opcode;
-pub mod opcodes;
-pub mod ppu;
-pub mod serial;
-pub mod timer;
-pub mod utils;
+pub mod channel;
+pub mod dac;
+pub mod generators;
+pub mod mixer;
+pub mod output_buffer;
+pub mod registers;

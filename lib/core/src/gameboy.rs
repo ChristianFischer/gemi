@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::apu::apu::Apu;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
 use crate::cpu::{Cpu, CpuFlag, RegisterR8};
@@ -96,6 +97,7 @@ pub struct GameBoy {
     device_config: DeviceConfig,
 
     pub cpu: Cpu,
+    pub apu: Apu,
     pub ppu: Ppu,
     pub mem: Memory,
     pub timer: Timer,
@@ -233,6 +235,7 @@ impl GameBoy {
                 device_config,
 
                 cpu: Cpu::new(mem.create_read_write_handle()),
+                apu: Apu::new(mem.create_read_write_handle()),
                 ppu: Ppu::new(device_config, mem.create_read_write_handle()),
                 timer: Timer::new(mem.create_read_write_handle()),
                 input: Input::new(mem.create_read_write_handle()),
@@ -518,6 +521,7 @@ impl GameBoy {
     /// Applies the time passed during CPU execution to other components as well.
     fn update_components(&mut self, cycles: Clock) {
         self.mem.update(cycles);
+        self.apu.update(cycles);
         self.cpu.update(cycles);
         self.timer.update(cycles);
         self.serial.update(cycles);
