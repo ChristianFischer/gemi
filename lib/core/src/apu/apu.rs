@@ -16,11 +16,12 @@
  */
 
 use crate::apu::channel::{Channel, ChannelType};
+use crate::apu::generators::noise::NoiseGenerator;
 use crate::apu::generators::pulse::{PulseGenerator, PulseSweepGenerator};
 use crate::apu::mixer::Mixer;
 use crate::apu::output_buffer::OutputBuffer;
 use crate::gameboy::Clock;
-use crate::memory::{MEMORY_LOCATION_APU_NR14, MEMORY_LOCATION_APU_NR24, MEMORY_LOCATION_APU_NR52, MemoryReadWriteHandle};
+use crate::memory::{MEMORY_LOCATION_APU_NR14, MEMORY_LOCATION_APU_NR24, MEMORY_LOCATION_APU_NR44, MEMORY_LOCATION_APU_NR52, MemoryReadWriteHandle};
 use crate::utils::get_bit;
 
 
@@ -51,7 +52,7 @@ pub struct Apu {
     ch1: Channel<PulseSweepGenerator>,
     ch2: Channel<PulseGenerator>,
     //ch3: Channel<WaveGenerator>,
-    //ch4: Channel<NoiseGenerator>,
+    ch4: Channel<NoiseGenerator>,
 
     /// The mixer used to mix the signals of each input channel into stereo output channels
     mixer: Mixer,
@@ -77,7 +78,7 @@ impl Apu {
             ch1: Channel::new(ChannelType::Ch1Pulse1, PulseSweepGenerator::new()),
             ch2: Channel::new(ChannelType::Ch2Pulse2, PulseGenerator::new()),
             //ch3: Channel::new(ChannelType::Ch3Wave,   WaveGenerator::new()),
-            //ch4: Channel::new(ChannelType::Ch4Noise,  NoiseGenerator::new()),
+            ch4: Channel::new(ChannelType::Ch4Noise,  NoiseGenerator::new()),
 
             mixer: Mixer::new(),
 
@@ -125,7 +126,7 @@ impl Apu {
         check_trigger_event!(MEMORY_LOCATION_APU_NR14, self.ch1);
         check_trigger_event!(MEMORY_LOCATION_APU_NR24, self.ch2);
         //check_trigger_event!(MEMORY_LOCATION_APU_NR34, self.ch3);
-        //check_trigger_event!(MEMORY_LOCATION_APU_NR44, self.ch4);
+        check_trigger_event!(MEMORY_LOCATION_APU_NR44, self.ch4);
     }
 
 
@@ -156,7 +157,7 @@ impl Apu {
             self.ch1.tick_sound_length(apu_registers);
             self.ch2.tick_sound_length(apu_registers);
             //self.ch3.tick_sound_length(apu_registers);
-            //self.ch4.tick_sound_length(apu_registers);
+            self.ch4.tick_sound_length(apu_registers);
         }
 
         // 128Hz -> CH1 freq sweep
@@ -164,7 +165,7 @@ impl Apu {
             self.ch1.tick_freq_sweep(apu_registers);
             self.ch2.tick_freq_sweep(apu_registers);
             //self.ch3.tick_freq_sweep(apu_registers);
-            //self.ch4.tick_freq_sweep(apu_registers);
+            self.ch4.tick_freq_sweep(apu_registers);
         }
 
         // 64Hz -> Envelope sweep
@@ -172,7 +173,7 @@ impl Apu {
             self.ch1.tick_envelope_sweep(apu_registers);
             self.ch2.tick_envelope_sweep(apu_registers);
             //self.ch3.tick_envelope_sweep(apu_registers);
-            //self.ch4.tick_envelope_sweep(apu_registers);
+            self.ch4.tick_envelope_sweep(apu_registers);
         }
     }
 
@@ -191,12 +192,12 @@ impl Apu {
             self.ch1.update(apu_registers, cycles_per_sample);
             self.ch2.update(apu_registers, cycles_per_sample);
             //self.ch3.update(apu_registers, cycles_per_sample);
-            //self.ch4.update(apu_registers, cycles_per_sample);
+            self.ch4.update(apu_registers, cycles_per_sample);
 
             self.mixer.put(&self.ch1);
             self.mixer.put(&self.ch2);
             //self.mixer.put(&self.ch3);
-            //self.mixer.put(&self.ch4);
+            self.mixer.put(&self.ch4);
 
             // mix all input values into left & right channels
             // according to their mixer settings
