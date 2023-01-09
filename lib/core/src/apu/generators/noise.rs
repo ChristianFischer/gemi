@@ -19,7 +19,7 @@ use std::cmp::min;
 use crate::apu::generators::envelope::Envelope;
 use crate::apu::generators::length_timer::LengthTimer;
 use crate::apu::generators::SoundGenerator;
-use crate::apu::registers::ApuChannelRegisters;
+use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
 
@@ -148,7 +148,7 @@ impl SoundGenerator for NoiseGenerator {
     }
 
 
-    fn get_sample(&self) -> u8 {
+    fn get_sample(&self, _registers: &ApuRegisters) -> u8 {
         if self.enabled {
             // take bit 0 to determine whether a tone is generated or not
             let amp    = (self.lfsr & 0x01) as u8;

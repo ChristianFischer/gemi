@@ -37,8 +37,15 @@ pub struct ApuRegisters {
     /// * Bit 0-3 reports which audio channel sound generator is enabled or not (read only)
     pub nr52: u8,
 
-    _unused_0x27: [u8; 25],
+    _unused_0x27: [u8; 9],
+
+    pub wave_ram: WaveRam,
 }
+
+
+/// An alias to a 16 byte array containing the wave RAM for channel 3.
+#[derive(Default)]
+pub struct WaveRam(pub [u8; 16]);
 
 
 /// Contains the registers for a single APU audio channel.

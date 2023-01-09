@@ -62,8 +62,8 @@ impl Mixer {
 
 
     /// Takes and stores the data from the given audio channel.
-    pub fn put<G : SoundGenerator>(&mut self, channel: &Channel<G>) {
-        let sample = channel.get_sample();
+    pub fn put<G : SoundGenerator>(&mut self, channel: &Channel<G>, registers: &ApuRegisters) {
+        let sample = channel.get_sample(registers);
 
         self.channels_in[channel.get_channel_ordinal() as usize].sample = sample;
     }

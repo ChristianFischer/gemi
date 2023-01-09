@@ -21,7 +21,7 @@ use crate::apu::generators::freq_sweep::{FrequencySweep, FrequencySweepResult};
 use crate::apu::generators::length_timer::LengthTimer;
 use crate::apu::generators::SoundGenerator;
 use crate::apu::generators::wave_duty::WaveDuty;
-use crate::apu::registers::ApuChannelRegisters;
+use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
 
 
@@ -140,7 +140,7 @@ impl SoundGenerator for PulseGenerator {
     }
 
 
-    fn get_sample(&self) -> u8 {
+    fn get_sample(&self, _registers: &ApuRegisters) -> u8 {
         let volume = self.envelope.get_current_volume();
         let wave = self.wave_duty.get_wave_at(self.wave_duty_step);
         wave * volume
@@ -198,7 +198,7 @@ impl SoundGenerator for PulseSweepGenerator {
         self.pulse_generator.is_dac_enabled()
     }
 
-    fn get_sample(&self) -> u8 {
-        self.pulse_generator.get_sample()
+    fn get_sample(&self, registers: &ApuRegisters) -> u8 {
+        self.pulse_generator.get_sample(registers)
     }
 }
