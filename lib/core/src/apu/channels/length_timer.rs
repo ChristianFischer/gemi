@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::apu::channels::channel::ChannelComponent;
 use crate::apu::registers::ApuChannelRegisters;
 use crate::utils::get_bit;
 
@@ -27,31 +28,20 @@ use crate::utils::get_bit;
 /// sound generator will be disabled. Initializing the timer with zero will NOT disable
 /// the sound generator.
 pub struct LengthTimer<const LENGTH_BITS: u8> {
+    /// Flag whether the length timer is enabled or not.
+    length_timer_enabled: bool,
+
     /// The current timer value.
     length_timer: u16,
 }
 
 
 impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
-    /// Initializes a new length timer from a channels registers.
-    pub fn from_registers(registers: &ApuChannelRegisters) -> Self {
-        let length = match LENGTH_BITS {
-            6 =>  64 - ((registers.nr1 & 0x3f) as u16),
-            8 => 256 - ((registers.nr1 & 0xff) as u16),
-            _ => unreachable!()
-        };
-
-        Self {
-            length_timer: length,
-        }
-    }
-
-
     /// Receives the periodic call from the frame sequencer.
     /// Decrease the timer on each tick. When the timer becomes zero during this operation,
     /// the channels sound generator will be disabled.
-    pub fn tick(&mut self, registers: &ApuChannelRegisters) -> bool {
-        if self.length_timer != 0 && get_bit(registers.nr4, 6) {
+    pub fn tick(&mut self) -> bool {
+        if self.length_timer != 0 && self.length_timer_enabled {
             self.length_timer = self.length_timer.saturating_sub(1);
 
             if self.length_timer == 0 {
@@ -64,9 +54,31 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
 }
 
 
+impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+        match number {
+            1 => {
+                self.length_timer = match LENGTH_BITS {
+                    6 =>  64 - ((registers.nr1 & 0x3f) as u16),
+                    8 => 256 - ((registers.nr1 & 0xff) as u16),
+                    _ => unreachable!()
+                };
+            }
+
+            4 => {
+                self.length_timer_enabled = get_bit(registers.nr4, 6);
+            }
+
+            _ => { }
+        }
+    }
+}
+
+
 impl<const LENGTH_BITS: u8> Default for LengthTimer<LENGTH_BITS> {
     fn default() -> Self {
         Self {
+            length_timer_enabled: false,
             length_timer: 0,
         }
     }

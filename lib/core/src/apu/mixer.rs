@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::channel::Channel;
-use crate::apu::generators::SoundGenerator;
+use crate::apu::channels::channel::Channel;
+use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::registers::ApuRegisters;
 use crate::utils::get_bit;
 
@@ -62,7 +62,7 @@ impl Mixer {
 
 
     /// Takes and stores the data from the given audio channel.
-    pub fn put<G : SoundGenerator>(&mut self, channel: &Channel<G>, registers: &ApuRegisters) {
+    pub fn put<G : SoundGenerator, const L:u8, const S:u8, const E:u8>(&mut self, channel: &Channel<G, L, S, E>, registers: &ApuRegisters) {
         let sample = channel.get_sample(registers);
 
         self.channels_in[channel.get_channel_ordinal() as usize].sample = sample;

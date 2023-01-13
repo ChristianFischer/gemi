@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::apu::channels::channel::ChannelComponent;
 use crate::apu::registers::ApuChannelRegisters;
 use crate::utils::get_bit;
 
@@ -69,25 +70,6 @@ impl Direction {
 
 
 impl Envelope {
-    /// Initializes a new envelope from a channels registers.
-    pub fn from_registers(registers: &ApuChannelRegisters) -> Self {
-        let volume        = (registers.nr2 >> 4) & 0x0f;
-        let period        = (registers.nr2 >> 0) & 0x07;
-        let direction_bit = get_bit(registers.nr2, 3);
-        let dac_enabled   = (registers.nr2 & 0xf8) != 0;
-        let enabled       = period != 0;
-
-        Self {
-            enabled,
-            dac_enabled,
-            volume,
-            period_length:  period,
-            period_timer:   period,
-            direction:      Direction::from_bit(direction_bit),
-        }
-    }
-
-
     /// Checks whether the channels DAC should be enabled.
     pub fn get_dac_enabled(&self) -> bool {
         self.dac_enabled
@@ -139,6 +121,34 @@ impl Envelope {
                 }
             }
         }
+    }
+}
+
+
+impl ChannelComponent for Envelope {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+        match number {
+            2 => {
+                let volume        = (registers.nr2 >> 4) & 0x0f;
+                let period        = (registers.nr2 >> 0) & 0x07;
+                let direction_bit = get_bit(registers.nr2, 3);
+                let dac_enabled   = (registers.nr2 & 0xf8) != 0;
+                let enabled       = period != 0;
+
+                self.enabled        = enabled;
+                self.dac_enabled    = dac_enabled;
+                self.volume         = volume;
+                self.period_length  = period;
+                self.direction      = Direction::from_bit(direction_bit);
+            }
+
+            _ => { }
+        }
+    }
+
+
+    fn on_trigger_event(&mut self) {
+        self.reload_envelope_timer();
     }
 }
 

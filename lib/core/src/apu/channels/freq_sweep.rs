@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::apu::channels::channel::ChannelComponent;
 use crate::apu::registers::ApuChannelRegisters;
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
@@ -75,23 +76,6 @@ impl Direction {
 
 
 impl FrequencySweep {
-    /// Initializes a new frequency sweep timer from a channels registers.
-    pub fn from_registers(registers: &ApuChannelRegisters) -> Self {
-        let period        = (registers.nr0 >> 4) & 0x07;
-        let shift         = (registers.nr0 >> 0) & 0x07;
-        let direction_bit = get_bit(registers.nr0, 3);
-        let enabled       = period != 0 || shift != 0;
-
-        Self {
-            enabled,
-            shift,
-            period_length:  period,
-            period_timer:   period,
-            direction:      Direction::from_bit(direction_bit),
-        }
-    }
-
-
     /// Reloads the timer once it reached zero.
     fn reload_timer(&mut self) {
         // if period length is zero, the value 8 is used instead
@@ -137,7 +121,7 @@ impl FrequencySweep {
     /// Receives the periodic call from the frame sequencer.
     /// When the timer elapsed, update the frequency and check for an overflow,
     /// deliver the result to the caller.
-    pub fn tick(&mut self, _registers: &ApuChannelRegisters, frequency: Clock) -> FrequencySweepResult {
+    pub fn tick(&mut self, frequency: Clock) -> FrequencySweepResult {
         self.period_timer = self.period_timer.saturating_sub(1);
 
         // when the timer elapses
@@ -152,6 +136,32 @@ impl FrequencySweep {
         }
 
         FrequencySweepResult::None
+    }
+}
+
+
+impl ChannelComponent for FrequencySweep {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+        match number {
+            0 => {
+                let period        = (registers.nr0 >> 4) & 0x07;
+                let shift         = (registers.nr0 >> 0) & 0x07;
+                let direction_bit = get_bit(registers.nr0, 3);
+                let enabled       = period != 0 || shift != 0;
+
+                self.enabled        = enabled;
+                self.shift          = shift;
+                self.period_length  = period;
+                self.direction      = Direction::from_bit(direction_bit);
+            }
+
+            _ => { }
+        }
+    }
+
+
+    fn on_trigger_event(&mut self) {
+        self.reload_timer();
     }
 }
 

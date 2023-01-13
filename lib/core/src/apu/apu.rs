@@ -15,18 +15,48 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::channel::{Channel, ChannelType};
-use crate::apu::generators::noise::NoiseGenerator;
-use crate::apu::generators::pulse::{PulseGenerator, PulseSweepGenerator};
-use crate::apu::generators::wave::WaveGenerator;
+use crate::apu::channels::channel::{Channel, ChannelType};
+use crate::apu::channels::channel::features::*;
+use crate::apu::channels::noise::NoiseGenerator;
+use crate::apu::channels::pulse::PulseGenerator;
+use crate::apu::channels::wave::WaveGenerator;
 use crate::apu::mixer::Mixer;
 use crate::apu::output_buffer::OutputBuffer;
 use crate::gameboy::Clock;
-use crate::memory::{MEMORY_LOCATION_APU_NR14, MEMORY_LOCATION_APU_NR24, MEMORY_LOCATION_APU_NR34, MEMORY_LOCATION_APU_NR44, MEMORY_LOCATION_APU_NR52, MemoryReadWriteHandle};
+use crate::memory::*;
 use crate::utils::get_bit;
 
 
 pub const APU_UPDATE_PERIOD : Clock = 8_192;
+
+
+type Channel1 = Channel<
+    PulseGenerator,
+    FEATURE_LENGTH_TIMER_6_BIT,
+    FEATURE_FREQUENCY_SWEEP_ENABLED,
+    FEATURE_VOLUME_ENVELOPE_ENABLED,
+>;
+
+type Channel2 = Channel<
+    PulseGenerator,
+    FEATURE_LENGTH_TIMER_6_BIT,
+    FEATURE_FREQUENCY_SWEEP_DISABLED,
+    FEATURE_VOLUME_ENVELOPE_ENABLED,
+>;
+
+type Channel3 = Channel<
+    WaveGenerator,
+    FEATURE_LENGTH_TIMER_8_BIT,
+    FEATURE_FREQUENCY_SWEEP_DISABLED,
+    FEATURE_VOLUME_ENVELOPE_DISABLED,
+>;
+
+type Channel4 = Channel<
+    NoiseGenerator,
+    FEATURE_LENGTH_TIMER_6_BIT,
+    FEATURE_FREQUENCY_SWEEP_DISABLED,
+    FEATURE_VOLUME_ENVELOPE_ENABLED,
+>;
 
 
 /// Represents the GameBoys Audio Processing Unit.
@@ -50,10 +80,10 @@ pub struct Apu {
     /// Frame Sequencer step
     fs_step: u8,
 
-    ch1: Channel<PulseSweepGenerator>,
-    ch2: Channel<PulseGenerator>,
-    ch3: Channel<WaveGenerator>,
-    ch4: Channel<NoiseGenerator>,
+    ch1: Channel1,
+    ch2: Channel2,
+    ch3: Channel3,
+    ch4: Channel4,
 
     /// The mixer used to mix the signals of each input channel into stereo output channels
     mixer: Mixer,
@@ -76,10 +106,10 @@ impl Apu {
             fs_clock: 0,
             fs_step: 0,
 
-            ch1: Channel::new(ChannelType::Ch1Pulse1, PulseSweepGenerator::new()),
-            ch2: Channel::new(ChannelType::Ch2Pulse2, PulseGenerator::new()),
-            ch3: Channel::new(ChannelType::Ch3Wave,   WaveGenerator::new()),
-            ch4: Channel::new(ChannelType::Ch4Noise,  NoiseGenerator::new()),
+            ch1: Channel::new(ChannelType::Ch1Pulse1),
+            ch2: Channel::new(ChannelType::Ch2Pulse2),
+            ch3: Channel::new(ChannelType::Ch3Wave),
+            ch4: Channel::new(ChannelType::Ch4Noise),
 
             mixer: Mixer::new(),
 
@@ -103,31 +133,56 @@ impl Apu {
         if self.apu_on {
             self.channels_clock += cycles;
 
-            self.check_trigger_events();
+            self.check_register_changes();
             self.update_frame_sequencer(cycles);
         }
     }
 
 
-    /// Checks for each channel whether it was triggered by it's control register
-    fn check_trigger_events(&mut self) {
-        macro_rules! check_trigger_event {
-            ($channel_control_register:expr, $channel:expr) => {
-                // Checks whether the channel was triggered by writing bit 7 into it's control register
-                if let Some(value) = self.mem.take_changed_io_register($channel_control_register) {
-                    let trigger = get_bit(value, 7);
+    /// Checks for each channel whether one of it's registers were changed
+    /// and additionally if it's trigger bit was set to trigger the channel on.
+    fn check_register_changes(&mut self) {
+        macro_rules! check_register_change {
+            ($register:expr, $channel:expr) => {
+                if let Some(value) = self.mem.take_changed_io_register($register) {
+                    let apu_registers = &(self.mem.get_io_registers().apu);
+                    let number = ($register - MEMORY_LOCATION_APU_NR10) % 5;
+                    $channel.fire_register_changed(number, apu_registers);
 
-                    if trigger {
-                        $channel.fire_trigger_event(&(self.mem.get_io_registers().apu));
+                    // additionally, for the control register, check for the trigger event as well,
+                    // so it does not need to be done in the channels themself
+                    if number == 4 {
+                        let trigger = get_bit(value, 7);
+
+                        if trigger {
+                            $channel.fire_trigger_event();
+                        }
                     }
                 }
             }
         }
 
-        check_trigger_event!(MEMORY_LOCATION_APU_NR14, self.ch1);
-        check_trigger_event!(MEMORY_LOCATION_APU_NR24, self.ch2);
-        check_trigger_event!(MEMORY_LOCATION_APU_NR34, self.ch3);
-        check_trigger_event!(MEMORY_LOCATION_APU_NR44, self.ch4);
+        check_register_change!(MEMORY_LOCATION_APU_NR10, self.ch1);
+        check_register_change!(MEMORY_LOCATION_APU_NR11, self.ch1);
+        check_register_change!(MEMORY_LOCATION_APU_NR12, self.ch1);
+        check_register_change!(MEMORY_LOCATION_APU_NR13, self.ch1);
+        check_register_change!(MEMORY_LOCATION_APU_NR14, self.ch1);
+
+        check_register_change!(MEMORY_LOCATION_APU_NR21, self.ch2);
+        check_register_change!(MEMORY_LOCATION_APU_NR22, self.ch2);
+        check_register_change!(MEMORY_LOCATION_APU_NR23, self.ch2);
+        check_register_change!(MEMORY_LOCATION_APU_NR24, self.ch2);
+
+        check_register_change!(MEMORY_LOCATION_APU_NR30, self.ch3);
+        check_register_change!(MEMORY_LOCATION_APU_NR31, self.ch3);
+        check_register_change!(MEMORY_LOCATION_APU_NR32, self.ch3);
+        check_register_change!(MEMORY_LOCATION_APU_NR33, self.ch3);
+        check_register_change!(MEMORY_LOCATION_APU_NR34, self.ch3);
+
+        check_register_change!(MEMORY_LOCATION_APU_NR41, self.ch4);
+        check_register_change!(MEMORY_LOCATION_APU_NR42, self.ch4);
+        check_register_change!(MEMORY_LOCATION_APU_NR43, self.ch4);
+        check_register_change!(MEMORY_LOCATION_APU_NR44, self.ch4);
     }
 
 
@@ -151,30 +206,28 @@ impl Apu {
         // generate all remaining audio data with the currently configured values.
         self.generate_audio();
 
-        let apu_registers = &(self.mem.get_io_registers().apu);
-
         // 256Hz -> Sound length
         if (self.fs_step & 0b0001) == 0 {
-            self.ch1.tick_sound_length(apu_registers);
-            self.ch2.tick_sound_length(apu_registers);
-            self.ch3.tick_sound_length(apu_registers);
-            self.ch4.tick_sound_length(apu_registers);
+            self.ch1.tick_length_timer();
+            self.ch2.tick_length_timer();
+            self.ch3.tick_length_timer();
+            self.ch4.tick_length_timer();
         }
 
         // 128Hz -> CH1 freq sweep
         if (self.fs_step & 0b0011) == 0 {
-            self.ch1.tick_freq_sweep(apu_registers);
-            self.ch2.tick_freq_sweep(apu_registers);
-            self.ch3.tick_freq_sweep(apu_registers);
-            self.ch4.tick_freq_sweep(apu_registers);
+            self.ch1.tick_freq_sweep();
+            self.ch2.tick_freq_sweep();
+            self.ch3.tick_freq_sweep();
+            self.ch4.tick_freq_sweep();
         }
 
         // 64Hz -> Envelope sweep
         if (self.fs_step & 0b0111) == 0 {
-            self.ch1.tick_envelope_sweep(apu_registers);
-            self.ch2.tick_envelope_sweep(apu_registers);
-            self.ch3.tick_envelope_sweep(apu_registers);
-            self.ch4.tick_envelope_sweep(apu_registers);
+            self.ch1.tick_envelope_sweep();
+            self.ch2.tick_envelope_sweep();
+            self.ch3.tick_envelope_sweep();
+            self.ch4.tick_envelope_sweep();
         }
     }
 
@@ -190,10 +243,10 @@ impl Apu {
         while self.channels_clock >= cycles_per_sample {
             self.channels_clock -= cycles_per_sample;
 
-            self.ch1.update(apu_registers, cycles_per_sample);
-            self.ch2.update(apu_registers, cycles_per_sample);
-            self.ch3.update(apu_registers, cycles_per_sample);
-            self.ch4.update(apu_registers, cycles_per_sample);
+            self.ch1.update(cycles_per_sample);
+            self.ch2.update(cycles_per_sample);
+            self.ch3.update(cycles_per_sample);
+            self.ch4.update(cycles_per_sample);
 
             self.mixer.put(&self.ch1, apu_registers);
             self.mixer.put(&self.ch2, apu_registers);

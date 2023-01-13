@@ -16,22 +16,16 @@
  */
 
 use std::cmp::min;
-use crate::apu::generators::length_timer::LengthTimer;
-use crate::apu::generators::SoundGenerator;
+use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
 
 
 pub struct WaveGenerator {
-    /// Stores whether the sound generator is enabled or not.
-    enabled: bool,
-
     /// Stores whether the DAC of this channel is enabled or not.
     dac_enabled: bool,
-
-    /// A length timer controlling how long the sound generator will run.
-    length_timer: LengthTimer<8>,
 
     /// The number of bits to shift the value of the sound sample to lower it's volume.
     volume_shift: u8,
@@ -52,9 +46,7 @@ pub struct WaveGenerator {
 impl WaveGenerator {
     pub fn new() -> Self {
         Self {
-            enabled: false,
-            dac_enabled: false,
-            length_timer: LengthTimer::default(),
+            dac_enabled: true,
 
             volume_shift: 0,
 
@@ -66,50 +58,60 @@ impl WaveGenerator {
 }
 
 
-impl SoundGenerator for WaveGenerator {
-    fn on_trigger_event(&mut self, registers: &ApuChannelRegisters) {
-        self.dac_enabled  = get_bit(registers.nr0, 7);
-        self.length_timer = LengthTimer::from_registers(registers);
+impl ChannelComponent for WaveGenerator {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+        match number {
+            0 => {
+                self.dac_enabled  = get_bit(registers.nr0, 7);
+            }
 
-        let output_level = (registers.nr2 >> 5) & 0x03;
-        self.volume_shift = match output_level {
-            0b00 => 4, // mute
-            0b01 => 0, // 100% (no change)
-            0b10 => 1, //  50%
-            0b11 => 2, //  25%
-            _ => unreachable!()
-        };
+            2 => {
+                let output_level = (registers.nr2 >> 5) & 0x03;
+                self.volume_shift = match output_level {
+                    0b00 => 4, // mute
+                    0b01 => 0, // 100% (no change)
+                    0b10 => 1, //  50%
+                    0b11 => 2, //  25%
+                    _ => unreachable!()
+                };
+            }
 
-        let wave_length_register_value = (registers.nr3 as Clock) | (((registers.nr4 as Clock) & 0x07) << 8);
-        let wave_length = (2048 - wave_length_register_value) * 4;
+            3 | 4 => {
+                let wave_length_register_value = (registers.nr3 as Clock) | (((registers.nr4 as Clock) & 0x07) << 8);
+                let wave_length = (2048 - wave_length_register_value) * 4;
 
-        self.wave_length = wave_length;
-        self.wave_timer  = wave_length;
+                self.wave_length = wave_length;
+                self.wave_timer  = wave_length;
+            }
 
-        self.enabled = true;
-    }
-
-
-    fn tick_sound_length(&mut self, registers: &ApuChannelRegisters) {
-        let expired = self.length_timer.tick(registers);
-
-        // when the timer expires, the generator will be disabled
-        if expired {
-            self.enabled = false;
+            _ => { }
         }
     }
 
 
-    fn tick_freq_sweep(&mut self, _registers: &ApuChannelRegisters) {
+    fn on_trigger_event(&mut self) {
+    }
+}
+
+
+impl SoundGenerator for WaveGenerator {
+    fn create() -> Self {
+        Self::new()
     }
 
 
-    fn tick_envelope_sweep(&mut self, _registers: &ApuChannelRegisters) {
+    fn get_frequency(&self) -> Clock {
+        self.wave_length
     }
 
 
-    fn update(&mut self, _registers: &ApuChannelRegisters, cycles: Clock) {
-        if self.enabled {
+    fn set_frequency(&mut self, frequency: Clock) {
+        self.wave_length = frequency;
+    }
+
+
+    fn update(&mut self, cycles: Clock) {
+        if self.wave_length != 0 {
             let mut remaining_cycles = cycles;
 
             while remaining_cycles > 0 {

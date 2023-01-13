@@ -15,9 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub mod apu;
-pub mod channels;
-pub mod dac;
-pub mod mixer;
-pub mod output_buffer;
-pub mod registers;
+pub mod channel;
+pub mod generator;
+pub mod noise;
+pub mod pulse;
+pub mod wave;
+
+mod envelope;
+mod freq_sweep;
+mod length_timer;
+mod wave_duty;

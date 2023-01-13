@@ -16,9 +16,8 @@
  */
 
 use std::cmp::min;
-use crate::apu::generators::envelope::Envelope;
-use crate::apu::generators::length_timer::LengthTimer;
-use crate::apu::generators::SoundGenerator;
+use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
@@ -28,19 +27,17 @@ use crate::utils::get_bit;
 /// This will generate a random sequence of 0 and 1, modified with the volume from
 /// the volume envelope function.
 pub struct NoiseGenerator {
-    enabled: bool,
-
-    /// A length timer controlling how long the sound generator will run.
-    length_timer: LengthTimer<6>,
-
-    /// An envelope function to provide the volume for the generated wave.
-    envelope: Envelope,
-
     /// A Linear Feedback Shift Register used to generate a random sequence of 0 an 1.
     lfsr: u16,
 
     /// Width of the LFSR in bits.
     lfsr_width: u16,
+
+    /// The base value of the frequencies divider value.
+    frequency_divider: Clock,
+
+    /// The number of bits to shift the base value left to get the actual divider.
+    frequency_shift: Clock,
 
     /// The time left until the next LFSR iteration.
     frequency_timer: Clock,
@@ -50,82 +47,87 @@ pub struct NoiseGenerator {
 impl NoiseGenerator {
     pub fn new() -> Self {
         Self {
-            enabled:            false,
-            envelope:           Envelope::default(),
-            length_timer:       LengthTimer::default(),
             lfsr:               0,
             lfsr_width:         15,
+            frequency_divider:  8,
+            frequency_shift:    0,
             frequency_timer:    0,
         }
     }
 
 
     /// Compute the time until next LFSR iteration.
-    pub fn compute_timer(&self, registers: &ApuChannelRegisters) -> Clock {
-        let shift        = (registers.nr3 >> 4) & 0x0f;
-        let divider_code = (registers.nr3 >> 0) & 0x07;
+    pub fn reset_timer(&mut self) {
+        // frequency is 4194304 / (divider << shift)
+        // so we compute the number of cycles until next value change
+        self.frequency_timer = self.frequency_divider << self.frequency_shift
+    }
+}
 
-        let divider = match divider_code {
-            0 => 8,
-            _ => (divider_code as Clock) << 4,
-        };
 
-        divider << shift
+impl ChannelComponent for NoiseGenerator {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+        match number {
+            3 => {
+                let shift        = (registers.nr3 >> 4) & 0x0f;
+                let divider_code = (registers.nr3 >> 0) & 0x07;
+
+                self.frequency_shift   = shift as Clock;
+                self.frequency_divider = match divider_code {
+                    0 => 8,
+                    _ => (divider_code as Clock) << 4,
+                };
+
+                // bit 3 determines the length of the LFSR, either 7 or 15 bits.
+                let lfsr_is_short = get_bit(registers.nr3, 3);
+                self.lfsr_width = match lfsr_is_short {
+                    false => 15,
+                    true  => 7,
+                };
+            }
+
+            _ => { }
+        }
+    }
+
+
+    fn on_trigger_event(&mut self) {
+        self.reset_timer();
+
+        // reset lfsr to zero
+        self.lfsr = 0;
     }
 }
 
 
 impl SoundGenerator for NoiseGenerator {
-    fn on_trigger_event(&mut self, registers: &ApuChannelRegisters) {
-        self.length_timer = LengthTimer::from_registers(registers);
-        self.envelope     = Envelope::from_registers(registers);
-
-        // bit 3 determines the length of the LFSR, either 7 or 15 bits.
-        let lfsr_is_short = get_bit(registers.nr3, 3);
-        self.lfsr_width = match lfsr_is_short {
-            false => 15,
-            true  => 7,
-        };
-
-        // reset lfsr to zero
-        self.lfsr = 0;
-
-        // channel is enabled when DAC is enabled as well
-        self.enabled = self.envelope.get_dac_enabled();
+    fn create() -> Self {
+        Self::new()
     }
 
 
-    fn tick_sound_length(&mut self, registers: &ApuChannelRegisters) {
-        let expired = self.length_timer.tick(registers);
-
-        // when the timer expires, the generator will be disabled
-        if expired {
-            self.enabled = false;
-        }
+    fn get_frequency(&self) -> Clock {
+        self.frequency_timer
     }
 
 
-    fn tick_freq_sweep(&mut self, _registers: &ApuChannelRegisters) {
+    fn set_frequency(&mut self, frequency: Clock) {
+        _ = frequency;
     }
 
 
-    fn tick_envelope_sweep(&mut self, _registers: &ApuChannelRegisters) {
-        self.envelope.tick();
-    }
-
-
-    fn update(&mut self, registers: &ApuChannelRegisters, cycles: Clock) {
+    fn update(&mut self, cycles: Clock) {
         let mut remaining_cycles = cycles;
 
         while remaining_cycles > 0 {
             let run_cycles = min(self.frequency_timer, remaining_cycles);
 
-            self.frequency_timer  = self.frequency_timer.saturating_sub(run_cycles);
+            self.frequency_timer = self.frequency_timer.saturating_sub(run_cycles);
 
             // when the timer expires
             if self.frequency_timer == 0 {
                 // timer will be restarted
-                self.frequency_timer = self.compute_timer(registers);
+                self.reset_timer();
 
                 // determine the new bit to insert by XOR of bit 0 and 1
                 let insert_bit = (self.lfsr ^ (self.lfsr >> 1) ^ 1) & 0x01;
@@ -143,21 +145,9 @@ impl SoundGenerator for NoiseGenerator {
     }
 
 
-    fn is_dac_enabled(&self) -> bool {
-        self.envelope.get_dac_enabled()
-    }
-
-
     fn get_sample(&self, _registers: &ApuRegisters) -> u8 {
-        if self.enabled {
-            // take bit 0 to determine whether a tone is generated or not
-            let amp    = (self.lfsr & 0x01) as u8;
-            let volume = self.envelope.get_current_volume();
-
-            amp * volume
-        }
-        else {
-            0
-        }
+        // take bit 0 to determine whether a tone is generated or not
+        let sample = (self.lfsr & 0x01) as u8;
+        sample
     }
 }
