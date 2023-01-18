@@ -15,7 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::apu::ApuState;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
 use crate::apu::registers::ApuChannelRegisters;
 use crate::utils::get_bit;
 
@@ -40,37 +41,61 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
     /// Receives the periodic call from the frame sequencer.
     /// Decrease the timer on each tick. When the timer becomes zero during this operation,
     /// the channels sound generator will be disabled.
-    pub fn tick(&mut self) -> bool {
+    pub fn tick(&mut self) -> TriggerAction {
         if self.length_timer != 0 && self.length_timer_enabled {
             self.length_timer = self.length_timer.saturating_sub(1);
 
             if self.length_timer == 0 {
-                return true;
+                return TriggerAction::DisableChannel;
             }
         }
 
-        false
+        TriggerAction::None
     }
 }
 
 
 impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
         match number {
             1 => {
-                self.length_timer = match LENGTH_BITS {
-                    6 =>  64 - ((registers.nr1 & 0x3f) as u16),
-                    8 => 256 - ((registers.nr1 & 0xff) as u16),
-                    _ => unreachable!()
-                };
+                let max  = 1 << LENGTH_BITS;
+                let mask = max - 1;
+
+                self.length_timer = max - ((registers.nr1 as u16) & mask);
             }
 
             4 => {
+                let was_enabled = self.length_timer_enabled;
+
                 self.length_timer_enabled = get_bit(registers.nr4, 6);
+
+                // extra clock in certain frame sequencer state if the timer got enabled
+                if
+                        !was_enabled
+                    &&  self.length_timer_enabled
+                    &&  self.length_timer != 0
+                    &&  (apu_state.fs_step & 1) != 0
+                {
+                    // this may also disable the channel
+                    return self.tick();
+                }
             }
 
             _ => { }
         }
+
+        default_on_register_changed(number, registers, apu_state)
+    }
+
+
+    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+        // length timer will be set to maximum, if zero when triggered
+        if self.length_timer == 0 {
+            self.length_timer = 1 << LENGTH_BITS;
+        }
+
+        default_on_trigger_event(apu_state)
     }
 }
 

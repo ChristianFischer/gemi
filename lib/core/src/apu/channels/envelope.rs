@@ -15,7 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::apu::ApuState;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
 use crate::apu::registers::ApuChannelRegisters;
 use crate::utils::get_bit;
 
@@ -39,10 +40,6 @@ pub struct Envelope {
     /// This is used to stop the timer once the volume reached it's minimum or maximum value
     /// and further calls wont have any effect.
     enabled: bool,
-
-    /// Stores whether the channel's DAC will be enabled or disabled.
-    /// The DAC is disabled when both the volume and direction bits or NRx2 are all zero.
-    dac_enabled: bool,
 
     /// The current volume used for sound generation.
     /// It will be initialized by the values of NRx2 and changed each time the period timer becomes zero.
@@ -70,12 +67,6 @@ impl Direction {
 
 
 impl Envelope {
-    /// Checks whether the channels DAC should be enabled.
-    pub fn get_dac_enabled(&self) -> bool {
-        self.dac_enabled
-    }
-
-
     /// Get the current volume.
     pub fn get_current_volume(&self) -> u8 {
         self.volume
@@ -126,7 +117,7 @@ impl Envelope {
 
 
 impl ChannelComponent for Envelope {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
         match number {
             2 => {
                 let volume        = (registers.nr2 >> 4) & 0x0f;
@@ -136,19 +127,29 @@ impl ChannelComponent for Envelope {
                 let enabled       = period != 0;
 
                 self.enabled        = enabled;
-                self.dac_enabled    = dac_enabled;
                 self.volume         = volume;
                 self.period_length  = period;
                 self.direction      = Direction::from_bit(direction_bit);
+
+                return if dac_enabled {
+                    TriggerAction::EnableDac
+                }
+                else {
+                    TriggerAction::DisableDac
+                };
             }
 
             _ => { }
         }
+
+        default_on_register_changed(number, registers, apu_state)
     }
 
 
-    fn on_trigger_event(&mut self) {
+    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         self.reload_envelope_timer();
+
+        default_on_trigger_event(apu_state)
     }
 }
 
@@ -156,12 +157,11 @@ impl ChannelComponent for Envelope {
 impl Default for Envelope {
     fn default() -> Self {
         Self {
-            enabled: false,
-            dac_enabled: false,
+            enabled:        false,
             volume:         0,
             period_length:  0,
             period_timer:   0,
-            direction: Direction::Decrement,
+            direction:      Direction::Decrement,
         }
     }
 }

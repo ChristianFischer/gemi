@@ -16,7 +16,8 @@
  */
 
 use std::cmp::min;
-use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::apu::ApuState;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed};
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_duty::WaveDuty;
 use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
@@ -55,7 +56,7 @@ impl PulseGenerator {
 
 
 impl ChannelComponent for PulseGenerator {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
         match number {
             1 => {
                 let wave_duty_index = (registers.nr1 >> 6) & 0x03;
@@ -72,10 +73,8 @@ impl ChannelComponent for PulseGenerator {
 
             _ => { }
         }
-    }
 
-
-    fn on_trigger_event(&mut self) {
+        default_on_register_changed(number, registers, apu_state)
     }
 }
 

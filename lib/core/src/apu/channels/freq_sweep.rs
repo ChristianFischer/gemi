@@ -15,7 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::apu::ApuState;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
 use crate::apu::registers::ApuChannelRegisters;
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
@@ -141,7 +142,7 @@ impl FrequencySweep {
 
 
 impl ChannelComponent for FrequencySweep {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
         match number {
             0 => {
                 let period        = (registers.nr0 >> 4) & 0x07;
@@ -157,11 +158,15 @@ impl ChannelComponent for FrequencySweep {
 
             _ => { }
         }
+
+        default_on_register_changed(number, registers, apu_state)
     }
 
 
-    fn on_trigger_event(&mut self) {
+    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         self.reload_timer();
+
+        default_on_trigger_event(apu_state)
     }
 }
 

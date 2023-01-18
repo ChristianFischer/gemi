@@ -16,7 +16,8 @@
  */
 
 use std::cmp::min;
-use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::apu::ApuState;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed};
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
@@ -59,10 +60,16 @@ impl WaveGenerator {
 
 
 impl ChannelComponent for WaveGenerator {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
         match number {
             0 => {
-                self.dac_enabled  = get_bit(registers.nr0, 7);
+                self.dac_enabled = get_bit(registers.nr0, 7);
+                return if self.dac_enabled {
+                    TriggerAction::EnableDac
+                }
+                else {
+                    TriggerAction::DisableDac
+                };
             }
 
             2 => {
@@ -86,10 +93,8 @@ impl ChannelComponent for WaveGenerator {
 
             _ => { }
         }
-    }
 
-
-    fn on_trigger_event(&mut self) {
+        default_on_register_changed(number, registers, apu_state)
     }
 }
 

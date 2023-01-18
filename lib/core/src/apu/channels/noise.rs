@@ -16,7 +16,8 @@
  */
 
 use std::cmp::min;
-use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::apu::ApuState;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
@@ -66,7 +67,7 @@ impl NoiseGenerator {
 
 
 impl ChannelComponent for NoiseGenerator {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
         match number {
             3 => {
                 let shift        = (registers.nr3 >> 4) & 0x0f;
@@ -88,14 +89,18 @@ impl ChannelComponent for NoiseGenerator {
 
             _ => { }
         }
+
+        default_on_register_changed(number, registers, apu_state)
     }
 
 
-    fn on_trigger_event(&mut self) {
+    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         self.reset_timer();
 
         // reset lfsr to zero
         self.lfsr = 0;
+
+        default_on_trigger_event(apu_state)
     }
 }
 

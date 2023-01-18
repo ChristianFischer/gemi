@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::channels::channel::{Channel, ChannelType};
+use crate::apu::channels::channel::{Channel, TriggerAction, TriggerActionSet, ChannelType};
 use crate::apu::channels::channel::features::*;
 use crate::apu::channels::noise::NoiseGenerator;
 use crate::apu::channels::pulse::PulseGenerator;
@@ -24,7 +24,7 @@ use crate::apu::mixer::Mixer;
 use crate::apu::output_buffer::OutputBuffer;
 use crate::gameboy::Clock;
 use crate::memory::*;
-use crate::utils::get_bit;
+use crate::utils::{get_bit, set_bit};
 
 
 pub const APU_UPDATE_PERIOD : Clock = 8_192;
@@ -59,6 +59,20 @@ type Channel4 = Channel<
 >;
 
 
+/// The current state of the APU.
+/// This includes the information, if the APU is enabled or not
+/// and information about the current frame sequencer state.
+pub struct ApuState {
+    pub apu_on: bool,
+
+    /// Frame Sequencer clock
+    pub fs_clock: Clock,
+
+    /// Frame Sequencer step
+    pub fs_step: u8,
+}
+
+
 /// Represents the GameBoys Audio Processing Unit.
 /// The APU contains various components
 /// * 4 Channels with each their distinct sound generator to create sound waves.
@@ -68,17 +82,12 @@ type Channel4 = Channel<
 pub struct Apu {
     mem: MemoryReadWriteHandle,
 
-    apu_on: bool,
-
     /// The number of cycles which have been passed since the last update
     /// on each channel.
     channels_clock: Clock,
 
-    /// Frame Sequencer clock
-    fs_clock: Clock,
-
-    /// Frame Sequencer step
-    fs_step: u8,
+    /// Information about the APUs current state.
+    state: ApuState,
 
     ch1: Channel1,
     ch2: Channel2,
@@ -99,12 +108,13 @@ impl Apu {
         Self {
             mem,
 
-            apu_on: true,
-
             channels_clock: 0,
 
-            fs_clock: 0,
-            fs_step: 0,
+            state: ApuState {
+                apu_on: true,
+                fs_clock: 0,
+                fs_step: 0,
+            },
 
             ch1: Channel::new(ChannelType::Ch1Pulse1),
             ch2: Channel::new(ChannelType::Ch2Pulse2),
@@ -123,14 +133,17 @@ impl Apu {
         if let Some(value) = self.mem.take_changed_io_register(MEMORY_LOCATION_APU_NR52) {
             let enabled = get_bit(value, 7);
 
-            if self.apu_on && !enabled {
+            if self.state.apu_on && !enabled {
                 self.reset();
             }
 
-            self.apu_on = enabled;
+            self.state.apu_on = enabled;
+
+            // update the NR52 register with correct values, after it has been written
+            self.update_apu_status_register();
         }
 
-        if self.apu_on {
+        if self.state.apu_on {
             self.channels_clock += cycles;
 
             self.check_register_changes();
@@ -142,12 +155,14 @@ impl Apu {
     /// Checks for each channel whether one of it's registers were changed
     /// and additionally if it's trigger bit was set to trigger the channel on.
     fn check_register_changes(&mut self) {
+        let mut results = TriggerActionSet::default();
+
         macro_rules! check_register_change {
             ($register:expr, $channel:expr) => {
                 if let Some(value) = self.mem.take_changed_io_register($register) {
                     let apu_registers = &(self.mem.get_io_registers().apu);
                     let number = ($register - MEMORY_LOCATION_APU_NR10) % 5;
-                    $channel.fire_register_changed(number, apu_registers);
+                    results |= $channel.fire_register_changed(number, apu_registers, &self.state);
 
                     // additionally, for the control register, check for the trigger event as well,
                     // so it does not need to be done in the channels themself
@@ -155,7 +170,7 @@ impl Apu {
                         let trigger = get_bit(value, 7);
 
                         if trigger {
-                            $channel.fire_trigger_event();
+                            results |= $channel.fire_trigger_event(&self.state);
                         }
                     }
                 }
@@ -183,16 +198,50 @@ impl Apu {
         check_register_change!(MEMORY_LOCATION_APU_NR42, self.ch4);
         check_register_change!(MEMORY_LOCATION_APU_NR43, self.ch4);
         check_register_change!(MEMORY_LOCATION_APU_NR44, self.ch4);
+
+        // if any register was written to, update the status register
+        // in case one of the channels was disabled
+        if results.contains(TriggerAction::DisableChannel) {
+            self.update_apu_status_register();
+        }
+    }
+
+
+    /// Updates NR52 with current channel enabled/disabled flags.
+    fn update_apu_status_register(&mut self) {
+        let mut nr52 = 0x00;
+
+        if self.state.apu_on {
+            nr52 = set_bit(nr52, 7);
+
+            if self.ch1.is_channel_enabled() {
+                nr52 = set_bit(nr52, 0);
+            }
+
+            if self.ch2.is_channel_enabled() {
+                nr52 = set_bit(nr52, 1);
+            }
+
+            if self.ch3.is_channel_enabled() {
+                nr52 = set_bit(nr52, 2);
+            }
+
+            if self.ch4.is_channel_enabled() {
+                nr52 = set_bit(nr52, 3);
+            }
+        }
+
+        self.mem.get_io_registers_mut().apu.nr52 = nr52;
     }
 
 
     /// Updates the frame sequencer with the time passed.
     /// This will periodically trigger some sound generator subcomponents.
     fn update_frame_sequencer(&mut self, cycles: Clock) {
-        self.fs_clock = self.fs_clock.wrapping_add(cycles);
+        self.state.fs_clock = self.state.fs_clock.wrapping_add(cycles);
 
-        while self.fs_clock >= APU_UPDATE_PERIOD {
-            self.fs_clock -= APU_UPDATE_PERIOD;
+        while self.state.fs_clock >= APU_UPDATE_PERIOD {
+            self.state.fs_clock -= APU_UPDATE_PERIOD;
             self.next_frame_sequencer_step();
         }
     }
@@ -200,22 +249,25 @@ impl Apu {
 
     /// Process the next step of the frame sequencer to trigger sound generator subcomponents.
     fn next_frame_sequencer_step(&mut self) {
-        self.fs_step = self.fs_step.wrapping_add(1);
+        self.state.fs_step = self.state.fs_step.wrapping_add(1);
 
         // before internal components of any sound generator may be changed,
         // generate all remaining audio data with the currently configured values.
         self.generate_audio();
 
         // 256Hz -> Sound length
-        if (self.fs_step & 0b0001) == 0 {
+        if (self.state.fs_step & 0b0001) == 0 {
             self.ch1.tick_length_timer();
             self.ch2.tick_length_timer();
             self.ch3.tick_length_timer();
             self.ch4.tick_length_timer();
+
+            // a channel may have been disabled, so update the status register
+            self.update_apu_status_register();
         }
 
         // 128Hz -> CH1 freq sweep
-        if (self.fs_step & 0b0011) == 0 {
+        if (self.state.fs_step & 0b0011) == 0 {
             self.ch1.tick_freq_sweep();
             self.ch2.tick_freq_sweep();
             self.ch3.tick_freq_sweep();
@@ -223,7 +275,7 @@ impl Apu {
         }
 
         // 64Hz -> Envelope sweep
-        if (self.fs_step & 0b0111) == 0 {
+        if (self.state.fs_step & 0b0111) == 0 {
             self.ch1.tick_envelope_sweep();
             self.ch2.tick_envelope_sweep();
             self.ch3.tick_envelope_sweep();

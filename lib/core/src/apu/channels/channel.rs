@@ -15,6 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use flagset::{flags, FlagSet};
+use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::features::{FEATURE_FREQUENCY_SWEEP_DISABLED, FEATURE_LENGTH_TIMER_DISABLED, FEATURE_VOLUME_ENVELOPE_DISABLED};
 use crate::apu::channels::envelope::Envelope;
 use crate::apu::channels::freq_sweep::{FrequencySweep, FrequencySweepResult};
@@ -46,20 +48,60 @@ pub enum ChannelType {
 }
 
 
+flags! {
+    /// An action to be performed as the result of a `on_trigger` or `on_register_changed`
+    /// invocation of a `ChannelComponent`.
+    pub enum TriggerAction : u8 {
+        /// No particular action to be done.
+        None,
+
+        /// The channels DAC should be enabled.
+        EnableDac,
+
+        /// The channels DAC should be disabled.
+        /// As a consequence, the channel itself will be disabled as well.
+        DisableDac,
+
+        /// The channel will be disabled.
+        /// This flag may be set indirectly after the DAC was disabled before.
+        DisableChannel,
+    }
+}
+
+/// A set of trigger actions returned by a trigger or register changed event.
+pub type TriggerActionSet = FlagSet<TriggerAction>;
+
+
 /// A trait for any component used inside an audio channel.
 /// This trait allows components to receive changes on their registers and to get notified
 /// when a channel was triggered by setting the trigger bit.
 pub trait ChannelComponent {
     /// Called when the value of a register was changed by writing on it.
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters) {
-        _ = (number, registers);
+    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+       default_on_register_changed(number, registers, apu_state)
     }
 
     /// Called when the channel was triggered by setting bit 7 of it's NRx4 register.
     /// This should start the channel to generate sound.
-    fn on_trigger_event(&mut self) {
+    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+        default_on_trigger_event(apu_state)
     }
 }
+
+
+/// Placeholder for `on_register_changed` implementations, which do not result in any special behaviour.
+pub fn default_on_register_changed(number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    _ = (number, registers, apu_state);
+    TriggerAction::None
+}
+
+
+/// Placeholder for `on_trigger_event` implementations, which do not result in any special behaviour.
+pub fn default_on_trigger_event(apu_state: &ApuState) -> TriggerAction {
+    _ = apu_state;
+    TriggerAction::None
+}
+
 
 
 /// Represents a single channel inside the GameBoy APU.
@@ -160,6 +202,12 @@ impl<
     }
 
 
+    /// Checks whether the current channel is enabled or not.
+    pub fn is_channel_enabled(&self) -> bool {
+        self.channel_enabled
+    }
+
+
     /// Get the sound generator of this channel.
     pub fn get_generator_mut(&mut self) -> &mut G {
         &mut self.generator
@@ -168,69 +216,93 @@ impl<
 
     /// Invokes a functor on each active component of this channel,
     /// including the generator component.
-    fn for_each_component<F>(&mut self, mut func: F)
-        where F : FnMut(&mut dyn ChannelComponent)
+    fn for_each_component<F, T>(&mut self, mut func: F) -> TriggerActionSet
+        where F : FnMut(&mut dyn ChannelComponent) -> T,
+              T : Into<FlagSet<TriggerAction>>
     {
+        let mut results: TriggerActionSet = Default::default();
+
         if Self::has_feature_length_timer() {
-            func(&mut self.length_timer);
+            results |= func(&mut self.length_timer);
         }
 
         if Self::has_feature_frequency_sweep() {
-            func(&mut self.freq_sweep);
+            results |= func(&mut self.freq_sweep);
         }
 
         if Self::has_feature_volume_envelope() {
-            func(&mut self.vol_envelope);
+            results |= func(&mut self.vol_envelope);
         }
 
-        func(&mut self.generator);
+        results |= func(&mut self.generator);
+
+        results
     }
 
 
-    /// Enables or disables the DAC depending on the channels current settings.
-    fn update_dac_enabled(&mut self) {
-        // check whether the generator would disable the DAC
-        let generator_dac_enabled = self.generator.is_dac_enabled();
+    /// Applies a set of actions delivered by a call to `on_trigger` or `on_register_changed`
+    /// events. A modified set of the actually applied results will be returned.
+    fn apply_actions(&mut self, actions: impl Into<TriggerActionSet>) -> TriggerActionSet {
+        // create a mutable clone of the initial set to store the actually applied actions
+        let mut actions_applied : TriggerActionSet = actions.into();
 
-        // on channels with an volume envelope, register NRx2 may also disable the DAC
-        let envelope_dac_enabled = if Self::has_feature_volume_envelope() {
-            self.vol_envelope.get_dac_enabled()
+        // enable DAC
+        if actions_applied.contains(TriggerAction::EnableDac) {
+            self.dac.set_enabled(true);
         }
-        else {
-            true
-        };
 
-        // enable or disable the DAC based on the current configuration
-        self.dac.set_enabled(generator_dac_enabled && envelope_dac_enabled);
+        // disable DAC
+        if actions_applied.contains(TriggerAction::DisableDac) {
+            self.dac.set_enabled(false);
+
+            // disabling DAC also disables the channel
+            actions_applied |= TriggerAction::DisableChannel;
+        }
+
+        // disable the channel
+        if actions_applied.contains(TriggerAction::DisableChannel) {
+            self.channel_enabled = false;
+        }
+
+        actions_applied
     }
 
 
     /// Fires the notification when a register of this channel was written to.
-    pub fn fire_register_changed(&mut self, number: u16, registers: &ApuRegisters) {
+    pub fn fire_register_changed(&mut self, number: u16, registers: &ApuRegisters, apu_state: &ApuState) -> TriggerActionSet {
         let channel_registers = &registers.channels[self.get_channel_ordinal() as usize];
-        self.for_each_component(|c| c.on_register_changed(number, channel_registers));
+        let actions = self.for_each_component(
+            |c| c.on_register_changed(number, channel_registers, apu_state)
+        );
+
+        // apply requested actions
+        let actions_applied = self.apply_actions(actions);
+
+        actions_applied
     }
 
 
     /// Fires the trigger event when the channel was triggered by writing NRx4 bit 7.
-    pub fn fire_trigger_event(&mut self) {
+    pub fn fire_trigger_event(&mut self, apu_state: &ApuState) -> TriggerActionSet {
         self.channel_enabled = true;
 
-        self.for_each_component(|c| c.on_trigger_event());
+        let actions = self.for_each_component(
+            |c| c.on_trigger_event(apu_state)
+        );
 
-        self.update_dac_enabled();
+        // apply requested actions
+        let actions_applied = self.apply_actions(actions);
+
+        actions_applied
     }
 
 
     /// Called by the frame sequencer to update the channels sound length timer.
     pub fn tick_length_timer(&mut self) {
         if Self::has_feature_length_timer() {
-            let expired = self.length_timer.tick();
+            let action = self.length_timer.tick();
 
-            // when the timer expires, the generator will be disabled
-            if expired {
-                self.channel_enabled = false;
-            }
+            self.apply_actions(action);
         }
     }
 
