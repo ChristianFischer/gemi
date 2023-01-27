@@ -16,7 +16,8 @@
  */
 
 use std::fmt::{Debug, Display, Formatter, LowerHex, UpperHex};
-use crate::memory::{MEMORY_LOCATION_OAM_BEGIN, MemoryRead};
+use crate::mmu::locations::MEMORY_LOCATION_OAM_BEGIN;
+use crate::mmu::memory::{Memory, MemoryRead};
 use crate::utils::get_bit;
 
 
@@ -341,13 +342,13 @@ impl Sprite {
     }
 
     /// Reads sprite data from it's OAM entry.
-    pub fn from_oam(mem: &dyn MemoryRead, index: u8) -> Sprite {
+    pub fn from_oam(mem: &Memory, index: u8) -> Sprite {
         let address = MEMORY_LOCATION_OAM_BEGIN + ((index as u16) * 4);
         Self::from_address(mem, address)
     }
 
     /// Reads sprite data from any memory address.
-    pub fn from_address(mem: &dyn MemoryRead, address: u16) -> Sprite {
+    pub fn from_address(mem: &Memory, address: u16) -> Sprite {
         Sprite {
             pos_y: mem.read_u8(address + 0),
             pos_x: mem.read_u8(address + 1),

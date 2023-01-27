@@ -17,10 +17,10 @@
 
 use std::fmt::{Display, Formatter};
 use crate::cartridge::Cartridge;
-use crate::mbc::mbc1::Mbc1;
-use crate::mbc::mbc2::Mbc2;
-use crate::mbc::mbc5::Mbc5;
-use crate::mbc::mbc_none::MbcNone;
+use crate::mmu::mbc::mbc1::Mbc1;
+use crate::mmu::mbc::mbc2::Mbc2;
+use crate::mmu::mbc::mbc5::Mbc5;
+use crate::mmu::mbc::mbc_none::MbcNone;
 
 /// Type of memory bank controller to be used
 pub enum MemoryBankController {
@@ -117,7 +117,7 @@ pub mod mbc_none {
 
 
 mod mbc1 {
-    use crate::memory_data::MemoryData;
+    use crate::mmu::memory_data::MemoryData;
     use super::*;
 
     /// Type 1 Memory Bank Controller:
@@ -333,7 +333,7 @@ mod mbc1 {
 
 
 mod mbc2 {
-    use crate::memory_data::{MemoryData, MemoryDataFixedSize};
+    use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
     use crate::utils::{get_bit, get_high};
     use super::*;
 
@@ -469,7 +469,7 @@ mod mbc2 {
 
 
 mod mbc5 {
-    use crate::memory_data::MemoryData;
+    use crate::mmu::memory_data::MemoryData;
     use super::*;
 
     /// Type 5 Memory Bank Controller:

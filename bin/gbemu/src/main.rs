@@ -77,10 +77,12 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
 
         // update window
         {
+            let peripherals = gb.get_peripherals_mut();
+
             window.poll_events();
-            window.apply_key_states(&mut gb.input);
-            window.present(gb.ppu.get_lcd(), &gb.ppu);
-            window.push_audio_samples(gb.apu.take_samples());
+            window.apply_key_states(&mut peripherals.input);
+            window.present(peripherals.ppu.get_lcd(), &peripherals.ppu);
+            window.push_audio_samples(peripherals.apu.take_samples());
         }
 
         // handle frame times
@@ -171,7 +173,7 @@ fn main() -> Result<(), String> {
     gb.initialize();
 
     // determine the title based on the cartridge available
-    let title = match &*gb.mem.get_cartridge() {
+    let title = match &*gb.get_peripherals().mem.get_cartridge() {
         Some(cartridge) => cartridge.get_title().to_string(),
         None => "GameBoy".to_string(),
     };
@@ -183,7 +185,7 @@ fn main() -> Result<(), String> {
     run(&mut window, &mut gb);
 
     // after running the cartridge, save it's on-chip-RAM, if any
-    gb.mem.save_cartridge_ram_if_any()
+    gb.get_peripherals().mem.save_cartridge_ram_if_any()
         .map_err(|e| e.to_string())
         ?
     ;

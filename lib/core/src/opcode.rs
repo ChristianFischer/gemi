@@ -17,7 +17,6 @@
 
 use std::fmt::{Display, Formatter};
 use crate::gameboy::{Clock, GameBoy};
-use crate::memory::{MemoryRead, MemoryReadOnlyHandle};
 
 type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> OpCodeResult;
 
@@ -46,6 +45,7 @@ macro_rules! opcode {
 }
 
 pub(crate) use opcode;
+use crate::mmu::memory::{Memory, MemoryRead};
 
 
 /// Data struct describing a single opcode.
@@ -120,7 +120,7 @@ pub struct Instruction {
     pub param_address: u16,
 
     /// The memory where to read the opcode from.
-    pub memory: MemoryReadOnlyHandle,
+    pub memory: Memory,
 }
 
 

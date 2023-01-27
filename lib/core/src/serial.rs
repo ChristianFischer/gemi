@@ -17,7 +17,8 @@
 
 use crate::cpu::Interrupt;
 use crate::gameboy::Clock;
-use crate::memory::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
+use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
+use crate::mmu::memory::{Memory, MemoryRead, MemoryWrite};
 
 
 const UPDATE_TIME_SERIAL_TRANSFER:      Clock = 4096;
@@ -36,7 +37,7 @@ pub struct SerialPort {
     clock: Clock,
 
     /// Access to the device memory.
-    mem: MemoryReadWriteHandle,
+    mem: Memory,
 
     /// A queue of all bytes sent by the device.
     output_queue: Vec<u8>,
@@ -48,7 +49,7 @@ pub struct SerialPort {
 
 impl SerialPort {
     /// Constructs a new instance of the SerialPort.
-    pub fn new(mem: MemoryReadWriteHandle) -> SerialPort {
+    pub fn new(mem: Memory) -> SerialPort {
         SerialPort {
             clock: 0,
             mem,
@@ -66,7 +67,7 @@ impl SerialPort {
             let transfer_enabled = self.mem.get_bit(MEMORY_LOCATION_SC, 7);
 
             if transfer_enabled {
-                let transfer_byte = self.mem.read_byte(MEMORY_LOCATION_SB);
+                let transfer_byte = self.mem.read_u8(MEMORY_LOCATION_SB);
 
                 // store the data only if the output queue is enabled
                 if self.output_queue_enabled {

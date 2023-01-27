@@ -145,7 +145,7 @@ pub fn create_comparison_pattern(expected_image: &RgbaImage, lcd_buffer: &LcdBuf
 pub fn compare_display_with_image(gb: &GameBoy, image_path: &str, color_mod: &LcdColorMod) {
     let image_res_path = get_test_file(image_path);
     let expected_image = load_image_from_file(&image_res_path);
-    let lcd_buffer     = gb.ppu.get_lcd();
+    let lcd_buffer     = gb.get_peripherals().ppu.get_lcd();
     let compare_image  = apply_color_mod(&lcd_buffer, &color_mod);
 
     // check if both images have the same size

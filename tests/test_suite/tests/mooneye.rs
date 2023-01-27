@@ -51,7 +51,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -78,7 +78,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -105,7 +105,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -132,7 +132,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -159,7 +159,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -186,7 +186,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -213,7 +213,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -244,7 +244,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -270,7 +270,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -302,7 +302,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -329,7 +329,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -361,7 +361,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -388,7 +388,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -415,7 +415,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -442,7 +442,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -469,7 +469,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -496,7 +496,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -523,7 +523,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -555,7 +555,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -582,7 +582,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -609,7 +609,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -636,7 +636,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -663,7 +663,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -690,7 +690,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -717,7 +717,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -744,7 +744,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -771,7 +771,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -798,7 +798,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -825,7 +825,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -852,7 +852,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -879,7 +879,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -906,7 +906,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -933,7 +933,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -960,7 +960,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -987,7 +987,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1014,7 +1014,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1041,7 +1041,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1068,7 +1068,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1095,7 +1095,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1122,7 +1122,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1149,7 +1149,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1176,7 +1176,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1203,7 +1203,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1230,7 +1230,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1257,7 +1257,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1284,7 +1284,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1311,7 +1311,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1343,7 +1343,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1374,7 +1374,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1400,7 +1400,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1426,7 +1426,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1452,7 +1452,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1478,7 +1478,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1504,7 +1504,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1530,7 +1530,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1556,7 +1556,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1582,7 +1582,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1608,7 +1608,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1634,7 +1634,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1660,7 +1660,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1686,7 +1686,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1712,7 +1712,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1738,7 +1738,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1764,7 +1764,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1790,7 +1790,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1816,7 +1816,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1842,7 +1842,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1868,7 +1868,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1894,7 +1894,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1920,7 +1920,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1946,7 +1946,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1972,7 +1972,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -1998,7 +1998,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2024,7 +2024,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2056,7 +2056,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2083,7 +2083,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2110,7 +2110,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2137,7 +2137,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2164,7 +2164,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2191,7 +2191,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2218,7 +2218,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2245,7 +2245,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2272,7 +2272,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2299,7 +2299,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2326,7 +2326,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2353,7 +2353,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2380,7 +2380,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2407,7 +2407,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2434,7 +2434,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2461,7 +2461,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2488,7 +2488,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2515,7 +2515,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2542,7 +2542,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2569,7 +2569,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2596,7 +2596,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2623,7 +2623,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2650,7 +2650,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2677,7 +2677,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2704,7 +2704,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2731,7 +2731,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2758,7 +2758,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2785,7 +2785,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2812,7 +2812,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2839,7 +2839,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2866,7 +2866,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2893,7 +2893,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2920,7 +2920,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2947,7 +2947,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -2974,7 +2974,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3001,7 +3001,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3028,7 +3028,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3055,7 +3055,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3082,7 +3082,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3109,7 +3109,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3136,7 +3136,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3163,7 +3163,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3190,7 +3190,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3217,7 +3217,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3244,7 +3244,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3271,7 +3271,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3298,7 +3298,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3325,7 +3325,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3352,7 +3352,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3379,7 +3379,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3406,7 +3406,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3433,7 +3433,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3460,7 +3460,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3487,7 +3487,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3514,7 +3514,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3541,7 +3541,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3568,7 +3568,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3595,7 +3595,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3622,7 +3622,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3649,7 +3649,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3676,7 +3676,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3703,7 +3703,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3730,7 +3730,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3757,7 +3757,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3784,7 +3784,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3811,7 +3811,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3838,7 +3838,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3865,7 +3865,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3892,7 +3892,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3919,7 +3919,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3946,7 +3946,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -3973,7 +3973,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4000,7 +4000,7 @@ mod acceptance {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4035,7 +4035,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4061,7 +4061,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4087,7 +4087,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4113,7 +4113,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4139,7 +4139,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4165,7 +4165,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4191,7 +4191,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4217,7 +4217,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4243,7 +4243,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4269,7 +4269,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4295,7 +4295,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4321,7 +4321,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4347,7 +4347,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4373,7 +4373,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4399,7 +4399,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4425,7 +4425,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4451,7 +4451,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4477,7 +4477,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4503,7 +4503,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4529,7 +4529,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4555,7 +4555,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4581,7 +4581,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4607,7 +4607,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4633,7 +4633,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4659,7 +4659,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4685,7 +4685,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4716,7 +4716,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4742,7 +4742,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4768,7 +4768,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4794,7 +4794,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4820,7 +4820,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4846,7 +4846,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4872,7 +4872,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4898,7 +4898,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4924,7 +4924,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4950,7 +4950,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -4976,7 +4976,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5002,7 +5002,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5028,7 +5028,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5054,7 +5054,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5085,7 +5085,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5111,7 +5111,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5137,7 +5137,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5163,7 +5163,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5189,7 +5189,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5215,7 +5215,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5241,7 +5241,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5267,7 +5267,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5293,7 +5293,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5319,7 +5319,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5345,7 +5345,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5371,7 +5371,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5397,7 +5397,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5423,7 +5423,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5449,7 +5449,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5475,7 +5475,7 @@ mod emulator_only {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5512,7 +5512,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5539,7 +5539,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5571,7 +5571,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5598,7 +5598,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5630,7 +5630,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5657,7 +5657,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5684,7 +5684,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }
@@ -5711,7 +5711,7 @@ mod misc {
 
             let mut gb = run_with_config(cfg);
 
-            let test_result_message = gb.serial.take_output();
+            let test_result_message = gb.get_peripherals_mut().serial.take_output();
             assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
             assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
         }

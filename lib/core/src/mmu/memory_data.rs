@@ -59,7 +59,7 @@ pub trait MemoryData {
 
 
 mod dynamic_size {
-    use crate::memory_data::MemoryData;
+    use crate::mmu::memory_data::MemoryData;
 
 
     /// A data object storing data of variable size.
@@ -103,7 +103,7 @@ mod dynamic_size {
 
 
 pub mod fixed_size {
-    use crate::memory_data::MemoryData;
+    use crate::mmu::memory_data::MemoryData;
 
 
     /// A data object storing data of fixed size.
@@ -151,7 +151,7 @@ pub mod mapped {
     use std::borrow::{Borrow, BorrowMut};
     use std::mem::size_of;
     use std::ptr::{slice_from_raw_parts, slice_from_raw_parts_mut};
-    use crate::memory_data::MemoryData;
+    use crate::mmu::memory_data::MemoryData;
 
 
     /// A memory data object storing data being represented by another data type like a struct.

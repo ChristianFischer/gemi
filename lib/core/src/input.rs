@@ -16,7 +16,8 @@
  */
 
 use crate::cpu::Interrupt;
-use crate::memory::{MEMORY_LOCATION_JOYP, MemoryReadWriteHandle};
+use crate::mmu::locations::MEMORY_LOCATION_JOYP;
+use crate::mmu::memory::Memory;
 use crate::utils::{change_bit, get_bit};
 
 
@@ -34,7 +35,7 @@ pub enum InputButton {
 
 
 pub struct Input {
-    mem: MemoryReadWriteHandle,
+    mem: Memory,
 
     /// Current state of each button.
     /// bit == 1 means pressed, bit == 0 means released
@@ -48,7 +49,7 @@ pub struct Input {
 
 impl Input {
     /// Creates a new Input object.
-    pub fn new(mem: MemoryReadWriteHandle) -> Input {
+    pub fn new(mem: Memory) -> Input {
         Input {
             mem,
             button_states:          0x00,

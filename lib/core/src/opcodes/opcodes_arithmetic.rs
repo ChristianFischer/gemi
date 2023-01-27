@@ -17,7 +17,6 @@
 
 use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
-use crate::memory::{MemoryRead, MemoryWrite};
 use crate::utils::{carrying_add_u16, carrying_add_u8, carrying_sub_u8};
 use crate::opcode::{opcode, OpCodeContext, OpCodeResult};
 
@@ -82,7 +81,7 @@ pub mod inc {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -92,7 +91,7 @@ pub mod inc {
                 let address = gb.cpu.get_r16(r16_ptr);
                 let value   = gb.cpu.get_intermediate_value();
                 let result  = increment_u8v(gb, value);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             }
@@ -172,7 +171,7 @@ pub mod dec {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -182,7 +181,7 @@ pub mod dec {
                 let address = gb.cpu.get_r16(r16_ptr);
                 let value = gb.cpu.get_intermediate_value();
                 let result  = decrement_u8v(gb, value);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             },
@@ -255,7 +254,7 @@ pub mod add {
     /// dst <- dst + (src_ptr) + (carry flag, if add_carry)
     fn add_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16, add_carry: bool) {
         let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.mem.read_u8(address);
+        let value   = gb.get_mmu().read_u8(address);
         add_r8_u8v(gb, dst, value, add_carry);
     }
 
@@ -347,7 +346,7 @@ pub mod sub {
     /// dst <- dst - (src_ptr) - (carry flag, if sub_carry)
     fn sub_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16, sub_carry: bool) {
         let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.mem.read_u8(address);
+        let value   = gb.get_mmu().read_u8(address);
         sub_r8_u8v(gb, dst, value, sub_carry);
     }
 
@@ -417,7 +416,7 @@ pub mod rl {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -427,7 +426,7 @@ pub mod rl {
                 let address = gb.cpu.get_r16(r16ptr);
                 let value   = gb.cpu.get_intermediate_value();
                 let result  = shift_left_u8v(gb, value, op);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             }
@@ -558,7 +557,7 @@ pub mod rr {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -568,7 +567,7 @@ pub mod rr {
                 let address = gb.cpu.get_r16(r16ptr);
                 let value   = gb.cpu.get_intermediate_value();
                 let result  = shift_right_u8v(gb, value, op);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             }
@@ -710,7 +709,7 @@ pub mod swap {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -720,7 +719,7 @@ pub mod swap {
                 let address = gb.cpu.get_r16(r16_ptr);
                 let value   = gb.cpu.get_intermediate_value();
                 let result  = swap_nibbles_u8v(gb, value);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             }
@@ -768,7 +767,7 @@ pub mod set_bit {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -778,7 +777,7 @@ pub mod set_bit {
                 let address = gb.cpu.get_r16(r16_ptr);
                 let value   = gb.cpu.get_intermediate_value();
                 let result  = set_bit_u8v(gb, value, bit);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             }
@@ -888,7 +887,7 @@ pub mod res_bit {
         match ctx.get_stage() {
             0 => {
                 let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.mem.read_u8(address);
+                let value   = gb.get_mmu().read_u8(address);
                 gb.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
@@ -898,7 +897,7 @@ pub mod res_bit {
                 let address = gb.cpu.get_r16(r16_ptr);
                 let value   = gb.cpu.get_intermediate_value();
                 let result  = res_bit_u8v(gb, value, bit);
-                gb.mem.write_u8(address, result);
+                gb.get_mmu_mut().write_u8(address, result);
 
                 OpCodeResult::Done
             }
@@ -1007,7 +1006,7 @@ pub mod chk_bit {
     /// Set the Zero flag, if the bit was 0.
     fn check_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
         let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.mem.read_u8(address);
+        let value   = gb.get_mmu().read_u8(address);
         check_bit_u8v(gb, value, bit);
     }
 
@@ -1121,7 +1120,7 @@ pub mod cp {
     fn cp_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
         let value1  = gb.cpu.get_r8(dst);
         let address = gb.cpu.get_r16(src_ptr);
-        let value2  = gb.mem.read_u8(address);
+        let value2  = gb.get_mmu().read_u8(address);
         cp_u8v_u8v(gb, value1, value2);
     }
 
@@ -1172,7 +1171,7 @@ pub mod and {
     /// dst <- dst & (src_ptr)
     fn and_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
         let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.mem.read_u8(address);
+        let value   = gb.get_mmu().read_u8(address);
         and_r8_u8v(gb, dst, value);
     }
 
@@ -1223,7 +1222,7 @@ pub mod or {
     /// dst <- dst | (src_ptr)
     fn or_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
         let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.mem.read_u8(address);
+        let value   = gb.get_mmu().read_u8(address);
         or_r8_u8v(gb, dst, value);
     }
 
@@ -1267,7 +1266,7 @@ pub mod xor {
     /// dst <- dst ^ (src_ptr)
     fn xor_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
         let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.mem.read_u8(address);
+        let value   = gb.get_mmu().read_u8(address);
         xor_r8_u8v(gb, dst, value);
     }
 

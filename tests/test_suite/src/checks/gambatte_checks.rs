@@ -207,7 +207,7 @@ const GAMBATTE_DIGIT_BITMAPS : BitmapDigitTable = [
 pub fn check_gambatte_display_code(gb: &GameBoy, display_code_expected: &str) {
     let length = display_code_expected.len();
 
-    match read_characters_from_display(gb.ppu.get_lcd(), length) {
+    match read_characters_from_display(gb.get_peripherals().ppu.get_lcd(), length) {
         Some(display_code_read) => {
             assert_eq!(display_code_expected, display_code_read);
         }

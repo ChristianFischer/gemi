@@ -20,7 +20,8 @@ use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
 use crate::cpu::{Cpu, CpuFlag, RegisterR8};
 use crate::input::Input;
-use crate::memory::{Memory, MemoryRead};
+use crate::mmu::memory::Memory;
+use crate::mmu::mmu::Mmu;
 use crate::opcode::{OpCodeContext, OpCodeResult};
 use crate::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
@@ -97,6 +98,11 @@ pub struct GameBoy {
     device_config: DeviceConfig,
 
     pub cpu: Cpu,
+}
+
+
+/// A set of components connected together via memory bus.
+pub struct Peripherals {
     pub apu: Apu,
     pub ppu: Ppu,
     pub mem: Memory,
@@ -207,12 +213,12 @@ impl Builder {
 
         // set boot ROM, if any
         if let Some(boot_rom) = self.boot_rom.take() {
-            gb.set_boot_rom(boot_rom);
+            gb.get_peripherals_mut().mem.set_boot_rom(boot_rom);
         }
 
         // insert cartridge, if any
         if let Some(cartridge) = self.cartridge.take() {
-            gb.insert_cart(cartridge);
+            gb.get_peripherals_mut().mem.set_cartridge(cartridge);
         }
 
         Ok(gb)
@@ -234,25 +240,20 @@ impl GameBoy {
             GameBoy {
                 device_config,
 
-                cpu: Cpu::new(mem.create_read_write_handle()),
-                apu: Apu::new(mem.create_read_write_handle()),
-                ppu: Ppu::new(device_config, mem.create_read_write_handle()),
-                timer: Timer::new(mem.create_read_write_handle()),
-                input: Input::new(mem.create_read_write_handle()),
-                serial: SerialPort::new(mem.create_read_write_handle()),
-                mem,
+                cpu: Cpu::new(
+                    Mmu::new(
+                        Peripherals {
+                            apu: Apu::new(mem.new_ref()),
+                            ppu: Ppu::new(device_config, mem.new_ref()),
+                            mem: mem.new_ref(),
+                            timer: Timer::new(mem.new_ref()),
+                            input: Input::new(mem.new_ref()),
+                            serial: SerialPort::new(mem.new_ref()),
+                        }
+                    )
+                )
             }
         )
-    }
-
-    /// Assign a boot rom to be executed on startup.
-    pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
-        self.mem.set_boot_rom(boot_rom);
-    }
-
-    /// Inserts a cartridge into the device and load ROM data into memory.
-    pub fn insert_cart(&mut self, cartridge: Cartridge) {
-        self.mem.set_cartridge(cartridge);
     }
 
     /// Get the configuration of the current GameBoy device.
@@ -262,7 +263,7 @@ impl GameBoy {
 
     /// Boot the device, initializing the Boot ROM program.
     pub fn initialize(&mut self) {
-        if self.mem.has_boot_rom() {
+        if self.get_peripherals().mem.has_boot_rom() {
             self.cpu.set_instruction_pointer(0x0000);
         }
         else {
@@ -277,7 +278,7 @@ impl GameBoy {
 
         // the title checksum is calculated on GBC and GBA in DMG compatibility mode
         // if licensee code is '1' in either old or new format
-        let title_checksum = if let Some(cartridge) = self.mem.get_cartridge().as_ref() {
+        let title_checksum = if let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() {
             match cartridge.get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
                     cartridge.compute_title_checksum()
@@ -292,7 +293,7 @@ impl GameBoy {
         };
 
         // read cartridge header checksum
-        let header_checksum = self.mem.read_u8(0x14d);
+        let header_checksum = self.get_mmu().read_u8(0x14d);
 
         // select initial values based on device type and emulation mode
         let (a, flag_z, flag_n, flag_h, flag_c, b, c, d, e, h, l) =
@@ -413,9 +414,33 @@ impl GameBoy {
             ];
 
             // apply selected values
-            self.mem.initialize_io_registers(io_reg_data);
-            self.timer.initialize_counter(timer_counter, tac);
+            self.get_peripherals_mut().mem.initialize_io_registers(io_reg_data);
+            self.get_peripherals_mut().timer.initialize_counter(timer_counter, tac);
         }
+    }
+
+
+    /// Get the device MMU.
+    pub fn get_mmu(&self) -> &Mmu {
+        self.cpu.get_mmu()
+    }
+
+
+    /// Get the device MMU.
+    pub fn get_mmu_mut(&mut self) -> &mut Mmu {
+        self.cpu.get_mmu_mut()
+    }
+
+
+    /// Get the device peripheral components.
+    pub fn get_peripherals(&self) -> &Peripherals {
+        self.get_mmu().get_peripherals()
+    }
+
+
+    /// Get the device peripheral components.
+    pub fn get_peripherals_mut(&mut self) -> &mut Peripherals {
+        self.get_mmu_mut().get_peripherals_mut()
     }
 
 
@@ -431,7 +456,7 @@ impl GameBoy {
             interval_cycles += cycles;
 
             // let the PPU run for the same amount of cycles
-            let ppu_state = self.ppu.update(cycles);
+            let ppu_state = self.get_peripherals_mut().ppu.update(cycles);
 
             // When a frame completed, it should be presented
             if let FrameState::FrameCompleted = ppu_state {
@@ -520,11 +545,11 @@ impl GameBoy {
 
     /// Applies the time passed during CPU execution to other components as well.
     fn update_components(&mut self, cycles: Clock) {
-        self.mem.update(cycles);
-        self.apu.update(cycles);
         self.cpu.update(cycles);
-        self.timer.update(cycles);
-        self.serial.update(cycles);
-        self.input.update();
+        self.get_mmu_mut().update(cycles);
+        self.get_peripherals_mut().apu.update(cycles);
+        self.get_peripherals_mut().timer.update(cycles);
+        self.get_peripherals_mut().serial.update(cycles);
+        self.get_peripherals_mut().input.update();
     }
 }

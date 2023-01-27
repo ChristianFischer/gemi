@@ -47,7 +47,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -77,7 +77,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -107,7 +107,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -137,7 +137,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -167,7 +167,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -197,7 +197,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -227,7 +227,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -257,7 +257,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -287,7 +287,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -317,7 +317,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -347,7 +347,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -377,7 +377,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -412,7 +412,7 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -450,7 +450,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -479,7 +479,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -508,7 +508,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -537,7 +537,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -566,7 +566,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -595,7 +595,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -624,7 +624,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -653,7 +653,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -682,7 +682,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -711,7 +711,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -740,7 +740,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -774,7 +774,7 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -813,7 +813,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -843,7 +843,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -873,7 +873,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -903,7 +903,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -933,7 +933,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -963,7 +963,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -993,7 +993,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1023,7 +1023,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1053,7 +1053,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1083,7 +1083,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1113,7 +1113,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1143,7 +1143,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1178,7 +1178,7 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1213,7 +1213,7 @@ mod instr_timing {
 
         let mut gb = run_with_config(cfg);
 
-        let output = gb.serial.take_output_as_text();
+        let output = gb.get_peripherals_mut().serial.take_output_as_text();
         match output.trim().split('\n').into_iter().last() {
             Some("Passed all tests") => { }
             Some("Passed") => { }
@@ -1248,7 +1248,7 @@ mod interrupt_time {
 
         let mut gb = run_with_config(cfg);
 
-        let output = gb.serial.take_output_as_text();
+        let output = gb.get_peripherals_mut().serial.take_output_as_text();
         match output.trim().split('\n').into_iter().last() {
             Some("Passed all tests") => { }
             Some("Passed") => { }
@@ -1285,7 +1285,7 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1314,7 +1314,7 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1343,7 +1343,7 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1377,7 +1377,7 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1416,7 +1416,7 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1446,7 +1446,7 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1476,7 +1476,7 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1511,7 +1511,7 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1550,7 +1550,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1580,7 +1580,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1610,7 +1610,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1640,7 +1640,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1670,7 +1670,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1700,7 +1700,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1730,7 +1730,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1760,7 +1760,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1795,7 +1795,7 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.serial.take_output_as_text();
+            let output = gb.get_peripherals_mut().serial.take_output_as_text();
             match output.trim().split('\n').into_iter().last() {
                 Some("Passed all tests") => { }
                 Some("Passed") => { }
@@ -1831,7 +1831,7 @@ mod blargg_other {
 
         let mut gb = run_with_config(cfg);
 
-        let output = gb.serial.take_output_as_text();
+        let output = gb.get_peripherals_mut().serial.take_output_as_text();
         match output.trim().split('\n').into_iter().last() {
             Some("Passed all tests") => { }
             Some("Passed") => { }

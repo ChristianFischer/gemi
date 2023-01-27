@@ -19,7 +19,6 @@ use std::env;
 use gbemu_core::boot_rom::BootRom;
 use gbemu_core::cartridge::Cartridge;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
-use gbemu_core::memory::MemoryRead;
 use gbemu_core::utils::to_u8;
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 use crate::checks::check_display::compare_display_with_image;
@@ -98,12 +97,12 @@ pub fn create_device_with_config(setup: SetUpConfig) -> GameBoy {
 
     // enable serial data output queue
     if setup.enable_serial_output {
-        gb.serial.enable_output_queue(true);
+        gb.get_peripherals_mut().serial.enable_output_queue(true);
     }
 
     // set the color palette for DMG emulation
     if let Some(palette) = setup.dmg_display_palette {
-        gb.ppu.set_dmg_display_palette(palette);
+        gb.get_peripherals_mut().ppu.set_dmg_display_palette(palette);
     }
 
     gb
@@ -187,7 +186,7 @@ fn check_for_opcode_sequence(gb: &GameBoy, address: u16, sequence: &[u8]) -> boo
         let i_addr = address + (i as u16);
 
         let byte_expected = sequence[i];
-        let byte_read     = gb.mem.read_u8(i_addr);
+        let byte_read     = gb.get_mmu().read_u8(i_addr);
 
         if byte_read != byte_expected {
             return false;

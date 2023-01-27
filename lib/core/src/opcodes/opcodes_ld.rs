@@ -17,7 +17,6 @@
 
 use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
-use crate::memory::{MemoryRead, MemoryWrite};
 use crate::opcode::{opcode, OpCodeContext};
 use crate::utils::signed_overflow_add_u16;
 
@@ -36,22 +35,22 @@ fn ld_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
 /// Loads the content of a 8bit register into the device memory.
 fn ld_addr_r8(gb: &mut GameBoy, dst_address: u16, src: RegisterR8) {
     let value = gb.cpu.get_r8(src);
-    gb.mem.write_u8(dst_address, value);
+    gb.get_mmu_mut().write_u8(dst_address, value);
 }
 
 /// Writes a 8bit value to a given address in the device memory.
 fn ld_addr_u8(gb: &mut GameBoy, dst_address: u16, value: u8) {
-    gb.mem.write_u8(dst_address, value);
+    gb.get_mmu_mut().write_u8(dst_address, value);
 }
 
 /// Writes a 8bit value to a given address in the device memory.
 fn ld_addr_u16(gb: &mut GameBoy, dst_address: u16, value: u16) {
-    gb.mem.write_u16(dst_address, value);
+    gb.get_mmu_mut().write_u16(dst_address, value);
 }
 
 /// Loads the value on a given address into a 8bit register.
 fn ld_r8_addr(gb: &mut GameBoy, dst: RegisterR8, src_address: u16) {
-    let value = gb.mem.read_u8(src_address);
+    let value = gb.get_mmu().read_u8(src_address);
     gb.cpu.set_r8(dst, value);
 }
 
@@ -106,14 +105,14 @@ fn ldh_u8_r8(gb: &mut GameBoy, src: RegisterR8) {
     let value     = gb.cpu.get_r8(src);
     let address_h = gb.cpu.fetch_u8();
     let address   = 0xff00 | (address_h as u16);
-    gb.mem.write_u8(address, value);
+    gb.get_mmu_mut().write_u8(address, value);
 }
 
 /// Loads a value from the device memory at the address (0xff00 + u8) into a 8bit register.
 fn ldh_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
     let address_h = gb.cpu.fetch_u8();
     let address   = 0xff00 | (address_h as u16);
-    let value     = gb.mem.read_u8(address);
+    let value     = gb.get_mmu().read_u8(address);
     gb.cpu.set_r8(dst, value);
 }
 
@@ -122,14 +121,14 @@ fn ldh_r8ptr_r8(gb: &mut GameBoy, dst_ptr: RegisterR8, src: RegisterR8) {
     let address_h = gb.cpu.get_r8(dst_ptr);
     let address   = 0xff00 | (address_h as u16);
     let value     = gb.cpu.get_r8(src);
-    gb.mem.write_u8(address, value);
+    gb.get_mmu_mut().write_u8(address, value);
 }
 
 /// Loads a value from the device memory at the address (0xff00 + r8) into a 8bit register.
 fn ldh_r8_r8ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR8) {
     let address_h = gb.cpu.get_r8(src_ptr);
     let address   = 0xff00 | (address_h as u16);
-    let value     = gb.mem.read_u8(address);
+    let value     = gb.get_mmu().read_u8(address);
     gb.cpu.set_r8(dst, value);
 }
 

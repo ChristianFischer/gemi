@@ -29,7 +29,7 @@ const MOONEYE_RESULT_SEQ_FAIL : &[u8] = &[0x42, 0x42, 0x42, 0x42, 0x42, 0x42];
 
 "#;
 
-const MOONEYE_TEST_ADDITIONA_CHECKS : &str = /* language=rust */ r#"    let test_result_message = gb.serial.take_output();
+const MOONEYE_TEST_ADDITIONA_CHECKS : &str = /* language=rust */ r#"    let test_result_message = gb.get_peripherals_mut().serial.take_output();
     assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
     assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
 "#;

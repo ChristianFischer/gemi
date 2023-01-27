@@ -16,99 +16,22 @@
  */
 
 use std::cell::{Ref, RefCell, RefMut};
-use std::cmp::{max, min};
+use std::cmp::max;
 use std::io;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::cpu::Interrupt;
-use crate::memory_data::{MemoryData, MemoryDataFixedSize};
-use crate::gameboy::{Clock, DeviceConfig, EmulationType};
+use crate::gameboy::{DeviceConfig, EmulationType};
 use crate::graphic_data::GbcPaletteData;
-use crate::io_registers::IoRegister;
-use crate::mbc::{create_mbc, Mbc};
-use crate::mbc::mbc_none::MbcNone;
-use crate::memory_data::mapped::MemoryDataMapped;
+use crate::mmu::io_registers::IoRegister;
+use crate::mmu::locations::*;
+use crate::mmu::mbc::{create_mbc, Mbc};
+use crate::mmu::mbc::mbc_none::MbcNone;
+use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
+use crate::mmu::memory_data::mapped::MemoryDataMapped;
+use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
-
-pub const MEMORY_LOCATION_VRAM_BEGIN:               u16 = 0x8000;
-pub const MEMORY_LOCATION_SPRITES_BEGIN:            u16 = 0x8000;
-pub const MEMORY_LOCATION_BACKGROUND_MAP_BEGIN:     u16 = 0x9800;
-pub const MEMORY_LOCATION_WRAM_BANK_0_BEGIN:        u16 = 0xc000;
-pub const MEMORY_LOCATION_WRAM_BANK_1_BEGIN:        u16 = 0xc000;
-pub const MEMORY_LOCATION_OAM_BEGIN:                u16 = 0xfe00;
-pub const MEMORY_LOCATION_OAM_END:                  u16 = 0xfe9f;
-pub const MEMORY_LOCATION_JOYP:                     u16 = 0xff00;
-pub const MEMORY_LOCATION_SB:                       u16 = 0xff01;
-pub const MEMORY_LOCATION_SC:                       u16 = 0xff02;
-pub const MEMORY_LOCATION_REGISTER_DIV:             u16 = 0xff04;
-pub const MEMORY_LOCATION_REGISTER_TIMA:            u16 = 0xff05;
-pub const MEMORY_LOCATION_REGISTER_TMA:             u16 = 0xff06;
-pub const MEMORY_LOCATION_REGISTER_TAC:             u16 = 0xff07;
-pub const MEMORY_LOCATION_APU_NR10:                 u16 = 0xff10;
-pub const MEMORY_LOCATION_APU_NR11:                 u16 = 0xff11;
-pub const MEMORY_LOCATION_APU_NR12:                 u16 = 0xff12;
-pub const MEMORY_LOCATION_APU_NR13:                 u16 = 0xff13;
-pub const MEMORY_LOCATION_APU_NR14:                 u16 = 0xff14;
-pub const MEMORY_LOCATION_APU_NR21:                 u16 = 0xff16;
-pub const MEMORY_LOCATION_APU_NR22:                 u16 = 0xff17;
-pub const MEMORY_LOCATION_APU_NR23:                 u16 = 0xff18;
-pub const MEMORY_LOCATION_APU_NR24:                 u16 = 0xff19;
-pub const MEMORY_LOCATION_APU_NR30:                 u16 = 0xff1a;
-pub const MEMORY_LOCATION_APU_NR31:                 u16 = 0xff1b;
-pub const MEMORY_LOCATION_APU_NR32:                 u16 = 0xff1c;
-pub const MEMORY_LOCATION_APU_NR33:                 u16 = 0xff1d;
-pub const MEMORY_LOCATION_APU_NR34:                 u16 = 0xff1e;
-pub const MEMORY_LOCATION_APU_NR41:                 u16 = 0xff20;
-pub const MEMORY_LOCATION_APU_NR42:                 u16 = 0xff21;
-pub const MEMORY_LOCATION_APU_NR43:                 u16 = 0xff22;
-pub const MEMORY_LOCATION_APU_NR44:                 u16 = 0xff23;
-pub const MEMORY_LOCATION_APU_NR50:                 u16 = 0xff24;
-pub const MEMORY_LOCATION_APU_NR51:                 u16 = 0xff25;
-pub const MEMORY_LOCATION_APU_NR52:                 u16 = 0xff26;
-pub const MEMORY_LOCATION_LCD_CONTROL:              u16 = 0xff40;
-pub const MEMORY_LOCATION_LCD_STATUS:               u16 = 0xff41;
-pub const MEMORY_LOCATION_SCY:                      u16 = 0xff42;
-pub const MEMORY_LOCATION_SCX:                      u16 = 0xff43;
-pub const MEMORY_LOCATION_LY:                       u16 = 0xff44;
-pub const MEMORY_LOCATION_LYC:                      u16 = 0xff45;
-pub const MEMORY_LOCATION_DMA_ADDRESS:              u16 = 0xff46;
-pub const MEMORY_LOCATION_PALETTE_BG:               u16 = 0xff47;
-pub const MEMORY_LOCATION_PALETTE_OBP0:             u16 = 0xff48;
-pub const MEMORY_LOCATION_PALETTE_OBP1:             u16 = 0xff49;
-pub const MEMORY_LOCATION_WY:                       u16 = 0xff4a;
-pub const MEMORY_LOCATION_WX:                       u16 = 0xff4b;
-pub const MEMORY_LOCATION_VBK:                      u16 = 0xff4f;
-pub const MEMORY_LOCATION_BOOT_ROM_DISABLE:         u16 = 0xff50;
-pub const MEMORY_LOCATION_HDMA1:                    u16 = 0xff51;
-pub const MEMORY_LOCATION_HDMA2:                    u16 = 0xff52;
-pub const MEMORY_LOCATION_HDMA3:                    u16 = 0xff53;
-pub const MEMORY_LOCATION_HDMA4:                    u16 = 0xff54;
-pub const MEMORY_LOCATION_HDMA5:                    u16 = 0xff55;
-pub const MEMORY_LOCATION_BCPS:                     u16 = 0xff68;
-pub const MEMORY_LOCATION_BCPD:                     u16 = 0xff69;
-pub const MEMORY_LOCATION_OCPS:                     u16 = 0xff6a;
-pub const MEMORY_LOCATION_OCPD:                     u16 = 0xff6b;
-pub const MEMORY_LOCATION_OPRI:                     u16 = 0xff6c;
-pub const MEMORY_LOCATION_SVBK:                     u16 = 0xff70;
-pub const MEMORY_LOCATION_INTERRUPTS_FLAGGED:       u16 = 0xff0f;
-pub const MEMORY_LOCATION_INTERRUPTS_ENABLED:       u16 = 0xffff;
-
-
-/// Helper macro to map memory addresses into their distinct areas.
-macro_rules! memory_map {
-    ($addr:expr => { $($from:literal $(..= $to:literal)? => [$($param:ident)?] $code:expr),+ }) => {
-        match $addr {
-            $(
-                $from $(..= $to)? => {
-                    $(let $param: usize = ($addr as usize) - ($from as usize);)?
-                    $code
-                }
-            )+
-        }
-    }
-}
-
 
 
 /// Stores the information of an active OAM DMA transfer
@@ -118,10 +41,10 @@ macro_rules! memory_map {
 /// 160 cycles to transfer for the transfer to be completed.
 pub struct DmaTransferInfo {
     /// The address where to start copying the memory from.
-    start_address: u16,
+    pub start_address: u16,
 
     /// The next byte to be copied.
-    next_byte: u16,
+    pub next_byte: u16,
 }
 
 
@@ -143,20 +66,6 @@ pub enum DmaTransferState {
 /// This object can be used to create additional handles which
 /// allow read and write access to the device memory.
 pub struct Memory {
-    internal: MemoryInternalRef,
-}
-
-/// A memory handle to provide readonly access to the device memory.
-/// This object can be created from an existing Memory object.
-#[derive(Clone)]
-pub struct MemoryReadOnlyHandle {
-    internal: MemoryInternalRef,
-}
-
-/// A memory handle to provide read/write access to the device memory.
-/// This object can be created from an existing Memory object.
-#[derive(Clone)]
-pub struct MemoryReadWriteHandle {
     internal: MemoryInternalRef,
 }
 
@@ -208,7 +117,6 @@ struct MemoryInternal {
     gbc_object_palette: GbcPaletteBank,
 
     mbc:        Box<dyn Mbc>,
-    dma:        DmaTransferState,
     boot_rom:   Option<BootRom>,
     cartridge:  Option<Cartridge>,
 }
@@ -337,11 +245,17 @@ impl Memory {
                     gbc_object_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
 
                     mbc:        Box::new(MbcNone::new()),
-                    dma:        DmaTransferState::Disabled,
                     boot_rom:   None,
                     cartridge:  None,
                 }
             )
+        }
+    }
+
+
+    pub fn new_ref(&self) -> Self {
+        Self {
+            internal: MemoryInternalRef::clone(&self.internal)
         }
     }
 
@@ -356,30 +270,6 @@ impl Memory {
         }
     }
 
-
-    /// Let the memory controller handle it's tasks.
-    /// 'cycles' gives the number of ticks passed since
-    /// the last call.
-    pub fn update(&mut self, cycles: Clock) {
-        self.internal.get_mut().handle_dma_transfer(cycles);
-    }
-
-
-    /// Creates a MemoryReadOnlyHandle from this Memory object.
-    /// This will be used to provide read/write access to the device memory.
-    pub fn create_readonly_handle(&self) -> MemoryReadOnlyHandle {
-        MemoryReadOnlyHandle {
-            internal: MemoryInternalRef::clone(&self.internal)
-        }
-    }
-
-    /// Creates a MemoryReadWriteHandle from this Memory object.
-    /// This will be used to provide read/write access to the device memory.
-    pub fn create_read_write_handle(&self) -> MemoryReadWriteHandle {
-        MemoryReadWriteHandle {
-            internal: MemoryInternalRef::clone(&self.internal)
-        }
-    }
 
     /// Checks whether a boot rom is active or not.
     pub fn has_boot_rom(&self) -> bool {
@@ -432,31 +322,17 @@ impl MemoryWrite for Memory {
     }
 }
 
-impl MemoryRead for MemoryReadOnlyHandle {
-    fn read_byte(&self, address: u16) -> u8 {
-        self.internal.get().read(address)
+impl MemoryBusConnection for Memory {
+    fn on_read(&self, address: u16) -> u8 {
+        self.read_byte(address)
+    }
+
+    fn on_write(&mut self, address: u16, value: u8) {
+        self.write_byte(address, value);
     }
 }
 
-impl MemoryRead for MemoryReadWriteHandle {
-    fn read_byte(&self, address: u16) -> u8 {
-        self.internal.get().read(address)
-    }
-}
-
-impl MemoryWrite for MemoryReadWriteHandle {
-    fn write_byte(&mut self, address: u16, value: u8) {
-        self.internal.get_mut().write(address, value);
-    }
-}
-
-impl MemoryReadWriteHandle {
-    pub fn clone_readonly(&self) -> MemoryReadOnlyHandle {
-        MemoryReadOnlyHandle {
-            internal: self.internal.clone()
-        }
-    }
-
+impl Memory {
     /// Get the list of Work RAM banks on this device.
     /// DMG = 2 banks, GBC = 8 banks.
     pub fn get_wram_banks(&self) -> Ref<Vec<WRamBank>> {
@@ -469,6 +345,18 @@ impl MemoryReadWriteHandle {
     pub fn get_vram_banks(&self) -> Ref<Vec<VRamBank>> {
         let mem = self.internal.get();
         Ref::map(mem, |mem| &mem.vram_banks)
+    }
+
+    /// Get the OAM table.
+    pub fn get_oam(&self) -> Ref<OamRamBank> {
+        let mem = self.internal.get();
+        Ref::map(mem, |mem| &mem.oam)
+    }
+
+    /// Get the OAM table.
+    pub fn get_oam_mut(&mut self) -> RefMut<OamRamBank> {
+        let mem = self.internal.get_mut();
+        RefMut::map(mem, |mem| &mut mem.oam)
     }
 
     /// Get the color palette used by background tiles on GameBoy Color.
@@ -693,15 +581,6 @@ impl MemoryInternal {
     /// Writes data into IO registers
     fn on_io_registers_changed(&mut self, address: u16, _old_value: u8, value: u8) {
         match address {
-            MEMORY_LOCATION_DMA_ADDRESS => {
-                let start_address = (value as u16) << 8;
-
-                self.dma = DmaTransferState::Transferring(DmaTransferInfo {
-                    start_address,
-                    next_byte: 0,
-                });
-            },
-
             MEMORY_LOCATION_VBK => {
                 // on GBC: switch VRAM bank
                 if let EmulationType::GBC = self.device_config.emulation {
@@ -771,38 +650,6 @@ impl MemoryInternal {
             },
 
             _ => { }
-        }
-    }
-
-    /// Handles an OAM DMA transfer, if any active.
-    fn handle_dma_transfer(&mut self, cycles: Clock) {
-        match self.dma {
-            DmaTransferState::Disabled => {}
-
-            DmaTransferState::Transferring(ref transfer) => {
-                let oam_size       = MEMORY_LOCATION_OAM_END - MEMORY_LOCATION_OAM_BEGIN + 1;
-                let transfer_begin = transfer.next_byte;
-                let transfer_end   = min(transfer_begin.saturating_add(cycles as u16), oam_size);
-
-                // Copy the amount of data the memory controller was able to handle
-                for b in transfer_begin .. transfer_end {
-                    let src = transfer.start_address.saturating_add(b);
-                    let dst = b as usize;
-
-                    self.oam.set_at(dst, self.read(src));
-                }
-
-                // store the current state or set the transfer state to 'Disabled'
-                if transfer_end == oam_size {
-                    self.dma = DmaTransferState::Disabled;
-                }
-                else {
-                    self.dma = DmaTransferState::Transferring(DmaTransferInfo {
-                        start_address: transfer.start_address,
-                        next_byte:     transfer_end,
-                    });
-                }
-            }
         }
     }
 }

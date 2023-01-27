@@ -20,8 +20,8 @@ use std::fs::File;
 use std::io;
 use std::io::Read;
 use std::ops::{Add, Range};
-use crate::memory_data::{MemoryData, MemoryDataDynamic};
-use crate::mbc::MemoryBankController;
+use crate::mmu::mbc::MemoryBankController;
+use crate::mmu::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::utils::as_hex_digit;
 
 

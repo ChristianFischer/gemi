@@ -143,9 +143,9 @@ pub struct IoRegister {
 
 #[cfg(test)]
 mod tests {
-    use crate::memory::*;
-    use crate::memory_data::mapped::MemoryDataMapped;
-    use crate::memory_data::MemoryData;
+    use crate::mmu::locations::*;
+    use crate::mmu::memory_data::mapped::MemoryDataMapped;
+    use crate::mmu::memory_data::MemoryData;
     use super::*;
 
     macro_rules! test_ioreg_struct_elem {

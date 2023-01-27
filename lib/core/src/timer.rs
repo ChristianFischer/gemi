@@ -20,7 +20,8 @@ use std::fmt::{Display, Formatter};
 use std::ops::Sub;
 use crate::cpu::Interrupt;
 use crate::gameboy::Clock;
-use crate::memory::{MEMORY_LOCATION_REGISTER_DIV, MEMORY_LOCATION_REGISTER_TAC, MEMORY_LOCATION_REGISTER_TIMA, MemoryReadWriteHandle};
+use crate::mmu::locations::*;
+use crate::mmu::memory::Memory;
 use crate::utils::{get_bit, get_high};
 
 
@@ -83,7 +84,7 @@ enum TimaState {
 /// An object handling the gameboys internal timers,
 /// which are controlled by TIMA, TMA, TAC and DIV registers.
 pub struct Timer {
-    mem: MemoryReadWriteHandle,
+    mem: Memory,
 
     /// The internal counter used to trigger TIMA increments
     internal_counter: InternalCounter,
@@ -231,7 +232,7 @@ impl Display for InternalCounter {
 
 impl Timer {
     /// Creates an empty CPU object.
-    pub fn new(mem: MemoryReadWriteHandle) -> Timer {
+    pub fn new(mem: Memory) -> Timer {
         Timer {
             mem,
 

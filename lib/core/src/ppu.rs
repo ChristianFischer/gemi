@@ -19,9 +19,10 @@ use std::cmp::min;
 use crate::cpu::Interrupt;
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::graphic_data::{Color, DmgDisplayPalette, DmgLcdPixel, DmgPalette, GbcPaletteData, Sprite, SpritePixelValue, TileMap, TileSet};
-use crate::memory::*;
-use crate::memory_data::mapped::MemoryDataMapped;
-use crate::memory_data::MemoryData;
+use crate::mmu::locations::*;
+use crate::mmu::memory::{Memory, MemoryRead, MemoryWrite};
+use crate::mmu::memory_data::mapped::MemoryDataMapped;
+use crate::mmu::memory_data::MemoryData;
 use crate::utils::{change_bit, get_bit};
 
 pub const SCREEN_W: u32 = 160;
@@ -155,7 +156,7 @@ pub struct Ppu {
     device_config: DeviceConfig,
 
     /// Handle to read and write device memory.
-    mem: MemoryReadWriteHandle,
+    mem: Memory,
 
     /// The PPU's current mode.
     mode: Mode,
@@ -251,7 +252,7 @@ impl ScanlineData {
 
 impl Ppu {
     /// Creates a new PPU object.
-    pub fn new(device_config: DeviceConfig, mem: MemoryReadWriteHandle) -> Ppu {
+    pub fn new(device_config: DeviceConfig, mem: Memory) -> Ppu {
         Ppu {
             clock: 0,
             device_config,

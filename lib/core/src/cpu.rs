@@ -17,8 +17,10 @@
 
 use std::fmt::{Display, Formatter};
 use crate::gameboy::Clock;
+use crate::mmu::locations::*;
+use crate::mmu::memory::MemoryWrite;
+use crate::mmu::mmu::Mmu;
 use crate::opcode::{Instruction, OpCode};
-use crate::memory::{MEMORY_LOCATION_INTERRUPTS_FLAGGED, MEMORY_LOCATION_INTERRUPTS_ENABLED, MemoryRead, MemoryReadWriteHandle, MemoryWrite};
 use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
@@ -90,8 +92,8 @@ pub enum HaltState {
 
 /// An object representing the gameboy's CPU
 pub struct Cpu {
-    /// Handle to the device memory.
-    mem: MemoryReadWriteHandle,
+    /// Interface to the device memory.
+    mmu: Mmu,
 
     /// All CPU registers as 8 bit value each.
     /// To access 16 bit registers there is a set of functions.
@@ -235,9 +237,9 @@ impl HaltState {
 
 impl Cpu {
     /// Creates an empty CPU object.
-    pub fn new(mem: MemoryReadWriteHandle) -> Cpu {
+    pub fn new(mmu: Mmu) -> Cpu {
         Cpu {
-            mem,
+            mmu,
 
             registers: [0; 8],
 
@@ -288,7 +290,7 @@ impl Cpu {
                         self.ime = ImeState::Disabled;
 
                         // clear interrupt bit
-                        self.mem.clear_bit(MEMORY_LOCATION_INTERRUPTS_FLAGGED, interrupt.bit());
+                        self.mmu.get_peripherals_mut().mem.clear_bit(MEMORY_LOCATION_INTERRUPTS_FLAGGED, interrupt.bit());
 
                         // call the address of the interrupt
                         self.call_addr(interrupt.address());
@@ -327,8 +329,8 @@ impl Cpu {
 
     /// Get pending interrupts in form of an integer with each bit representing it's according interrupt.
     pub fn get_interrupts_pending(&self) -> u8 {
-        let interrupts_flagged = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_FLAGGED);
-        let interrupts_enabled = self.mem.read_u8(MEMORY_LOCATION_INTERRUPTS_ENABLED);
+        let interrupts_flagged = self.mmu.read_u8(MEMORY_LOCATION_INTERRUPTS_FLAGGED);
+        let interrupts_enabled = self.mmu.read_u8(MEMORY_LOCATION_INTERRUPTS_ENABLED);
         let interrupts_pending = interrupts_flagged & interrupts_enabled;
 
         interrupts_pending
@@ -380,6 +382,18 @@ impl Cpu {
         }
     }
 
+
+    /// Get access to the memory unit linked to the CPU.
+    pub fn get_mmu(&self) -> &Mmu {
+        &self.mmu
+    }
+
+    /// Get access to the memory unit linked to the CPU.
+    pub fn get_mmu_mut(&mut self) -> &mut Mmu {
+        &mut self.mmu
+    }
+
+
     /// Fetches the next opcode on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
     pub fn fetch_next_opcode(&mut self) -> &'static OpCode {
@@ -401,7 +415,7 @@ impl Cpu {
         let opcode_id      = if opcode_byte == 0xCB { self.get_next_u16() } else { opcode_byte };
         let opcode         = self.fetch_next_opcode();
         let param_address  = self.instruction_pointer;
-        let memory         = self.mem.clone_readonly();
+        let memory         = self.mmu.get_peripherals().mem.new_ref();
 
         Instruction {
             opcode,
@@ -414,12 +428,12 @@ impl Cpu {
 
     /// Get the next byte on the current location of the instruction pointer, without moving it.
     pub fn get_next_byte(&self) -> u8 {
-        self.mem.read_byte(self.instruction_pointer)
+        self.mmu.read_u8(self.instruction_pointer)
     }
 
     /// Get the next byte relative to the current location of the instruction pointer, without moving it.
     pub fn get_next_byte_at(&self, offset: u16) -> u8 {
-        self.mem.read_byte(self.instruction_pointer + offset)
+        self.mmu.read_u8(self.instruction_pointer + offset)
     }
 
     /// Get the next i8 value on the current location of the instruction pointer, without moving it.
@@ -470,7 +484,7 @@ impl Cpu {
     /// Pushes a 8bit value on the stack, moving the stack pointer.
     pub fn push_u8(&mut self, value: u8) {
         self.stack_pointer -= 1;
-        self.mem.write_u8(self.stack_pointer, value);
+        self.mmu.write_u8(self.stack_pointer, value);
     }
 
     /// Pushes a 16bit value on the stack, moving the stack pointer.
@@ -482,7 +496,7 @@ impl Cpu {
 
     /// Pops a 8bit value from the stack, moving the stack pointer.
     pub fn pop_u8(&mut self) -> u8 {
-        let value = self.mem.read_u8(self.stack_pointer);
+        let value = self.mmu.read_u8(self.stack_pointer);
         self.stack_pointer += 1;
         value
     }
