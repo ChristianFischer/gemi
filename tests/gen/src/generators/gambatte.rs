@@ -17,7 +17,7 @@
 
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
-use gbemu_core::graphic_data::{Color, DmgDisplayPalette};
+use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, LcdColorMod, RunConfig, SetUpConfig};
 use crate::generators::common::TEST_FILE_HEADER;
 use crate::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, update_file};
@@ -26,7 +26,7 @@ use crate::test_generator::TestGenerator;
 
 
 const GAMBATTE_ADDITIONAL_SRC : &str = /* language=rust */
-r#"use gbemu_core::graphic_data::{Color, DmgDisplayPalette};
+r#"use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
 "#;
 
 

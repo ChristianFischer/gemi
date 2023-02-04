@@ -16,7 +16,7 @@
  */
 
 use gbemu_core::gameboy::DeviceType;
-use gbemu_core::graphic_data::DmgDisplayPalette;
+use gbemu_core::ppu::graphic_data::DmgDisplayPalette;
 
 
 /// A definition how to modify the colors of the emulator display

@@ -19,8 +19,8 @@ use std::cmp::min;
 use gbemu_core::gameboy::GameBoy;
 use image::io::Reader as ImageReader;
 use image::{Rgba, RgbaImage};
-use gbemu_core::graphic_data::Color;
-use gbemu_core::ppu::LcdBuffer;
+use gbemu_core::ppu::graphic_data::Color;
+use gbemu_core::ppu::ppu::LcdBuffer;
 use tests_shared::test_config::LcdColorMod;
 use crate::util::get_test_file;
 

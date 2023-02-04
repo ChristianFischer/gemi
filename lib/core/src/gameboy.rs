@@ -23,7 +23,7 @@ use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::mmu::Mmu;
 use crate::opcode::{OpCodeContext, OpCodeResult};
-use crate::ppu::{FrameState, Ppu};
+use crate::ppu::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};

@@ -17,16 +17,16 @@
 
 extern crate sdl2;
 
-use gbemu_core::graphic_data::{Color, DmgPalette, TileMap, TileSet};
 use gbemu_core::input::{Input, InputButton};
 use gbemu_core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
-use gbemu_core::ppu::{LCD_CONTROL_BIT_BG_TILE_MAP_SELECT, LCD_CONTROL_BIT_TILE_DATA_SELECT, LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
-use gbemu_core::utils::get_bit;
+use gbemu_core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
+use gbemu_core::ppu::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
 use std::collections::HashMap;
+use gbemu_core::ppu::flags::LcdControlFlag;
 use crate::sound_queue::SoundQueue;
 
 
@@ -337,9 +337,8 @@ impl Window {
     /// Present the whole background on the screen.
     /// This includes the whole content even outside of the scrolling viewport.
     pub fn present_background(&mut self, ppu: &Ppu) {
-        let lcdc = ppu.get_lcdc();
-        let tilemap = TileMap::by_select_bit(get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT));
-        let tileset = TileSet::by_select_bit(get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT));
+        let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
+        let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
         let palette = DmgPalette::create_default();
 
         // convert palette based image data into RGBA

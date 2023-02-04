@@ -23,7 +23,6 @@ use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::cpu::Interrupt;
 use crate::gameboy::{DeviceConfig, EmulationType};
-use crate::graphic_data::GbcPaletteData;
 use crate::mmu::io_registers::IoRegister;
 use crate::mmu::locations::*;
 use crate::mmu::mbc::{create_mbc, Mbc};
@@ -31,6 +30,7 @@ use crate::mmu::mbc::mbc_none::MbcNone;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
+use crate::ppu::graphic_data::GbcPaletteData;
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
 

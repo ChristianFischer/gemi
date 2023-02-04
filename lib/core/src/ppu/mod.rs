@@ -15,16 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub mod apu;
-pub mod boot_rom;
-pub mod cartridge;
-pub mod cpu;
-pub mod gameboy;
-pub mod input;
-pub mod mmu;
-pub mod opcode;
-pub mod opcodes;
+pub mod flags;
+pub mod graphic_data;
 pub mod ppu;
-pub mod serial;
-pub mod timer;
-pub mod utils;

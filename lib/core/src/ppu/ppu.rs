@@ -18,12 +18,14 @@
 use std::cmp::min;
 use crate::cpu::Interrupt;
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
-use crate::graphic_data::{Color, DmgDisplayPalette, DmgLcdPixel, DmgPalette, GbcPaletteData, Sprite, SpritePixelValue, TileMap, TileSet};
 use crate::mmu::locations::*;
-use crate::mmu::memory::{Memory, MemoryRead, MemoryWrite};
+use crate::mmu::memory::Memory;
+use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::MemoryData;
-use crate::utils::{change_bit, get_bit};
+use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
+use crate::ppu::graphic_data::*;
+use crate::utils::get_bit;
 
 pub const SCREEN_W: u32 = 160;
 pub const SCREEN_H: u32 = 144;
@@ -32,24 +34,6 @@ pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
 
 pub const CPU_CYCLES_PER_LINE:  Clock =    456;
 pub const CPU_CYCLES_PER_FRAME: Clock = 70_224;
-
-pub const LCD_CONTROL_BIT_BG_WINDOW_ENABLED:        u8 = 0;
-pub const LCD_CONTROL_BIT_SPRITE_ENABLED:           u8 = 1;
-pub const LCD_CONTROL_BIT_SPRITE_SIZE:              u8 = 2;
-pub const LCD_CONTROL_BIT_BG_TILE_MAP_SELECT:       u8 = 3;
-pub const LCD_CONTROL_BIT_TILE_DATA_SELECT:         u8 = 4;
-pub const LCD_CONTROL_BIT_WINDOW_ENABLED:           u8 = 5;
-pub const LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT:   u8 = 6;
-pub const LCD_CONTROL_BIT_LCD_ENABLED:              u8 = 7;
-
-pub const LCD_STATUS_BIT_PPU_MODE_0:                u8 = 0;
-pub const LCD_STATUS_BIT_PPU_MODE_1:                u8 = 1;
-pub const LCD_STATUS_BIT_FLAG_COINCIDENCE:          u8 = 2;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_0:         u8 = 3;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_1:         u8 = 4;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_MODE_2:         u8 = 5;
-pub const LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY:      u8 = 6;
-pub const LCD_STATUS_BIT_UNUSED:                    u8 = 7;
 
 pub const TILE_ATTR_BIT_VRAM_BANK:                  u8 = 3;
 pub const TILE_ATTR_BIT_H_FLIP:                     u8 = 5;
@@ -148,6 +132,34 @@ pub struct TileFetchProperties {
 }
 
 
+#[derive(Default)]
+struct PpuRegisters {
+    /// LCD control flags.
+    lcd_control: LcdControl,
+
+    /// Part of the LCD Status register, which stores the flags
+    /// when the LCD Stat Interrupt may be fired
+    lcd_interrupts: LcdInterruptFlags,
+
+    /// The comparison value to be compared with the current line.
+    /// If LY == LYC and the according interrupt flag in LCD STAT is enabled,
+    /// the LCD Stat interrupt will be fired.
+    line_compare: u8,
+
+    /// Background scroll value on X axis.
+    scroll_x: u8,
+
+    /// Background scroll value on Y axis.
+    scroll_y: u8,
+
+    /// Window x position.
+    window_x: u8,
+
+    /// Window y position.
+    window_y: u8,
+}
+
+
 /// An object representing the gameboy's picture processing unit.
 pub struct Ppu {
     clock: Clock,
@@ -161,8 +173,11 @@ pub struct Ppu {
     /// The PPU's current mode.
     mode: Mode,
 
+    /// Current values of registers used by the PPU.
+    registers: PpuRegisters,
+
     /// The currently processed scanline.
-    ly: u8,
+    current_line: u8,
 
     /// The currently processed pixel in the current scanline.
     current_line_pixel: u8,
@@ -258,7 +273,8 @@ impl Ppu {
             device_config,
             mem,
             mode: Mode::OamScan,
-            ly: 0,
+            registers: PpuRegisters::default(),
+            current_line: 0,
             current_line_pixel: 0,
             current_line_cycles: 0,
             current_scanline: ScanlineData::new(),
@@ -292,7 +308,7 @@ impl Ppu {
         if self.clock > 80 {
             self.clock -= 80;
 
-            self.current_scanline    = self.do_oam_scan_for_line(self.ly);
+            self.current_scanline    = self.do_oam_scan_for_line(self.current_line);
             self.current_line_pixel  = 0;
             self.current_line_cycles = 80;
 
@@ -319,19 +335,18 @@ impl Ppu {
 
         {
             let io_regs          = self.mem.get_io_registers();
-            let lcdc             = self.get_lcdc();
-            let window_enabled   = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_ENABLED);
+            let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
             let palette_bg       = &io_regs.bgp;
             let palette_obp      = &io_regs.obp;
             let palettes_gbc_bg  = self.mem.get_gbc_background_palettes();
             let palettes_gbc_obj = self.mem.get_gbc_object_palettes();
-            let wx               = self.get_window_x();
-            let wy               = self.get_window_y();
+            let wx               = self.registers.window_x;
+            let wy               = self.registers.window_y;
 
             for _ in 0..pixels_to_update {
                 // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
                 if !self.current_scanline.window_enabled && window_enabled {
-                    if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.ly) {
+                    if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.current_line) {
                         self.current_scanline.window_enabled = true;
                     }
                 }
@@ -375,7 +390,7 @@ impl Ppu {
                 // write pixel into LCD buffer
                 self.lcd_buffer.set_pixel(
                     self.current_line_pixel as u32,
-                    self.ly as u32,
+                    self.current_line as u32,
                     pixel_color
                 );
 
@@ -395,11 +410,8 @@ impl Ppu {
 
     /// Fetch the data of the background or window layer on the current position in the active scanline.
     fn fetch_background_pixel(&self) -> PixelFetchResult {
-        let io_regs = self.mem.get_io_registers();
-
-        let lcdc            = self.get_lcdc();
-        let bg_enabled      = get_bit(lcdc, LCD_CONTROL_BIT_BG_WINDOW_ENABLED);
-        let tileset_select  = get_bit(lcdc, LCD_CONTROL_BIT_TILE_DATA_SELECT);
+        let bg_enabled      = self.check_lcdc(LcdControlFlag::BackgroundAndWindowEnabled);
+        let tileset_select  = self.check_lcdc(LcdControlFlag::TileDataSelect);
         let tileset         = TileSet::by_select_bit(tileset_select);
 
         // check if the flag for window/background is enabled
@@ -408,9 +420,9 @@ impl Ppu {
         if bg_enabled || self.device_config.is_gbc_enabled() {
             // process window pixels instead of background, if the window was enabled for this scanline
             let tile_info = if self.current_scanline.window_enabled {
-                let window_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_WINDOW_TILE_MAP_SELECT);
+                let window_tilemap_select = self.check_lcdc(LcdControlFlag::WindowTileMapSelect);
                 let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
-                let position_in_window_x  = self.current_line_pixel+7 - io_regs.wx;
+                let position_in_window_x  = self.current_line_pixel+7 - self.registers.window_x;
                 let position_in_window_y  = self.window_line;
 
                 self.read_tilemap_properties(
@@ -423,12 +435,12 @@ impl Ppu {
             else {
                 // otherwise just handle the normal background
 
-                let bg_tilemap_select = get_bit(lcdc, LCD_CONTROL_BIT_BG_TILE_MAP_SELECT);
+                let bg_tilemap_select = self.check_lcdc(LcdControlFlag::BackgroundTileMapSelect);
                 let bg_tilemap        = TileMap::by_select_bit(bg_tilemap_select);
 
                 let (background_x, background_y) = self.screen_to_background(
                     self.current_line_pixel,
-                    self.ly
+                    self.current_line
                 );
 
                 self.read_tilemap_properties(
@@ -450,8 +462,7 @@ impl Ppu {
     /// Fetch the foreground pixel by reading the color of any sprite on the current
     /// position within the active scanline
     pub fn fetch_foreground_pixel(&self) -> PixelFetchResult {
-        let lcdc            = self.get_lcdc();
-        let sprites_enabled = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_ENABLED);
+        let sprites_enabled = self.check_lcdc(LcdControlFlag::SpritesEnabled);
 
         if sprites_enabled {
             self.read_scanline_sprite_pixel(
@@ -476,7 +487,7 @@ impl Ppu {
         // disables the background priority flags, instead of disabling the whole background
         let is_master_priority =
                 self.device_config.is_gbc_enabled()
-            &&  !get_bit(self.get_lcdc(), LCD_CONTROL_BIT_BG_WINDOW_ENABLED)
+            &&  !self.check_lcdc(LcdControlFlag::BackgroundAndWindowEnabled)
         ;
 
         // check for background priority, if not in master priority mode
@@ -509,7 +520,7 @@ impl Ppu {
         if self.clock >= remaining_cycles {
             self.clock -= remaining_cycles;
 
-            return self.next_ly();
+            return self.enter_next_line();
         }
 
         FrameState::Processing
@@ -523,7 +534,7 @@ impl Ppu {
         if self.clock >= CPU_CYCLES_PER_LINE {
             self.clock -= CPU_CYCLES_PER_LINE;
 
-            return self.next_ly();
+            return self.enter_next_line();
         }
 
         FrameState::Processing
@@ -535,22 +546,16 @@ impl Ppu {
     fn enter_mode(&mut self, mode: Mode) {
         self.mode = mode;
 
-        let mut lcd_stat = self.get_lcd_stat();
-        lcd_stat = lcd_stat & 0b_1111_1100;
-        lcd_stat = lcd_stat | (self.mode as u8);
-
-        self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcd_stat);
-
         // request interrupt when entering VBlank
         match mode {
             Mode::HBlank => {
-                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_MODE_0) {
+                if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByHBlank) {
                     self.mem.request_interrupt(Interrupt::LcdStat);
                 }
             }
 
             Mode::VBlank => {
-                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_MODE_1) {
+                if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByVBlank) {
                     self.mem.request_interrupt(Interrupt::LcdStat);
                 }
 
@@ -558,7 +563,7 @@ impl Ppu {
             },
 
             Mode::OamScan => {
-                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_MODE_2) {
+                if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByOam) {
                     self.mem.request_interrupt(Interrupt::LcdStat);
                 }
             }
@@ -573,12 +578,12 @@ impl Ppu {
     /// LCD status byte as well as the current LY byte in memory.
     /// Enters either Mode::OamScan or Mode::VBlank depending on
     /// the next scanline.
-    fn next_ly(&mut self) -> FrameState {
-        if self.ly == 153 {
-            self.ly = 0;
+    fn enter_next_line(&mut self) -> FrameState {
+        if self.current_line == 153 {
+            self.current_line = 0;
         }
         else {
-            self.ly = self.ly + 1;
+            self.current_line = self.current_line + 1;
         }
 
         // also progress window line counter,
@@ -587,20 +592,13 @@ impl Ppu {
             self.window_line += 1;
         }
 
-        // update ly value in memory
-        self.mem.write_u8(MEMORY_LOCATION_LY, self.ly);
-
         // check for ly == lyc coincidence
         {
-            let lyc = self.mem.read_u8(MEMORY_LOCATION_LYC);
-            let coincidence = self.ly == lyc;
-            let mut lcd_stat = self.get_lcd_stat();
-            lcd_stat = change_bit(lcd_stat, LCD_STATUS_BIT_FLAG_COINCIDENCE, coincidence);
-            self.mem.write_u8(MEMORY_LOCATION_LCD_STATUS, lcd_stat);
+            let coincidence = self.current_line == self.registers.line_compare;
 
             // fire interrupt, if enabled
             if coincidence {
-                if get_bit(lcd_stat, LCD_STATUS_BIT_ENABLE_IRQ_LYC_EQ_LY) {
+                if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByCoincidence) {
                     self.mem.request_interrupt(Interrupt::LcdStat);
                 }
             }
@@ -608,7 +606,7 @@ impl Ppu {
 
         // enter vblank when beyond the last scanline
         // enter OAM scan for next scanline otherwise
-        match self.ly {
+        match self.current_line {
               0..=143 => self.enter_mode(Mode::OamScan),
             144       => self.enter_mode(Mode::VBlank),
             145..=153 => { /* remains in VBlank */ },
@@ -616,7 +614,7 @@ impl Ppu {
         }
 
         // notify FrameCompleted after switching back to line #0
-        if self.ly == 0 {
+        if self.current_line == 0 {
             self.on_new_frame();
 
             FrameState::FrameCompleted
@@ -653,40 +651,20 @@ impl Ppu {
         &self.lcd_buffer
     }
 
-    /// Get the value of the LCD Control register
-    pub fn get_lcdc(&self) -> u8 {
-        self.mem.read_u8(MEMORY_LOCATION_LCD_CONTROL)
+    /// Checks the LCD control register for a specific flag to be set.
+    pub fn check_lcdc(&self, flag: LcdControlFlag) -> bool {
+        self.registers.lcd_control.contains(flag)
     }
 
-    /// Get the value of the LCD Status register
-    pub fn get_lcd_stat(&self) -> u8 {
-        self.mem.read_u8(MEMORY_LOCATION_LCD_STATUS)
-    }
-
-    /// Get the display viewport offset on X axis.
-    pub fn get_scroll_x(&self) -> u8 {
-        self.mem.read_u8(MEMORY_LOCATION_SCX)
-    }
-
-    /// Get the display viewport offset on Y axis.
-    pub fn get_scroll_y(&self) -> u8 {
-        self.mem.read_u8(MEMORY_LOCATION_SCY)
-    }
-
-    /// Get the window position on X axis.
-    pub fn get_window_x(&self) -> u8 {
-        self.mem.read_u8(MEMORY_LOCATION_WX)
-    }
-
-    /// Get the window position on Y axis.
-    pub fn get_window_y(&self) -> u8 {
-        self.mem.read_u8(MEMORY_LOCATION_WY)
+    /// Checks whether a specific interrupt type was enabled via LCD STAT register.
+    pub fn is_interrupt_enabled(&self, interrupt: LcdInterruptFlag) -> bool {
+        self.registers.lcd_interrupts.contains(interrupt)
     }
 
     /// Compute the background location of any screen pixel.
     pub fn screen_to_background(&self, screen_x: u8, screen_y: u8) -> (u8, u8) {
-        let background_x = ((screen_x as u32 + self.get_scroll_x() as u32) & 0xff) as u8;
-        let background_y = ((screen_y as u32 + self.get_scroll_y() as u32) & 0xff) as u8;
+        let background_x = ((screen_x as u32 + self.registers.scroll_x as u32) & 0xff) as u8;
+        let background_y = ((screen_y as u32 + self.registers.scroll_y as u32) & 0xff) as u8;
         (background_x, background_y)
     }
 
@@ -695,8 +673,7 @@ impl Ppu {
         let mut scanline = ScanlineData::new();
         scanline.line = line_number;
 
-        let lcdc        = self.get_lcdc();
-        let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
+        let big_sprites = self.check_lcdc(LcdControlFlag::SpritesSize);
         let sprite_h    = if big_sprites { 16 } else { 8 };
 
         // sprite position 0 is not on scanline 0, but 16 pixel above the screen to
@@ -748,8 +725,7 @@ impl Ppu {
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
 
-        let lcdc        = self.get_lcdc();
-        let big_sprites = get_bit(lcdc, LCD_CONTROL_BIT_SPRITE_SIZE);
+        let big_sprites = self.check_lcdc(LcdControlFlag::SpritesSize);
         let sprite_h    = if big_sprites { 16 } else { 8 };
         let sprite_w    = 8;
 
@@ -892,6 +868,45 @@ impl Ppu {
         ;
 
         SpritePixelValue::new(pixel)
+    }
+}
+
+
+impl MemoryBusConnection for Ppu {
+    fn on_read(&self, address: u16) -> u8 {
+        match address {
+            MEMORY_LOCATION_LCD_STATUS  => {
+                let mode_bits       = self.mode as u8;
+                let coincidence_bit = if self.current_line == self.registers.line_compare { 0b_0100 } else { 0b_0000 };
+                let interrupt_flags = self.registers.lcd_interrupts.bits();
+
+                mode_bits | coincidence_bit | interrupt_flags
+            },
+
+            MEMORY_LOCATION_LCD_CONTROL => self.registers.lcd_control.bits(),
+            MEMORY_LOCATION_SCY         => self.registers.scroll_y,
+            MEMORY_LOCATION_SCX         => self.registers.scroll_x,
+            MEMORY_LOCATION_LY          => self.current_line,
+            MEMORY_LOCATION_LYC         => self.registers.line_compare,
+            MEMORY_LOCATION_WY          => self.registers.window_y,
+            MEMORY_LOCATION_WX          => self.registers.window_x,
+            _ => 0xff,
+        }
+    }
+
+    fn on_write(&mut self, address: u16, value: u8) {
+        match address {
+            MEMORY_LOCATION_LCD_CONTROL => self.registers.lcd_control       = LcdControl::new_truncated(value),
+            MEMORY_LOCATION_LCD_STATUS  => self.registers.lcd_interrupts    = LcdInterruptFlags::new_truncated(value),
+            MEMORY_LOCATION_SCY         => self.registers.scroll_y          = value,
+            MEMORY_LOCATION_SCX         => self.registers.scroll_x          = value,
+            MEMORY_LOCATION_LY          => self.current_line                = value,
+            MEMORY_LOCATION_LYC         => self.registers.line_compare      = value,
+            MEMORY_LOCATION_WY          => self.registers.window_y          = value,
+            MEMORY_LOCATION_WX          => self.registers.window_x          = value,
+
+            _ => { }
+        }
     }
 }
 

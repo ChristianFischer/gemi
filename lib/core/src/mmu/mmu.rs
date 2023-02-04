@@ -203,6 +203,10 @@ impl_memory_mapper!(
         // Restricted RAM area
         0xfea0 ..= 0xfeff => root.peripherals.mem,
 
+        // PPU registers
+        0xff40 ..= 0xff45 => root.peripherals.ppu,
+        0xff4a ..= 0xff4b => root.peripherals.ppu,
+
         MEMORY_LOCATION_DMA_ADDRESS => *root,
 
         // IO Registers

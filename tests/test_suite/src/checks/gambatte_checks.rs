@@ -16,7 +16,7 @@
  */
 
 use gbemu_core::gameboy::GameBoy;
-use gbemu_core::ppu::LcdBuffer;
+use gbemu_core::ppu::ppu::LcdBuffer;
 
 type BitmapDigit      = [u8; 8];
 type BitmapDigitEntry = (char, BitmapDigit);

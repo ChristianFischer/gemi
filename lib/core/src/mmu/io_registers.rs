@@ -16,7 +16,7 @@
  */
 
 use crate::apu::registers::ApuRegisters;
-use crate::graphic_data::DmgPalette;
+use crate::ppu::graphic_data::DmgPalette;
 
 /// Data struct containing raw data of all IO Registers in memory range 0xff00 to 0xffff.
 /// This allows read/write operations without involving the memory bus. In real hardware,
@@ -59,23 +59,7 @@ pub struct IoRegister {
     /// Sound control registers
     pub apu: ApuRegisters,
 
-    /// LCD control
-    pub lcdc: u8,
-
-    /// LCD status
-    pub lcd_stat: u8,
-
-    /// LCD scroll offset Y
-    pub scy: u8,
-
-    /// LCD scroll offset X
-    pub scx: u8,
-
-    /// LCD current line
-    pub ly: u8,
-
-    /// LCD current line comparison
-    pub lyc: u8,
+    _unused_ppu_0x40: [u8; 6],
 
     /// OAM DMA transfer start address
     pub dma_address: u8,
@@ -86,11 +70,7 @@ pub struct IoRegister {
     /// DMG object palettes
     pub obp: [DmgPalette; 2],
 
-    /// LCD window Y coordinate
-    pub wy: u8,
-
-    /// LCD window X coordinate
-    pub wx: u8,
+    _unused_ppu_0x4a: [u8; 2],
 
     _unused_0x4c: [u8; 3],
 
@@ -197,18 +177,10 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR50            => apu.nr50);
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR51            => apu.nr51);
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR52            => apu.nr52);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_LCD_CONTROL         => lcdc);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_LCD_STATUS          => lcd_stat);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_SCY                 => scy);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_SCX                 => scx);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_LY                  => ly);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_LYC                 => lyc);
         test_ioreg_struct_elem!(MEMORY_LOCATION_DMA_ADDRESS         => dma_address);
         test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_BG          => bgp);
         test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP0        => obp[0]);
         test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP1        => obp[1]);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_WY                  => wy);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_WX                  => wx);
         test_ioreg_struct_elem!(MEMORY_LOCATION_VBK                 => vbk);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BCPS                => bcps);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BCPD                => bcpd);
