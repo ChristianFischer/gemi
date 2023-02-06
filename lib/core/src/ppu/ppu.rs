@@ -20,11 +20,12 @@ use crate::cpu::Interrupt;
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
 use crate::mmu::memory::Memory;
-use crate::mmu::memory_bus::MemoryBusConnection;
+use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::MemoryData;
 use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
 use crate::ppu::graphic_data::*;
+use crate::ppu::video_memory::{OamRam, OamRamBank, VideoMemory};
 use crate::utils::get_bit;
 
 pub const SCREEN_W: u32 = 160;
@@ -157,6 +158,9 @@ struct PpuRegisters {
 
     /// Window y position.
     window_y: u8,
+
+    /// Object priority flag
+    object_priority: bool,
 }
 
 
@@ -172,6 +176,9 @@ pub struct Ppu {
 
     /// The PPU's current mode.
     mode: Mode,
+
+    /// Several memory units connected to the PPU.
+    memory: VideoMemory,
 
     /// Current values of registers used by the PPU.
     registers: PpuRegisters,
@@ -273,6 +280,7 @@ impl Ppu {
             device_config,
             mem,
             mode: Mode::OamScan,
+            memory: VideoMemory::new(device_config),
             registers: PpuRegisters::default(),
             current_line: 0,
             current_line_pixel: 0,
@@ -334,12 +342,11 @@ impl Ppu {
         self.clock               -= cycles;
 
         {
-            let io_regs          = self.mem.get_io_registers();
             let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
-            let palette_bg       = &io_regs.bgp;
-            let palette_obp      = &io_regs.obp;
-            let palettes_gbc_bg  = self.mem.get_gbc_background_palettes();
-            let palettes_gbc_obj = self.mem.get_gbc_object_palettes();
+            let palette_bg       = &self.memory.bgp;
+            let palette_obp      = &self.memory.obp;
+            let palettes_gbc_bg  = &self.memory.gbc_background_palette.get();
+            let palettes_gbc_obj = &self.memory.gbc_object_palette.get();
             let wx               = self.registers.window_x;
             let wy               = self.registers.window_y;
 
@@ -651,6 +658,21 @@ impl Ppu {
         &self.lcd_buffer
     }
 
+    /// Get the OAM table.
+    pub fn get_oam(&self) -> &OamRam {
+        self.memory.oam.get()
+    }
+
+    /// Get the OAM table.
+    pub fn get_oam_mut(&mut self) -> &mut OamRam {
+        self.memory.oam.get_mut()
+    }
+
+    /// Get the OAM table.
+    pub fn get_oam_bank_mut(&mut self) -> &mut OamRamBank {
+        &mut self.memory.oam
+    }
+
     /// Checks the LCD control register for a specific flag to be set.
     pub fn check_lcdc(&self, flag: LcdControlFlag) -> bool {
         self.registers.lcd_control.contains(flag)
@@ -683,7 +705,7 @@ impl Ppu {
 
         // iterate through all OAM entries
         for oam_entry in 0..40 {
-            let sprite = Sprite::from_oam(&self.mem, oam_entry);
+            let sprite = self.memory.oam.get()[oam_entry as usize];
 
             // take a sprite if x > 0 and intersects the current scanline
             if
@@ -706,7 +728,7 @@ impl Ppu {
         // On GBC this behaviour can be switched by the object priority bit in 0xff6c
         //  - 0 means OAM position has priority
         //  - 1 means X position has priority
-        if !self.device_config.is_gbc_enabled() || get_bit(self.mem.get_io_registers().opri, 0) {
+        if !self.device_config.is_gbc_enabled() || self.registers.object_priority {
             scanline.sprites[0 .. scanline.sprites_found as usize].sort_by(
                 |a, b| {
                     let ax = a.pos_x;
@@ -748,11 +770,20 @@ impl Ppu {
             let sprite_pixel_x = flipped_if(screen_x - sprite.pos_x, sprite_w, sprite.is_flip_x());
             let sprite_pixel_y = flipped_if(screen_y - sprite.pos_y, sprite_h, sprite.is_flip_y());
 
+            // if in GBC mode, check the sprite properties for the VRAM bank index
+            // where to read the pixel data from
+            let vram_bank_index = if self.device_config.is_gbc_enabled() {
+                sprite.get_gbc_vram_bank()
+            }
+            else {
+                0
+            };
+
             // read the sprite pixel value
             let pixel = self.read_sprite_pixel(
                 TileSet::H8000,
                 sprite.tile & sprite_mask,
-                sprite.get_gbc_vram_bank(),
+                vram_bank_index,
                 sprite_pixel_x,
                 sprite_pixel_y
             );
@@ -801,7 +832,7 @@ impl Ppu {
     /// Read the pixel value from a tile using previously created TileFetchProperties.
     pub fn read_tile_pixel(&self, tile: &TileFetchProperties) -> PixelFetchResult {
         let tile_address = (tile.tilemap.base_address() + tile.tile_index - MEMORY_LOCATION_VRAM_BEGIN) as usize;
-        let vram0        = &self.mem.get_vram_banks()[0];
+        let vram0        = &self.memory.vram_banks[0];
         let sprite       = vram0.get_at(tile_address);
 
         let mut fetch_position_x    = tile.tile_pixel_x;
@@ -812,7 +843,7 @@ impl Ppu {
 
         if self.device_config.is_gbc_enabled() {
             // read tile attributes from the same location in VRAM1
-            let vram1 = &self.mem.get_vram_banks()[1];
+            let vram1 = &self.memory.vram_banks[1];
             let tile_attr    = vram1.get_at(tile_address);
 
             // read properties from the tile attribute byte
@@ -856,7 +887,7 @@ impl Ppu {
 
     /// Read the pixel value of a sprite.
     pub fn read_sprite_pixel_from_address(&self, sprite_address: u16, bank: u8, x: u8, y: u8) -> SpritePixelValue {
-        let vram                = &self.mem.get_vram_banks()[(bank & 0x01) as usize];
+        let vram                = &self.memory.vram_banks[(bank & 0x01) as usize];
         let sprite_line_address = (sprite_address + (y as u16 * 2) - MEMORY_LOCATION_VRAM_BEGIN) as usize;
         let pixel_mask            = 1u8 << (7 - x);
         let byte0                 = vram.get_at(sprite_line_address + 0);
@@ -874,39 +905,150 @@ impl Ppu {
 
 impl MemoryBusConnection for Ppu {
     fn on_read(&self, address: u16) -> u8 {
-        match address {
-            MEMORY_LOCATION_LCD_STATUS  => {
-                let mode_bits       = self.mode as u8;
-                let coincidence_bit = if self.current_line == self.registers.line_compare { 0b_0100 } else { 0b_0000 };
-                let interrupt_flags = self.registers.lcd_interrupts.bits();
-
-                mode_bits | coincidence_bit | interrupt_flags
+        memory_map!(address => {
+            // Video RAM
+            0x8000 ..= 0x9fff => [mapped_address] {
+                let bank = &self.memory.vram_banks[self.memory.vram_active_bank as usize];
+                bank.get_at(mapped_address)
             },
 
-            MEMORY_LOCATION_LCD_CONTROL => self.registers.lcd_control.bits(),
-            MEMORY_LOCATION_SCY         => self.registers.scroll_y,
-            MEMORY_LOCATION_SCX         => self.registers.scroll_x,
-            MEMORY_LOCATION_LY          => self.current_line,
-            MEMORY_LOCATION_LYC         => self.registers.line_compare,
-            MEMORY_LOCATION_WY          => self.registers.window_y,
-            MEMORY_LOCATION_WX          => self.registers.window_x,
-            _ => 0xff,
-        }
+            // OAM memory
+            0xfe00 ..= 0xfe9f => [mapped_address] {
+                self.memory.oam.get_at(mapped_address)
+            },
+
+            // IO Registers
+            0xff00 ..= 0xffff => [] {
+                match address {
+                    MEMORY_LOCATION_LCD_STATUS  => {
+                        let mode_bits       = self.mode as u8;
+                        let coincidence_bit = if self.current_line == self.registers.line_compare { 0b_0100 } else { 0b_0000 };
+                        let interrupt_flags = self.registers.lcd_interrupts.bits();
+
+                        mode_bits | coincidence_bit | interrupt_flags
+                    },
+
+                    MEMORY_LOCATION_LCD_CONTROL     => self.registers.lcd_control.bits(),
+                    MEMORY_LOCATION_SCY             => self.registers.scroll_y,
+                    MEMORY_LOCATION_SCX             => self.registers.scroll_x,
+                    MEMORY_LOCATION_LY              => self.current_line,
+                    MEMORY_LOCATION_LYC             => self.registers.line_compare,
+                    MEMORY_LOCATION_WY              => self.registers.window_y,
+                    MEMORY_LOCATION_WX              => self.registers.window_x,
+
+                    MEMORY_LOCATION_PALETTE_BG      => self.memory.bgp.into(),
+                    MEMORY_LOCATION_PALETTE_OBP0    => self.memory.obp[0].into(),
+                    MEMORY_LOCATION_PALETTE_OBP1    => self.memory.obp[1].into(),
+
+                    MEMORY_LOCATION_VBK => {
+                        // on GBC: get the active RAM bank
+                        if let EmulationType::GBC = self.device_config.emulation {
+                            // register will contain the active bank in bit #0
+                            // and all other bits set to 1
+                            0b_1111_1110 | self.memory.vram_active_bank
+                        }
+                        else {
+                            0xff
+                        }
+                    },
+
+                    MEMORY_LOCATION_BCPS => {
+                        self.memory.gbc_background_palette_pointer.get()
+                    }
+
+                    MEMORY_LOCATION_BCPD => {
+                        self.memory.gbc_background_palette_pointer.read(
+                            &self.memory.gbc_background_palette
+                        )
+                    }
+
+                    MEMORY_LOCATION_OCPS => {
+                        self.memory.gbc_object_palette_pointer.get()
+                    }
+
+                    MEMORY_LOCATION_OCPD => {
+                        self.memory.gbc_object_palette_pointer.read(
+                            &self.memory.gbc_object_palette
+                        )
+                    }
+
+                    MEMORY_LOCATION_OPRI => {
+                        self.registers.object_priority as u8
+                    }
+
+                    _ => 0xff,
+                }
+            }
+        })
     }
 
     fn on_write(&mut self, address: u16, value: u8) {
-        match address {
-            MEMORY_LOCATION_LCD_CONTROL => self.registers.lcd_control       = LcdControl::new_truncated(value),
-            MEMORY_LOCATION_LCD_STATUS  => self.registers.lcd_interrupts    = LcdInterruptFlags::new_truncated(value),
-            MEMORY_LOCATION_SCY         => self.registers.scroll_y          = value,
-            MEMORY_LOCATION_SCX         => self.registers.scroll_x          = value,
-            MEMORY_LOCATION_LY          => self.current_line                = value,
-            MEMORY_LOCATION_LYC         => self.registers.line_compare      = value,
-            MEMORY_LOCATION_WY          => self.registers.window_y          = value,
-            MEMORY_LOCATION_WX          => self.registers.window_x          = value,
+        memory_map!(address => {
+            // Video RAM
+            0x8000 ..= 0x9fff => [mapped_address] {
+                let bank = &mut self.memory.vram_banks[self.memory.vram_active_bank as usize];
+                bank.set_at(mapped_address, value)
+            },
 
-            _ => { }
-        }
+            // OAM memory
+            0xfe00 ..= 0xfe9f => [mapped_address] {
+                self.memory.oam.set_at(mapped_address, value)
+            },
+
+            // IO registers
+            0xff00 ..= 0xffff => [] {
+                match address {
+                    MEMORY_LOCATION_LCD_CONTROL     => self.registers.lcd_control       = LcdControl::new_truncated(value),
+                    MEMORY_LOCATION_LCD_STATUS      => self.registers.lcd_interrupts    = LcdInterruptFlags::new_truncated(value),
+                    MEMORY_LOCATION_SCY             => self.registers.scroll_y          = value,
+                    MEMORY_LOCATION_SCX             => self.registers.scroll_x          = value,
+                    MEMORY_LOCATION_LY              => self.current_line                = value,
+                    MEMORY_LOCATION_LYC             => self.registers.line_compare      = value,
+                    MEMORY_LOCATION_WY              => self.registers.window_y          = value,
+                    MEMORY_LOCATION_WX              => self.registers.window_x          = value,
+
+                    MEMORY_LOCATION_PALETTE_BG      => self.memory.bgp                  = DmgPalette::from(value),
+                    MEMORY_LOCATION_PALETTE_OBP0    => self.memory.obp[0]               = DmgPalette::from(value),
+                    MEMORY_LOCATION_PALETTE_OBP1    => self.memory.obp[1]               = DmgPalette::from(value),
+
+                    MEMORY_LOCATION_VBK => {
+                        // on GBC: switch VRAM bank
+                        if let EmulationType::GBC = self.device_config.emulation {
+                            let bank = value & 0x01;
+                            self.memory.vram_active_bank = bank;
+                        }
+                    },
+
+                    MEMORY_LOCATION_BCPS => {
+                        self.memory.gbc_background_palette_pointer.set(value)
+                    }
+
+                    MEMORY_LOCATION_BCPD => {
+                        self.memory.gbc_background_palette_pointer.write(
+                            &mut self.memory.gbc_background_palette,
+                            value
+                        )
+                    }
+
+                    MEMORY_LOCATION_OCPS => {
+                        self.memory.gbc_object_palette_pointer.set(value)
+                    }
+
+                    MEMORY_LOCATION_OCPD => {
+                        self.memory.gbc_object_palette_pointer.write(
+                            &mut self.memory.gbc_object_palette,
+                            value
+                        )
+                    }
+
+                    MEMORY_LOCATION_OPRI => {
+                        self.registers.object_priority = get_bit(value, 0)
+                    }
+
+                    _ => { }
+                }
+            }
+        });
     }
 }
 

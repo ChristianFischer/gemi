@@ -30,7 +30,6 @@ use crate::mmu::mbc::mbc_none::MbcNone;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
-use crate::ppu::graphic_data::GbcPaletteData;
 use crate::utils::{clear_bit, get_bit, set_bit, to_u16, to_u8};
 
 
@@ -70,11 +69,8 @@ pub struct Memory {
 }
 
 
-pub type VRamBank       = MemoryDataFixedSize<8192>;
 pub type WRamBank       = MemoryDataFixedSize<4096>;
-pub type OamRamBank     = MemoryDataFixedSize<160>;
 pub type HRamBank       = MemoryDataFixedSize<127>;
-pub type GbcPaletteBank = MemoryDataMapped<[GbcPaletteData; 8]>;
 pub type IoRegisterBank = MemoryDataMapped<IoRegister>;
 
 
@@ -83,12 +79,6 @@ struct MemoryInternal {
     /// The configuration of the running device
     device_config: DeviceConfig,
 
-    /// Video RAM (DMG = 1 * 8kiB, GBC = 2 * 8kiB)
-    vram_banks: Vec<VRamBank>,
-
-    /// Active Video RAM Bank (0-1, CGB only)
-    vram_active_bank: u8,
-
     /// Work RAM banks (DMG = 2 * 4kiB, GBC = 8 * 4kiB)
     wram_banks: Vec<WRamBank>,
 
@@ -96,9 +86,6 @@ struct MemoryInternal {
     /// Bank 0 is fixed, Bank 1 can be switched between 1-7 on GBC.
     wram_active_bank_0: u8,
     wram_active_bank_1: u8,
-
-    /// OAM memory: 40 sprites, 4 bytes each = 160B
-    oam: OamRamBank,
 
     /// IO Registers
     io_registers: IoRegisterBank,
@@ -109,12 +96,6 @@ struct MemoryInternal {
 
     /// High RAM
     hram: HRamBank,
-
-    /// GameBoy Color only: storage for background palettes
-    gbc_background_palette: GbcPaletteBank,
-
-    /// GameBoy Color only: storage for object palettes
-    gbc_object_palette: GbcPaletteBank,
 
     mbc:        Box<dyn Mbc>,
     boot_rom:   Option<BootRom>,
@@ -219,9 +200,9 @@ pub trait MemoryWrite : MemoryRead {
 impl Memory {
     /// Create a new Memory object.
     pub fn new(device_config: DeviceConfig) -> Self {
-        let (num_vram_banks, num_wram_banks) = match device_config.emulation {
-            EmulationType::DMG => (1, 2),
-            EmulationType::GBC => (2, 8),
+        let num_wram_banks = match device_config.emulation {
+            EmulationType::DMG => 2,
+            EmulationType::GBC => 8,
         };
 
         Self {
@@ -229,20 +210,13 @@ impl Memory {
                 MemoryInternal {
                     device_config,
 
-                    vram_banks: std::iter::repeat_with(|| VRamBank::new()).take(num_vram_banks).collect(),
-                    vram_active_bank: 0,
-
                     wram_banks: std::iter::repeat_with(|| WRamBank::new()).take(num_wram_banks).collect(),
                     wram_active_bank_0: 0,
                     wram_active_bank_1: 1,
 
-                    oam: OamRamBank::new(),
                     hram: HRamBank::new(),
                     io_registers: IoRegisterBank::new(IoRegister::default()),
                     io_registers_written: [false; 256],
-
-                    gbc_background_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
-                    gbc_object_palette: GbcPaletteBank::new([GbcPaletteData::new(); 8]),
 
                     mbc:        Box::new(MbcNone::new()),
                     boot_rom:   None,
@@ -340,37 +314,6 @@ impl Memory {
         Ref::map(mem, |mem| &mem.wram_banks)
     }
 
-    /// Get the list of Video RAM banks on this device.
-    /// DMG = 1 bank, GBC = 2 banks.
-    pub fn get_vram_banks(&self) -> Ref<Vec<VRamBank>> {
-        let mem = self.internal.get();
-        Ref::map(mem, |mem| &mem.vram_banks)
-    }
-
-    /// Get the OAM table.
-    pub fn get_oam(&self) -> Ref<OamRamBank> {
-        let mem = self.internal.get();
-        Ref::map(mem, |mem| &mem.oam)
-    }
-
-    /// Get the OAM table.
-    pub fn get_oam_mut(&mut self) -> RefMut<OamRamBank> {
-        let mem = self.internal.get_mut();
-        RefMut::map(mem, |mem| &mut mem.oam)
-    }
-
-    /// Get the color palette used by background tiles on GameBoy Color.
-    pub fn get_gbc_background_palettes(&self) -> Ref<[GbcPaletteData; 8]> {
-        let mem = self.internal.get();
-        Ref::map(mem, |mem| mem.gbc_background_palette.get())
-    }
-
-    /// Get the color palette used by background tiles on GameBoy Color.
-    pub fn get_gbc_object_palettes(&self) -> Ref<[GbcPaletteData; 8]> {
-        let mem = self.internal.get();
-        Ref::map(mem, |mem| mem.gbc_object_palette.get())
-    }
-
     /// Get the IO Registers struct.
     pub fn get_io_registers(&self) -> Ref<IoRegister> {
         let mem = self.internal.get();
@@ -466,12 +409,6 @@ impl MemoryInternal {
             address => {
                 0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(address),
                 0x0100 ..= 0x7fff => [] self.read_from_cartridge(address),
-
-                0x8000 ..= 0x9fff => [mapped_address] {
-                    let bank = &self.vram_banks[self.vram_active_bank as usize];
-                    bank.get_at(mapped_address)
-                },
-
                 0xa000 ..= 0xbfff => [] self.read_from_cartridge(address),
 
                 0xc000 ..= 0xcfff => [mapped_address] {
@@ -489,7 +426,6 @@ impl MemoryInternal {
                     self.read((mapped_address + 0xc000) as u16)
                 },
 
-                0xfe00 ..= 0xfe9f => [mapped_address] self.oam.get_at(mapped_address),
                 0xfea0 ..= 0xfeff => []               unreachable!(), // unusable ram area
                 0xff00 ..= 0xff7f => [mapped_address] self.io_registers.get_at(mapped_address),
                 0xff80 ..= 0xfffe => [mapped_address] self.hram.get_at(mapped_address),
@@ -523,12 +459,6 @@ impl MemoryInternal {
         memory_map!(
             address => {
                 0x0000 ..= 0x7fff => [] self.write_to_cartridge(address, value),
-
-                0x8000 ..= 0x9fff => [mapped_address] {
-                    let bank = &mut self.vram_banks[self.vram_active_bank as usize];
-                    bank.set_at(mapped_address, value)
-                },
-
                 0xa000 ..= 0xbfff => [] self.write_to_cartridge(address, value),
 
                 0xc000 ..= 0xcfff => [mapped_address] {
@@ -546,7 +476,6 @@ impl MemoryInternal {
                     self.write((mapped_address + 0xc000) as u16, value)
                 },
 
-                0xfe00 ..= 0xfe9f => [mapped_address] self.oam.set_at(mapped_address, value),
                 0xfea0 ..= 0xfeff => []               unreachable!(), // unusable ram area
 
                 0xff00 ..= 0xff7f => [mapped_address] {
@@ -581,63 +510,9 @@ impl MemoryInternal {
     /// Writes data into IO registers
     fn on_io_registers_changed(&mut self, address: u16, _old_value: u8, value: u8) {
         match address {
-            MEMORY_LOCATION_VBK => {
-                // on GBC: switch VRAM bank
-                if let EmulationType::GBC = self.device_config.emulation {
-                    let bank = value & 0x01;
-                    self.vram_active_bank = bank;
-
-                    // register will contain the active bank in bit #0
-                    // and all other bits set to 1
-                    self.io_registers.get_mut().vbk = 0b_1111_1110 | bank;
-                }
-            },
-
             MEMORY_LOCATION_BOOT_ROM_DISABLE => {
                 if (value & 0x01) != 0 {
                     self.boot_rom = None;
-                }
-            },
-
-            MEMORY_LOCATION_BCPS => {
-                // on writing background palette index load the according value into bcpd
-                let palette_address = (value & 0x3f) as usize;
-                self.io_registers.get_mut().bcpd = self.gbc_background_palette.get_at(palette_address);
-            },
-
-            MEMORY_LOCATION_BCPD => {
-                let io_reg  = self.io_registers.get_mut();
-
-                // get the address from BCPS
-                let palette_address = (io_reg.bcps & 0x3f) as usize;
-
-                // write palette data value
-                self.gbc_background_palette.set_at(palette_address, value);
-
-                // increment address, if auto increment is enabled
-                if get_bit(io_reg.bcps, 7) {
-                    io_reg.bcps = (((palette_address + 1) & 0x3f) | 0x80) as u8;
-                }
-            },
-
-            MEMORY_LOCATION_OCPS => {
-                // on writing object palette index load the according value into ocpd
-                let palette_address = (value & 0x07) as usize;
-                self.io_registers.get_mut().ocpd = self.gbc_object_palette.get_at(palette_address);
-            },
-
-            MEMORY_LOCATION_OCPD => {
-                let io_reg  = self.io_registers.get_mut();
-
-                // get the address from OCPS
-                let palette_address = (io_reg.ocps & 0x3f) as usize;
-
-                // write palette data value
-                self.gbc_object_palette.set_at(palette_address, value);
-
-                // increment address, if auto increment is enabled
-                if get_bit(io_reg.ocps, 7) {
-                    io_reg.ocps = (((palette_address + 1) & 0x3f) | 0x80) as u8;
                 }
             },
 

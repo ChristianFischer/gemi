@@ -16,7 +16,6 @@
  */
 
 use crate::apu::registers::ApuRegisters;
-use crate::ppu::graphic_data::DmgPalette;
 
 /// Data struct containing raw data of all IO Registers in memory range 0xff00 to 0xffff.
 /// This allows read/write operations without involving the memory bus. In real hardware,
@@ -59,23 +58,11 @@ pub struct IoRegister {
     /// Sound control registers
     pub apu: ApuRegisters,
 
-    _unused_ppu_0x40: [u8; 6],
-
-    /// OAM DMA transfer start address
-    pub dma_address: u8,
-
-    /// DMG background palette
-    pub bgp: DmgPalette,
-
-    /// DMG object palettes
-    pub obp: [DmgPalette; 2],
-
-    _unused_ppu_0x4a: [u8; 2],
+    _unused_ppu_0x40: [u8; 12],
 
     _unused_0x4c: [u8; 3],
 
-    /// GBC: VRAM bank select
-    pub vbk: u8,
+    _unused_vbk: u8,
 
     pub boot_rom_disable: u8,
 
@@ -84,22 +71,7 @@ pub struct IoRegister {
 
     _unused_0x56: [u8; 18],
 
-    /// bit 0-6: address of the GBC background palette to read/write
-    /// bit 7: auto increment the address on write
-    pub bcps: u8,
-
-    /// byte data to be read or written on the background palette memory
-    pub bcpd: u8,
-
-    /// bit 0-6: address of the GBC object palette to read/write
-    /// bit 7: auto increment the address on write
-    pub ocps: u8,
-
-    /// byte data to be read or written on the object palette memory
-    pub ocpd: u8,
-
-    /// Object priority flag
-    pub opri: u8,
+    _unused_ppu_0x68: [u8; 5],
 
     _unused_0x6d: [u8; 3],
 
@@ -177,16 +149,6 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR50            => apu.nr50);
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR51            => apu.nr51);
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR52            => apu.nr52);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_DMA_ADDRESS         => dma_address);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_BG          => bgp);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP0        => obp[0]);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_PALETTE_OBP1        => obp[1]);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_VBK                 => vbk);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_BCPS                => bcps);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_BCPD                => bcpd);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_OCPS                => ocps);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_OCPD                => ocpd);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_OPRI                => opri);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
         test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_FLAGGED  => interrupts_flagged);

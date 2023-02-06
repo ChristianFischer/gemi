@@ -107,6 +107,8 @@ macro_rules! memory_map {
                     $code
                 }
             )+
+
+            _ => unreachable!(),
         }
     }
 }

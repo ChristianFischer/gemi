@@ -119,7 +119,7 @@ impl MmuInternal {
                     let dst = b as usize;
 
                     let val = self.read(src);
-                    self.peripherals.mem.get_oam_mut().set_at(dst, val);
+                    self.peripherals.ppu.get_oam_bank_mut().set_at(dst, val);
                 }
 
                 // store the current state or set the transfer state to 'Disabled'
@@ -189,7 +189,7 @@ impl_memory_mapper!(
         0x0000 ..= 0x7fff => root.peripherals.mem,
 
         // Video RAM
-        0x8000 ..= 0x9fff => root.peripherals.mem,
+        0x8000 ..= 0x9fff => root.peripherals.ppu,
 
         // External RAM
         0xa000 ..= 0xbfff => root.peripherals.mem,
@@ -198,14 +198,15 @@ impl_memory_mapper!(
         0xc000 ..= 0xfdff => root.peripherals.mem,
 
         // OAM
-        0xfe00 ..= 0xfe9f => root.peripherals.mem,
+        0xfe00 ..= 0xfe9f => root.peripherals.ppu,
 
         // Restricted RAM area
         0xfea0 ..= 0xfeff => root.peripherals.mem,
 
         // PPU registers
         0xff40 ..= 0xff45 => root.peripherals.ppu,
-        0xff4a ..= 0xff4b => root.peripherals.ppu,
+        0xff47 ..= 0xff4f => root.peripherals.ppu,
+        0xff68 ..= 0xff6b => root.peripherals.ppu,
 
         MEMORY_LOCATION_DMA_ADDRESS => *root,
 

@@ -18,3 +18,4 @@
 pub mod flags;
 pub mod graphic_data;
 pub mod ppu;
+pub mod video_memory;
