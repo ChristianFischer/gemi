@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::CPU_CLOCK_SPEED;
+use crate::cpu::cpu::CPU_CLOCK_SPEED;
 use crate::gameboy::Clock;
 
 

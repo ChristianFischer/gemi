@@ -15,9 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::{CpuFlag, RegisterR16};
+use crate::cpu::cpu::{CpuFlag, RegisterR16};
 use crate::gameboy::{Clock, GameBoy};
-use crate::opcode::{opcode, OpCodeContext};
+use crate::cpu::opcode::{opcode, OpCodeContext};
 
 const BRANCH_CYCLES_JMP:    Clock =  4;
 const BRANCH_CYCLES_CALL:   Clock = 12;

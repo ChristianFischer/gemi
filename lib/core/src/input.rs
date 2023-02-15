@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::Interrupt;
+use crate::cpu::cpu::Interrupt;
 use crate::mmu::locations::MEMORY_LOCATION_JOYP;
 use crate::mmu::memory::Memory;
 use crate::utils::{change_bit, get_bit};

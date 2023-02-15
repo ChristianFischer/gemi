@@ -20,26 +20,26 @@ mod opcodes_control;
 mod opcodes_jump;
 mod opcodes_ld;
 
-use crate::opcode::OpCode;
+use crate::cpu::opcode::OpCode;
 
-use crate::opcodes::opcodes_arithmetic::*;
-use crate::opcodes::opcodes_arithmetic::inc::*;
-use crate::opcodes::opcodes_arithmetic::dec::*;
-use crate::opcodes::opcodes_arithmetic::add::*;
-use crate::opcodes::opcodes_arithmetic::sub::*;
-use crate::opcodes::opcodes_arithmetic::and::*;
-use crate::opcodes::opcodes_arithmetic::xor::*;
-use crate::opcodes::opcodes_arithmetic::or::*;
-use crate::opcodes::opcodes_arithmetic::cp::*;
-use crate::opcodes::opcodes_arithmetic::rl::*;
-use crate::opcodes::opcodes_arithmetic::rr::*;
-use crate::opcodes::opcodes_arithmetic::swap::*;
-use crate::opcodes::opcodes_arithmetic::set_bit::*;
-use crate::opcodes::opcodes_arithmetic::res_bit::*;
-use crate::opcodes::opcodes_arithmetic::chk_bit::*;
-use crate::opcodes::opcodes_control::*;
-use crate::opcodes::opcodes_jump::*;
-use crate::opcodes::opcodes_ld::*;
+use crate::cpu::opcodes::opcodes_arithmetic::*;
+use crate::cpu::opcodes::opcodes_arithmetic::inc::*;
+use crate::cpu::opcodes::opcodes_arithmetic::dec::*;
+use crate::cpu::opcodes::opcodes_arithmetic::add::*;
+use crate::cpu::opcodes::opcodes_arithmetic::sub::*;
+use crate::cpu::opcodes::opcodes_arithmetic::and::*;
+use crate::cpu::opcodes::opcodes_arithmetic::xor::*;
+use crate::cpu::opcodes::opcodes_arithmetic::or::*;
+use crate::cpu::opcodes::opcodes_arithmetic::cp::*;
+use crate::cpu::opcodes::opcodes_arithmetic::rl::*;
+use crate::cpu::opcodes::opcodes_arithmetic::rr::*;
+use crate::cpu::opcodes::opcodes_arithmetic::swap::*;
+use crate::cpu::opcodes::opcodes_arithmetic::set_bit::*;
+use crate::cpu::opcodes::opcodes_arithmetic::res_bit::*;
+use crate::cpu::opcodes::opcodes_arithmetic::chk_bit::*;
+use crate::cpu::opcodes::opcodes_control::*;
+use crate::cpu::opcodes::opcodes_jump::*;
+use crate::cpu::opcodes::opcodes_ld::*;
 
 
 /// Represents an invalid opcode.

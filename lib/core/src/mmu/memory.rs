@@ -21,7 +21,7 @@ use std::io;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
-use crate::cpu::Interrupt;
+use crate::cpu::cpu::Interrupt;
 use crate::gameboy::{DeviceConfig, EmulationType};
 use crate::mmu::io_registers::IoRegister;
 use crate::mmu::locations::*;

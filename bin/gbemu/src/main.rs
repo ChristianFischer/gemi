@@ -26,7 +26,7 @@ use gbemu_core::boot_rom::BootRom;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
 use std::{env, time};
 use std::time::Duration;
-use gbemu_core::cpu::CPU_CLOCK_SPEED;
+use gbemu_core::cpu::cpu::CPU_CLOCK_SPEED;
 use crate::window::Window;
 
 fn print_rom_info(filename: &String, cartridge: &Cartridge) {

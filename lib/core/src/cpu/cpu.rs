@@ -20,8 +20,8 @@ use crate::gameboy::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory::MemoryWrite;
 use crate::mmu::mmu::Mmu;
-use crate::opcode::{Instruction, OpCode};
-use crate::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
+use crate::cpu::opcode::{Instruction, OpCode};
+use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
 

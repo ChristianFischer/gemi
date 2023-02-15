@@ -18,11 +18,11 @@
 use crate::apu::apu::Apu;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
-use crate::cpu::{Cpu, CpuFlag, RegisterR8};
+use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8};
 use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::mmu::Mmu;
-use crate::opcode::{OpCodeContext, OpCodeResult};
+use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
 use crate::ppu::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;

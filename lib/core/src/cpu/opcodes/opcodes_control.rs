@@ -15,9 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::CpuFlag;
+use crate::cpu::cpu::CpuFlag;
 use crate::gameboy::GameBoy;
-use crate::opcode::{opcode, OpCodeContext};
+use crate::cpu::opcode::{opcode, OpCodeContext};
 use crate::utils::signed_overflow_add_u16;
 
 opcode!(nop, []);

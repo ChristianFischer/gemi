@@ -25,7 +25,7 @@ type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> OpCodeResu
 macro_rules! opcode {
     ($(#[$meta:meta])? $name:ident, [$($bind_gb:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
         $(#[$meta])?
-        pub fn $name(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> crate::opcode::OpCodeResult {
+        pub fn $name(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
             // silence 'unused' warning for gb and ctx
             { let _ = (&gb, &ctx); }
 
@@ -39,7 +39,7 @@ macro_rules! opcode {
             };
 
             // convert return value into OpCodeResult
-            crate::opcode::OpCodeResult::from(result)
+            crate::cpu::opcode::OpCodeResult::from(result)
         }
     };
 }

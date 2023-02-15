@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::Interrupt;
+use crate::cpu::cpu::Interrupt;
 use crate::gameboy::Clock;
 use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
 use crate::mmu::memory::{Memory, MemoryRead, MemoryWrite};

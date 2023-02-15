@@ -18,7 +18,7 @@
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
 use std::ops::Sub;
-use crate::cpu::Interrupt;
+use crate::cpu::cpu::Interrupt;
 use crate::gameboy::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory::Memory;

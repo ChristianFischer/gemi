@@ -15,10 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::{CpuFlag, RegisterR16, RegisterR8};
+use crate::cpu::cpu::{CpuFlag, RegisterR16, RegisterR8};
 use crate::gameboy::GameBoy;
 use crate::utils::{carrying_add_u16, carrying_add_u8, carrying_sub_u8};
-use crate::opcode::{opcode, OpCodeContext, OpCodeResult};
+use crate::cpu::opcode::{opcode, OpCodeContext, OpCodeResult};
 
 
 ////////////////////////////////////////////////

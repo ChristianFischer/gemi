@@ -16,7 +16,7 @@
  */
 
 use std::cmp::min;
-use crate::cpu::Interrupt;
+use crate::cpu::cpu::Interrupt;
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
 use crate::mmu::memory::Memory;
