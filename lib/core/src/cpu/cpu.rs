@@ -17,8 +17,6 @@
 
 use std::fmt::{Display, Formatter};
 use crate::gameboy::Clock;
-use crate::mmu::locations::*;
-use crate::mmu::memory::MemoryWrite;
 use crate::mmu::mmu::Mmu;
 use crate::cpu::opcode::{Instruction, OpCode};
 use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
@@ -57,16 +55,6 @@ pub enum CpuFlag {
     Negative,
     HalfCarry,
     Carry,
-}
-
-/// An enumeration of all interrupts available.
-#[derive(Copy, Clone)]
-pub enum Interrupt {
-    VBlank,
-    LcdStat,
-    Timer,
-    Serial,
-    Input,
 }
 
 /// State of the interrupts enabled flag.
@@ -189,41 +177,6 @@ impl CpuFlag {
 }
 
 
-impl Interrupt {
-    /// An array containing all possible interrupts for easier iteration.
-    const ALL_INTERRUPTS : [Interrupt; 5] = [
-        Interrupt::VBlank,
-        Interrupt::LcdStat,
-        Interrupt::Timer,
-        Interrupt::Serial,
-        Interrupt::Input
-    ];
-
-    /// Get the bit inside the interrupts register which stores
-    /// the interrupt to be enabled or to be fired.
-    pub fn bit(&self) -> u8 {
-        match self {
-            Interrupt::VBlank   => 0,
-            Interrupt::LcdStat  => 1,
-            Interrupt::Timer    => 2,
-            Interrupt::Serial   => 3,
-            Interrupt::Input    => 4,
-        }
-    }
-
-    /// Get the address this interrupt will jump to when fired.
-    pub fn address(&self) -> u16 {
-        match self {
-            Interrupt::VBlank   => 0x0040,
-            Interrupt::LcdStat  => 0x0048,
-            Interrupt::Timer    => 0x0050,
-            Interrupt::Serial   => 0x0058,
-            Interrupt::Input    => 0x0060,
-        }
-    }
-}
-
-
 impl HaltState {
     /// Checks whether the CPU is running in the according state.
     pub fn is_cpu_running(&self) -> bool {
@@ -269,7 +222,7 @@ impl Cpu {
     fn handle_halt_state(&mut self) {
         match self.halt {
             HaltState::Halt => {
-                if self.get_interrupts_pending() != 0 {
+                if self.get_mmu().get_peripherals().interrupts.has_interrupts_pending() {
                     self.halt = HaltState::Running;
                 }
             },
@@ -282,22 +235,17 @@ impl Cpu {
     pub fn handle_interrupts(&mut self) -> Option<Clock> {
         match self.ime {
             ImeState::Enabled => {
-                let interrupts_pending = self.get_interrupts_pending();
+                let cpu_state = &mut self.get_mmu_mut().get_peripherals_mut().interrupts;
 
-                for interrupt in &Interrupt::ALL_INTERRUPTS {
-                    if get_bit(interrupts_pending, interrupt.bit()) {
-                        // disable further interrupts when a interrupt is being handled
-                        self.ime = ImeState::Disabled;
+                if let Some(interrupt) = cpu_state.take_pending_interrupt() {
+                    // disable further interrupts when a interrupt is being handled
+                    self.ime = ImeState::Disabled;
 
-                        // clear interrupt bit
-                        self.mmu.get_peripherals_mut().mem.clear_bit(MEMORY_LOCATION_INTERRUPTS_FLAGGED, interrupt.bit());
+                    // call the address of the interrupt
+                    self.call_addr(interrupt.address());
 
-                        // call the address of the interrupt
-                        self.call_addr(interrupt.address());
-
-                        // stop handling other interrupts
-                        return Some(20);
-                    }
+                    // stop handling other interrupts
+                    return Some(20);
                 }
             },
 
@@ -308,7 +256,7 @@ impl Cpu {
     }
 
     /// Handles IME state.
-    fn handle_ime_pending(&mut self, cycles: Clock) -> Option<(Interrupt, Clock)> {
+    fn handle_ime_pending(&mut self, cycles: Clock) {
         match self.ime {
             ImeState::EnabledInCycles(timeout) => {
                 let new_timeout = timeout.saturating_sub(cycles);
@@ -323,17 +271,6 @@ impl Cpu {
 
             _ => { }
         }
-
-        None
-    }
-
-    /// Get pending interrupts in form of an integer with each bit representing it's according interrupt.
-    pub fn get_interrupts_pending(&self) -> u8 {
-        let interrupts_flagged = self.mmu.read_u8(MEMORY_LOCATION_INTERRUPTS_FLAGGED);
-        let interrupts_enabled = self.mmu.read_u8(MEMORY_LOCATION_INTERRUPTS_ENABLED);
-        let interrupts_pending = interrupts_flagged & interrupts_enabled;
-
-        interrupts_pending
     }
 
     /// Enables interrupts.

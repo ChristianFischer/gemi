@@ -210,14 +210,14 @@ impl_memory_mapper!(
 
         MEMORY_LOCATION_DMA_ADDRESS => *root,
 
+        MEMORY_LOCATION_INTERRUPTS_FLAGGED => root.peripherals.interrupts,
+        MEMORY_LOCATION_INTERRUPTS_ENABLED => root.peripherals.interrupts,
+
         // IO Registers
         0xff00 ..= 0xff7f => root.peripherals.mem,
 
         // HRAM
-        0xff80 ..= 0xfffe => root.peripherals.mem,
-
-        // IE
-        0xffff => root.peripherals.mem
+        0xff80 ..= 0xfffe => root.peripherals.mem
     }
 );
 

@@ -16,10 +16,9 @@
  */
 
 use std::cmp::min;
-use crate::cpu::cpu::Interrupt;
+use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
-use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::MemoryData;
@@ -171,8 +170,8 @@ pub struct Ppu {
     /// Current device config
     device_config: DeviceConfig,
 
-    /// Handle to read and write device memory.
-    mem: Memory,
+    /// Pending interrupts requested by this component.
+    interrupts: Interrupts,
 
     /// The PPU's current mode.
     mode: Mode,
@@ -274,11 +273,11 @@ impl ScanlineData {
 
 impl Ppu {
     /// Creates a new PPU object.
-    pub fn new(device_config: DeviceConfig, mem: Memory) -> Ppu {
+    pub fn new(device_config: DeviceConfig) -> Ppu {
         Ppu {
             clock: 0,
             device_config,
-            mem,
+            interrupts: Interrupts::default(),
             mode: Mode::OamScan,
             memory: VideoMemory::new(device_config),
             registers: PpuRegisters::default(),
@@ -557,21 +556,21 @@ impl Ppu {
         match mode {
             Mode::HBlank => {
                 if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByHBlank) {
-                    self.mem.request_interrupt(Interrupt::LcdStat);
+                    self.request_interrupt(Interrupt::LcdStat);
                 }
             }
 
             Mode::VBlank => {
                 if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByVBlank) {
-                    self.mem.request_interrupt(Interrupt::LcdStat);
+                    self.request_interrupt(Interrupt::LcdStat);
                 }
 
-                self.mem.request_interrupt(Interrupt::VBlank);
+                self.request_interrupt(Interrupt::VBlank);
             },
 
             Mode::OamScan => {
                 if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByOam) {
-                    self.mem.request_interrupt(Interrupt::LcdStat);
+                    self.request_interrupt(Interrupt::LcdStat);
                 }
             }
 
@@ -606,7 +605,7 @@ impl Ppu {
             // fire interrupt, if enabled
             if coincidence {
                 if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByCoincidence) {
-                    self.mem.request_interrupt(Interrupt::LcdStat);
+                    self.request_interrupt(Interrupt::LcdStat);
                 }
             }
         }
@@ -637,6 +636,10 @@ impl Ppu {
         self.window_line = 0;
     }
 
+    /// Requests an interrupt to be fired.
+    fn request_interrupt(&mut self, interrupt: Interrupt) {
+        self.interrupts |= interrupt;
+    }
 
     /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
     pub fn set_dmg_display_palette(&mut self, palette: DmgDisplayPalette) {
@@ -1049,6 +1052,14 @@ impl MemoryBusConnection for Ppu {
                 }
             }
         });
+    }
+
+
+    fn take_requested_interrupts(&mut self) -> Interrupts {
+        let result = self.interrupts.clone();
+        self.interrupts.clear();
+
+        result
     }
 }
 

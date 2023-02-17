@@ -19,10 +19,12 @@ use crate::apu::apu::Apu;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
 use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8};
+use crate::cpu::interrupts::InterruptRegisters;
 use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::mmu::Mmu;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
+use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::ppu::ppu::{FrameState, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
@@ -109,6 +111,7 @@ pub struct Peripherals {
     pub timer: Timer,
     pub input: Input,
     pub serial: SerialPort,
+    pub interrupts: InterruptRegisters,
 }
 
 
@@ -244,11 +247,12 @@ impl GameBoy {
                     Mmu::new(
                         Peripherals {
                             apu: Apu::new(mem.new_ref()),
-                            ppu: Ppu::new(device_config, mem.new_ref()),
+                            ppu: Ppu::new(device_config),
                             mem: mem.new_ref(),
                             timer: Timer::new(mem.new_ref()),
                             input: Input::new(mem.new_ref()),
                             serial: SerialPort::new(mem.new_ref()),
+                            interrupts: InterruptRegisters::new(),
                         }
                     )
                 )
@@ -458,6 +462,10 @@ impl GameBoy {
             // let the PPU run for the same amount of cycles
             let ppu_state = self.get_peripherals_mut().ppu.update(cycles);
 
+            // forward interrupts requested by the ppu
+            let interrupts = self.get_peripherals_mut().ppu.take_requested_interrupts();
+            self.get_peripherals_mut().interrupts.request_interrupts(interrupts);
+
             // When a frame completed, it should be presented
             if let FrameState::FrameCompleted = ppu_state {
                 return interval_cycles;
@@ -551,5 +559,17 @@ impl GameBoy {
         self.get_peripherals_mut().timer.update(cycles);
         self.get_peripherals_mut().serial.update(cycles);
         self.get_peripherals_mut().input.update();
+
+        // collects all requested interrupts to forward them into the interrupts component
+        {
+            let interrupts =
+                    self.get_peripherals_mut().apu.take_requested_interrupts()
+                |   self.get_peripherals_mut().timer.take_requested_interrupts()
+                |   self.get_peripherals_mut().serial.take_requested_interrupts()
+                |   self.get_peripherals_mut().input.take_requested_interrupts()
+            ;
+
+            self.get_peripherals_mut().interrupts.request_interrupts(interrupts);
+        }
     }
 }

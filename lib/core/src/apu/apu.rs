@@ -25,6 +25,7 @@ use crate::apu::output_buffer::OutputBuffer;
 use crate::gameboy::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory::Memory;
+use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::utils::{get_bit, set_bit};
 
 
@@ -325,5 +326,21 @@ impl Apu {
 
     pub fn take_samples(&mut self) -> Vec<i16> {
         self.output_buffer.take_samples()
+    }
+}
+
+
+impl MemoryBusConnection for Apu {
+    fn on_read(&self, address: u16) -> u8 {
+        match address {
+            _ => 0xff
+        }
+    }
+
+
+    fn on_write(&mut self, address: u16, value: u8) {
+        match address {
+            _ => { _ = value }
+        };
     }
 }

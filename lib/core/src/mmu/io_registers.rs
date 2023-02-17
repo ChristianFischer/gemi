@@ -50,10 +50,7 @@ pub struct IoRegister {
     /// Timer control
     pub tac: u8,
 
-    _unused_0x08: [u8; 7],
-
-    /// IF: pending interrupts
-    interrupts_flagged: u8,
+    _unused_0x08: [u8; 8],
 
     /// Sound control registers
     pub apu: ApuRegisters,
@@ -86,10 +83,7 @@ pub struct IoRegister {
     _unused_0xc0: [u8; 0x10],
     _unused_0xd0: [u8; 0x10],
     _unused_0xe0: [u8; 0x10],
-    _unused_0xf0: [u8; 0x0f],
-
-    /// IE: interrupts enabled
-    pub interrupts_enabled: u8,
+    _unused_0xf0: [u8; 0x10],
 }
 
 
@@ -151,7 +145,5 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR52            => apu.nr52);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_FLAGGED  => interrupts_flagged);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_INTERRUPTS_ENABLED  => interrupts_enabled);
     }
 }

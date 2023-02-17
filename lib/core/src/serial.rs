@@ -15,10 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::cpu::Interrupt;
+use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::gameboy::Clock;
 use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
 use crate::mmu::memory::{Memory, MemoryRead, MemoryWrite};
+use crate::mmu::memory_bus::MemoryBusConnection;
 
 
 const UPDATE_TIME_SERIAL_TRANSFER:      Clock = 4096;
@@ -39,6 +40,9 @@ pub struct SerialPort {
     /// Access to the device memory.
     mem: Memory,
 
+    /// Pending interrupts requested by this component.
+    interrupts: Interrupts,
+
     /// A queue of all bytes sent by the device.
     output_queue: Vec<u8>,
 
@@ -53,6 +57,7 @@ impl SerialPort {
         SerialPort {
             clock: 0,
             mem,
+            interrupts: Interrupts::default(),
             output_queue: vec![],
             output_queue_enabled: false,
         }
@@ -78,12 +83,18 @@ impl SerialPort {
                 self.mem.clear_bit(MEMORY_LOCATION_SC, 7);
 
                 // ..  and raise serial transfer interrupt
-                self.mem.request_interrupt(Interrupt::Serial);
+                self.request_interrupt(Interrupt::Serial);
             }
 
 
             self.clock -= UPDATE_TIME_SERIAL_TRANSFER;
         }
+    }
+
+
+    /// Requests an interrupt to be fired.
+    fn request_interrupt(&mut self, interrupt: Interrupt) {
+        self.interrupts |= interrupt;
     }
 
 
@@ -121,5 +132,29 @@ impl SerialPort {
         }
 
         None
+    }
+}
+
+
+impl MemoryBusConnection for SerialPort {
+    fn on_read(&self, address: u16) -> u8 {
+        match address {
+            _ => 0xff
+        }
+    }
+
+
+    fn on_write(&mut self, address: u16, value: u8) {
+        match address {
+            _ => { _ = value }
+        };
+    }
+
+
+    fn take_requested_interrupts(&mut self) -> Interrupts {
+        let result = self.interrupts.clone();
+        self.interrupts.clear();
+
+        result
     }
 }

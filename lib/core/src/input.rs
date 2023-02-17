@@ -15,9 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::cpu::Interrupt;
+use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::mmu::locations::MEMORY_LOCATION_JOYP;
 use crate::mmu::memory::Memory;
+use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::utils::{change_bit, get_bit};
 
 
@@ -37,6 +38,9 @@ pub enum InputButton {
 pub struct Input {
     mem: Memory,
 
+    /// Pending interrupts requested by this component.
+    interrupts: Interrupts,
+
     /// Current state of each button.
     /// bit == 1 means pressed, bit == 0 means released
     button_states: u8,
@@ -52,6 +56,7 @@ impl Input {
     pub fn new(mem: Memory) -> Input {
         Input {
             mem,
+            interrupts:             Interrupts::default(),
             button_states:          0x00,
             previous_button_states: 0x00,
         }
@@ -67,7 +72,7 @@ impl Input {
 
             // when any key was pressed this frame, fire the input interrupt
             if keys_pressed != 0 {
-                self.mem.request_interrupt(Interrupt::Input);
+                self.request_interrupt(Interrupt::Input);
             }
 
             self.previous_button_states = self.button_states;
@@ -99,5 +104,34 @@ impl Input {
     /// Checks whether a particular button is currently pressed.
     pub fn is_button_pressed(&self, button: InputButton) -> bool {
         get_bit(self.button_states, button as u8)
+    }
+
+    /// Requests an interrupt to be fired.
+    fn request_interrupt(&mut self, interrupt: Interrupt) {
+        self.interrupts |= interrupt;
+    }
+}
+
+
+impl MemoryBusConnection for Input {
+    fn on_read(&self, address: u16) -> u8 {
+        match address {
+            _ => 0xff
+        }
+    }
+
+
+    fn on_write(&mut self, address: u16, value: u8) {
+        match address {
+            _ => { _ = value }
+        };
+    }
+
+
+    fn take_requested_interrupts(&mut self) -> Interrupts {
+        let result = self.interrupts.clone();
+        self.interrupts.clear();
+
+        result
     }
 }

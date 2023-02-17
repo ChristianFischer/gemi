@@ -21,7 +21,6 @@ use std::io;
 use std::rc::Rc;
 use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
-use crate::cpu::cpu::Interrupt;
 use crate::gameboy::{DeviceConfig, EmulationType};
 use crate::mmu::io_registers::IoRegister;
 use crate::mmu::locations::*;
@@ -360,14 +359,6 @@ impl Memory {
             None
         }
     }
-
-    /// requests an interrupt to be fired.
-    /// This will set the according bit in the memory. If Interrupts
-    /// are enabled for the CPU, the instruction pointer will jump
-    /// to the according interrupt address, otherwise it will be ignored.
-    pub fn request_interrupt(&mut self, interrupt: Interrupt) {
-        self.set_bit(MEMORY_LOCATION_INTERRUPTS_FLAGGED, interrupt.bit());
-    }
 }
 
 impl MemoryInternalRef {
@@ -428,8 +419,7 @@ impl MemoryInternal {
 
                 0xfea0 ..= 0xfeff => []               unreachable!(), // unusable ram area
                 0xff00 ..= 0xff7f => [mapped_address] self.io_registers.get_at(mapped_address),
-                0xff80 ..= 0xfffe => [mapped_address] self.hram.get_at(mapped_address),
-                0xffff            => []               self.io_registers.get().interrupts_enabled
+                0xff80 ..= 0xfffe => [mapped_address] self.hram.get_at(mapped_address)
             }
         )
     }
@@ -485,17 +475,7 @@ impl MemoryInternal {
                     self.on_io_registers_changed(address, old, value);
                 },
 
-                0xff80 ..= 0xfffe => [mapped_address] self.hram.set_at(mapped_address, value),
-
-                0xffff => [] {
-                    let ioreg = self.io_registers.get_mut();
-                    let old = ioreg.interrupts_enabled;
-                    ioreg.interrupts_enabled = value;
-
-                    self.io_registers_written[0xff] = true;
-
-                    self.on_io_registers_changed(address, old, value);
-                }
+                0xff80 ..= 0xfffe => [mapped_address] self.hram.set_at(mapped_address, value)
             }
         )
     }

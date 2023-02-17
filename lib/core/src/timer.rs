@@ -18,10 +18,11 @@
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
 use std::ops::Sub;
-use crate::cpu::cpu::Interrupt;
+use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::gameboy::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory::Memory;
+use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::utils::{get_bit, get_high};
 
 
@@ -85,6 +86,9 @@ enum TimaState {
 /// which are controlled by TIMA, TMA, TAC and DIV registers.
 pub struct Timer {
     mem: Memory,
+
+    /// Pending interrupts requested by this component.
+    interrupts: Interrupts,
 
     /// The internal counter used to trigger TIMA increments
     internal_counter: InternalCounter,
@@ -235,7 +239,7 @@ impl Timer {
     pub fn new(mem: Memory) -> Timer {
         Timer {
             mem,
-
+            interrupts: Interrupts::default(),
             internal_counter: InternalCounter::new(),
             tima_state: TimaState::Normal,
         }
@@ -356,7 +360,7 @@ impl Timer {
         match self.tima_state {
             TimaState::Overflow => {
                 // overflow, raise interrupt
-                self.mem.request_interrupt(Interrupt::Timer);
+                self.request_interrupt(Interrupt::Timer);
 
                 // reset value
                 self.reset_tima_to_tma();
@@ -387,4 +391,33 @@ impl Timer {
         io_regs.tima = tma;
     }
 
+
+    /// Requests an interrupt to be fired.
+    fn request_interrupt(&mut self, interrupt: Interrupt) {
+        self.interrupts |= interrupt;
+    }
+}
+
+
+impl MemoryBusConnection for Timer {
+    fn on_read(&self, address: u16) -> u8 {
+        match address {
+            _ => 0xff
+        }
+    }
+
+
+    fn on_write(&mut self, address: u16, value: u8) {
+        match address {
+            _ => { _ = value }
+        };
+    }
+
+
+    fn take_requested_interrupts(&mut self) -> Interrupts {
+        let result = self.interrupts.clone();
+        self.interrupts.clear();
+
+        result
+    }
 }

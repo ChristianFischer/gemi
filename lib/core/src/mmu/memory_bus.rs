@@ -15,6 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::cpu::interrupts::Interrupts;
+
+
 /// Trait for objects connected to the memory bus.
 /// A connected object may receive memory read and write requests
 /// and has to respond on them.
@@ -26,6 +29,12 @@ pub trait MemoryBusConnection {
 
     /// A request to write to a memory address in the components accountability.
     fn on_write(&mut self, address: u16, value: u8);
+
+    /// Takes the FlagSet containing all interrupts requested since the last call.
+    /// After calling this, the requested interrupts of this component are expected to be cleared.
+    fn take_requested_interrupts(&mut self) -> Interrupts {
+        Interrupts::default()
+    }
 }
 
 
