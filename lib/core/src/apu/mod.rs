@@ -20,4 +20,3 @@ pub mod channels;
 pub mod dac;
 pub mod mixer;
 pub mod output_buffer;
-pub mod registers;

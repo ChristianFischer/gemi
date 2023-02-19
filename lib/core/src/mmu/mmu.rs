@@ -203,6 +203,9 @@ impl_memory_mapper!(
         // Restricted RAM area
         0xfea0 ..= 0xfeff => root.peripherals.mem,
 
+        // APU registers
+        0xff10 ..= 0xff3f => root.peripherals.apu,
+
         // PPU registers
         0xff40 ..= 0xff45 => root.peripherals.ppu,
         0xff47 ..= 0xff4f => root.peripherals.ppu,

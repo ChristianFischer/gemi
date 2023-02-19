@@ -15,8 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::registers::ApuRegisters;
-
 /// Data struct containing raw data of all IO Registers in memory range 0xff00 to 0xffff.
 /// This allows read/write operations without involving the memory bus. In real hardware,
 /// most of those registers are no storage units, but read/write operations would directly
@@ -53,7 +51,9 @@ pub struct IoRegister {
     _unused_0x08: [u8; 8],
 
     /// Sound control registers
-    pub apu: ApuRegisters,
+    _unused_apu_0x10: [u8; 0x10],
+    _unused_apu_0x20: [u8; 0x10],
+    _unused_apu_0x30: [u8; 0x10],
 
     _unused_ppu_0x40: [u8; 12],
 
@@ -122,27 +122,6 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TIMA       => tima);
         test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TMA        => tma);
         test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TAC        => tac);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR10            => apu.channels[0].nr0);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR11            => apu.channels[0].nr1);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR12            => apu.channels[0].nr2);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR13            => apu.channels[0].nr3);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR14            => apu.channels[0].nr4);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR21            => apu.channels[1].nr1);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR22            => apu.channels[1].nr2);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR23            => apu.channels[1].nr3);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR24            => apu.channels[1].nr4);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR30            => apu.channels[2].nr0);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR31            => apu.channels[2].nr1);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR32            => apu.channels[2].nr2);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR33            => apu.channels[2].nr3);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR34            => apu.channels[2].nr4);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR41            => apu.channels[3].nr1);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR42            => apu.channels[3].nr2);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR43            => apu.channels[3].nr3);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR44            => apu.channels[3].nr4);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR50            => apu.nr50);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR51            => apu.nr51);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_APU_NR52            => apu.nr52);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
     }

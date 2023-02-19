@@ -16,9 +16,8 @@
  */
 
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
-use crate::apu::registers::ApuChannelRegisters;
-use crate::utils::get_bit;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
+use crate::utils::{as_bit_flag, get_bit};
 
 
 /// A counter to disable a sound generator after a specific time period.
@@ -56,19 +55,37 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
 
 
 impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    fn on_read_register(&self, number: u16) -> u8 {
         match number {
             1 => {
                 let max  = 1 << LENGTH_BITS;
                 let mask = max - 1;
 
-                self.length_timer = max - ((registers.nr1 as u16) & mask);
+                max - ((self.length_timer as u8) & mask)
+            },
+
+            4 => {
+                as_bit_flag(self.length_timer_enabled, 6)
+            },
+
+            _ => default_on_read_register(number)
+        }
+    }
+
+
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+        match number {
+            1 => {
+                let max  = 1 << LENGTH_BITS;
+                let mask = max - 1;
+
+                self.length_timer = max - ((value as u16) & mask);
             }
 
             4 => {
                 let was_enabled = self.length_timer_enabled;
 
-                self.length_timer_enabled = get_bit(registers.nr4, 6);
+                self.length_timer_enabled = get_bit(value, 6);
 
                 // extra clock in certain frame sequencer state if the timer got enabled
                 if
@@ -85,7 +102,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
             _ => { }
         }
 
-        default_on_register_changed(number, registers, apu_state)
+        default_on_write_register(number, value, apu_state)
     }
 
 

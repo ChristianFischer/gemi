@@ -23,8 +23,9 @@ use crate::apu::channels::freq_sweep::{FrequencySweep, FrequencySweepResult};
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::length_timer::LengthTimer;
 use crate::apu::dac::DigitalAudioConverter;
-use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
+use crate::utils::get_bit;
+
 
 pub mod features {
     pub const FEATURE_LENGTH_TIMER_DISABLED : u8        = 0;
@@ -76,9 +77,14 @@ pub type TriggerActionSet = FlagSet<TriggerAction>;
 /// This trait allows components to receive changes on their registers and to get notified
 /// when a channel was triggered by setting the trigger bit.
 pub trait ChannelComponent {
-    /// Called when the value of a register was changed by writing on it.
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
-       default_on_register_changed(number, registers, apu_state)
+    /// Called to read the value of a register.
+    fn on_read_register(&self, number: u16) -> u8 {
+        default_on_read_register(number)
+    }
+
+    /// Called when the value of a register was written.
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+       default_on_write_register(number, value, apu_state)
     }
 
     /// Called when the channel was triggered by setting bit 7 of it's NRx4 register.
@@ -89,10 +95,17 @@ pub trait ChannelComponent {
 }
 
 
-/// Placeholder for `on_register_changed` implementations, which do not result in any special behaviour.
-pub fn default_on_register_changed(number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
-    _ = (number, registers, apu_state);
+/// Placeholder for `on_write_register` implementations, which do not result in any special behaviour.
+pub fn default_on_write_register(number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    _ = (number, value, apu_state);
     TriggerAction::None
+}
+
+
+/// Placeholder for `on_read_register` implementations, which do not result in any special behaviour.
+pub fn default_on_read_register(number: u16) -> u8 {
+    _ = number;
+    0x00
 }
 
 
@@ -216,7 +229,37 @@ impl<
 
     /// Invokes a functor on each active component of this channel,
     /// including the generator component.
-    fn for_each_component<F, T>(&mut self, mut func: F) -> TriggerActionSet
+    /// Each component is readonly and is expected to return a numeric
+    /// value as a result of this operation.
+    fn for_each_component<F, T>(&self, func: F) -> T
+        where F : Fn(&dyn ChannelComponent) -> T,
+              T : Default + std::ops::BitOr + std::ops::BitOrAssign
+    {
+        let mut results: T = Default::default();
+
+        if Self::has_feature_length_timer() {
+            results |= func(&self.length_timer);
+        }
+
+        if Self::has_feature_frequency_sweep() {
+            results |= func(&self.freq_sweep);
+        }
+
+        if Self::has_feature_volume_envelope() {
+            results |= func(&self.vol_envelope);
+        }
+
+        results |= func(&self.generator);
+
+        results
+    }
+
+
+    /// Invokes a functor on each active component of this channel,
+    /// including the generator component.
+    /// Any component will be mutable and is expected to return a TriggerAction
+    /// to invoke actions in result of this call.
+    fn for_each_component_mut<F, T>(&mut self, mut func: F) -> TriggerActionSet
         where F : FnMut(&mut dyn ChannelComponent) -> T,
               T : Into<FlagSet<TriggerAction>>
     {
@@ -268,32 +311,40 @@ impl<
     }
 
 
-    /// Fires the notification when a register of this channel was written to.
-    pub fn fire_register_changed(&mut self, number: u16, registers: &ApuRegisters, apu_state: &ApuState) -> TriggerActionSet {
-        let channel_registers = &registers.channels[self.get_channel_ordinal() as usize];
-        let actions = self.for_each_component(
-            |c| c.on_register_changed(number, channel_registers, apu_state)
+    /// Reads from a register which belongs to this channel.
+    pub fn on_read_register(&self, number: u16) -> u8 {
+        self.for_each_component(|c| c.on_read_register(number))
+    }
+
+
+    /// Writes to a register which belongs to this channel.
+    /// When NRx4 bit 7 was set, this will also fire the trigger event for this channel.
+    pub fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerActionSet {
+        let mut actions = self.for_each_component_mut(
+            |c| c.on_write_register(number, value, apu_state)
         );
 
-        // apply requested actions
-        let actions_applied = self.apply_actions(actions);
+        // check whether the trigger bit was set
+        if number == 4 && get_bit(value, 7) {
+            actions |= self.fire_trigger_event(apu_state);
+        }
 
-        actions_applied
+        // apply requested actions
+        actions = self.apply_actions(actions);
+
+        actions
     }
 
 
     /// Fires the trigger event when the channel was triggered by writing NRx4 bit 7.
-    pub fn fire_trigger_event(&mut self, apu_state: &ApuState) -> TriggerActionSet {
+    fn fire_trigger_event(&mut self, apu_state: &ApuState) -> TriggerActionSet {
         self.channel_enabled = true;
 
-        let actions = self.for_each_component(
+        let actions = self.for_each_component_mut(
             |c| c.on_trigger_event(apu_state)
         );
 
-        // apply requested actions
-        let actions_applied = self.apply_actions(actions);
-
-        actions_applied
+        actions
     }
 
 
@@ -346,10 +397,10 @@ impl<
 
     /// Get the audio sample generated by the channels sound generator and
     /// converted by the channels DAC.
-    pub fn get_sample(&self, registers: &ApuRegisters) -> i16 {
+    pub fn get_sample(&self, apu_state: &ApuState) -> i16 {
         let value = if self.channel_enabled {
             // take the current sample from the sound generator
-            let generated_sample = self.generator.get_sample(registers);
+            let generated_sample = self.generator.get_sample(apu_state);
 
             // get the volume level from the envelope function, if available
             let volume = if Self::has_feature_volume_envelope() {

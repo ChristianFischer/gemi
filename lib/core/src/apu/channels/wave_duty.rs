@@ -30,6 +30,9 @@ pub const WAVE_DUTY_PATTERN: [u8; 4] = [
 /// This creates a wave pattern of alternating valleys and peaks with their
 /// duration depending on the ratio between valleys and peaks.
 pub struct WaveDuty {
+    /// Get the index of this wave duty pattern.
+    index: u8,
+
     /// The pattern created by the wave duty.
     wave_pattern: u8,
 }
@@ -43,8 +46,15 @@ impl WaveDuty {
     /// * 3 -> 75%
     pub fn by_index(index: u8) -> Self {
         Self {
+            index,
             wave_pattern: WAVE_DUTY_PATTERN[(index & 0b11) as usize],
         }
+    }
+
+
+    /// Get the index of this wave duty pattern, as it is referenced by the NRx1 register.
+    pub fn get_index(&self) -> u8 {
+        self.index
     }
 
 
@@ -58,8 +68,6 @@ impl WaveDuty {
 
 impl Default for WaveDuty {
     fn default() -> Self {
-        Self {
-            wave_pattern: 0b_0000_0000,
-        }
+        Self::by_index(0)
     }
 }

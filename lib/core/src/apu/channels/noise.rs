@@ -17,9 +17,8 @@
 
 use std::cmp::min;
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
 use crate::apu::channels::generator::SoundGenerator;
-use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
 
@@ -33,6 +32,9 @@ pub struct NoiseGenerator {
 
     /// Width of the LFSR in bits.
     lfsr_width: u16,
+
+    /// The divider code read from the NR43 register.
+    divider_code: u8,
 
     /// The base value of the frequencies divider value.
     frequency_divider: Clock,
@@ -50,6 +52,7 @@ impl NoiseGenerator {
         Self {
             lfsr:               0,
             lfsr_width:         15,
+            divider_code:       0,
             frequency_divider:  8,
             frequency_shift:    0,
             frequency_timer:    0,
@@ -67,12 +70,25 @@ impl NoiseGenerator {
 
 
 impl ChannelComponent for NoiseGenerator {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    fn on_read_register(&self, number: u16) -> u8 {
         match number {
             3 => {
-                let shift        = (registers.nr3 >> 4) & 0x0f;
-                let divider_code = (registers.nr3 >> 0) & 0x07;
+                    self.divider_code
+                |   (((self.frequency_shift & 0x0f) as u8) << 4)
+            },
 
+            _ => default_on_read_register(number)
+        }
+    }
+
+
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+        match number {
+            3 => {
+                let shift        = (value >> 4) & 0x0f;
+                let divider_code = (value >> 0) & 0x07;
+
+                self.divider_code      = divider_code;
                 self.frequency_shift   = shift as Clock;
                 self.frequency_divider = match divider_code {
                     0 => 8,
@@ -80,7 +96,7 @@ impl ChannelComponent for NoiseGenerator {
                 };
 
                 // bit 3 determines the length of the LFSR, either 7 or 15 bits.
-                let lfsr_is_short = get_bit(registers.nr3, 3);
+                let lfsr_is_short = get_bit(value, 3);
                 self.lfsr_width = match lfsr_is_short {
                     false => 15,
                     true  => 7,
@@ -90,7 +106,7 @@ impl ChannelComponent for NoiseGenerator {
             _ => { }
         }
 
-        default_on_register_changed(number, registers, apu_state)
+        default_on_write_register(number, value, apu_state)
     }
 
 
@@ -150,7 +166,7 @@ impl SoundGenerator for NoiseGenerator {
     }
 
 
-    fn get_sample(&self, _registers: &ApuRegisters) -> u8 {
+    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
         // take bit 0 to determine whether a tone is generated or not
         let sample = (self.lfsr & 0x01) as u8;
         sample

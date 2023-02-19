@@ -60,6 +60,15 @@ pub const fn set_bit(byte: u8, bit: u8) -> u8 {
     byte | ((1 << bit) as u8)
 }
 
+/// Creates a u8 integer with the n'th bit set to the given value.
+/// ```
+/// let x = gbemu_core::utils::as_bit_flag(true, 4);
+/// assert_eq!(0b_0001_0000, x);
+/// ```
+pub const fn as_bit_flag(value: bool, bit: u8) -> u8 {
+    (value as u8) << bit
+}
+
 /// Get the integer value of a character, if it matches a hex digit (0-9, a-f)
 pub fn as_hex_digit(c: char) -> Option<u8> {
     match c {

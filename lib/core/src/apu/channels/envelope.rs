@@ -16,8 +16,7 @@
  */
 
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
-use crate::apu::registers::ApuChannelRegisters;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
 use crate::utils::get_bit;
 
 
@@ -57,10 +56,20 @@ pub struct Envelope {
 
 
 impl Direction {
-    pub fn from_bit(bit: bool) -> Self {
-        match bit {
+    /// Get the direction based on the value written into the NRx2 register.
+    pub fn from_register_value(value: u8) -> Self {
+        match get_bit(value, 3) {
             false => Direction::Decrement,
             true  => Direction::Increment,
+        }
+    }
+
+
+    /// Get the value, which should be written into the NRx2 register.
+    pub fn to_register_value(&self) -> u8 {
+        match self {
+            Direction::Decrement => 0b_0000_0000,
+            Direction::Increment => 0b_0000_1000,
         }
     }
 }
@@ -117,19 +126,31 @@ impl Envelope {
 
 
 impl ChannelComponent for Envelope {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    fn on_read_register(&self, number: u16) -> u8 {
         match number {
             2 => {
-                let volume        = (registers.nr2 >> 4) & 0x0f;
-                let period        = (registers.nr2 >> 0) & 0x07;
-                let direction_bit = get_bit(registers.nr2, 3);
-                let dac_enabled   = (registers.nr2 & 0xf8) != 0;
+                    self.direction.to_register_value()
+                |   ((self.period_length & 0x07) << 0)
+                |   ((self.volume        & 0x0f) << 4)
+            },
+
+            _ => default_on_read_register(number)
+        }
+    }
+
+
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+        match number {
+            2 => {
+                let volume        = (value >> 4) & 0x0f;
+                let period        = (value >> 0) & 0x07;
+                let dac_enabled   = (value & 0xf8) != 0;
                 let enabled       = period != 0;
 
                 self.enabled        = enabled;
                 self.volume         = volume;
                 self.period_length  = period;
-                self.direction      = Direction::from_bit(direction_bit);
+                self.direction      = Direction::from_register_value(value);
 
                 return if dac_enabled {
                     TriggerAction::EnableDac
@@ -142,7 +163,7 @@ impl ChannelComponent for Envelope {
             _ => { }
         }
 
-        default_on_register_changed(number, registers, apu_state)
+        default_on_write_register(number, value, apu_state)
     }
 
 

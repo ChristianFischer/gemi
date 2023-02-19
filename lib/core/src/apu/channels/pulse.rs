@@ -17,11 +17,11 @@
 
 use std::cmp::min;
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed};
+use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_write_register, TriggerAction};
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_duty::WaveDuty;
-use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
+use crate::utils::to_u16;
 
 
 /// A sound generator to generate a pulse wave. The wave is based is based on a wave duty value
@@ -29,6 +29,12 @@ use crate::gameboy::Clock;
 pub struct PulseGenerator {
     /// The base of the sound wave to be played, represented by a square wave.
     wave_duty: WaveDuty,
+
+    /// Lower byte of the wave length, set by NRx3 register.
+    wave_length_low: u8,
+
+    /// Upper byte of the wave length, set by NRx4 register.
+    wave_length_high: u8,
 
     /// The length controlling how fast the wave will be played.
     /// The value will be read from NRx3 and NRx4 register of the channel.
@@ -46,35 +52,59 @@ pub struct PulseGenerator {
 impl PulseGenerator {
     pub fn new() -> Self {
         Self {
-            wave_duty:      WaveDuty::default(),
-            wave_length:    0,
-            wave_timer:     0,
-            wave_duty_step: 0,
+            wave_duty:          WaveDuty::default(),
+            wave_length_low:    0,
+            wave_length_high:   0,
+            wave_length:        0,
+            wave_timer:         0,
+            wave_duty_step:     0,
         }
+    }
+
+
+    /// After writing to either NRx3 or NRx4, update the channel's wave length
+    fn refresh_wave_length(&mut self) {
+        let wave_length_register_value = to_u16(self.wave_length_high, self.wave_length_low) as Clock;
+        let wave_length = (2048 - wave_length_register_value) * 4;
+
+        self.wave_length = wave_length;
+        self.wave_timer  = wave_length;
     }
 }
 
 
 impl ChannelComponent for PulseGenerator {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    fn on_read_register(&self, number: u16) -> u8 {
+        match number {
+            1 => self.wave_duty.get_index() << 6,
+            3 => self.wave_length_low,
+            4 => self.wave_length_high,
+            _ => default_on_read_register(number)
+        }
+    }
+
+
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
         match number {
             1 => {
-                let wave_duty_index = (registers.nr1 >> 6) & 0x03;
+                let wave_duty_index = (value >> 6) & 0x03;
                 self.wave_duty = WaveDuty::by_index(wave_duty_index);
             }
 
-            3 | 4 => {
-                let wave_length_register_value = (registers.nr3 as Clock) | (((registers.nr4 as Clock) & 0x07) << 8);
-                let wave_length = (2048 - wave_length_register_value) * 4;
+            3 => {
+                self.wave_length_low = value;
+                self.refresh_wave_length();
+            }
 
-                self.wave_length = wave_length;
-                self.wave_timer  = wave_length;
+            4 => {
+                self.wave_length_high = value & 0x07;
+                self.refresh_wave_length();
             }
 
             _ => { }
         }
 
-        default_on_register_changed(number, registers, apu_state)
+        default_on_write_register(number, value, apu_state)
     }
 }
 
@@ -117,7 +147,7 @@ impl SoundGenerator for PulseGenerator {
     }
 
 
-    fn get_sample(&self, _registers: &ApuRegisters) -> u8 {
+    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
         let wave = self.wave_duty.get_wave_at(self.wave_duty_step);
         wave
     }

@@ -17,19 +17,27 @@
 
 use std::cmp::min;
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed};
+use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_write_register, TriggerAction};
 use crate::apu::channels::generator::SoundGenerator;
-use crate::apu::registers::{ApuChannelRegisters, ApuRegisters};
 use crate::gameboy::Clock;
-use crate::utils::get_bit;
+use crate::utils::{as_bit_flag, get_bit, to_u16};
 
 
 pub struct WaveGenerator {
     /// Stores whether the DAC of this channel is enabled or not.
     dac_enabled: bool,
 
+    /// The output level value read from the NR32 register.
+    output_level: u8,
+
     /// The number of bits to shift the value of the sound sample to lower it's volume.
     volume_shift: u8,
+
+    /// Lower byte of the wave length, set by NRx3 register.
+    wave_length_low: u8,
+
+    /// Upper byte of the wave length, set by NRx4 register.
+    wave_length_high: u8,
 
     /// The length controlling how fast the wave will be played.
     /// The value will be read from NRx3 and NRx4 register of the channel.
@@ -47,23 +55,45 @@ pub struct WaveGenerator {
 impl WaveGenerator {
     pub fn new() -> Self {
         Self {
-            dac_enabled: true,
-
-            volume_shift: 0,
-
-            wave_length: 0,
-            wave_timer: 0,
-            wave_step: 0,
+            dac_enabled:        true,
+            output_level:       0,
+            volume_shift:       0,
+            wave_length_low:    0,
+            wave_length_high:   0,
+            wave_length:        0,
+            wave_timer:         0,
+            wave_step:          0,
         }
+    }
+
+
+    /// After writing to either NRx3 or NRx4, update the channel's wave length
+    fn refresh_wave_length(&mut self) {
+        let wave_length_register_value = to_u16(self.wave_length_high, self.wave_length_low) as Clock;
+        let wave_length = (2048 - wave_length_register_value) * 4;
+
+        self.wave_length = wave_length;
+        self.wave_timer  = wave_length;
     }
 }
 
 
 impl ChannelComponent for WaveGenerator {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    fn on_read_register(&self, number: u16) -> u8 {
+        match number {
+            0 => as_bit_flag(self.dac_enabled, 7),
+            2 => self.output_level << 5,
+            3 => self.wave_length_low,
+            4 => self.wave_length_high,
+            _ => default_on_read_register(number)
+        }
+    }
+
+
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
         match number {
             0 => {
-                self.dac_enabled = get_bit(registers.nr0, 7);
+                self.dac_enabled = get_bit(value, 7);
                 return if self.dac_enabled {
                     TriggerAction::EnableDac
                 }
@@ -73,8 +103,8 @@ impl ChannelComponent for WaveGenerator {
             }
 
             2 => {
-                let output_level = (registers.nr2 >> 5) & 0x03;
-                self.volume_shift = match output_level {
+                self.output_level = (value >> 5) & 0x03;
+                self.volume_shift = match self.output_level {
                     0b00 => 4, // mute
                     0b01 => 0, // 100% (no change)
                     0b10 => 1, //  50%
@@ -83,18 +113,20 @@ impl ChannelComponent for WaveGenerator {
                 };
             }
 
-            3 | 4 => {
-                let wave_length_register_value = (registers.nr3 as Clock) | (((registers.nr4 as Clock) & 0x07) << 8);
-                let wave_length = (2048 - wave_length_register_value) * 4;
+            3 => {
+                self.wave_length_low = value;
+                self.refresh_wave_length();
+            }
 
-                self.wave_length = wave_length;
-                self.wave_timer  = wave_length;
+            4 => {
+                self.wave_length_high = value & 0x07;
+                self.refresh_wave_length();
             }
 
             _ => { }
         }
 
-        default_on_register_changed(number, registers, apu_state)
+        default_on_write_register(number, value, apu_state)
     }
 }
 
@@ -142,13 +174,13 @@ impl SoundGenerator for WaveGenerator {
     }
 
 
-    fn get_sample(&self, registers: &ApuRegisters) -> u8 {
+    fn get_sample(&self, apu_state: &ApuState) -> u8 {
         // since wave ram contains two samples per byte,
         // the index within the wave ram is wave_step / 2.
         let index = (self.wave_step >> 1) & 0x0f;
 
         // read the byte from wave RAM
-        let value = registers.wave_ram.0[index as usize];
+        let value = apu_state.wave_ram.0[index as usize];
 
         // depending on bit 1, either take the high or low nibble
         let amp = match self.wave_step & 0x01 {

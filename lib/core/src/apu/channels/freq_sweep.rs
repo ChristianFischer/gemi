@@ -16,8 +16,7 @@
  */
 
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_register_changed, default_on_trigger_event};
-use crate::apu::registers::ApuChannelRegisters;
+use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
 use crate::gameboy::Clock;
 use crate::utils::get_bit;
 
@@ -67,10 +66,20 @@ pub struct FrequencySweep {
 
 
 impl Direction {
-    pub fn from_bit(bit: bool) -> Self {
-        match bit {
+    /// Get the direction based on the value written into the NR10 register.
+    pub fn from_register_value(value: u8) -> Self {
+        match get_bit(value, 3) {
             false => Direction::Addition,
             true  => Direction::Subtraction,
+        }
+    }
+
+
+    /// Get the value, which should be written into the NR10 register.
+    pub fn to_register_value(&self) -> u8 {
+        match self {
+            Direction::Addition    => 0b_0000_0000,
+            Direction::Subtraction => 0b_0000_1000,
         }
     }
 }
@@ -142,24 +151,36 @@ impl FrequencySweep {
 
 
 impl ChannelComponent for FrequencySweep {
-    fn on_register_changed(&mut self, number: u16, registers: &ApuChannelRegisters, apu_state: &ApuState) -> TriggerAction {
+    fn on_read_register(&self, number: u16) -> u8 {
         match number {
             0 => {
-                let period        = (registers.nr0 >> 4) & 0x07;
-                let shift         = (registers.nr0 >> 0) & 0x07;
-                let direction_bit = get_bit(registers.nr0, 3);
-                let enabled       = period != 0 || shift != 0;
+                    self.direction.to_register_value()
+                |   ((self.shift         & 0x07) << 0)
+                |   ((self.period_length & 0x07) << 4)
+            },
+
+            _ => default_on_read_register(number)
+        }
+    }
+
+
+    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+        match number {
+            0 => {
+                let period  = (value >> 4) & 0x07;
+                let shift   = (value >> 0) & 0x07;
+                let enabled = period != 0 || shift != 0;
 
                 self.enabled        = enabled;
                 self.shift          = shift;
                 self.period_length  = period;
-                self.direction      = Direction::from_bit(direction_bit);
+                self.direction      = Direction::from_register_value(value);
             }
 
             _ => { }
         }
 
-        default_on_register_changed(number, registers, apu_state)
+        default_on_write_register(number, value, apu_state)
     }
 
 

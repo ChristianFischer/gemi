@@ -246,7 +246,7 @@ impl GameBoy {
                 cpu: Cpu::new(
                     Mmu::new(
                         Peripherals {
-                            apu: Apu::new(mem.new_ref()),
+                            apu: Apu::new(),
                             ppu: Ppu::new(device_config),
                             mem: mem.new_ref(),
                             timer: Timer::new(mem.new_ref()),
