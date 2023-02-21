@@ -36,17 +36,7 @@ pub struct IoRegister {
 
     _unused_0x03: u8,
 
-    /// Divider register
-    pub div: u8,
-
-    /// Timer counter
-    pub tima: u8,
-
-    /// Timer modulo
-    pub tma: u8,
-
-    /// Timer control
-    pub tac: u8,
+    _unused_timer_0x04: [u8; 4],
 
     _unused_0x08: [u8; 8],
 
@@ -118,10 +108,6 @@ mod tests {
         test_ioreg_struct_elem!(MEMORY_LOCATION_JOYP                => joyp);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SB                  => sb);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SC                  => sc);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_DIV        => div);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TIMA       => tima);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TMA        => tma);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_REGISTER_TAC        => tac);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
     }

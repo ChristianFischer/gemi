@@ -21,9 +21,8 @@ use std::ops::Sub;
 use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::gameboy::Clock;
 use crate::mmu::locations::*;
-use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::MemoryBusConnection;
-use crate::utils::{get_bit, get_high};
+use crate::utils::{as_bit_flag, get_bit, get_high};
 
 
 /// Represents the internal counter which will be incremented with the system clock
@@ -85,8 +84,6 @@ enum TimaState {
 /// An object handling the gameboys internal timers,
 /// which are controlled by TIMA, TMA, TAC and DIV registers.
 pub struct Timer {
-    mem: Memory,
-
     /// Pending interrupts requested by this component.
     interrupts: Interrupts,
 
@@ -96,6 +93,13 @@ pub struct Timer {
     /// Internal state of the TIMA counter.
     /// See documentation of ```TimaState```
     tima_state: TimaState,
+
+    /// Current value of the timer counter.
+    tima: u8,
+
+    /// Current value of the timer modulo.
+    /// When TIMA overflows, it's value will be reset to the current value of TMA.
+    tma: u8,
 }
 
 
@@ -108,6 +112,19 @@ fn get_trigger_bit(tac: u8) -> u8 {
         0b11 => 7,
         _    => unreachable!(),
     }
+}
+
+
+/// Get the selector bits as been written into the TAC register.
+fn get_trigger_bit_selector_bits(trigger_bit: u8) -> u8 {
+    match trigger_bit {
+        3 => 0b01,
+        5 => 0b10,
+        7 => 0b11,
+        9 => 0b00,
+        _ => unreachable!(),
+    }
+
 }
 
 
@@ -157,6 +174,14 @@ impl InternalCounter {
         let bit_after = self.check_trigger_bit();
 
         self.fall_bit_triggered = bit_before && !bit_after;
+    }
+
+
+    /// Get the value of the timer control register register.
+    pub fn get_tac(&self) -> u8 {
+            0b_1111_1000
+        |   as_bit_flag(self.timer_enabled, 3)
+        |   get_trigger_bit_selector_bits(self.fall_bit)
     }
 
 
@@ -236,12 +261,13 @@ impl Display for InternalCounter {
 
 impl Timer {
     /// Creates an empty CPU object.
-    pub fn new(mem: Memory) -> Timer {
+    pub fn new() -> Timer {
         Timer {
-            mem,
-            interrupts: Interrupts::default(),
-            internal_counter: InternalCounter::new(),
-            tima_state: TimaState::Normal,
+            interrupts:         Interrupts::default(),
+            internal_counter:   InternalCounter::new(),
+            tima_state:         TimaState::Normal,
+            tima:               0x00,
+            tma:                0x00,
         }
     }
 
@@ -262,51 +288,12 @@ impl Timer {
 
     /// check for changed values (should be moved into a callback instead)
     fn check_for_changed_registers(&mut self) {
-        // check if DIV changed
-        if let Some(_) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_DIV) {
-            // if DIV was written to, it always resets to zero
-            self.mem.get_io_registers_mut().div = 0;
-
-            // writing to DIV will reset the counter
-            self.internal_counter.reset();
-
-            // resetting the counter may trigger an increment on TIMA,
-            // if the trigger bit was falling from 1 to 0
-            if self.internal_counter.is_fall_bit_triggered() {
-                self.increment_tima();
-            }
-        }
-
-        // handle TIMA writing during overflow state
-        if let Some(_) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_TIMA) {
-            match self.tima_state {
-                // TIMA was written during the overflow state, which will
-                // cancel the overflow state and let TIMA continue counting as usual
-                TimaState::Overflow => {
-                    self.tima_state = TimaState::Normal;
-                }
-
-                _ => {}
-            }
-        }
-
-        // check if TAC changed
-        if let Some(tac) = self.mem.take_changed_io_register(MEMORY_LOCATION_REGISTER_TAC) {
-            // apply the new value of TAC
-            self.internal_counter.apply_tac(tac);
-
-            // changing the value may cause the fall bit detection to trigger
-            if self.internal_counter.is_fall_bit_triggered() {
-                self.increment_tima();
-            }
-        }
     }
 
 
     /// Increment the internal counter by the clock ticks passed since last call.
     /// Also increments TIMA when triggered.
     fn increment_counter(&mut self, cycles: Clock) {
-        let div_before = self.internal_counter.get_div();
         let mut cycles_remaining = cycles;
 
         while cycles_remaining > 0 {
@@ -324,12 +311,6 @@ impl Timer {
                 self.increment_tima();
             }
         }
-
-        // Check if DIV changed
-        let div_after = self.internal_counter.get_div();
-        if div_before != div_after {
-            self.mem.get_io_registers_mut().div = div_after;
-        }
     }
 
 
@@ -342,11 +323,10 @@ impl Timer {
 
         // perform the increment
         {
-            let mut io_regs = self.mem.get_io_registers_mut();
-            let (tima, overflow) = io_regs.tima.overflowing_add(1);
+            let (tima_new, overflow) = self.tima.overflowing_add(1);
 
             // store the incremented value
-            io_regs.tima = tima;
+            self.tima = tima_new;
 
             if overflow {
                 self.tima_state = TimaState::Overflow;
@@ -385,10 +365,7 @@ impl Timer {
 
     /// Reset TIMA by loading the value of TMA
     fn reset_tima_to_tma(&mut self) {
-        let mut io_regs = self.mem.get_io_registers_mut();
-
-        let tma = io_regs.tma;
-        io_regs.tima = tma;
+        self.tima = self.tma;
     }
 
 
@@ -402,6 +379,10 @@ impl Timer {
 impl MemoryBusConnection for Timer {
     fn on_read(&self, address: u16) -> u8 {
         match address {
+            MEMORY_LOCATION_REGISTER_DIV  => self.internal_counter.get_div(),
+            MEMORY_LOCATION_REGISTER_TIMA => self.tima,
+            MEMORY_LOCATION_REGISTER_TMA  => self.tma,
+            MEMORY_LOCATION_REGISTER_TAC  => self.internal_counter.get_tac(),
             _ => 0xff
         }
     }
@@ -409,7 +390,46 @@ impl MemoryBusConnection for Timer {
 
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
-            _ => { _ = value }
+            MEMORY_LOCATION_REGISTER_DIV => {
+                // writing to DIV will reset the counter
+                self.internal_counter.reset();
+
+                // resetting the counter may trigger an increment on TIMA,
+                // if the trigger bit was falling from 1 to 0
+                if self.internal_counter.is_fall_bit_triggered() {
+                    self.increment_tima();
+                }
+            },
+
+            MEMORY_LOCATION_REGISTER_TIMA => {
+                self.tima = value;
+
+                match self.tima_state {
+                    // TIMA was written during the overflow state, which will
+                    // cancel the overflow state and let TIMA continue counting as usual
+                    TimaState::Overflow => {
+                        self.tima_state = TimaState::Normal;
+                    }
+
+                    _ => {}
+                }
+            },
+
+            MEMORY_LOCATION_REGISTER_TMA => {
+                self.tma = value;
+            },
+
+            MEMORY_LOCATION_REGISTER_TAC => {
+                // apply the new value of TAC
+                self.internal_counter.apply_tac(value);
+
+                // changing the value may cause the fall bit detection to trigger
+                if self.internal_counter.is_fall_bit_triggered() {
+                    self.increment_tima();
+                }
+            }
+
+            _ => { }
         };
     }
 
