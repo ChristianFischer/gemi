@@ -18,8 +18,8 @@
 use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::gameboy::Clock;
 use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
-use crate::mmu::memory::{Memory, MemoryRead, MemoryWrite};
 use crate::mmu::memory_bus::MemoryBusConnection;
+use crate::utils::{as_bit_flag, get_bit};
 
 
 const UPDATE_TIME_SERIAL_TRANSFER:      Clock = 4096;
@@ -37,11 +37,14 @@ pub struct SerialPort {
     /// The SerialPort's clock to measure time between the transfer of each byte.
     clock: Clock,
 
-    /// Access to the device memory.
-    mem: Memory,
-
     /// Pending interrupts requested by this component.
     interrupts: Interrupts,
+
+    /// The flag written by SC register to enable or disable serial data transfer.
+    transfer_enabled: bool,
+
+    /// The current byte written via SB register to be transferred.
+    transfer_byte: u8,
 
     /// A queue of all bytes sent by the device.
     output_queue: Vec<u8>,
@@ -53,13 +56,14 @@ pub struct SerialPort {
 
 impl SerialPort {
     /// Constructs a new instance of the SerialPort.
-    pub fn new(mem: Memory) -> SerialPort {
+    pub fn new() -> SerialPort {
         SerialPort {
-            clock: 0,
-            mem,
-            interrupts: Interrupts::default(),
-            output_queue: vec![],
-            output_queue_enabled: false,
+            clock:                  0,
+            interrupts:             Interrupts::default(),
+            transfer_enabled:       false,
+            transfer_byte:          0x00,
+            output_queue:           vec![],
+            output_queue_enabled:   false,
         }
     }
 
@@ -69,18 +73,14 @@ impl SerialPort {
         self.clock += cycles;
 
         if self.clock >= UPDATE_TIME_SERIAL_TRANSFER {
-            let transfer_enabled = self.mem.get_bit(MEMORY_LOCATION_SC, 7);
-
-            if transfer_enabled {
-                let transfer_byte = self.mem.read_u8(MEMORY_LOCATION_SB);
-
+            if self.transfer_enabled {
                 // store the data only if the output queue is enabled
                 if self.output_queue_enabled {
-                    self.output_queue.push(transfer_byte);
+                    self.output_queue.push(self.transfer_byte);
                 }
 
                 // after transfer completion, disable the transfer status bit
-                self.mem.clear_bit(MEMORY_LOCATION_SC, 7);
+                self.transfer_enabled = false;
 
                 // ..  and raise serial transfer interrupt
                 self.request_interrupt(Interrupt::Serial);
@@ -139,6 +139,8 @@ impl SerialPort {
 impl MemoryBusConnection for SerialPort {
     fn on_read(&self, address: u16) -> u8 {
         match address {
+            MEMORY_LOCATION_SB => self.transfer_byte,
+            MEMORY_LOCATION_SC => 0b_0111_1111 | as_bit_flag(self.transfer_enabled, 7),
             _ => 0xff
         }
     }
@@ -146,7 +148,9 @@ impl MemoryBusConnection for SerialPort {
 
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
-            _ => { _ = value }
+            MEMORY_LOCATION_SB => self.transfer_byte    = value,
+            MEMORY_LOCATION_SC => self.transfer_enabled = get_bit(value, 7),
+            _ => { }
         };
     }
 

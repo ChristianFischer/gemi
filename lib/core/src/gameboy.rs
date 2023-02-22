@@ -250,8 +250,8 @@ impl GameBoy {
                             ppu: Ppu::new(device_config),
                             mem: mem.new_ref(),
                             timer: Timer::new(),
-                            input: Input::new(mem.new_ref()),
-                            serial: SerialPort::new(mem.new_ref()),
+                            input: Input::new(),
+                            serial: SerialPort::new(),
                             interrupts: InterruptRegisters::new(),
                         }
                     )

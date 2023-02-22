@@ -203,6 +203,12 @@ impl_memory_mapper!(
         // Restricted RAM area
         0xfea0 ..= 0xfeff => root.peripherals.mem,
 
+        // input registers
+        0xff00 ..= 0xff00 => root.peripherals.input,
+
+        // serial data transfer registers
+        0xff01 ..= 0xff02 => root.peripherals.serial,
+
         // timer registers
         0xff04 ..= 0xff07 => root.peripherals.timer,
 

@@ -17,7 +17,6 @@
 
 use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::mmu::locations::MEMORY_LOCATION_JOYP;
-use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::utils::{change_bit, get_bit};
 
@@ -36,10 +35,13 @@ pub enum InputButton {
 
 
 pub struct Input {
-    mem: Memory,
-
     /// Pending interrupts requested by this component.
     interrupts: Interrupts,
+
+    /// JOYP bits 4 + 5 used to select which button states are returned by reading JOYP:
+    /// * 0b_0001_0000 -> direction buttons
+    /// * 0b_0010_0000 -> action buttons
+    button_selection: u8,
 
     /// Current state of each button.
     /// bit == 1 means pressed, bit == 0 means released
@@ -53,10 +55,10 @@ pub struct Input {
 
 impl Input {
     /// Creates a new Input object.
-    pub fn new(mem: Memory) -> Input {
+    pub fn new() -> Input {
         Input {
-            mem,
             interrupts:             Interrupts::default(),
+            button_selection:       0x00,
             button_states:          0x00,
             previous_button_states: 0x00,
         }
@@ -76,23 +78,6 @@ impl Input {
             }
 
             self.previous_button_states = self.button_states;
-        }
-
-        if self.mem.was_io_register_written(MEMORY_LOCATION_JOYP) || keys_changed {
-            self.mem.acknowledge_io_register_written(MEMORY_LOCATION_JOYP);
-            let mut io_regs = self.mem.get_io_registers_mut();
-            let joyp = io_regs.joyp;
-
-            let select = joyp & 0x30;
-            let value = match select {
-                0x00 => 0x00,
-                0x10 => (!self.button_states >> 4) & 0x0f,
-                0x20 => (!self.button_states >> 0) & 0x0f,
-                _    => 0x0f,
-            };
-
-            let new_joyp = select | value;
-            io_regs.joyp = new_joyp;
         }
     }
 
@@ -116,6 +101,17 @@ impl Input {
 impl MemoryBusConnection for Input {
     fn on_read(&self, address: u16) -> u8 {
         match address {
+            MEMORY_LOCATION_JOYP => {
+                let states = match self.button_selection {
+                    0x00 => 0x00,
+                    0x10 => (!self.button_states >> 4) & 0x0f,
+                    0x20 => (!self.button_states >> 0) & 0x0f,
+                    _    => 0x0f,
+                };
+
+                states | self.button_selection
+            },
+
             _ => 0xff
         }
     }
@@ -123,7 +119,11 @@ impl MemoryBusConnection for Input {
 
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
-            _ => { _ = value }
+            MEMORY_LOCATION_JOYP => {
+                self.button_selection = value & 0x30;
+            },
+
+            _ => { }
         };
     }
 

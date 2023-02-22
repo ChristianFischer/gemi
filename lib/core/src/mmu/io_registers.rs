@@ -25,16 +25,7 @@
 #[allow(dead_code)]
 #[repr(packed(1))]
 pub struct IoRegister {
-    /// JoyPad input
-    pub joyp: u8,
-
-    /// Serial transfer data
-    pub sb: u8,
-
-    /// Serial transfer control
-    pub sc: u8,
-
-    _unused_0x03: u8,
+    _unused_0x00: [u8; 4],
 
     _unused_timer_0x04: [u8; 4],
 
@@ -105,9 +96,6 @@ mod tests {
 
     #[test]
     fn test_ioreg_struct_locations() {
-        test_ioreg_struct_elem!(MEMORY_LOCATION_JOYP                => joyp);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_SB                  => sb);
-        test_ioreg_struct_elem!(MEMORY_LOCATION_SC                  => sc);
         test_ioreg_struct_elem!(MEMORY_LOCATION_BOOT_ROM_DISABLE    => boot_rom_disable);
         test_ioreg_struct_elem!(MEMORY_LOCATION_SVBK                => svbk);
     }
