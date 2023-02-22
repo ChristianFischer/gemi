@@ -45,7 +45,7 @@ macro_rules! opcode {
 }
 
 pub(crate) use opcode;
-use crate::mmu::memory::{Memory, MemoryRead};
+use crate::utils::to_u16;
 
 
 /// Data struct describing a single opcode.
@@ -116,11 +116,8 @@ pub struct Instruction {
     /// The address the opcode starts (or the location 0xCB prefix)
     pub opcode_address: u16,
 
-    /// The address, where the parameters are beginning.
-    pub param_address: u16,
-
-    /// The memory where to read the opcode from.
-    pub memory: Memory,
+    /// The byte values read from the memory bus following the instruction opcode.
+    pub arg: [u8; 2],
 }
 
 
@@ -174,34 +171,37 @@ impl From<()> for OpCodeResult {
 
 
 fn get_arg(arg: &str, instruction: &Instruction) -> String {
+    let arg0 = instruction.arg[0];
+    let arg1 = instruction.arg[1];
+
     match arg {
         "i8" => {
-            let value = instruction.memory.read_i8(instruction.param_address);
+            let value = arg0 as i8;
             format!("{}", value)
         }
 
         "u8" => {
-            let value = instruction.memory.read_u8(instruction.param_address);
+            let value = arg0;
             format!("{}", value)
         }
 
         "x8" => {
-            let value = instruction.memory.read_u8(instruction.param_address);
+            let value = arg0;
             format!("{:02x}", value)
         }
 
         "i16" => {
-            let value = instruction.memory.read_i16(instruction.param_address);
+            let value = to_u16(arg1, arg0) as i16;
             format!("{}", value)
         }
 
         "u16" => {
-            let value = instruction.memory.read_u16(instruction.param_address);
+            let value = to_u16(arg1, arg0);
             format!("{}", value)
         }
 
         "x16" => {
-            let value = instruction.memory.read_u16(instruction.param_address);
+            let value = to_u16(arg1, arg0);
             format!("{:04x}", value)
         }
 

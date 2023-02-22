@@ -237,8 +237,6 @@ impl GameBoy {
 
     /// Create a new GameBoy device.
     pub fn new(device_config: DeviceConfig) -> Result<GameBoy,String> {
-        let mem = Memory::new(device_config);
-
         Ok(
             GameBoy {
                 device_config,
@@ -248,7 +246,7 @@ impl GameBoy {
                         Peripherals {
                             apu: Apu::new(),
                             ppu: Ppu::new(device_config),
-                            mem: mem.new_ref(),
+                            mem: Memory::new(device_config),
                             timer: Timer::new(),
                             input: Input::new(),
                             serial: SerialPort::new(),
@@ -418,7 +416,10 @@ impl GameBoy {
             ];
 
             // apply selected values
-            self.get_peripherals_mut().mem.initialize_io_registers(io_reg_data);
+            for i in 0..=255 {
+                self.get_mmu_mut().write_u8(0xff00 + i, io_reg_data[i as usize]);
+            }
+
             self.get_peripherals_mut().timer.initialize_counter(timer_counter, tac);
         }
     }

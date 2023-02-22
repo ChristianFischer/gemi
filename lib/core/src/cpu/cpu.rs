@@ -351,15 +351,15 @@ impl Cpu {
         let opcode_byte    = self.get_next_byte() as u16;
         let opcode_id      = if opcode_byte == 0xCB { self.get_next_u16() } else { opcode_byte };
         let opcode         = self.fetch_next_opcode();
-        let param_address  = self.instruction_pointer;
-        let memory         = self.mmu.get_peripherals().mem.new_ref();
 
         Instruction {
             opcode,
             opcode_id,
             opcode_address,
-            param_address,
-            memory
+            arg: [
+                self.mmu.read_u8(self.instruction_pointer),
+                self.mmu.read_u8(self.instruction_pointer.wrapping_add(1))
+            ]
         }
     }
 
