@@ -30,6 +30,8 @@ use crate::utils::{as_bit_flag, get_bit};
 
 pub const APU_UPDATE_PERIOD : Clock = 8_192;
 
+const NR52_NON_READABLE_BITS : u8   = 0b_0111_0000;
+
 
 type Channel1 = Channel<
     PulseGenerator,
@@ -222,7 +224,11 @@ impl Apu {
 
     /// Reset the APUs internal data.
     fn reset(&mut self) {
-
+        self.mixer.reset();
+        self.ch1.reset();
+        self.ch2.reset();
+        self.ch3.reset();
+        self.ch4.reset();
     }
 
 
@@ -241,17 +247,17 @@ impl MemoryBusConnection for Apu {
             }
 
             MEMORY_LOCATION_APU_NR21 ..= MEMORY_LOCATION_APU_NR24 => {
-                let number = address - MEMORY_LOCATION_APU_NR21 + 1;
+                let number = address - MEMORY_LOCATION_APU_NR20;
                 self.ch2.on_read_register(number)
             }
 
             MEMORY_LOCATION_APU_NR30 ..= MEMORY_LOCATION_APU_NR34 => {
-                let number = address - MEMORY_LOCATION_APU_NR10;
+                let number = address - MEMORY_LOCATION_APU_NR30;
                 self.ch3.on_read_register(number)
             }
 
             MEMORY_LOCATION_APU_NR41 ..= MEMORY_LOCATION_APU_NR44 => {
-                let number = address - MEMORY_LOCATION_APU_NR41 + 1;
+                let number = address - MEMORY_LOCATION_APU_NR40;
                 self.ch4.on_read_register(number)
             }
 
@@ -265,14 +271,15 @@ impl MemoryBusConnection for Apu {
 
             MEMORY_LOCATION_APU_NR52 => {
                 if self.state.apu_on {
-                        0b_1111_0000
+                        NR52_NON_READABLE_BITS
+                    |   as_bit_flag(self.state.apu_on, 7)
                     |   as_bit_flag(self.ch1.is_channel_enabled(), 0)
                     |   as_bit_flag(self.ch2.is_channel_enabled(), 1)
                     |   as_bit_flag(self.ch3.is_channel_enabled(), 2)
                     |   as_bit_flag(self.ch4.is_channel_enabled(), 3)
                 }
                 else {
-                    0x00
+                    NR52_NON_READABLE_BITS
                 }
             },
 
@@ -290,31 +297,43 @@ impl MemoryBusConnection for Apu {
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
-                let number = address - MEMORY_LOCATION_APU_NR10;
-                self.ch1.on_write_register(number, value, &self.state);
+                if self.state.apu_on {
+                    let number = address - MEMORY_LOCATION_APU_NR10;
+                    self.ch1.on_write_register(number, value, &self.state);
+                }
             }
 
             MEMORY_LOCATION_APU_NR21 ..= MEMORY_LOCATION_APU_NR24 => {
-                let number = address - MEMORY_LOCATION_APU_NR21 + 1;
-                self.ch2.on_write_register(number, value, &self.state);
+                if self.state.apu_on {
+                    let number = address - MEMORY_LOCATION_APU_NR20;
+                    self.ch2.on_write_register(number, value, &self.state);
+                }
             }
 
             MEMORY_LOCATION_APU_NR30 ..= MEMORY_LOCATION_APU_NR34 => {
-                let number = address - MEMORY_LOCATION_APU_NR10;
-                self.ch3.on_write_register(number, value, &self.state);
+                if self.state.apu_on {
+                    let number = address - MEMORY_LOCATION_APU_NR30;
+                    self.ch3.on_write_register(number, value, &self.state);
+                }
             }
 
             MEMORY_LOCATION_APU_NR41 ..= MEMORY_LOCATION_APU_NR44 => {
-                let number = address - MEMORY_LOCATION_APU_NR41 + 1;
-                self.ch4.on_write_register(number, value, &self.state);
+                if self.state.apu_on {
+                    let number = address - MEMORY_LOCATION_APU_NR40;
+                    self.ch4.on_write_register(number, value, &self.state);
+                }
             }
 
             MEMORY_LOCATION_APU_NR50 => {
-                self.mixer.write_nr50(value);
+                if self.state.apu_on {
+                    self.mixer.write_nr50(value);
+                }
             },
 
             MEMORY_LOCATION_APU_NR51 => {
-                self.mixer.write_nr51(value);
+                if self.state.apu_on {
+                    self.mixer.write_nr51(value);
+                }
             },
 
             MEMORY_LOCATION_APU_NR52 => {

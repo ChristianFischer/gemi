@@ -23,6 +23,14 @@ use crate::gameboy::Clock;
 use crate::utils::{as_bit_flag, get_bit, to_u16};
 
 
+const NR30_NON_READABLE_BITS : u8       = 0b_0111_1111;
+const NR32_NON_READABLE_BITS : u8       = 0b_1001_1111;
+const NR33_WRITE_ONLY_FREQUENCY : u8    = 0b_1111_1111;
+const NR34_NON_READABLE_BITS : u8       = 0b_0011_1000;
+const NR34_WRITE_ONLY_FREQUENCY : u8    = 0b_0000_0111;
+const NR34_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
+
+
 pub struct WaveGenerator {
     /// Stores whether the DAC of this channel is enabled or not.
     dac_enabled: bool,
@@ -55,7 +63,7 @@ pub struct WaveGenerator {
 impl WaveGenerator {
     pub fn new() -> Self {
         Self {
-            dac_enabled:        true,
+            dac_enabled:        false,
             output_level:       0,
             volume_shift:       0,
             wave_length_low:    0,
@@ -81,10 +89,10 @@ impl WaveGenerator {
 impl ChannelComponent for WaveGenerator {
     fn on_read_register(&self, number: u16) -> u8 {
         match number {
-            0 => as_bit_flag(self.dac_enabled, 7),
-            2 => self.output_level << 5,
-            3 => self.wave_length_low,
-            4 => self.wave_length_high,
+            0 => NR30_NON_READABLE_BITS | as_bit_flag(self.dac_enabled, 7),
+            2 => NR32_NON_READABLE_BITS | (self.output_level << 5),
+            3 => NR33_WRITE_ONLY_FREQUENCY,
+            4 => NR34_WRITE_ONLY_FREQUENCY | NR34_NON_READABLE_BITS | NR34_WRITE_ONLY_TRIGGER_BIT,
             _ => default_on_read_register(number)
         }
     }
@@ -127,6 +135,11 @@ impl ChannelComponent for WaveGenerator {
         }
 
         default_on_write_register(number, value, apu_state)
+    }
+
+
+    fn on_reset(&mut self) {
+        *self = Self::new();
     }
 }
 

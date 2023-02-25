@@ -172,6 +172,11 @@ impl ChannelComponent for Envelope {
 
         default_on_trigger_event(apu_state)
     }
+
+
+    fn on_reset(&mut self) {
+        *self = Self::default();
+    }
 }
 
 

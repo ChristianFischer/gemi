@@ -20,7 +20,12 @@ use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
 use crate::apu::channels::generator::SoundGenerator;
 use crate::gameboy::Clock;
-use crate::utils::get_bit;
+use crate::utils::{as_bit_flag, get_bit};
+
+
+const NR41_NON_READABLE_BITS : u8       = 0b_1100_0000;
+const NR44_NON_READABLE_BITS : u8       = 0b_0011_1111;
+const NR44_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
 
 
 /// A sound generator to generate random noise using a Linear Feedback Shift Register (LFSR)
@@ -72,10 +77,20 @@ impl NoiseGenerator {
 impl ChannelComponent for NoiseGenerator {
     fn on_read_register(&self, number: u16) -> u8 {
         match number {
+            1 => NR41_NON_READABLE_BITS, // unused bits
+
             3 => {
+                let lfsr_is_short = match self.lfsr_width {
+                    7 => true,
+                    _ => false,
+                };
+
                     self.divider_code
+                |   as_bit_flag(lfsr_is_short, 3)
                 |   (((self.frequency_shift & 0x0f) as u8) << 4)
             },
+
+            4 => NR44_NON_READABLE_BITS | NR44_WRITE_ONLY_TRIGGER_BIT,
 
             _ => default_on_read_register(number)
         }
@@ -117,6 +132,11 @@ impl ChannelComponent for NoiseGenerator {
         self.lfsr = 0;
 
         default_on_trigger_event(apu_state)
+    }
+
+
+    fn on_reset(&mut self) {
+        *self = Self::new();
     }
 }
 

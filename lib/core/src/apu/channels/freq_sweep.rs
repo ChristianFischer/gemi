@@ -21,6 +21,9 @@ use crate::gameboy::Clock;
 use crate::utils::get_bit;
 
 
+const NRX0_NON_READABLE_BITS : u8       = 0b_1000_0000;
+
+
 /// The maximum possible frequency, which can be stored in 11 bits being used in NRx3 and NRx4.
 /// Used to check for a possible overflow.
 const MAX_FREQUENCY : Clock = 0b_0000_0111_1111_1111;
@@ -154,7 +157,8 @@ impl ChannelComponent for FrequencySweep {
     fn on_read_register(&self, number: u16) -> u8 {
         match number {
             0 => {
-                    self.direction.to_register_value()
+                    NRX0_NON_READABLE_BITS
+                |   self.direction.to_register_value()
                 |   ((self.shift         & 0x07) << 0)
                 |   ((self.period_length & 0x07) << 4)
             },
@@ -188,6 +192,11 @@ impl ChannelComponent for FrequencySweep {
         self.reload_timer();
 
         default_on_trigger_event(apu_state)
+    }
+
+
+    fn on_reset(&mut self) {
+        *self = Self::default();
     }
 }
 

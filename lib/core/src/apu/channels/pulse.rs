@@ -24,6 +24,12 @@ use crate::gameboy::Clock;
 use crate::utils::to_u16;
 
 
+const NRX3_WRITE_ONLY_FREQUENCY : u8    = 0b_1111_1111;
+const NRX4_NON_READABLE_BITS : u8       = 0b_0011_1000;
+const NRX4_WRITE_ONLY_FREQUENCY : u8    = 0b_0000_0111;
+const NRX4_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
+
+
 /// A sound generator to generate a pulse wave. The wave is based is based on a wave duty value
 /// and a volume computed by an envelope function.
 pub struct PulseGenerator {
@@ -77,8 +83,8 @@ impl ChannelComponent for PulseGenerator {
     fn on_read_register(&self, number: u16) -> u8 {
         match number {
             1 => self.wave_duty.get_index() << 6,
-            3 => self.wave_length_low,
-            4 => self.wave_length_high,
+            3 => NRX3_WRITE_ONLY_FREQUENCY,
+            4 => NRX4_WRITE_ONLY_FREQUENCY | NRX4_NON_READABLE_BITS | NRX4_WRITE_ONLY_TRIGGER_BIT,
             _ => default_on_read_register(number)
         }
     }
@@ -105,6 +111,11 @@ impl ChannelComponent for PulseGenerator {
         }
 
         default_on_write_register(number, value, apu_state)
+    }
+
+
+    fn on_reset(&mut self) {
+        *self = Self::new();
     }
 }
 

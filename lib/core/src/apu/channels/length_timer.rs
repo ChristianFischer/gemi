@@ -37,6 +37,9 @@ pub struct LengthTimer<const LENGTH_BITS: u8> {
 
 
 impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
+    pub const LENGTH_MAX  : u16 = 1 << LENGTH_BITS;
+    pub const LENGTH_MASK : u8  = (Self::LENGTH_MAX - 1) as u8;
+
     /// Receives the periodic call from the frame sequencer.
     /// Decrease the timer on each tick. When the timer becomes zero during this operation,
     /// the channels sound generator will be disabled.
@@ -58,10 +61,9 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
     fn on_read_register(&self, number: u16) -> u8 {
         match number {
             1 => {
-                let max  = 1 << LENGTH_BITS;
-                let mask = max - 1;
-
-                max - ((self.length_timer as u8) & mask)
+                // length timer initial value is write-only,
+                // therefor set all bits to '1' on reading
+                Self::LENGTH_MASK
             },
 
             4 => {
@@ -76,10 +78,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
     fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
         match number {
             1 => {
-                let max  = 1 << LENGTH_BITS;
-                let mask = max - 1;
-
-                self.length_timer = max - ((value as u16) & mask);
+                self.length_timer = Self::LENGTH_MAX - ((value & Self::LENGTH_MASK) as u16);
             }
 
             4 => {
@@ -109,10 +108,15 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
     fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         // length timer will be set to maximum, if zero when triggered
         if self.length_timer == 0 {
-            self.length_timer = 1 << LENGTH_BITS;
+            self.length_timer = Self::LENGTH_MAX;
         }
 
         default_on_trigger_event(apu_state)
+    }
+
+
+    fn on_reset(&mut self) {
+        *self = Self::default();
     }
 }
 

@@ -54,6 +54,7 @@ impl Mixer {
     }
 
 
+    /// Write data into NR50.
     pub fn write_nr50(&mut self, value: u8) {
         self.volume_left  = ((value >> 4) & 0x07) + 1;
         self.volume_right = ((value >> 0) & 0x07) + 1;
@@ -62,15 +63,17 @@ impl Mixer {
     }
 
 
+    /// Read from NR50.
     pub fn read_nr50(&self) -> u8 {
             0x00
-        |   ((self.volume_left  & 0x07) << 4)
-        |   ((self.volume_right & 0x07) << 4)
+        |   ((self.volume_left.wrapping_sub(1)  & 0x07) << 4)
+        |   ((self.volume_right.wrapping_sub(1) & 0x07) << 0)
         |   as_bit_flag(self.vin_left,  7)
         |   as_bit_flag(self.vin_right, 3)
     }
 
 
+    /// Write data into NR51.
     pub fn write_nr51(&mut self, value: u8) {
         for i in 0..4u8 {
             self.channels_in[i as usize].pan_left  = get_bit(value, i + 4);
@@ -79,6 +82,7 @@ impl Mixer {
     }
 
 
+    /// Read from NR51.
     pub fn read_nr51(&self) -> u8 {
         let mut value = 0x00;
 
@@ -88,6 +92,20 @@ impl Mixer {
         }
 
         value
+    }
+
+
+    /// Called when the APU was reset by turning it off.
+    pub fn reset(&mut self) {
+        for channel in &mut self.channels_in {
+            channel.pan_left  = false;
+            channel.pan_right = false;
+        }
+
+        self.volume_left  = 1;
+        self.volume_right = 1;
+        self.vin_left     = false;
+        self.vin_right    = false;
     }
 
 

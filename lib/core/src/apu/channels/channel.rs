@@ -92,6 +92,10 @@ pub trait ChannelComponent {
     fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         default_on_trigger_event(apu_state)
     }
+
+    /// Called when the APU was reset by turning it off.
+    /// It's expected to every component to set it's data to '0'.
+    fn on_reset(&mut self);
 }
 
 
@@ -345,6 +349,13 @@ impl<
         );
 
         actions
+    }
+
+
+    /// Reset this channel when the APU was turned off.
+    pub fn reset(&mut self) {
+        self.for_each_component_mut(|c| { c.on_reset(); TriggerAction::None });
+        self.channel_enabled = false;
     }
 
 
