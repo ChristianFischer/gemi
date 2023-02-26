@@ -114,21 +114,21 @@ pub struct PixelFetchResultWithPalette<'a> {
 /// information from the PPU tile map.
 pub struct TileFetchProperties {
     /// The TileMap where to read from
-    tilemap: TileMap,
+    pub tilemap: TileMap,
 
     /// The TileSet where to take the images from, which are referenced by the TileSet.
-    tileset: TileSet,
+    pub tileset: TileSet,
 
     /// The tile index to be read from the tile map.
-    tile_index: u16,
+    pub tile_index: u16,
 
     /// The pixel on the X axis to read from the tile image.
     /// This may get flipped depending on tile properties.
-    tile_pixel_x: u8,
+    pub tile_pixel_x: u8,
 
     /// The pixel on the Y axis to read from the tile image.
     /// This may get flipped depending on tile properties.
-    tile_pixel_y: u8,
+    pub tile_pixel_y: u8,
 }
 
 

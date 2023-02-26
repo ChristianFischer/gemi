@@ -19,6 +19,7 @@ use gbemu_core::gameboy::DeviceType;
 use testrunner::runner::run_with_config;
 use tests_shared::test_config::*;
 
+use testrunner::checks::blargg_checks::check_blargg_test_passed;
 
 mod cgb_sound {
     use super::*;
@@ -47,12 +48,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -77,12 +74,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -107,12 +100,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -137,12 +126,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -167,12 +152,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -197,12 +178,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -227,12 +204,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -257,12 +230,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -287,12 +256,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -317,12 +282,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -347,12 +308,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -377,12 +334,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -412,12 +365,8 @@ mod cgb_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -450,12 +399,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -479,12 +424,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -508,12 +449,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -537,12 +474,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -566,12 +499,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -595,12 +524,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -624,12 +549,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -653,12 +574,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -682,12 +599,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -711,12 +624,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -740,12 +649,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -774,12 +679,8 @@ mod cpu_instrs {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -813,12 +714,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -843,12 +740,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -873,12 +766,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -903,12 +792,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -933,12 +818,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -963,12 +844,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -993,12 +870,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1023,12 +896,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1053,12 +922,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1083,12 +948,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1113,12 +974,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1143,12 +1000,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1178,12 +1031,8 @@ mod dmg_sound {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1213,12 +1062,8 @@ mod instr_timing {
 
         let mut gb = run_with_config(cfg);
 
-        let output = gb.get_peripherals_mut().serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
     }
 
 }
@@ -1248,12 +1093,8 @@ mod interrupt_time {
 
         let mut gb = run_with_config(cfg);
 
-        let output = gb.get_peripherals_mut().serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
     }
 
 }
@@ -1285,12 +1126,8 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1314,12 +1151,8 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1343,12 +1176,8 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1377,12 +1206,8 @@ mod mem_timing {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1397,7 +1222,6 @@ mod mem_timing_2 {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_01_read_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1416,18 +1240,13 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
 
         #[test]
-        #[ignore]
         fn rom_singles_02_write_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1446,18 +1265,13 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
 
         #[test]
-        #[ignore]
         fn rom_singles_03_modify_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1476,12 +1290,8 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1492,7 +1302,6 @@ mod mem_timing_2 {
 
 
         #[test]
-        #[ignore]
         fn mem_timing() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
@@ -1511,12 +1320,8 @@ mod mem_timing_2 {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1550,12 +1355,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1580,12 +1381,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1610,12 +1407,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1640,12 +1433,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1670,12 +1459,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1700,12 +1485,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1730,12 +1511,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
 
@@ -1760,12 +1537,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1795,12 +1568,8 @@ mod oam_bug {
 
             let mut gb = run_with_config(cfg);
 
-            let output = gb.get_peripherals_mut().serial.take_output_as_text();
-            match output.trim().split('\n').into_iter().last() {
-                Some("Passed all tests") => { }
-                Some("Passed") => { }
-                _ => { panic!("Unexpected output:\n{}", output); }
-            }
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
         }
 
     }
@@ -1831,12 +1600,8 @@ mod blargg_other {
 
         let mut gb = run_with_config(cfg);
 
-        let output = gb.get_peripherals_mut().serial.take_output_as_text();
-        match output.trim().split('\n').into_iter().last() {
-            Some("Passed all tests") => { }
-            Some("Passed") => { }
-            _ => { panic!("Unexpected output:\n{}", output); }
-        }
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
     }
 
 }

@@ -21,18 +21,19 @@ use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, rec
 use crate::rom_utils::file_is_rom;
 use crate::test_generator::TestGenerator;
 
+const BLARGG_ADDITIONAL_SRC : &str = /* language=rust */
+    r#"use testrunner::checks::blargg_checks::check_blargg_test_passed;
+"#;
+
+const BLARGG_CHECK_TEST : &str = /* language=rust */ r#"    let result = check_blargg_test_passed(&mut gb);
+    assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+"#;
+
+
 /// Create tests for Blargg's test roms.
 pub fn generate_tests_blargg(gen: &TestGenerator) {
     let blargg_root      = gen.base_path_roms.join("blargg");
     let blargg_test_file = gen.base_path_tests.join("blargg.rs");
-
-    // extra code to check, if the last line sent to the serial port is either 'Passed' or 'Passed all tests'
-    let blargg_checks = /*language=rust*/ "    let output = gb.get_peripherals_mut().serial.take_output_as_text();
-    match output.trim().split('\\n').into_iter().last() {
-        Some(\"Passed all tests\") => { }
-        Some(\"Passed\") => { }
-        _ => { panic!(\"Unexpected output:\\n{}\", output); }
-    }\n";
 
     let tests_content = recursive_visit_directory(
         blargg_root,
@@ -62,7 +63,7 @@ pub fn generate_tests_blargg(gen: &TestGenerator) {
                         gen.create_test(
                             &filename_to_symbol(f.to_str().unwrap()),
                             cfg,
-                            Some(blargg_checks.to_string()),
+                            Some(BLARGG_CHECK_TEST.to_string()),
                             state
                         )
                     }
@@ -75,6 +76,7 @@ pub fn generate_tests_blargg(gen: &TestGenerator) {
 
     let mut content = String::new();
     content.push_str(TEST_FILE_HEADER);
+    content.push_str(BLARGG_ADDITIONAL_SRC);
     content.push_str(&tests_content);
 
     update_file(&blargg_test_file, &content);

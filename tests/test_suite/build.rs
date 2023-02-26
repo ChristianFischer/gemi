@@ -43,7 +43,6 @@ fn main() {
             "blargg/cgb_sound/",
             "blargg/dmg_sound/",
             "blargg/interrupt_time/interrupt_time",
-            "blargg/mem_timing_2/", // seems to be same as mem_timing, but missing serial output
             "blargg/oam_bug/",
             "blargg/blargg_other/halt_bug",
 
