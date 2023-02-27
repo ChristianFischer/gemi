@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests/shared/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/test_suite/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/test_suite/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/core/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/tests/test_suite/res/test_roms" />
     </content>

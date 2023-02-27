@@ -76,12 +76,20 @@ pub struct ApuState {
     /// Frame Sequencer clock
     pub fs_clock: Clock,
 
-    /// Frame Sequencer step
-    pub fs_step: u8,
+    /// The frame sequencer to activate channel components periodically.
+    pub fs: FrameSequencer,
 
     /// Wave pattern RAM, which will be used
     /// for playback by channel 3.
     pub wave_ram: WaveRam,
+}
+
+
+/// The frame sequencer holds a counter which is tied to the device's DIV counter
+/// to periodically activate and deactivate components of the APU channels.
+pub struct FrameSequencer {
+    /// Frame Sequencer step
+    pub fs_step: u8,
 }
 
 
@@ -112,6 +120,47 @@ pub struct Apu {
 }
 
 
+impl FrameSequencer {
+    pub fn new() -> Self {
+        Self {
+            fs_step: 0,
+        }
+    }
+
+
+    /// Let the frame sequencer increment it's internal counter.
+    /// This changes the state which channel components will be active or not.
+    /// This does NOT invoke the channel components themself.
+    pub fn tick(&mut self) {
+        self.fs_step = self.fs_step.wrapping_add(1);
+    }
+
+
+    /// Checks if the length timer component is active.
+    /// The sound length timer has a tick rate of 256Hz and therefor is
+    /// activated every 2nd tick of the frame sequencer.
+    pub fn is_length_timer_active(&self) -> bool {
+        (self.fs_step & 0b0001) == 0
+    }
+
+
+    /// Checks if the frequency sweep component is active.
+    /// The frequency sweep has a tick rate of 128Hz and therefor is
+    /// activated every 4th tick of the frame sequencer.
+    pub fn is_freq_sweep_active(&self) -> bool {
+        (self.fs_step & 0b0011) == 0
+    }
+
+
+    /// Checks if the volume envelope component is active.
+    /// The volume envelope has a tick rate of 64Hz and therefor is
+    /// activated every 8th tick of the frame sequencer.
+    pub fn is_volume_envelope_active(&self) -> bool {
+        (self.fs_step & 0b0111) == 0
+    }
+}
+
+
 impl Apu {
     /// Creates a new APU object.
     pub fn new() -> Self {
@@ -121,7 +170,7 @@ impl Apu {
             state: ApuState {
                 apu_on:     true,
                 fs_clock:   0,
-                fs_step:    0,
+                fs:         FrameSequencer::new(),
                 wave_ram:   WaveRam::default()
             },
 
@@ -161,14 +210,14 @@ impl Apu {
 
     /// Process the next step of the frame sequencer to trigger sound generator subcomponents.
     fn next_frame_sequencer_step(&mut self) {
-        self.state.fs_step = self.state.fs_step.wrapping_add(1);
+        self.state.fs.tick();
 
         // before internal components of any sound generator may be changed,
         // generate all remaining audio data with the currently configured values.
         self.generate_audio();
 
         // 256Hz -> Sound length
-        if (self.state.fs_step & 0b0001) == 0 {
+        if self.state.fs.is_length_timer_active() {
             self.ch1.tick_length_timer();
             self.ch2.tick_length_timer();
             self.ch3.tick_length_timer();
@@ -176,7 +225,7 @@ impl Apu {
         }
 
         // 128Hz -> CH1 freq sweep
-        if (self.state.fs_step & 0b0011) == 0 {
+        if self.state.fs.is_freq_sweep_active() {
             self.ch1.tick_freq_sweep();
             self.ch2.tick_freq_sweep();
             self.ch3.tick_freq_sweep();
@@ -184,7 +233,7 @@ impl Apu {
         }
 
         // 64Hz -> Envelope sweep
-        if (self.state.fs_step & 0b0111) == 0 {
+        if self.state.fs.is_volume_envelope_active() {
             self.ch1.tick_envelope_sweep();
             self.ch2.tick_envelope_sweep();
             self.ch3.tick_envelope_sweep();

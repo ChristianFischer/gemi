@@ -344,9 +344,14 @@ impl<
     fn fire_trigger_event(&mut self, apu_state: &ApuState) -> TriggerActionSet {
         self.channel_enabled = true;
 
-        let actions = self.for_each_component_mut(
+        let mut actions = self.for_each_component_mut(
             |c| c.on_trigger_event(apu_state)
         );
+
+        // DAC disabled prevents the channel from being enabled
+        if !self.dac.is_enabled() {
+            actions |= TriggerAction::DisableChannel;
+        }
 
         actions
     }

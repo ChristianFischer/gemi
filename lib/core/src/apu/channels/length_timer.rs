@@ -86,12 +86,13 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
 
                 self.length_timer_enabled = get_bit(value, 6);
 
-                // extra clock in certain frame sequencer state if the timer got enabled
+                // extra clock if the timer got enabled and the sound length component
+                // is activated by the frame sequencer
                 if
                         !was_enabled
                     &&  self.length_timer_enabled
                     &&  self.length_timer != 0
-                    &&  (apu_state.fs_step & 1) != 0
+                    &&  apu_state.fs.is_length_timer_active()
                 {
                     // this may also disable the channel
                     return self.tick();
@@ -107,8 +108,14 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
 
     fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         // length timer will be set to maximum, if zero when triggered
+        // this prevents the timer to be stuck at zero
         if self.length_timer == 0 {
             self.length_timer = Self::LENGTH_MAX;
+
+            // when the sound length timer is activated, this will cause an extra tick
+            if apu_state.fs.is_length_timer_active() {
+                self.tick();
+            }
         }
 
         default_on_trigger_event(apu_state)

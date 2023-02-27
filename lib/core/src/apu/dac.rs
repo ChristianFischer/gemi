@@ -40,6 +40,12 @@ impl DigitalAudioConverter {
     }
 
 
+    /// Checks whether DAC is currently enabled or not.
+    pub fn is_enabled(&self) -> bool {
+        self.enabled
+    }
+
+
     /// Converts a digital input value into an audio sample value.
     pub fn convert(&self, value: u8) -> i16 {
         if self.enabled {
