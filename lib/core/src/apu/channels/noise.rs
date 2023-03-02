@@ -18,6 +18,7 @@
 use std::cmp::min;
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
+use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::gameboy::Clock;
 use crate::utils::{as_bit_flag, get_bit};
@@ -147,12 +148,12 @@ impl SoundGenerator for NoiseGenerator {
     }
 
 
-    fn get_frequency(&self) -> Clock {
-        self.frequency_timer
+    fn get_frequency(&self) -> Frequency {
+        Frequency::default()
     }
 
 
-    fn set_frequency(&mut self, frequency: Clock) {
+    fn set_frequency(&mut self, frequency: Frequency) {
         _ = frequency;
     }
 

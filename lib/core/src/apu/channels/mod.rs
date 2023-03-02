@@ -23,5 +23,6 @@ pub mod wave;
 
 mod envelope;
 mod freq_sweep;
+mod frequency;
 mod length_timer;
 mod wave_duty;

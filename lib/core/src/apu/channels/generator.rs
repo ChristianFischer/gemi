@@ -17,6 +17,7 @@
 
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::ChannelComponent;
+use crate::apu::channels::frequency::Frequency;
 use crate::gameboy::Clock;
 
 
@@ -26,10 +27,10 @@ pub trait SoundGenerator : ChannelComponent {
     fn create() -> Self;
 
     /// Get the generators current frequency.
-    fn get_frequency(&self) -> Clock;
+    fn get_frequency(&self) -> Frequency;
 
     /// Changes the frequency for this generator.
-    fn set_frequency(&mut self, frequency: Clock);
+    fn set_frequency(&mut self, frequency: Frequency);
 
     /// Called to update the internal values of the sound generator.
     /// This call wont happen periodically but when necessary on register changes

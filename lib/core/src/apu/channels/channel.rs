@@ -344,6 +344,14 @@ impl<
     fn fire_trigger_event(&mut self, apu_state: &ApuState) -> TriggerActionSet {
         self.channel_enabled = true;
 
+        // when the channel has a frequency sweep, it will initialize it's shadow frequency
+        // at the beginning of it's trigger event
+        if Self::has_feature_frequency_sweep() {
+            let frequency = self.generator.get_frequency();
+            self.freq_sweep.init_shadow_frequency(frequency);
+        }
+
+        // invoke trigger event for each component
         let mut actions = self.for_each_component_mut(
             |c| c.on_trigger_event(apu_state)
         );
@@ -377,8 +385,7 @@ impl<
     /// Called by the frame sequencer to update the frequency sweep of channel 1.
     pub fn tick_freq_sweep(&mut self) {
         if Self::has_feature_frequency_sweep() {
-            let frequency = self.generator.get_frequency();
-            let result    = self.freq_sweep.tick(frequency);
+            let result = self.freq_sweep.tick();
 
             match result {
                 // the channel was disabled because of an overflow
@@ -387,8 +394,8 @@ impl<
                 }
 
                 // apply the changed frequency
-                FrequencySweepResult::FrequencyChanged(new_wave_length) => {
-                    self.generator.set_frequency(new_wave_length);
+                FrequencySweepResult::FrequencyChanged(new_frequency) => {
+                    self.generator.set_frequency(new_frequency);
                 }
 
                 _ => { }

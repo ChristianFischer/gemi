@@ -18,9 +18,10 @@
 use std::cmp::min;
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_write_register, TriggerAction};
+use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::gameboy::Clock;
-use crate::utils::{as_bit_flag, get_bit, to_u16};
+use crate::utils::{as_bit_flag, get_bit};
 
 
 const NR30_NON_READABLE_BITS : u8       = 0b_0111_1111;
@@ -41,17 +42,12 @@ pub struct WaveGenerator {
     /// The number of bits to shift the value of the sound sample to lower it's volume.
     volume_shift: u8,
 
-    /// Lower byte of the wave length, set by NRx3 register.
-    wave_length_low: u8,
-
-    /// Upper byte of the wave length, set by NRx4 register.
-    wave_length_high: u8,
-
-    /// The length controlling how fast the wave will be played.
+    /// The frequency is controlling how fast the wave will be played.
     /// The value will be read from NRx3 and NRx4 register of the channel.
-    wave_length: Clock,
+    frequency: Frequency,
 
-    /// Current value of the wave timer. The value is decreased with each CPU T-Cycle
+    /// Current value of the wave timer. The value is built based on the frequency
+    /// configured by the application. It will be decreased with each CPU T-Cycle
     /// and restarts when reaching zero.
     wave_timer: Clock,
 
@@ -66,9 +62,7 @@ impl WaveGenerator {
             dac_enabled:        false,
             output_level:       0,
             volume_shift:       0,
-            wave_length_low:    0,
-            wave_length_high:   0,
-            wave_length:        0,
+            frequency:          Frequency::default(),
             wave_timer:         0,
             wave_step:          0,
         }
@@ -77,11 +71,7 @@ impl WaveGenerator {
 
     /// After writing to either NRx3 or NRx4, update the channel's wave length
     fn refresh_wave_length(&mut self) {
-        let wave_length_register_value = to_u16(self.wave_length_high, self.wave_length_low) as Clock;
-        let wave_length = (2048 - wave_length_register_value) * 4;
-
-        self.wave_length = wave_length;
-        self.wave_timer  = wave_length;
+        self.wave_timer = self.frequency.to_countdown();
     }
 }
 
@@ -121,13 +111,8 @@ impl ChannelComponent for WaveGenerator {
                 };
             }
 
-            3 => {
-                self.wave_length_low = value;
-                self.refresh_wave_length();
-            }
-
-            4 => {
-                self.wave_length_high = value & 0x07;
+            3 | 4 => {
+                self.frequency.set_by_register(number, value);
                 self.refresh_wave_length();
             }
 
@@ -150,34 +135,32 @@ impl SoundGenerator for WaveGenerator {
     }
 
 
-    fn get_frequency(&self) -> Clock {
-        self.wave_length
+    fn get_frequency(&self) -> Frequency {
+        self.frequency
     }
 
 
-    fn set_frequency(&mut self, frequency: Clock) {
-        self.wave_length = frequency;
+    fn set_frequency(&mut self, frequency: Frequency) {
+        self.frequency = frequency;
     }
 
 
     fn update(&mut self, cycles: Clock) {
-        if self.wave_length != 0 {
-            let mut remaining_cycles = cycles;
+        let mut remaining_cycles = cycles;
 
-            while remaining_cycles > 0 {
-                let run_cycles = min(self.wave_timer, remaining_cycles);
+        while remaining_cycles > 0 {
+            let run_cycles = min(self.wave_timer, remaining_cycles);
 
-                self.wave_timer  = self.wave_timer.saturating_sub(run_cycles);
+            self.wave_timer  = self.wave_timer.saturating_sub(run_cycles);
 
-                // when the wave timer expires, it will be restarted and the
-                // position inside the wave ram proceeds
-                if self.wave_timer == 0 {
-                    self.wave_timer = self.wave_length;
-                    self.wave_step = self.wave_step.wrapping_add(1);
-                }
-
-                remaining_cycles = remaining_cycles.saturating_sub(run_cycles);
+            // when the wave timer expires, it will be restarted and the
+            // position inside the wave ram proceeds
+            if self.wave_timer == 0 {
+                self.wave_timer = self.frequency.to_countdown();
+                self.wave_step  = self.wave_step.wrapping_add(1);
             }
+
+            remaining_cycles = remaining_cycles.saturating_sub(run_cycles);
         }
     }
 

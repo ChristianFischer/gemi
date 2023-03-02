@@ -17,23 +17,11 @@
 
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
-use crate::gameboy::Clock;
-use crate::utils::get_bit;
+use crate::apu::channels::frequency::Frequency;
+use crate::utils::{as_bit_flag, get_bit};
 
 
-const NRX0_NON_READABLE_BITS : u8       = 0b_1000_0000;
-
-
-/// The maximum possible frequency, which can be stored in 11 bits being used in NRx3 and NRx4.
-/// Used to check for a possible overflow.
-const MAX_FREQUENCY : Clock = 0b_0000_0111_1111_1111;
-
-
-/// Whether to increment or decrement the frequency
-pub enum Direction {
-    Addition,
-    Subtraction,
-}
+const NRX0_NON_READABLE_BITS : u8 = 0b_1000_0000;
 
 
 /// The result of a sweep update.
@@ -45,13 +33,19 @@ pub enum FrequencySweepResult {
     DisableChannel,
 
     /// The value of the frequency was changed and need to be applied.
-    FrequencyChanged(Clock),
+    FrequencyChanged(Frequency),
 }
 
 
 pub struct FrequencySweep {
     /// Flag to store whether the frequency sweep is enabled or not.
     enabled: bool,
+
+    /// The shadow frequency, which is a copy of the channel frequency at the moment
+    /// of the trigger event and used for frequency calculation. Even if the channel's
+    /// frequency gets updated via registers, the shadow register wont get updated
+    /// until the next trigger event.
+    shadow_frequency: Frequency,
 
     /// The number of bits, the previous frequency has to be shifted to get the value
     /// the frequency has to be increased or decreased.
@@ -64,31 +58,21 @@ pub struct FrequencySweep {
     period_timer: u8,
 
     /// Whether to increase or decrease the frequency.
-    direction: Direction,
-}
+    subtract_mode: bool,
 
-
-impl Direction {
-    /// Get the direction based on the value written into the NR10 register.
-    pub fn from_register_value(value: u8) -> Self {
-        match get_bit(value, 3) {
-            false => Direction::Addition,
-            true  => Direction::Subtraction,
-        }
-    }
-
-
-    /// Get the value, which should be written into the NR10 register.
-    pub fn to_register_value(&self) -> u8 {
-        match self {
-            Direction::Addition    => 0b_0000_0000,
-            Direction::Subtraction => 0b_0000_1000,
-        }
-    }
+    /// Flag to store whether a subtraction was applied.
+    subtraction_flag: bool,
 }
 
 
 impl FrequencySweep {
+    /// Initializes the shadow frequency with the channels original frequency
+    /// at the beginning of a trigger event.
+    pub fn init_shadow_frequency(&mut self, frequency: Frequency) {
+        self.shadow_frequency = frequency;
+    }
+
+
     /// Reloads the timer once it reached zero.
     fn reload_timer(&mut self) {
         // if period length is zero, the value 8 is used instead
@@ -101,40 +85,65 @@ impl FrequencySweep {
     }
 
 
-    /// Computes the new frequency based on the last one and
-    fn compute_frequency(&self, wave_length: Clock) -> Clock {
-        let slope_amount = wave_length >> self.shift;
+    /// Computes the new frequency based on the last one and checks if the calculation
+    /// did produce an overflow.
+    fn compute_frequency(&mut self) -> Option<Frequency> {
+        let slope_amount = self.shadow_frequency.get_value() >> self.shift;
 
-        match self.direction {
-            Direction::Addition    => wave_length + slope_amount,
-            Direction::Subtraction => wave_length - slope_amount,
+        let new_value = if self.subtract_mode {
+            self.subtraction_flag = true;
+            self.shadow_frequency.get_value() - slope_amount
+        }
+        else {
+            self.shadow_frequency.get_value() + slope_amount
+        };
+
+        Frequency::new(new_value)
+    }
+
+
+    /// Performs the frequency calculation and checks if the value would overflow.
+    fn would_overflow(&mut self) -> bool {
+        match self.compute_frequency() {
+            Some(_) => false,
+            None    => true,
         }
     }
 
 
     /// Updates the current frequency and checks for an overflow.
-    pub fn update_frequency(&mut self, frequency: Clock) -> FrequencySweepResult {
-        let new_frequency = self.compute_frequency(frequency);
+    fn update_frequency(&mut self) -> FrequencySweepResult {
+        match self.compute_frequency() {
+            None => {
+                // if the wavelength would overflow, the channel is turned off instead
+                FrequencySweepResult::DisableChannel
+            }
 
-        // if the wavelength would overflow, the channel is turned off instead
-        if new_frequency >= MAX_FREQUENCY {
-            return FrequencySweepResult::DisableChannel;
-        }
-        else {
-            // otherwise, if the slope shift is non-zero, the new wavelength should be applied
-            if self.shift != 0 {
-                return FrequencySweepResult::FrequencyChanged(new_frequency);
+            Some(new_frequency) => {
+                // otherwise, if the slope shift is non-zero, the new frequency should be applied
+                if self.shift != 0 {
+                    self.shadow_frequency = new_frequency;
+
+                    // disable channel, if frequency would overflow next calculation
+                    if self.would_overflow() {
+                        FrequencySweepResult::DisableChannel
+                    }
+                    else {
+                        FrequencySweepResult::FrequencyChanged(new_frequency)
+                    }
+                }
+                else {
+                    return FrequencySweepResult::None
+                }
             }
         }
-
-        return FrequencySweepResult::None;
     }
 
 
     /// Receives the periodic call from the frame sequencer.
     /// When the timer elapsed, update the frequency and check for an overflow,
     /// deliver the result to the caller.
-    pub fn tick(&mut self, frequency: Clock) -> FrequencySweepResult {
+    pub fn tick(&mut self) -> FrequencySweepResult {
         self.period_timer = self.period_timer.saturating_sub(1);
 
         // when the timer elapses
@@ -144,7 +153,7 @@ impl FrequencySweep {
 
             if self.enabled && self.period_length != 0 {
                 // update the frequency and return the new value if changed
-                return self.update_frequency(frequency);
+                return self.update_frequency();
             }
         }
 
@@ -158,7 +167,7 @@ impl ChannelComponent for FrequencySweep {
         match number {
             0 => {
                     NRX0_NON_READABLE_BITS
-                |   self.direction.to_register_value()
+                |   as_bit_flag(self.subtract_mode, 3)
                 |   ((self.shift         & 0x07) << 0)
                 |   ((self.period_length & 0x07) << 4)
             },
@@ -171,14 +180,14 @@ impl ChannelComponent for FrequencySweep {
     fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
         match number {
             0 => {
-                let period  = (value >> 4) & 0x07;
-                let shift   = (value >> 0) & 0x07;
-                let enabled = period != 0 || shift != 0;
+                self.shift          = (value >> 0) & 0x07;
+                self.period_length  = (value >> 4) & 0x07;
+                self.subtract_mode  = get_bit(value, 3);
 
-                self.enabled        = enabled;
-                self.shift          = shift;
-                self.period_length  = period;
-                self.direction      = Direction::from_register_value(value);
+                // exit negate mode after calculation will disable the channel
+                if self.subtraction_flag && !self.subtract_mode {
+                    return TriggerAction::DisableChannel;
+                }
             }
 
             _ => { }
@@ -189,7 +198,21 @@ impl ChannelComponent for FrequencySweep {
 
 
     fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+        // reload the timer
         self.reload_timer();
+
+        // reset subtraction flag
+        self.subtraction_flag = false;
+
+        // frequency sweep gets enabled or disabled if either length or shift is non-zero
+        self.enabled = self.period_length != 0 || self.shift != 0;
+
+        // if shift is non-zero, the overflow check is applied immediately
+        if self.shift != 0 {
+            if self.would_overflow() {
+                return TriggerAction::DisableChannel;
+            }
+        }
 
         default_on_trigger_event(apu_state)
     }
@@ -204,11 +227,13 @@ impl ChannelComponent for FrequencySweep {
 impl Default for FrequencySweep {
     fn default() -> Self {
         Self {
-            enabled:        false,
-            shift:          0,
-            period_length:  0,
-            period_timer:   0,
-            direction:      Direction::Addition,
+            enabled:            false,
+            shadow_frequency:   Frequency::default(),
+            shift:              0,
+            period_length:      0,
+            period_timer:       0,
+            subtract_mode:      false,
+            subtraction_flag:   false,
         }
     }
 }

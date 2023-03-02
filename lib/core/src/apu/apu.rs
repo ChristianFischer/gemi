@@ -156,7 +156,7 @@ impl FrameSequencer {
     /// The volume envelope has a tick rate of 64Hz and therefor is
     /// activated every 8th tick of the frame sequencer.
     pub fn is_volume_envelope_active(&self) -> bool {
-        (self.fs_step & 0b0111) == 0
+        (self.fs_step & 0b0111) == 0b0111
     }
 }
 
