@@ -88,8 +88,10 @@ pub struct ApuState {
 /// The frame sequencer holds a counter which is tied to the device's DIV counter
 /// to periodically activate and deactivate components of the APU channels.
 pub struct FrameSequencer {
-    /// Frame Sequencer step
-    pub fs_step: u8,
+    /// The next step of the frame sequencer.
+    /// In real hardware, this is a 3 bit value. Here we're using a 8 bit integer
+    /// and just ignoring the higher 5 bits on reading.
+    pub fs_next_step: u8,
 }
 
 
@@ -123,16 +125,22 @@ pub struct Apu {
 impl FrameSequencer {
     pub fn new() -> Self {
         Self {
-            fs_step: 0,
+            fs_next_step: 0,
         }
+    }
+
+
+    /// Resets the frame sequencer next step to zero.
+    pub fn reset(&mut self) {
+        self.fs_next_step = 0;
     }
 
 
     /// Let the frame sequencer increment it's internal counter.
     /// This changes the state which channel components will be active or not.
     /// This does NOT invoke the channel components themself.
-    pub fn tick(&mut self) {
-        self.fs_step = self.fs_step.wrapping_add(1);
+    pub fn increment(&mut self) {
+        self.fs_next_step = self.fs_next_step.wrapping_add(1);
     }
 
 
@@ -140,7 +148,7 @@ impl FrameSequencer {
     /// The sound length timer has a tick rate of 256Hz and therefor is
     /// activated every 2nd tick of the frame sequencer.
     pub fn is_length_timer_active(&self) -> bool {
-        (self.fs_step & 0b0001) == 0
+        (self.fs_next_step & 0b0001) == 0
     }
 
 
@@ -148,7 +156,7 @@ impl FrameSequencer {
     /// The frequency sweep has a tick rate of 128Hz and therefor is
     /// activated every 4th tick of the frame sequencer.
     pub fn is_freq_sweep_active(&self) -> bool {
-        (self.fs_step & 0b0011) == 0
+        (self.fs_next_step & 0b0011) == 0b010
     }
 
 
@@ -156,7 +164,7 @@ impl FrameSequencer {
     /// The volume envelope has a tick rate of 64Hz and therefor is
     /// activated every 8th tick of the frame sequencer.
     pub fn is_volume_envelope_active(&self) -> bool {
-        (self.fs_step & 0b0111) == 0b0111
+        (self.fs_next_step & 0b0111) == 0b0111
     }
 }
 
@@ -210,8 +218,6 @@ impl Apu {
 
     /// Process the next step of the frame sequencer to trigger sound generator subcomponents.
     fn next_frame_sequencer_step(&mut self) {
-        self.state.fs.tick();
-
         // before internal components of any sound generator may be changed,
         // generate all remaining audio data with the currently configured values.
         self.generate_audio();
@@ -239,6 +245,9 @@ impl Apu {
             self.ch3.tick_envelope_sweep();
             self.ch4.tick_envelope_sweep();
         }
+
+        // increment after invoking components to get the next FS state.
+        self.state.fs.increment();
     }
 
 
@@ -268,6 +277,12 @@ impl Apu {
         }
 
         // todo: channels_clock contains a remainder, which should be applied to channels as well
+    }
+
+
+    /// The APU was powered on after being disabled before.
+    fn power_on(&mut self) {
+        self.state.fs.reset();
     }
 
 
@@ -388,11 +403,16 @@ impl MemoryBusConnection for Apu {
             MEMORY_LOCATION_APU_NR52 => {
                 let enabled = get_bit(value, 7);
 
-                if self.state.apu_on && !enabled {
-                    self.reset();
-                }
+                if self.state.apu_on != enabled {
+                    self.state.apu_on = enabled;
 
-                self.state.apu_on = enabled;
+                    if enabled {
+                        self.power_on();
+                    }
+                    else {
+                        self.reset();
+                    }
+                }
             },
 
             // Wave RAM
