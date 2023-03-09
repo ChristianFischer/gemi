@@ -174,7 +174,7 @@ impl ChannelComponent for Envelope {
     }
 
 
-    fn on_reset(&mut self) {
+    fn on_reset(&mut self, _apu_state: &ApuState) {
         *self = Self::default();
     }
 }

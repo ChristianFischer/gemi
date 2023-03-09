@@ -244,7 +244,7 @@ impl GameBoy {
                 cpu: Cpu::new(
                     Mmu::new(
                         Peripherals {
-                            apu: Apu::new(),
+                            apu: Apu::new(device_config),
                             ppu: Ppu::new(device_config),
                             mem: Memory::new(device_config),
                             timer: Timer::new(),

@@ -77,6 +77,14 @@ pub type TriggerActionSet = FlagSet<TriggerAction>;
 /// This trait allows components to receive changes on their registers and to get notified
 /// when a channel was triggered by setting the trigger bit.
 pub trait ChannelComponent {
+    /// Checks whether this component can be written to in the current state.
+    /// The default implementation disallows write while the APU is turned off, which
+    /// is the case for most components, except the length timer.
+    fn can_write_register(&self, number: u16, apu_state: &ApuState) -> bool {
+        _ = number;
+        apu_state.apu_on
+    }
+
     /// Called to read the value of a register.
     fn on_read_register(&self, number: u16) -> u8 {
         default_on_read_register(number)
@@ -95,7 +103,7 @@ pub trait ChannelComponent {
 
     /// Called when the APU was reset by turning it off.
     /// It's expected to every component to set it's data to '0'.
-    fn on_reset(&mut self);
+    fn on_reset(&mut self, apu_state: &ApuState);
 }
 
 
@@ -325,16 +333,26 @@ impl<
     /// When NRx4 bit 7 was set, this will also fire the trigger event for this channel.
     pub fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerActionSet {
         let mut actions = self.for_each_component_mut(
-            |c| c.on_write_register(number, value, apu_state)
+            |c| {
+                // block writing to this component, if not allowed
+                if !c.can_write_register(number, apu_state) {
+                    return TriggerAction::None;
+                }
+
+                c.on_write_register(number, value, apu_state)
+            }
         );
 
-        // check whether the trigger bit was set
-        if number == 4 && get_bit(value, 7) {
-            actions |= self.fire_trigger_event(apu_state);
-        }
+        // a channel may only be triggered, if the APU is not turned off
+        if apu_state.apu_on {
+            // check whether the trigger bit was set
+            if number == 4 && get_bit(value, 7) {
+                actions |= self.fire_trigger_event(apu_state);
+            }
 
-        // apply requested actions
-        actions = self.apply_actions(actions);
+            // apply requested actions
+            actions = self.apply_actions(actions);
+        }
 
         actions
     }
@@ -366,8 +384,14 @@ impl<
 
 
     /// Reset this channel when the APU was turned off.
-    pub fn reset(&mut self) {
-        self.for_each_component_mut(|c| { c.on_reset(); TriggerAction::None });
+    pub fn reset(&mut self, apu_state: &ApuState) {
+        self.for_each_component_mut(
+            |c| {
+                c.on_reset(apu_state);
+                TriggerAction::None
+            }
+        );
+
         self.channel_enabled = false;
     }
 

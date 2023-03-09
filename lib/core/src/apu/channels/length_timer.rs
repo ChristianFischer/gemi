@@ -58,6 +58,17 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
 
 
 impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
+    fn can_write_register(&self, number: u16, apu_state: &ApuState) -> bool {
+        match number {
+            // length timer can always be written to
+            1 => true,
+
+            // other values only if APU is turned on
+            _ => apu_state.apu_on,
+        }
+    }
+
+
     fn on_read_register(&self, number: u16) -> u8 {
         match number {
             1 => {
@@ -123,8 +134,13 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
     }
 
 
-    fn on_reset(&mut self) {
-        *self = Self::default();
+    fn on_reset(&mut self, apu_state: &ApuState) {
+        self.length_timer_enabled = false;
+
+        // on GameBoy Color, the length value will be reset to the maximum.
+        if apu_state.device_config.is_gbc_enabled() {
+            self.length_timer = Self::LENGTH_MAX;
+        }
     }
 }
 

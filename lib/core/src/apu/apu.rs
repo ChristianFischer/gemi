@@ -22,7 +22,7 @@ use crate::apu::channels::pulse::PulseGenerator;
 use crate::apu::channels::wave::WaveGenerator;
 use crate::apu::mixer::Mixer;
 use crate::apu::output_buffer::OutputBuffer;
-use crate::gameboy::Clock;
+use crate::gameboy::{Clock, DeviceConfig};
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::utils::{as_bit_flag, get_bit};
@@ -72,6 +72,9 @@ pub struct WaveRam(pub [u8; 16]);
 /// and information about the current frame sequencer state.
 pub struct ApuState {
     pub apu_on: bool,
+
+    /// Current device config
+    pub device_config: DeviceConfig,
 
     /// Frame Sequencer clock
     pub fs_clock: Clock,
@@ -171,7 +174,7 @@ impl FrameSequencer {
 
 impl Apu {
     /// Creates a new APU object.
-    pub fn new() -> Self {
+    pub fn new(device_config: DeviceConfig) -> Self {
         Self {
             channels_clock: 0,
 
@@ -179,7 +182,8 @@ impl Apu {
                 apu_on:     true,
                 fs_clock:   0,
                 fs:         FrameSequencer::new(),
-                wave_ram:   WaveRam::default()
+                wave_ram:   WaveRam::default(),
+                device_config,
             },
 
             ch1: Channel::new(ChannelType::Ch1Pulse1),
@@ -289,10 +293,10 @@ impl Apu {
     /// Reset the APUs internal data.
     fn reset(&mut self) {
         self.mixer.reset();
-        self.ch1.reset();
-        self.ch2.reset();
-        self.ch3.reset();
-        self.ch4.reset();
+        self.ch1.reset(&self.state);
+        self.ch2.reset(&self.state);
+        self.ch3.reset(&self.state);
+        self.ch4.reset(&self.state);
     }
 
 
@@ -305,34 +309,41 @@ impl Apu {
 impl MemoryBusConnection for Apu {
     fn on_read(&self, address: u16) -> u8 {
         match address {
+            // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
                 let number = address - MEMORY_LOCATION_APU_NR10;
                 self.ch1.on_read_register(number)
             }
 
+            // Channel 2
             MEMORY_LOCATION_APU_NR21 ..= MEMORY_LOCATION_APU_NR24 => {
                 let number = address - MEMORY_LOCATION_APU_NR20;
                 self.ch2.on_read_register(number)
             }
 
+            // Channel 3
             MEMORY_LOCATION_APU_NR30 ..= MEMORY_LOCATION_APU_NR34 => {
                 let number = address - MEMORY_LOCATION_APU_NR30;
                 self.ch3.on_read_register(number)
             }
 
+            // Channel 4
             MEMORY_LOCATION_APU_NR41 ..= MEMORY_LOCATION_APU_NR44 => {
                 let number = address - MEMORY_LOCATION_APU_NR40;
                 self.ch4.on_read_register(number)
             }
 
+            // Volume / VIN settings
             MEMORY_LOCATION_APU_NR50 => {
                 self.mixer.read_nr50()
             },
 
+            // Channel panning
             MEMORY_LOCATION_APU_NR51 => {
                 self.mixer.read_nr51()
             },
 
+            // APU powered state / channel active states
             MEMORY_LOCATION_APU_NR52 => {
                 if self.state.apu_on {
                         NR52_NON_READABLE_BITS
@@ -360,46 +371,45 @@ impl MemoryBusConnection for Apu {
 
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
+            // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
-                if self.state.apu_on {
-                    let number = address - MEMORY_LOCATION_APU_NR10;
-                    self.ch1.on_write_register(number, value, &self.state);
-                }
+                let number = address - MEMORY_LOCATION_APU_NR10;
+                self.ch1.on_write_register(number, value, &self.state);
             }
 
-            MEMORY_LOCATION_APU_NR21 ..= MEMORY_LOCATION_APU_NR24 => {
-                if self.state.apu_on {
-                    let number = address - MEMORY_LOCATION_APU_NR20;
-                    self.ch2.on_write_register(number, value, &self.state);
-                }
+            // Channel 2
+            MEMORY_LOCATION_APU_NR20 ..= MEMORY_LOCATION_APU_NR24 => {
+                let number = address - MEMORY_LOCATION_APU_NR20;
+                self.ch2.on_write_register(number, value, &self.state);
             }
 
+            // Channel 3
             MEMORY_LOCATION_APU_NR30 ..= MEMORY_LOCATION_APU_NR34 => {
-                if self.state.apu_on {
-                    let number = address - MEMORY_LOCATION_APU_NR30;
-                    self.ch3.on_write_register(number, value, &self.state);
-                }
+                let number = address - MEMORY_LOCATION_APU_NR30;
+                self.ch3.on_write_register(number, value, &self.state);
             }
 
-            MEMORY_LOCATION_APU_NR41 ..= MEMORY_LOCATION_APU_NR44 => {
-                if self.state.apu_on {
-                    let number = address - MEMORY_LOCATION_APU_NR40;
-                    self.ch4.on_write_register(number, value, &self.state);
-                }
+            // Channel 4
+            MEMORY_LOCATION_APU_NR40 ..= MEMORY_LOCATION_APU_NR44 => {
+                let number = address - MEMORY_LOCATION_APU_NR40;
+                self.ch4.on_write_register(number, value, &self.state);
             }
 
+            // Volume / VIN settings
             MEMORY_LOCATION_APU_NR50 => {
                 if self.state.apu_on {
                     self.mixer.write_nr50(value);
                 }
             },
 
+            // Channel panning
             MEMORY_LOCATION_APU_NR51 => {
                 if self.state.apu_on {
                     self.mixer.write_nr51(value);
                 }
             },
 
+            // Enable / Disable APU
             MEMORY_LOCATION_APU_NR52 => {
                 let enabled = get_bit(value, 7);
 
