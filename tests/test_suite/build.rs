@@ -41,7 +41,6 @@ fn main() {
         // Those will be ignored until their functionality is fully supported.
         tests_known_to_fail: vec![
             "blargg/cgb_sound/",
-            "blargg/dmg_sound/",
             "blargg/interrupt_time/interrupt_time",
             "blargg/oam_bug/",
             "blargg/blargg_other/halt_bug",

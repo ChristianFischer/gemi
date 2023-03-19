@@ -46,6 +46,11 @@ impl DigitalAudioConverter {
     }
 
 
+    pub fn on_reset(&mut self) {
+        self.enabled = false;
+    }
+
+
     /// Converts a digital input value into an audio sample value.
     pub fn convert(&self, value: u8) -> i16 {
         if self.enabled {

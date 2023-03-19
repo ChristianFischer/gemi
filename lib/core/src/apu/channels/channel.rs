@@ -403,6 +403,7 @@ impl<
 
     /// Reset this channel when the APU was turned off.
     pub fn reset(&mut self, apu_state: &ApuState) {
+        // notify each component to reset
         self.for_each_component_mut(
             |c| {
                 c.on_reset(apu_state);
@@ -410,6 +411,10 @@ impl<
             }
         );
 
+        // reset DAC
+        self.dac.on_reset();
+
+        // channels become disabled on reset
         self.channel_enabled = false;
     }
 

@@ -40,8 +40,12 @@ pub struct Envelope {
     /// and further calls wont have any effect.
     enabled: bool,
 
+    /// The initial volume as read from NRx2.
+    /// This value will be taken as initial value when the channel get triggered.
+    initial_volume: u8,
+
     /// The current volume used for sound generation.
-    /// It will be initialized by the values of NRx2 and changed each time the period timer becomes zero.
+    /// It will be initialized by the value of NRx2 and changed each time the period timer becomes zero.
     volume: u8,
 
     /// The length of each period in ticks by the frame sequencer.
@@ -130,8 +134,8 @@ impl ChannelComponent for Envelope {
         match number {
             2 => {
                     self.direction.to_register_value()
-                |   ((self.period_length & 0x07) << 0)
-                |   ((self.volume        & 0x0f) << 4)
+                |   ((self.period_length  & 0x07) << 0)
+                |   ((self.initial_volume & 0x0f) << 4)
             },
 
             _ => default_on_read_register(number, apu_state)
@@ -148,6 +152,7 @@ impl ChannelComponent for Envelope {
                 let enabled       = period != 0;
 
                 self.enabled        = enabled;
+                self.initial_volume = volume;
                 self.volume         = volume;
                 self.period_length  = period;
                 self.direction      = Direction::from_register_value(value);
@@ -170,6 +175,9 @@ impl ChannelComponent for Envelope {
     fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         self.reload_envelope_timer();
 
+        // initialize the volume from it's configured value
+        self.volume = self.initial_volume;
+
         default_on_trigger_event(apu_state)
     }
 
@@ -184,6 +192,7 @@ impl Default for Envelope {
     fn default() -> Self {
         Self {
             enabled:        false,
+            initial_volume: 0,
             volume:         0,
             period_length:  0,
             period_timer:   0,
