@@ -69,7 +69,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
     }
 
 
-    fn on_read_register(&self, number: u16) -> u8 {
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
         match number {
             1 => {
                 // length timer initial value is write-only,
@@ -81,7 +81,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
                 as_bit_flag(self.length_timer_enabled, 6)
             },
 
-            _ => default_on_read_register(number)
+            _ => default_on_read_register(number, apu_state)
         }
     }
 

@@ -163,7 +163,7 @@ impl FrequencySweep {
 
 
 impl ChannelComponent for FrequencySweep {
-    fn on_read_register(&self, number: u16) -> u8 {
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
         match number {
             0 => {
                     NRX0_NON_READABLE_BITS
@@ -172,7 +172,7 @@ impl ChannelComponent for FrequencySweep {
                 |   ((self.period_length & 0x07) << 4)
             },
 
-            _ => default_on_read_register(number)
+            _ => default_on_read_register(number, apu_state)
         }
     }
 

@@ -126,7 +126,7 @@ impl Envelope {
 
 
 impl ChannelComponent for Envelope {
-    fn on_read_register(&self, number: u16) -> u8 {
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
         match number {
             2 => {
                     self.direction.to_register_value()
@@ -134,7 +134,7 @@ impl ChannelComponent for Envelope {
                 |   ((self.volume        & 0x0f) << 4)
             },
 
-            _ => default_on_read_register(number)
+            _ => default_on_read_register(number, apu_state)
         }
     }
 

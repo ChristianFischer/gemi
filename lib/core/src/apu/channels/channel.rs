@@ -86,8 +86,8 @@ pub trait ChannelComponent {
     }
 
     /// Called to read the value of a register.
-    fn on_read_register(&self, number: u16) -> u8 {
-        default_on_read_register(number)
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+        default_on_read_register(number, apu_state)
     }
 
     /// Called when the value of a register was written.
@@ -100,6 +100,9 @@ pub trait ChannelComponent {
     fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
         default_on_trigger_event(apu_state)
     }
+
+    /// Called when this channel was disabled.
+    fn on_channel_disabled(&mut self) { }
 
     /// Called when the APU was reset by turning it off.
     /// It's expected to every component to set it's data to '0'.
@@ -115,8 +118,8 @@ pub fn default_on_write_register(number: u16, value: u8, apu_state: &ApuState) -
 
 
 /// Placeholder for `on_read_register` implementations, which do not result in any special behaviour.
-pub fn default_on_read_register(number: u16) -> u8 {
-    _ = number;
+pub fn default_on_read_register(number: u16, apu_state: &ApuState) -> u8 {
+    _ = (number, apu_state);
     0x00
 }
 
@@ -316,7 +319,7 @@ impl<
 
         // disable the channel
         if actions_applied.contains(TriggerAction::DisableChannel) {
-            self.channel_enabled = false;
+            self.disable_channel();
         }
 
         actions_applied
@@ -324,8 +327,8 @@ impl<
 
 
     /// Reads from a register which belongs to this channel.
-    pub fn on_read_register(&self, number: u16) -> u8 {
-        self.for_each_component(|c| c.on_read_register(number))
+    pub fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+        self.for_each_component(|c| c.on_read_register(number, apu_state))
     }
 
 
@@ -380,6 +383,21 @@ impl<
         }
 
         actions
+    }
+
+
+    /// Disables this channel and notifies all components.
+    fn disable_channel(&mut self) {
+        // disables the channel
+        self.channel_enabled = false;
+
+        // notify all components
+        self.for_each_component_mut(
+            |c| {
+                c.on_channel_disabled();
+                TriggerAction::None
+            }
+        );
     }
 
 

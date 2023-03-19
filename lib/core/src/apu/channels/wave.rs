@@ -17,10 +17,12 @@
 
 use std::cmp::min;
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_write_register, TriggerAction};
+use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
+use crate::apu::channels::wave_ram::{WaveRam, WaveRamPositionCursor};
 use crate::gameboy::Clock;
+use crate::mmu::locations::*;
 use crate::utils::{as_bit_flag, get_bit};
 
 
@@ -32,9 +34,23 @@ const NR34_WRITE_ONLY_FREQUENCY : u8    = 0b_0000_0111;
 const NR34_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
 
 
+/// The time, the Wave RAM is accessible during a read operation
+/// when the sound generator is active.
+const WAVE_RAM_ACCESS_TIME: Clock = 2;
+
+/// The value to multiply the frequency with to get the number of CPU cycles for the wave timer.
+const FREQUENCY_CYCLES : u16 = 2;
+
+
+/// A sound generator reading wave data from a dedicated memory location called Wave RAM.
+/// Each time the frequency timer expires, a sample is read from the Wave RAM and the reading
+/// cursor get incremented.
 pub struct WaveGenerator {
     /// Stores whether the DAC of this channel is enabled or not.
     dac_enabled: bool,
+
+    /// Flag to store whether the channel is currently enabled or not.
+    channel_enabled: bool,
 
     /// The output level value read from the NR32 register.
     output_level: u8,
@@ -52,38 +68,114 @@ pub struct WaveGenerator {
     wave_timer: Clock,
 
     /// The current position where to read the value from the wave duty.
-    wave_step: u8,
+    wave_ram_position: WaveRamPositionCursor,
+
+    /// The last byte accessed by reading a sample from the Wave RAM.
+    /// While the channel is enabled, read/write operations from the memory bus will be
+    /// restricted to this address.
+    wave_ram_last_address: u8,
+
+    /// The time window when the Wave RAM is accessible after a read operation on DMG.
+    /// When the value becomes zero, the time window is closed and Wave RAM gets inaccessible.
+    wave_ram_access_timeout: Clock,
+
+    /// The current sample read from Wave RAM.
+    wave_ram_current_sample: u8,
+
+    /// Wave pattern RAM.
+    wave_ram: WaveRam,
+
 }
 
 
 impl WaveGenerator {
     pub fn new() -> Self {
         Self {
-            dac_enabled:        false,
-            output_level:       0,
-            volume_shift:       0,
-            frequency:          Frequency::default(),
-            wave_timer:         0,
-            wave_step:          0,
+            dac_enabled:                false,
+            channel_enabled:            false,
+            output_level:               0,
+            volume_shift:               0,
+            frequency:                  Frequency::default(),
+            wave_timer:                 0,
+            wave_ram_position:          WaveRamPositionCursor::default(),
+            wave_ram_last_address:      0,
+            wave_ram_access_timeout:    0,
+            wave_ram_current_sample:    0,
+            wave_ram:                   WaveRam::default(),
         }
     }
 
 
-    /// After writing to either NRx3 or NRx4, update the channel's wave length
-    fn refresh_wave_length(&mut self) {
-        self.wave_timer = self.frequency.to_countdown();
+    /// A read or write operation on Wave RAM may not access the requested index, depending on
+    /// the current state of the wave channel and the device we're running.
+    /// This function maps the requested byte into the address which will actually be accessed
+    /// or `None` if the wave ram is currently not accessible.
+    pub fn get_wave_ram_access(&self, requested_address: u16, apu_state: &ApuState) -> Option<u8> {
+        if !self.channel_enabled {
+            // Wave RAM is completely accessible, when channel is disabled
+            let index = (requested_address - MEMORY_LOCATION_APU_WAVE_RAM_BEGIN) & 0x0f;
+            Some(index as u8)
+        }
+        else if apu_state.device_config.is_gbc_enabled() || (self.wave_ram_access_timeout > 0) {
+            // with the channel enabled, the access is restricted to the last
+            // address being read by the sound generator.
+            // On DMG this is only possible within 2 cycles after the data was read,
+            // otherwise reading or writing the wave ram will fail.
+            Some(self.wave_ram_last_address & 0x0f)
+        }
+        else {
+            // on DMG, after the time window is closed,
+            // access on wave ram is no longer possible
+            None
+        }
+    }
+
+
+    /// Reads data from the Wave RAM given the requested memory address.
+    /// This takes into account when the access is restricted when the channel is enabled.
+    pub fn read_wave_ram(&self, requested_address: u16, apu_state: &ApuState) -> u8 {
+        if let Some(address) = self.get_wave_ram_access(requested_address, apu_state) {
+            self.wave_ram[address]
+        }
+        else {
+            0xff
+        }
+    }
+
+
+    /// Writes data to the Wave RAM given the requested memory address.
+    /// This takes into account when the access is restricted when the channel is enabled.
+    pub fn write_wave_ram(&mut self, requested_address: u16, value: u8, apu_state: &ApuState) {
+        if let Some(address) = self.get_wave_ram_access(requested_address, apu_state) {
+            self.wave_ram[address] = value;
+        }
     }
 }
 
 
 impl ChannelComponent for WaveGenerator {
-    fn on_read_register(&self, number: u16) -> u8 {
+    fn can_write_register(&self, number: u16, apu_state: &ApuState) -> bool {
+        match number {
+            // Wave RAM is always writable
+            MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => true,
+            _ => apu_state.apu_on,
+        }
+    }
+
+
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
         match number {
             0 => NR30_NON_READABLE_BITS | as_bit_flag(self.dac_enabled, 7),
             2 => NR32_NON_READABLE_BITS | (self.output_level << 5),
             3 => NR33_WRITE_ONLY_FREQUENCY,
             4 => NR34_WRITE_ONLY_FREQUENCY | NR34_NON_READABLE_BITS | NR34_WRITE_ONLY_TRIGGER_BIT,
-            _ => default_on_read_register(number)
+
+            // Wave RAM
+            MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => {
+                self.read_wave_ram(number, apu_state)
+            }
+
+            _ => default_on_read_register(number, apu_state)
         }
     }
 
@@ -113,7 +205,11 @@ impl ChannelComponent for WaveGenerator {
 
             3 | 4 => {
                 self.frequency.set_by_register(number, value);
-                self.refresh_wave_length();
+            }
+
+            // Wave RAM
+            MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => {
+                self.write_wave_ram(number, value, apu_state);
             }
 
             _ => { }
@@ -123,8 +219,36 @@ impl ChannelComponent for WaveGenerator {
     }
 
 
+    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+        if
+                self.channel_enabled // was already enabled
+            &&  self.wave_timer == 2 // wave ram is about to be read when the timer expires
+            &&  !apu_state.device_config.is_gbc_enabled()
+        {
+            self.wave_ram.do_wave_ram_corruption(&self.wave_ram_position);
+        }
+
+        self.wave_ram_position.reset();
+
+        self.channel_enabled        = self.is_dac_enabled();
+        self.wave_ram_last_address  = 0;
+        self.wave_timer             = 6; // required to pass Blargg's test 09-wave-read-while-on
+
+        default_on_trigger_event(apu_state)
+    }
+
+
+    fn on_channel_disabled(&mut self) {
+        self.channel_enabled = false;
+    }
+
+
     fn on_reset(&mut self, _apu_state: &ApuState) {
-        *self = Self::new();
+        // reset everything except wave ram
+        *self = Self {
+            wave_ram: self.wave_ram,
+            .. Self::new()
+        }
     }
 }
 
@@ -153,11 +277,18 @@ impl SoundGenerator for WaveGenerator {
 
             self.wave_timer  = self.wave_timer.saturating_sub(run_cycles);
 
+            // reduce the time the wave ram cursor is active
+            self.wave_ram_access_timeout = self.wave_ram_access_timeout.saturating_sub(run_cycles);
+
             // when the wave timer expires, it will be restarted and the
             // position inside the wave ram proceeds
             if self.wave_timer == 0 {
-                self.wave_timer = self.frequency.to_countdown();
-                self.wave_step  = self.wave_step.wrapping_add(1);
+                self.wave_timer              = self.frequency.to_countdown(FREQUENCY_CYCLES);
+                self.wave_ram_current_sample = self.wave_ram.get_sample(&self.wave_ram_position);
+                self.wave_ram_last_address   = self.wave_ram_position.get_index();
+                self.wave_ram_access_timeout = WAVE_RAM_ACCESS_TIME;
+
+                self.wave_ram_position.advance();
             }
 
             remaining_cycles = remaining_cycles.saturating_sub(run_cycles);
@@ -170,19 +301,9 @@ impl SoundGenerator for WaveGenerator {
     }
 
 
-    fn get_sample(&self, apu_state: &ApuState) -> u8 {
-        // since wave ram contains two samples per byte,
-        // the index within the wave ram is wave_step / 2.
-        let index = (self.wave_step >> 1) & 0x0f;
-
-        // read the byte from wave RAM
-        let value = apu_state.wave_ram.0[index as usize];
-
-        // depending on bit 1, either take the high or low nibble
-        let amp = match self.wave_step & 0x01 {
-            0 => (value >> 4) & 0x0f,
-            _ => (value >> 0) & 0x0f,
-        };
+    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
+        // get the sample amplitude at the current wave ram position
+        let amp = self.wave_ram_current_sample;
 
         // apply the volume shift to the amplitude to get the final sample
         let sample = amp >> self.volume_shift;

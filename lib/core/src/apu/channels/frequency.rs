@@ -99,8 +99,8 @@ impl Frequency {
 
 
     /// Get the countdown value used to measure the time to the next wave iteration.
-    pub fn to_countdown(&self) -> Clock {
-        let wave_length = (2048 - self.value) * 4;
+    pub fn to_countdown(&self, cycles: u16) -> Clock {
+        let wave_length = (2048 - self.value) * cycles;
         wave_length as Clock
     }
 }

@@ -30,6 +30,10 @@ const NRX4_WRITE_ONLY_FREQUENCY : u8    = 0b_0000_0111;
 const NRX4_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
 
 
+/// The value to multiply the frequency with to get the number of CPU cycles for the wave timer.
+const FREQUENCY_CYCLES : u16 = 4;
+
+
 /// A sound generator to generate a pulse wave. The wave is based is based on a wave duty value
 /// and a volume computed by an envelope function.
 pub struct PulseGenerator {
@@ -59,22 +63,16 @@ impl PulseGenerator {
             wave_duty_step:     0,
         }
     }
-
-
-    /// After writing to either NRx3 or NRx4, update the channel's wave length
-    fn refresh_wave_length(&mut self) {
-        self.wave_timer = self.frequency.to_countdown();
-    }
 }
 
 
 impl ChannelComponent for PulseGenerator {
-    fn on_read_register(&self, number: u16) -> u8 {
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
         match number {
             1 => self.wave_duty.get_index() << 6,
             3 => NRX3_WRITE_ONLY_FREQUENCY,
             4 => NRX4_WRITE_ONLY_FREQUENCY | NRX4_NON_READABLE_BITS | NRX4_WRITE_ONLY_TRIGGER_BIT,
-            _ => default_on_read_register(number)
+            _ => default_on_read_register(number, apu_state)
         }
     }
 
@@ -88,7 +86,6 @@ impl ChannelComponent for PulseGenerator {
 
             3 | 4 => {
                 self.frequency.set_by_register(number, value);
-                self.refresh_wave_length();
             }
 
             _ => { }
@@ -131,7 +128,7 @@ impl SoundGenerator for PulseGenerator {
             // when the wave timer expires, it will be restarted and the
             // position inside the wave duty proceeds
             if self.wave_timer == 0 {
-                self.wave_timer     = self.frequency.to_countdown();
+                self.wave_timer     = self.frequency.to_countdown(FREQUENCY_CYCLES);
                 self.wave_duty_step = self.wave_duty_step.wrapping_add(1);
             }
 

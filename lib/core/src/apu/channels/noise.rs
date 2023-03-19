@@ -76,7 +76,7 @@ impl NoiseGenerator {
 
 
 impl ChannelComponent for NoiseGenerator {
-    fn on_read_register(&self, number: u16) -> u8 {
+    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
         match number {
             1 => NR41_NON_READABLE_BITS, // unused bits
 
@@ -93,7 +93,7 @@ impl ChannelComponent for NoiseGenerator {
 
             4 => NR44_NON_READABLE_BITS | NR44_WRITE_ONLY_TRIGGER_BIT,
 
-            _ => default_on_read_register(number)
+            _ => default_on_read_register(number, apu_state)
         }
     }
 
