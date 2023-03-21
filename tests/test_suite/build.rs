@@ -40,7 +40,7 @@ fn main() {
         // A list of tests currently known to fail
         // Those will be ignored until their functionality is fully supported.
         tests_known_to_fail: vec![
-            "blargg/cgb_sound/",
+            //"blargg/cgb_sound/",
             "blargg/interrupt_time/interrupt_time",
             "blargg/oam_bug/",
             "blargg/blargg_other/halt_bug",

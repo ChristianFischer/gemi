@@ -60,8 +60,17 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
 impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
     fn can_write_register(&self, number: u16, apu_state: &ApuState) -> bool {
         match number {
-            // length timer can always be written to
-            1 => true,
+            1 => {
+                // on DMG, length timer can always be written to.
+                // When GameBoy Color mode is enabled, the behaviour is the same as for
+                // other registers and can only be written, when the APU is enabled.
+                if apu_state.device_config.is_gbc_enabled() {
+                    apu_state.apu_on
+                }
+                else {
+                    true
+                }
+            },
 
             // other values only if APU is turned on
             _ => apu_state.apu_on,

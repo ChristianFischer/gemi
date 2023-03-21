@@ -29,11 +29,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_01_registers() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/01-registers.gb")
                 },
@@ -55,11 +54,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_02_len_ctr() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/02-len ctr.gb")
                 },
@@ -81,11 +79,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_03_trigger() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/03-trigger.gb")
                 },
@@ -107,11 +104,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_04_sweep() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/04-sweep.gb")
                 },
@@ -133,11 +129,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_05_sweep_details() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/05-sweep details.gb")
                 },
@@ -159,11 +154,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_06_overflow_on_trigger() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/06-overflow on trigger.gb")
                 },
@@ -185,11 +179,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_07_len_sweep_period_sync() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/07-len sweep period sync.gb")
                 },
@@ -211,11 +204,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_08_len_ctr_during_power() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/08-len ctr during power.gb")
                 },
@@ -237,11 +229,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_09_wave_read_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/09-wave read while on.gb")
                 },
@@ -263,11 +254,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_10_wave_trigger_while_on() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/10-wave trigger while on.gb")
                 },
@@ -289,11 +279,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_11_regs_after_power() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/11-regs after power.gb")
                 },
@@ -315,11 +304,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn rom_singles_12_wave() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/12-wave.gb")
                 },
@@ -346,11 +334,10 @@ mod cgb_sound {
 
 
         #[test]
-        #[ignore]
         fn cgb_sound() {
             let cfg = EmulatorTestConfig {
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/cgb_sound.gb")
                 },
