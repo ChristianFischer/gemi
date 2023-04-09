@@ -82,7 +82,6 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
             window.poll_events();
             window.apply_key_states(&mut peripherals.input);
             window.present(peripherals.ppu.get_lcd(), &peripherals.ppu);
-            window.push_audio_samples(peripherals.apu.take_samples());
         }
 
         // handle frame times
@@ -179,7 +178,7 @@ fn main() -> Result<(), String> {
     };
 
     // create window
-    let mut window = Window::create(&title)?;
+    let mut window = Window::create(&title, &mut gb)?;
 
     // run the game
     run(&mut window, &mut gb);

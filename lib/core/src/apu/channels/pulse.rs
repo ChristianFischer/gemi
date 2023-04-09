@@ -31,7 +31,7 @@ const NRX4_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
 
 
 /// The value to multiply the frequency with to get the number of CPU cycles for the wave timer.
-const FREQUENCY_CYCLES : u16 = 4;
+const FREQUENCY_CYCLES : Clock = 4;
 
 
 /// A sound generator to generate a pulse wave. The wave is based is based on a wave duty value

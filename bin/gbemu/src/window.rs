@@ -26,6 +26,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
 use std::collections::HashMap;
+use gbemu_core::gameboy::GameBoy;
 use gbemu_core::ppu::flags::LcdControlFlag;
 use crate::sound_queue::SoundQueue;
 
@@ -132,7 +133,7 @@ impl BufferedTexture {
 
 impl Window {
     /// Creates a new window with a given size and title.
-    pub fn create(title: &str) -> Result<Window, String> {
+    pub fn create(title: &str, gb: &mut GameBoy) -> Result<Window, String> {
         let display_scale = 4;
 
         let sdl = sdl2::init()?;
@@ -161,7 +162,7 @@ impl Window {
         let texture_background = BufferedTexture::new(&texture_creator, 256, 256)?;
         let texture_objects    = BufferedTexture::new(&texture_creator, 16*8, 24*8)?;
 
-        let audio = SoundQueue::create(&sdl)?;
+        let audio = SoundQueue::create(&sdl, &mut gb.get_peripherals_mut().apu)?;
 
         Ok(Window {
             display_scale,
@@ -221,6 +222,17 @@ impl Window {
             Keycode::F1     => { self.set_display_mode(DisplayMode::Game); }
             Keycode::F2     => { self.set_display_mode(DisplayMode::Background); }
             Keycode::F3     => { self.set_display_mode(DisplayMode::Objects); }
+
+            Keycode::KpMinus => {
+                let volume = self.audio.get_volume();
+                self.audio.set_volume(volume - 0.05);
+            }
+
+            Keycode::KpPlus => {
+                let volume = self.audio.get_volume();
+                self.audio.set_volume(volume + 0.05);
+            }
+
             _ => { }
         }
     }
@@ -415,11 +427,5 @@ impl Window {
 
         // present the framebuffer
         self.canvas.present();
-    }
-
-
-    pub fn push_audio_samples(&mut self, samples: Vec<i16>) {
-        self.audio.push_audio_samples(samples);
-
     }
 }

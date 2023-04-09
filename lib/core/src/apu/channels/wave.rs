@@ -39,7 +39,7 @@ const NR34_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
 const WAVE_RAM_ACCESS_TIME: Clock = 2;
 
 /// The value to multiply the frequency with to get the number of CPU cycles for the wave timer.
-const FREQUENCY_CYCLES : u16 = 2;
+const FREQUENCY_CYCLES : Clock = 2;
 
 
 /// A sound generator reading wave data from a dedicated memory location called Wave RAM.

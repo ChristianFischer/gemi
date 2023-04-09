@@ -60,7 +60,7 @@ impl WaveRamPositionCursor {
 
     /// Get whether to read the high or low nibble of the byte read from the Wave RAM.
     pub fn get_high_or_low(&self) -> bool {
-        (self.position & 0x01) != 0
+        (self.position & 0x01) == 0
     }
 }
 
