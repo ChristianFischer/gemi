@@ -19,5 +19,6 @@ pub mod apu;
 pub mod audio_output;
 pub mod channels;
 pub mod dac;
+pub mod hpf;
 pub mod mixer;
 pub mod sample;

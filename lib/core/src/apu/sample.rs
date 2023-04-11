@@ -36,6 +36,20 @@ pub struct StereoSample {
 }
 
 
+/// The result of taking a sample from the APU channels.
+/// This may be sound data or silence, if no DAC was enabled.
+#[derive(Copy, Clone)]
+pub enum SampleResult<T>
+    where T : Copy + Clone
+{
+    /// An audio sample was produced by the source.
+    Audio(T),
+
+    /// No audio data was produced and the audio source is silent.
+    Silence,
+}
+
+
 impl Sample {
     pub fn new(value: SampleType) -> Self {
         Self {
@@ -119,6 +133,28 @@ impl ops::Mul<SampleType> for StereoSample {
         StereoSample {
             left:  self.left  * rhs,
             right: self.right * rhs,
+        }
+    }
+}
+
+
+/// Implementation for a [SampleResult] for a [StereoSample] to retrieve a SampleResult for each
+/// left and right channels.
+impl SampleResult<StereoSample> {
+    /// Get the [SampleResult] for the left channel.
+    pub fn get_left(&self) -> SampleResult<Sample> {
+        match self {
+            SampleResult::Audio(sample) => SampleResult::Audio(sample.left),
+            SampleResult::Silence       => SampleResult::Silence
+        }
+    }
+
+
+    /// Get the [SampleResult] for the right channel.
+    pub fn get_right(&self) -> SampleResult<Sample> {
+        match self {
+            SampleResult::Audio(sample) => SampleResult::Audio(sample.right),
+            SampleResult::Silence       => SampleResult::Silence
         }
     }
 }

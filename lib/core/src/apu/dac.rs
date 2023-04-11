@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::sample::{Sample, SampleType};
+use crate::apu::sample::{Sample, SampleResult, SampleType};
 
 /// The DAC is the component to covert the sound generators output signal
 /// into an audio wave signal.
@@ -54,16 +54,19 @@ impl DigitalAudioConverter {
 
 
     /// Converts a digital input value into an audio sample value.
-    pub fn convert(&self, value: u8) -> Sample {
-        Sample::new(
-            if self.enabled {
-                let safe_value  = value & 0x0f;
+    pub fn convert(&self, value: u8) -> SampleResult<Sample> {
+        if self.enabled {
+            let safe_value   = value & 0x0f;
+            let sample_value = 1.0 - ((safe_value as SampleType) / 7.5);
 
-                1.0 - ((safe_value as SampleType) / 7.5)
-            }
-            else {
-                0.0
-            }
-        )
+            SampleResult::Audio(
+                Sample::new(
+                    sample_value
+                )
+            )
+        }
+        else {
+            SampleResult::Silence
+        }
     }
 }

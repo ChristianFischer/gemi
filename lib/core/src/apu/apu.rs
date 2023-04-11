@@ -177,7 +177,7 @@ impl Apu {
 
             mixer: Mixer::new(),
 
-            audio_output: AudioOutput::new(),
+            audio_output: AudioOutput::new(device_config),
         }
     }
 

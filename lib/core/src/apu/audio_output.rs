@@ -16,11 +16,11 @@
  */
 
 use std::cmp::min;
-use std::error::Error;
 use std::sync::mpsc::{channel, Receiver, Sender};
-use crate::apu::sample::StereoSample;
+use crate::apu::hpf::StereoHighPassFilters;
+use crate::apu::sample::{SampleResult, StereoSample};
 use crate::cpu::cpu::CPU_CLOCK_SPEED;
-use crate::gameboy::Clock;
+use crate::gameboy::{Clock, DeviceConfig};
 
 
 /// The size of the sample buffer to be transmitted to the receiver of generated audio data.
@@ -67,6 +67,9 @@ pub struct AudioOutput {
     /// The position where to insert the next sample.
     buffer_insert_pos: usize,
 
+    /// Highpass filters for left and right channels to filter the output samples.
+    high_pass_filter: StereoHighPassFilters,
+
     /// Sender part of the channel to transfer sample data to the emulator frontend.
     sender: Option<SamplesSender>
 }
@@ -76,7 +79,7 @@ impl AudioOutput {
     pub const DEFAULT_SAMPLE_RATE: u32 = 48_000;
 
 
-    pub fn new() -> Self {
+    pub fn new(device_config: DeviceConfig) -> Self {
         Self {
             sample_rate:        Self::DEFAULT_SAMPLE_RATE,
             time_passed:        0,
@@ -85,6 +88,7 @@ impl AudioOutput {
             current_sample:     StereoSample::default(),
             buffer:             [StereoSample::default(); SAMPLE_BUFFER_SIZE],
             buffer_insert_pos:  0,
+            high_pass_filter:   StereoHighPassFilters::new(device_config),
             sender:             None,
         }
     }
@@ -101,15 +105,18 @@ impl AudioOutput {
     /// this sample was live.
     /// To produce sample data with the requested sample rate, the audio output will
     /// compute the average of all values within `CPU_CLOCK / sample rate` cycles.
-    pub(crate) fn push(&mut self, sample: StereoSample, cycles: Clock) {
+    pub(crate) fn push(&mut self, sample: SampleResult<StereoSample>, cycles: Clock) {
         let mut remaining_cycles = cycles;
 
         while remaining_cycles > 0 {
             let time_to_next_sample = self.next_sample_time - self.time_passed;
             let run_cycles          = min(remaining_cycles, time_to_next_sample);
 
+            // filter the sample data via high pass filter
+            let sample_filtered = self.high_pass_filter.filter(sample);
+
             // sample data will be accumulated to produce the average value for one sample
-            self.current_sample += sample * (run_cycles as f32) * self.sample_multiplier;
+            self.current_sample += sample_filtered * (run_cycles as f32) * self.sample_multiplier;
 
             // check if enough data collected to complete a sample
             self.time_passed += run_cycles;
