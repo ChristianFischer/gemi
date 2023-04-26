@@ -30,45 +30,13 @@ use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};
 
+// re-export some types
+pub use crate::device_type::{DeviceType, EmulationType};
+
 
 /// Type to measure clock ticks of the device.
 /// Alias for unsigned 64bit integer.
 pub type Clock = u64;
-
-
-/// The type of GameBoy device to be emulated.
-#[derive(Copy, Clone)]
-pub enum DeviceType {
-    /// The original GameBoy with monochrome 4 color display.
-    /// DMG = Dot Matrix Game
-    GameBoyDmg,
-
-    /// GameBoy Color with slightly more RAM and color support.
-    GameBoyColor,
-
-    /// GameBoy Advance
-    GameBoyAdvance,
-
-    /// Super GameBoy
-    SuperGameBoy,
-
-    /// Super GameBoy 2
-    SuperGameBoy2,
-}
-
-
-/// Depending on the device and ROM being emulated, the type of
-/// emulation running. For example, the GameBoy Color hardware may
-/// run in DMG compatibility mode when a ROM without GBC support
-/// is played.
-#[derive(Copy, Clone)]
-pub enum EmulationType {
-    /// Classic GameBoy or compatibility mode.
-    DMG,
-
-    /// GameBoy Color support enabled.
-    GBC,
-}
 
 
 /// A struct containing the setup information of the running device.

@@ -54,6 +54,7 @@ pub struct DmgLcdPixel(u8);
 
 /// A palette to convert DmgLcdPixel values into RGB colors
 /// which can be represented on modern screens.
+#[derive(Copy, Clone)]
 pub struct DmgDisplayPalette {
     palette: [Color; 4],
 }

@@ -15,11 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::collections::HashSet;
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
+use tests_shared::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, update_file};
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 use crate::generators::common::TEST_FILE_HEADER;
-use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, update_file};
 use crate::test_generator::TestGenerator;
 
 
@@ -60,12 +61,12 @@ const DEVICE_TYPE_GROUP_LOOKUP_TABLE : &[(&str, &[DeviceType])] = &[
 /// Checks if a filename is a valid ROM of the mooneye test suite.
 /// If so, it returns the test name stripped away the device codes and a list
 /// of devices, this test is intended to run on.
-fn file_is_mooneye_test(file: &PathBuf) -> (String, Vec<DeviceType>) {
+fn file_is_mooneye_test(file: &PathBuf) -> (String, HashSet<DeviceType>) {
     // check if it's a ROM file at all
     let is_gbc_rom = match file.extension().map(|o| o.to_str().unwrap()) {
         Some("gb")  => false,
         Some("gbc") => true,
-        _ => return (String::new(), vec![])
+        _ => return (String::new(), HashSet::new()),
     };
 
     // get the filename normalized to unix file separators
@@ -85,7 +86,7 @@ fn file_is_mooneye_test(file: &PathBuf) -> (String, Vec<DeviceType>) {
     // check for a dash within the filename which would separate
     // the actual name from the device type suffix
     if let Some(last_dash) = filename.rfind('-') {
-        let mut devices : Vec<DeviceType> = Vec::new();
+        let mut devices : HashSet<DeviceType> = HashSet::new();
         let mut substr = &filename[last_dash+1 ..];
         let mut found_devices = false;
 
@@ -98,7 +99,7 @@ fn file_is_mooneye_test(file: &PathBuf) -> (String, Vec<DeviceType>) {
                     // since device revisions are currently not supported, skip any tests
                     // for specific revisions not covered by the current lookup entry
                     if found_revision_codes == *supported_revision_mask {
-                        devices.push(*device_type);
+                        devices.insert(*device_type);
                     }
 
                     // but still found 'something'
@@ -112,7 +113,7 @@ fn file_is_mooneye_test(file: &PathBuf) -> (String, Vec<DeviceType>) {
             for (code, device_types) in DEVICE_TYPE_GROUP_LOOKUP_TABLE {
                 if lookup_model_group_code(&mut substr, code) {
                     for device_type in *device_types {
-                        devices.push(*device_type);
+                        devices.insert(*device_type);
                     }
 
                     found_devices = true;
@@ -134,23 +135,14 @@ fn file_is_mooneye_test(file: &PathBuf) -> (String, Vec<DeviceType>) {
 
     // if no device specifiers were found, just return a default list
     // based on whether it's a GBC or DMG file extension
-    let default_devices = if is_gbc_rom {
-        vec![
-            DeviceType::GameBoyDmg,
-            DeviceType::GameBoyColor,
-            DeviceType::GameBoyAdvance,
-            DeviceType::SuperGameBoy,
-            DeviceType::SuperGameBoy2,
-        ]
+    let devices = if is_gbc_rom {
+        EmulatorTestConfig::for_gbc_devices()
     }
     else {
-        vec![
-            DeviceType::GameBoyDmg,
-            DeviceType::SuperGameBoy,
-        ]
+        EmulatorTestConfig::for_any_device()
     };
 
-    (filename_to_symbol(&filename), default_devices)
+    (filename_to_symbol(&filename), devices)
 }
 
 
@@ -213,18 +205,6 @@ fn eat_up_revision_codes(substr: &mut &str) -> u32 {
 }
 
 
-/// Creates a short name of any device type.
-fn get_device_type_short_name(device_type: &DeviceType) -> &str {
-    match device_type {
-        DeviceType::GameBoyDmg      => "dmg",
-        DeviceType::GameBoyColor    => "cgb",
-        DeviceType::GameBoyAdvance  => "agb",
-        DeviceType::SuperGameBoy    => "sgb",
-        DeviceType::SuperGameBoy2   => "sgb2",
-    }
-}
-
-
 
 /// Create tests for Mooneye test roms.
 pub fn generate_tests_mooneye(gen: &TestGenerator) {
@@ -247,34 +227,32 @@ pub fn generate_tests_mooneye(gen: &TestGenerator) {
                 let mut content = String::new();
                 let (test_name, devices) = file_is_mooneye_test(f);
 
-                for device_type in devices {
-                    let cfg = EmulatorTestConfig {
-                        setup: SetUpConfig {
-                            device: Some(device_type),
-                            enable_serial_output: true,
-                            .. SetUpConfig::with_rom_file(&f.to_str().unwrap())
-                        },
-                        run_config: RunConfig {
-                            stop_on_infinite_loop: true,
-                            .. RunConfig::default()
-                        },
-                        result: CheckResultConfig::default(),
-                    };
+                let cfg = EmulatorTestConfig {
+                    name: test_name,
+                    devices,
+                    setup: SetUpConfig {
+                        enable_serial_output: true,
+                        .. SetUpConfig::with_rom_file(&f.to_str().unwrap())
+                    },
+                    run_config: RunConfig {
+                        stop_on_infinite_loop: true,
+                        .. RunConfig::default()
+                    },
+                    result: CheckResultConfig::default(),
+                };
 
-                    let test_content = gen.create_test(
-                        &format!("{}_{}", test_name, get_device_type_short_name(&device_type)),
-                        cfg,
-                        Some(MOONEYE_TEST_ADDITIONA_CHECKS.to_string()),
-                        state
-                    );
+                let test_content = gen.create_tests(
+                    cfg,
+                    Some(MOONEYE_TEST_ADDITIONA_CHECKS.to_string()),
+                    state
+                );
 
-                    if !test_content.is_empty() {
-                        if !content.is_empty() {
-                            content.push_str("\n\n");
-                        }
-
-                        content.push_str(&test_content);
+                if !test_content.is_empty() {
+                    if !content.is_empty() {
+                        content.push_str("\n\n");
                     }
+
+                    content.push_str(&test_content);
                 }
 
                 content

@@ -15,17 +15,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use gbemu_core::gameboy::DeviceType;
+use gbemu_core::device_type::DeviceType;
 use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
-use testrunner::runner::run_with_config;
-use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
+use testrunner::runner::run_test_case;
+use tests_shared::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
 
 
 #[test]
 pub fn acid2_dmg() {
-    let cfg = EmulatorTestConfig {
+    let test_case = EmulatorTestCase {
+        device: DeviceType::GameBoyDmg,
+
         setup: SetUpConfig {
-            device: Some(DeviceType::GameBoyDmg),
             dmg_display_palette: Some(DmgDisplayPalette::new([
                 Color::from_rgba32(0xffffffff),
                 Color::from_rgba32(0xaaaaaaff),
@@ -46,15 +47,16 @@ pub fn acid2_dmg() {
         },
     };
 
-    run_with_config(cfg);
+    run_test_case(test_case);
 }
 
 
 #[test]
 pub fn acid2_gbc() {
-    let cfg = EmulatorTestConfig {
+    let test_case = EmulatorTestCase {
+        device: DeviceType::GameBoyColor,
+
         setup: SetUpConfig {
-            device: Some(DeviceType::GameBoyColor),
             .. SetUpConfig::with_rom_file("cgb-acid2/cgb-acid2.gbc")
         },
 
@@ -69,16 +71,17 @@ pub fn acid2_gbc() {
         },
     };
 
-    run_with_config(cfg);
+    run_test_case(test_case);
 }
 
 
 #[test]
 #[ignore]
 pub fn acid2_gbc_hell() {
-    let cfg = EmulatorTestConfig {
+    let test_case = EmulatorTestCase {
+        device: DeviceType::GameBoyColor,
+
         setup: SetUpConfig {
-            device: Some(DeviceType::GameBoyColor),
             .. SetUpConfig::with_rom_file("cgb-acid-hell/cgb-acid-hell.gbc")
         },
 
@@ -93,5 +96,5 @@ pub fn acid2_gbc_hell() {
         },
     };
 
-    run_with_config(cfg);
+    run_test_case(test_case);
 }

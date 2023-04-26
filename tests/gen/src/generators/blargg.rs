@@ -15,10 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use gbemu_core::gameboy::DeviceType;
+use gbemu_core::device_type::EmulationType;
+use tests_shared::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, update_file};
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 use crate::generators::common::TEST_FILE_HEADER;
-use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, update_file};
 use crate::rom_utils::file_is_rom;
 use crate::test_generator::TestGenerator;
 
@@ -51,18 +51,20 @@ pub fn generate_tests_blargg(gen: &TestGenerator) {
                     Some(file_device_type) => {
                         // check whether this file is in a subdir of cgb_sound
                         let is_gbc_subfolder = state.stack.contains(&cgb_sound_folder);
+                        let is_gbc_file      = file_device_type == EmulationType::GBC;
 
-                        // when folder is gbc, this overrides the file type
-                        let device_type = if is_gbc_subfolder {
-                            DeviceType::GameBoyColor
+                        // when folder is gbc, only allow gbc compatible devices
+                        let devices = if is_gbc_subfolder || is_gbc_file {
+                            EmulatorTestConfig::for_gbc_devices()
                         }
                         else {
-                            file_device_type
+                            EmulatorTestConfig::for_any_device()
                         };
 
                         let cfg = EmulatorTestConfig {
+                            name: filename_to_symbol(f.to_str().unwrap()),
+                            devices,
                             setup: SetUpConfig {
-                                device: Some(device_type),
                                 enable_serial_output: true,
                                 .. SetUpConfig::with_rom_file(&f.to_str().unwrap())
                             },
@@ -73,8 +75,7 @@ pub fn generate_tests_blargg(gen: &TestGenerator) {
                             result: CheckResultConfig::default(),
                         };
 
-                        gen.create_test(
-                            &filename_to_symbol(f.to_str().unwrap()),
+                        gen.create_tests(
                             cfg,
                             Some(BLARGG_CHECK_TEST.to_string()),
                             state

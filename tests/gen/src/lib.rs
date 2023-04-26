@@ -18,5 +18,4 @@
 pub mod download;
 pub mod generators;
 pub mod test_generator;
-pub mod io_utils;
 pub mod rom_utils;

@@ -15,12 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::collections::HashSet;
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
 use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
+use tests_shared::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, update_file};
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, LcdColorMod, RunConfig, SetUpConfig};
 use crate::generators::common::TEST_FILE_HEADER;
-use crate::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, update_file};
 use crate::rom_utils::file_is_rom;
 use crate::test_generator::TestGenerator;
 
@@ -31,28 +32,21 @@ r#"use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
 
 
 /// Lookup table to check for device types within gambatte test rom file names.
-const GAMBATTE_DEVICE_CODE_TABLE : &[(&str, DeviceType)] = &[
-    ("dmg08",  DeviceType::GameBoyDmg),
-    ("xdmg08", DeviceType::GameBoyDmg),
-    ("cgb04c", DeviceType::GameBoyColor),
-    ("xcgb",   DeviceType::GameBoyColor),
+const GAMBATTE_DEVICE_CODE_TABLE : &[(&str, &[DeviceType])] = &[
+    ("dmg08",  &[DeviceType::GameBoyDmg]),
+    ("xdmg08", &[DeviceType::GameBoyDmg]),
+    ("cgb04c", &[DeviceType::GameBoyColor]),
+    ("xcgb",   &[DeviceType::GameBoyColor]),
 ];
-
-
-/// A test entry containing a test config and it's name.
-struct GambatteEmuTestConfig {
-    name: String,
-    config: EmulatorTestConfig,
-}
 
 
 /// Creates a test config for a particular file with any given settings.
 fn make_config_for_file(
     file: &PathBuf,
     name: &str,
-    device_type: DeviceType,
+    devices: HashSet<DeviceType>,
     checks: &CheckResultConfig
-) -> GambatteEmuTestConfig {
+) -> EmulatorTestConfig {
     let mut test_name = name.to_string().to_lowercase();
 
     // add test code to test name, because there are some similar test configs
@@ -61,27 +55,23 @@ fn make_config_for_file(
         test_name = format!("{}_out{}", test_name, display_code.to_lowercase());
     }
 
-    GambatteEmuTestConfig {
-        name: format!("{}_{}", test_name, get_device_type_short_name(&device_type)),
-        config: EmulatorTestConfig {
-            setup: SetUpConfig {
-                device: Some(device_type),
-                .. SetUpConfig::with_rom_file(&file.to_str().unwrap())
-            },
-            run_config: RunConfig {
-                run_frames: Some(16),
-                .. RunConfig::default()
-            },
-            result: checks.clone(),
-        }
+    EmulatorTestConfig {
+        name: test_name,
+        devices,
+        setup: SetUpConfig::with_rom_file(&file.to_str().unwrap()),
+        run_config: RunConfig {
+            run_frames: Some(16),
+            .. RunConfig::default()
+        },
+        result: checks.clone(),
     }
 }
 
 
 /// Finds test configurations for a gambatte test rom.
-fn find_gambatte_checks(file: &PathBuf) -> Vec<GambatteEmuTestConfig> {
+fn find_gambatte_checks(file: &PathBuf) -> Vec<EmulatorTestConfig> {
     if let Some(_) = file_is_rom(file) {
-        let mut configs : Vec<GambatteEmuTestConfig> = Vec::new();
+        let mut configs : Vec<EmulatorTestConfig> = Vec::new();
         let filename = get_plain_filename(file);
 
         // check for comparison images
@@ -91,38 +81,33 @@ fn find_gambatte_checks(file: &PathBuf) -> Vec<GambatteEmuTestConfig> {
             for entry in GAMBATTE_DEVICE_CODE_TABLE {
                 let ref_image_name = format!("{}_{}.png", filename, entry.0);
                 let ref_image_path = path.join(ref_image_name);
-                let device_type    = entry.1;
+                let device_types   = HashSet::from_iter(entry.1.into_iter().map(|d| *d));
 
                 // look for any comparison image matching the current device type
                 if ref_image_path.exists() {
                     let mut config = make_config_for_file(
                         file,
                         &filename,
-                        device_type,
+                        device_types.clone(),
                         &Default::default()
                     );
 
-                    config.config.result.compare_lcd_with_image = Some(
+                    config.result.compare_lcd_with_image = Some(
                         ref_image_path.to_str().unwrap().to_string().replace('\\', "/")
                     );
 
-                    match device_type {
+                    if device_types.contains(&DeviceType::GameBoyDmg) {
                         // for DMG set the expected color palette
-                        DeviceType::GameBoyDmg => {
-                            config.config.setup.dmg_display_palette = Some(DmgDisplayPalette::new([
-                                Color::from_rgba32(0x000000ff),
-                                Color::from_rgba32(0x555555ff),
-                                Color::from_rgba32(0xaaaaaaff),
-                                Color::from_rgba32(0xffffffff),
-                            ]));
-                        }
-
+                        config.setup.dmg_display_palette = Some(DmgDisplayPalette::new([
+                            Color::from_rgba32(0x000000ff),
+                            Color::from_rgba32(0x555555ff),
+                            Color::from_rgba32(0xaaaaaaff),
+                            Color::from_rgba32(0xffffffff),
+                        ]));
+                    }
+                    else {
                         // for GameBoyColor define how colors are expected in the comparison image
-                        DeviceType::GameBoyColor => {
-                            config.config.result.color_mod = LcdColorMod::Gambatte;
-                        }
-
-                        _ => { }
+                        config.result.color_mod = LcdColorMod::Gambatte;
                     }
 
                     configs.push(config);
@@ -165,12 +150,15 @@ fn find_gambatte_checks(file: &PathBuf) -> Vec<GambatteEmuTestConfig> {
 
             // parse the file name
             while !filename_elements.is_empty() {
-                let mut devices : Vec<DeviceType> = Vec::new();
+                let mut devices : HashSet<DeviceType> = HashSet::new();
                 let mut checks = CheckResultConfig::default();
 
                 // collect all device types found at the current position in the file name
-                while let Some(device_type) = filepart_is_device(filename_elements[0]) {
-                    devices.push(device_type);
+                while let Some(device_types) = filepart_is_device(filename_elements[0]) {
+                    for device_type in device_types {
+                        devices.insert(*device_type);
+                    }
+
                     filename_elements.remove(0);
 
                     if filename_elements.is_empty() {
@@ -196,16 +184,14 @@ fn find_gambatte_checks(file: &PathBuf) -> Vec<GambatteEmuTestConfig> {
 
                 // when found any checks, create a test config for each device type pending
                 if checks.has_any_checks() {
-                    for device_type in devices {
-                        let test_config = make_config_for_file(
-                            file,
-                            &test_name,
-                            device_type,
-                            &checks
-                        );
+                    let test_config = make_config_for_file(
+                        file,
+                        &test_name,
+                        devices,
+                        &checks
+                    );
 
-                        configs.push(test_config);
-                    }
+                    configs.push(test_config);
                 }
             }
 
@@ -220,7 +206,7 @@ fn find_gambatte_checks(file: &PathBuf) -> Vec<GambatteEmuTestConfig> {
 
 
 /// Checks whether the given part of a file name matches a device type.
-fn filepart_is_device(part: &str) -> Option<DeviceType> {
+fn filepart_is_device(part: &str) -> Option<&[DeviceType]> {
     for entry in GAMBATTE_DEVICE_CODE_TABLE {
         if part == entry.0 {
             return Some(entry.1);
@@ -243,18 +229,6 @@ fn filepart_is_display_check_code(part: &str) -> Option<String> {
 }
 
 
-/// Creates a short name of any device type.
-fn get_device_type_short_name(device_type: &DeviceType) -> &str {
-    match device_type {
-        DeviceType::GameBoyDmg      => "dmg",
-        DeviceType::GameBoyColor    => "cgb",
-        DeviceType::GameBoyAdvance  => "agb",
-        DeviceType::SuperGameBoy    => "sgb",
-        DeviceType::SuperGameBoy2   => "sgb2",
-    }
-}
-
-
 
 /// Create tests for Gambatte test roms.
 pub fn generate_tests_gambatte(gen: &TestGenerator) {
@@ -274,9 +248,8 @@ pub fn generate_tests_gambatte(gen: &TestGenerator) {
                 let mut content = String::new();
 
                 for test_cfg in find_gambatte_checks(f) {
-                    let test_content = gen.create_test(
-                        &test_cfg.name,
-                        test_cfg.config,
+                    let test_content = gen.create_tests(
+                        test_cfg,
                         None,
                         state
                     );

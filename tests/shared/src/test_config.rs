@@ -15,8 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::collections::HashSet;
 use gbemu_core::gameboy::DeviceType;
 use gbemu_core::ppu::graphic_data::DmgDisplayPalette;
+use crate::io_utils::filename_to_symbol;
 
 
 /// A definition how to modify the colors of the emulator display
@@ -32,12 +34,8 @@ pub enum LcdColorMod {
 
 
 /// Configuration parameters on how to setup an emulator instance.
+#[derive(Clone)]
 pub struct SetUpConfig {
-    /// Optional: Device type which kind of device to be emulated.
-    /// When omitted, the emulator tries to detect the correct
-    /// emulation based on the cartridge to be inserted.
-    pub device: Option<DeviceType>,
-
     /// Optional: Boot ROM to be run before the actual cartridge is run.
     pub boot_rom_path: Option<String>,
 
@@ -49,7 +47,7 @@ pub struct SetUpConfig {
 
     /// Optional: A palette to translate DMG color values into
     /// RGBA color values. Only used in DMG mode.
-    pub dmg_display_palette: Option<DmgDisplayPalette>
+    pub dmg_display_palette: Option<DmgDisplayPalette>,
 }
 
 
@@ -91,8 +89,21 @@ pub struct CheckResultConfig {
 }
 
 
-/// Configuration of a single test case.
+/// Configuration of an emulator test run.
+/// This configuration has a set of devices which should be tested,
+/// and can spawn an unique test case for each device.
 pub struct EmulatorTestConfig {
+    pub name:       String,
+    pub devices:    HashSet<DeviceType>,
+    pub setup:      SetUpConfig,
+    pub run_config: RunConfig,
+    pub result:     CheckResultConfig,
+}
+
+
+/// Configuration of a single test case.
+pub struct EmulatorTestCase {
+    pub device:     DeviceType,
     pub setup:      SetUpConfig,
     pub run_config: RunConfig,
     pub result:     CheckResultConfig,
@@ -103,11 +114,10 @@ impl SetUpConfig {
     /// Creates a configuration where a ROM file will be loaded.
     pub fn with_rom_file(cartridge_path: &str) -> Self {
         Self {
-            device: None,
-            cartridge_path: cartridge_path.to_string(),
-            boot_rom_path: None,
-            enable_serial_output: false,
-            dmg_display_palette: None,
+            cartridge_path:         cartridge_path.to_string(),
+            boot_rom_path:          None,
+            enable_serial_output:   false,
+            dmg_display_palette:    None,
         }
     }
 }
@@ -150,3 +160,49 @@ impl Default for CheckResultConfig {
     }
 }
 
+
+impl EmulatorTestConfig {
+
+    /// Generates a hash set with all valid devices.
+    pub fn for_any_device() -> HashSet<DeviceType> {
+        HashSet::from(DeviceType::ALL_DEVICES)
+    }
+
+
+    /// Generates a hash set with all devices with GameBoy Color compatibility.
+    pub fn for_gbc_devices() -> HashSet<DeviceType> {
+        HashSet::from(DeviceType::GBC_DEVICES)
+    }
+
+
+    /// Creates a configuration where a ROM file will be loaded.
+    pub fn with_rom_file(cartridge_path: &str) -> Self {
+        Self {
+            name:       filename_to_symbol(cartridge_path),
+            devices:    HashSet::new(),
+            setup:      SetUpConfig::with_rom_file(cartridge_path),
+            run_config: RunConfig::default(),
+            result:     CheckResultConfig::default(),
+        }
+    }
+
+
+    /// Get an iterator over all test cases which are defined in this configuration.
+    pub fn get_test_cases(&self) -> impl Iterator<Item = EmulatorTestCase> + '_ {
+        DeviceType::ALL_DEVICES
+            .into_iter()
+
+            // just select devices enabled for this test
+            .filter(|device| self.devices.contains(device))
+
+            // generate a test case for each of them
+            .map(|device| {
+                EmulatorTestCase {
+                    device:     device.clone(),
+                    setup:      self.setup.clone(),
+                    run_config: self.run_config.clone(),
+                    result:     self.result.clone(),
+                }
+            })
+    }
+}

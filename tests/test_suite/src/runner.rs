@@ -20,7 +20,7 @@ use gbemu_core::boot_rom::BootRom;
 use gbemu_core::cartridge::Cartridge;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
 use gbemu_core::utils::to_u8;
-use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
+use tests_shared::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
 use crate::checks::check_display::compare_display_with_image;
 use crate::checks::gambatte_checks::check_gambatte_display_code;
 use crate::util::get_test_file;
@@ -31,14 +31,14 @@ const MAX_FRAMES: u32 = 10_000;
 
 
 /// Print the commandline to re-run this test ROM normally.
-pub fn print_run_command(setup: &SetUpConfig) {
+pub fn print_run_command(device_type: DeviceType, setup: &SetUpConfig) {
     let mut cmd = String::new();
 
     // command
     cmd.push_str("cargo run --package gbemu --bin gbemu --");
 
     // add argument for specific device type
-    if let Some(device_type) = &setup.device {
+    {
         let device_type_arg = match device_type {
             DeviceType::GameBoyDmg     => "--dmg",
             DeviceType::GameBoyColor   => "--gbc",
@@ -70,13 +70,11 @@ pub fn print_run_command(setup: &SetUpConfig) {
 
 
 /// Creates the device emulator based on a setup configuration.
-pub fn create_device_with_config(setup: SetUpConfig) -> GameBoy {
+pub fn create_device_with_config(device_type: DeviceType, setup: SetUpConfig) -> GameBoy {
     let mut builder = GameBoy::build();
 
     // set the device type to be emulated
-    if let Some(device_type) = setup.device {
-        builder.set_device_type(device_type);
-    }
+    builder.set_device_type(device_type);
 
     // load the cartridge file
     let cartridge_path = get_test_file(&setup.cartridge_path);
@@ -212,16 +210,17 @@ pub fn check_results(gb: &GameBoy, result: &CheckResultConfig) {
 /// Helper function to run a whole test case
 /// Constructs the emulator instance, runs the program and checks for results.
 /// Each failure will lead into panic!
-pub fn run_with_config(test_config: EmulatorTestConfig) -> GameBoy {
-    let setup    = test_config.setup;
-    let run_cfg = test_config.run_config;
-    let result  = test_config.result;
+pub fn run_test_case(test_case: EmulatorTestCase) -> GameBoy {
+    let device  = test_case.device;
+    let setup   = test_case.setup;
+    let run_cfg = test_case.run_config;
+    let result  = test_case.result;
 
     // print commandline arg to easily re-run the test
-    print_run_command(&setup);
+    print_run_command(device, &setup);
 
     // Construct
-    let mut gb = create_device_with_config(setup);
+    let mut gb = create_device_with_config(device, setup);
 
     // Run
     run_to_stop_conditions(&mut gb, &run_cfg);

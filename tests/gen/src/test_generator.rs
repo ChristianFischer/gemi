@@ -17,8 +17,8 @@
 
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
-use tests_shared::test_config::{EmulatorTestConfig, LcdColorMod, RunConfig};
-use crate::io_utils::{IteratorState, starts_with_number};
+use tests_shared::io_utils::{IteratorState, starts_with_number};
+use tests_shared::test_config::{EmulatorTestCase, EmulatorTestConfig, LcdColorMod, RunConfig};
 
 
 /// Configuration for generating tests.
@@ -30,19 +30,50 @@ pub struct TestGenerator {
 
 
 impl TestGenerator {
-    /// Creates a test using a given EmulatorTestConfig and
+
+    /// Creates a set of tests using a given [EmulatorTestConfig] and
+    /// optional a string containing rust code with additional checks.
+    /// For each device configured in the [EmulatorTestConfig], a separate
+    /// [EmulatorTestCase] will be created.
+    pub fn create_tests(
+        &self,
+        test_cfg: EmulatorTestConfig,
+        additional_checks: Option<String>,
+        state: &IteratorState
+    ) -> String {
+        test_cfg
+            // get all test cases
+            .get_test_cases()
+
+            // create the source code of each test case
+            .map(|test_case|
+                self.create_test(
+                    test_cfg.name.as_str(),
+                    test_case,
+                    additional_checks.clone(),
+                    state
+                )
+            )
+
+            // concatenate all generated source code elements
+            .collect::<Vec<String>>()
+            .join("\n\n")
+    }
+
+
+    /// Creates a test using data from a given [EmulatorTestCase] and
     /// optional a string containing rust code with additional checks.
     pub fn create_test(
             &self,
             name: &str,
-            test_cfg: EmulatorTestConfig,
+            test_case: EmulatorTestCase,
             additional_checks: Option<String>,
             state: &IteratorState
     ) -> String {
         let mut test_code = String::new();
 
         // the ROM file being tested, stripping the BASE_PATH_ROM_FILES
-        let rom_file = test_cfg.setup.cartridge_path
+        let rom_file = test_case.setup.cartridge_path
             .replace('\\', "/")
             .replace(self.base_path_roms.to_str().unwrap(), "")
         ;
@@ -71,27 +102,24 @@ impl TestGenerator {
             String::new()
         };
 
+        // get a device code suffix for the test name
+        let device_code = test_case.device.get_abbreviation();
+
         // test function body
-        test_code.push_str(&format!("fn {test_prefix}{name}() {{\n"));
-        test_code.push_str("    let cfg = EmulatorTestConfig {\n");
+        test_code.push_str(&format!("fn {test_prefix}{name}_{device_code}() {{\n"));
+        test_code.push_str("    let test_case = EmulatorTestCase {\n");
+
+        // device type
+        {
+            let device_type_strval = test_case.device.to_string();
+            test_code.push_str(&format!("        device: DeviceType::{device_type_strval},\n"));
+        }
 
         // SetUpConfig
         {
             test_code.push_str("        setup: SetUpConfig {\n");
 
-            if let Some(device_type) = test_cfg.setup.device {
-                let device_type_strval = match device_type {
-                    DeviceType::GameBoyDmg     => "GameBoyDmg",
-                    DeviceType::GameBoyColor   => "GameBoyColor",
-                    DeviceType::GameBoyAdvance => "GameBoyAdvance",
-                    DeviceType::SuperGameBoy   => "SuperGameBoy",
-                    DeviceType::SuperGameBoy2  => "SuperGameBoy2",
-                };
-
-                test_code.push_str(&format!("            device: Some(DeviceType::{device_type_strval}),\n"));
-            }
-
-            if let Some(palette) = test_cfg.setup.dmg_display_palette {
+            if let Some(palette) = test_case.setup.dmg_display_palette {
                 let palette_colors = palette.get_colors();
 
                 test_code.push_str(&format!("            dmg_display_palette: Some(DmgDisplayPalette::new([\n"));
@@ -102,8 +130,8 @@ impl TestGenerator {
                 test_code.push_str(&format!("            ])),\n"));
             }
 
-            if test_cfg.setup.enable_serial_output != false {
-                let enable_serial_output = test_cfg.setup.enable_serial_output;
+            if test_case.setup.enable_serial_output != false {
+                let enable_serial_output = test_case.setup.enable_serial_output;
                 test_code.push_str(&format!("            enable_serial_output: {enable_serial_output},\n"));
             }
 
@@ -115,17 +143,17 @@ impl TestGenerator {
         {
             test_code.push_str("        run_config: RunConfig {\n");
 
-            if let Some(run_frames) = test_cfg.run_config.run_frames {
+            if let Some(run_frames) = test_case.run_config.run_frames {
                 test_code.push_str(&format!("            run_frames: Some({run_frames}),\n"));
             }
 
-            if test_cfg.run_config.stop_on_halt != RunConfig::default().stop_on_halt {
-                let stop_on_halt = test_cfg.run_config.stop_on_halt;
+            if test_case.run_config.stop_on_halt != RunConfig::default().stop_on_halt {
+                let stop_on_halt = test_case.run_config.stop_on_halt;
                 test_code.push_str(&format!("            stop_on_halt: {stop_on_halt},\n"));
             }
 
-            if test_cfg.run_config.stop_on_infinite_loop != RunConfig::default().stop_on_infinite_loop {
-                let stop_on_infinite_loop = test_cfg.run_config.stop_on_infinite_loop;
+            if test_case.run_config.stop_on_infinite_loop != RunConfig::default().stop_on_infinite_loop {
+                let stop_on_infinite_loop = test_case.run_config.stop_on_infinite_loop;
                 test_code.push_str(&format!("            stop_on_infinite_loop: {stop_on_infinite_loop},\n"));
             }
 
@@ -137,7 +165,7 @@ impl TestGenerator {
         {
             test_code.push_str("        result: CheckResultConfig {\n");
 
-            if let Some(ref_image) = test_cfg.result.compare_lcd_with_image {
+            if let Some(ref_image) = test_case.result.compare_lcd_with_image {
                 let ref_image_path = ref_image
                     .replace('\\', "/")
                     .replace(self.base_path_roms.to_str().unwrap(), "")
@@ -146,12 +174,12 @@ impl TestGenerator {
                 test_code.push_str(&format!("            compare_lcd_with_image: Some(\"{ref_image_path}\".to_string()),\n"));
             }
 
-            match test_cfg.result.color_mod {
+            match test_case.result.color_mod {
                 LcdColorMod::None => {}
                 LcdColorMod::Gambatte => test_code.push_str("            color_mod: LcdColorMod::Gambatte,\n"),
             }
 
-            if let Some(gambatte_display_code) = test_cfg.result.gambatte_display_result_code {
+            if let Some(gambatte_display_code) = test_case.result.gambatte_display_result_code {
                 test_code.push_str(&format!("            gambatte_display_result_code: Some(\"{gambatte_display_code}\".to_string()),\n"));
             }
 
@@ -164,12 +192,12 @@ impl TestGenerator {
         test_code.push_str("\n");
 
         if let Some(additional_checks) = additional_checks {
-            test_code.push_str("    let mut gb = run_with_config(cfg);\n");
+            test_code.push_str("    let mut gb = run_test_case(test_case);\n");
             test_code.push_str("\n");
             test_code.push_str(&additional_checks);
         }
         else {
-            test_code.push_str("    run_with_config(cfg);\n");
+            test_code.push_str("    run_test_case(test_case);\n");
         }
 
         test_code.push_str("}\n");

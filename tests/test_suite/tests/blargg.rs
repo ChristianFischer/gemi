@@ -16,7 +16,7 @@
  */
 
 use gbemu_core::gameboy::DeviceType;
-use testrunner::runner::run_with_config;
+use testrunner::runner::run_test_case;
 use tests_shared::test_config::*;
 
 use testrunner::checks::blargg_checks::check_blargg_test_passed;
@@ -29,10 +29,10 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_01_registers() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_01_registers_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/01-registers.gb")
                 },
@@ -45,7 +45,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -54,10 +54,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_02_len_ctr() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_01_registers_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/01-registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_len_ctr_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/02-len ctr.gb")
                 },
@@ -70,7 +95,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -79,10 +104,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_03_trigger() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_02_len_ctr_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/02-len ctr.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_trigger_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/03-trigger.gb")
                 },
@@ -95,7 +145,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -104,10 +154,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_04_sweep() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_03_trigger_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/03-trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_04_sweep_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/04-sweep.gb")
                 },
@@ -120,7 +195,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -129,10 +204,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_05_sweep_details() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_04_sweep_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/04-sweep.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_05_sweep_details_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/05-sweep details.gb")
                 },
@@ -145,7 +245,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -154,10 +254,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_06_overflow_on_trigger() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_05_sweep_details_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/05-sweep details.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_06_overflow_on_trigger_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/06-overflow on trigger.gb")
                 },
@@ -170,7 +295,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -179,10 +304,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_07_len_sweep_period_sync() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_06_overflow_on_trigger_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/06-overflow on trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_07_len_sweep_period_sync_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/07-len sweep period sync.gb")
                 },
@@ -195,7 +345,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -204,10 +354,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_08_len_ctr_during_power() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_07_len_sweep_period_sync_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/07-len sweep period sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_08_len_ctr_during_power_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/08-len ctr during power.gb")
                 },
@@ -220,7 +395,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -229,10 +404,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_09_wave_read_while_on() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_08_len_ctr_during_power_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/08-len ctr during power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_09_wave_read_while_on_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/09-wave read while on.gb")
                 },
@@ -245,7 +445,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -254,10 +454,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_10_wave_trigger_while_on() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_09_wave_read_while_on_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/09-wave read while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_10_wave_trigger_while_on_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/10-wave trigger while on.gb")
                 },
@@ -270,7 +495,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -279,10 +504,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_11_regs_after_power() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_10_wave_trigger_while_on_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/10-wave trigger while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_11_regs_after_power_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/11-regs after power.gb")
                 },
@@ -295,7 +545,7 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -304,10 +554,35 @@ mod cgb_sound {
 
 
         #[test]
-        fn rom_singles_12_wave() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_11_regs_after_power_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/11-regs after power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/12-wave.gb")
                 },
@@ -320,7 +595,32 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/rom_singles/12-wave.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -334,10 +634,10 @@ mod cgb_sound {
 
 
         #[test]
-        fn cgb_sound() {
-            let cfg = EmulatorTestConfig {
+        fn cgb_sound_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyColor),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cgb_sound/cgb_sound.gb")
                 },
@@ -350,7 +650,32 @@ mod cgb_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn cgb_sound_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cgb_sound/cgb_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -368,10 +693,10 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_01_special() {
-            let cfg = EmulatorTestConfig {
+        fn individual_01_special_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/01-special.gb")
                 },
@@ -384,7 +709,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -393,10 +718,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_02_interrupts() {
-            let cfg = EmulatorTestConfig {
+        fn individual_01_special_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/01-special.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_01_special_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/01-special.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_01_special_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/01-special.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_01_special_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/01-special.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_interrupts_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/02-interrupts.gb")
                 },
@@ -409,7 +834,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -418,10 +843,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_03_op_sp_hl() {
-            let cfg = EmulatorTestConfig {
+        fn individual_02_interrupts_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/02-interrupts.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_interrupts_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/02-interrupts.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_interrupts_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/02-interrupts.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_interrupts_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/02-interrupts.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_op_sp_hl_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/03-op sp,hl.gb")
                 },
@@ -434,7 +959,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -443,10 +968,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_04_op_r_imm() {
-            let cfg = EmulatorTestConfig {
+        fn individual_03_op_sp_hl_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/03-op sp,hl.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_op_sp_hl_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/03-op sp,hl.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_op_sp_hl_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/03-op sp,hl.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_op_sp_hl_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/03-op sp,hl.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_04_op_r_imm_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/04-op r,imm.gb")
                 },
@@ -459,7 +1084,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -468,10 +1093,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_05_op_rp() {
-            let cfg = EmulatorTestConfig {
+        fn individual_04_op_r_imm_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/04-op r,imm.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_04_op_r_imm_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/04-op r,imm.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_04_op_r_imm_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/04-op r,imm.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_04_op_r_imm_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/04-op r,imm.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_05_op_rp_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/05-op rp.gb")
                 },
@@ -484,7 +1209,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -493,10 +1218,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_06_ld_r_r() {
-            let cfg = EmulatorTestConfig {
+        fn individual_05_op_rp_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/05-op rp.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_05_op_rp_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/05-op rp.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_05_op_rp_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/05-op rp.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_05_op_rp_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/05-op rp.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_06_ld_r_r_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/06-ld r,r.gb")
                 },
@@ -509,7 +1334,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -518,10 +1343,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_07_jr_jp_call_ret_rst() {
-            let cfg = EmulatorTestConfig {
+        fn individual_06_ld_r_r_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/06-ld r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_06_ld_r_r_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/06-ld r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_06_ld_r_r_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/06-ld r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_06_ld_r_r_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/06-ld r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_07_jr_jp_call_ret_rst_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb")
                 },
@@ -534,7 +1459,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -543,10 +1468,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_08_misc_instrs() {
-            let cfg = EmulatorTestConfig {
+        fn individual_07_jr_jp_call_ret_rst_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_07_jr_jp_call_ret_rst_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_07_jr_jp_call_ret_rst_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_07_jr_jp_call_ret_rst_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_08_misc_instrs_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/08-misc instrs.gb")
                 },
@@ -559,7 +1584,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -568,10 +1593,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_09_op_r_r() {
-            let cfg = EmulatorTestConfig {
+        fn individual_08_misc_instrs_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/08-misc instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_08_misc_instrs_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/08-misc instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_08_misc_instrs_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/08-misc instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_08_misc_instrs_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/08-misc instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_09_op_r_r_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/09-op r,r.gb")
                 },
@@ -584,7 +1709,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -593,10 +1718,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_10_bit_ops() {
-            let cfg = EmulatorTestConfig {
+        fn individual_09_op_r_r_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/09-op r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_09_op_r_r_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/09-op r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_09_op_r_r_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/09-op r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_09_op_r_r_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/09-op r,r.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_10_bit_ops_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/10-bit ops.gb")
                 },
@@ -609,7 +1834,7 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -618,10 +1843,110 @@ mod cpu_instrs {
 
 
         #[test]
-        fn individual_11_op_a_hl() {
-            let cfg = EmulatorTestConfig {
+        fn individual_10_bit_ops_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/10-bit ops.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_10_bit_ops_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/10-bit ops.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_10_bit_ops_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/10-bit ops.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_10_bit_ops_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/10-bit ops.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_11_op_a_hl_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/11-op a,(hl).gb")
                 },
@@ -634,7 +1959,107 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_11_op_a_hl_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/11-op a,(hl).gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_11_op_a_hl_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/11-op a,(hl).gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_11_op_a_hl_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/11-op a,(hl).gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_11_op_a_hl_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/individual/11-op a,(hl).gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -648,10 +2073,10 @@ mod cpu_instrs {
 
 
         #[test]
-        fn cpu_instrs() {
-            let cfg = EmulatorTestConfig {
+        fn cpu_instrs_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
                 },
@@ -664,7 +2089,107 @@ mod cpu_instrs {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn cpu_instrs_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn cpu_instrs_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn cpu_instrs_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn cpu_instrs_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/cpu_instrs/cpu_instrs.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -682,10 +2207,10 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_01_registers() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_01_registers_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/01-registers.gb")
                 },
@@ -698,7 +2223,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -707,10 +2232,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_02_len_ctr() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_01_registers_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/01-registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_01_registers_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/01-registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_01_registers_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/01-registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_01_registers_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/01-registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_len_ctr_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/02-len ctr.gb")
                 },
@@ -723,7 +2348,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -732,10 +2357,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_03_trigger() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_02_len_ctr_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/02-len ctr.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_len_ctr_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/02-len ctr.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_len_ctr_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/02-len ctr.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_len_ctr_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/02-len ctr.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_trigger_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/03-trigger.gb")
                 },
@@ -748,7 +2473,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -757,10 +2482,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_04_sweep() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_03_trigger_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/03-trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_trigger_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/03-trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_trigger_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/03-trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_trigger_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/03-trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_04_sweep_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/04-sweep.gb")
                 },
@@ -773,7 +2598,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -782,10 +2607,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_05_sweep_details() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_04_sweep_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/04-sweep.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_04_sweep_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/04-sweep.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_04_sweep_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/04-sweep.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_04_sweep_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/04-sweep.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_05_sweep_details_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/05-sweep details.gb")
                 },
@@ -798,7 +2723,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -807,10 +2732,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_06_overflow_on_trigger() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_05_sweep_details_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/05-sweep details.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_05_sweep_details_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/05-sweep details.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_05_sweep_details_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/05-sweep details.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_05_sweep_details_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/05-sweep details.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_06_overflow_on_trigger_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/06-overflow on trigger.gb")
                 },
@@ -823,7 +2848,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -832,10 +2857,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_07_len_sweep_period_sync() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_06_overflow_on_trigger_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/06-overflow on trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_06_overflow_on_trigger_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/06-overflow on trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_06_overflow_on_trigger_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/06-overflow on trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_06_overflow_on_trigger_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/06-overflow on trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_07_len_sweep_period_sync_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/07-len sweep period sync.gb")
                 },
@@ -848,7 +2973,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -857,10 +2982,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_08_len_ctr_during_power() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_07_len_sweep_period_sync_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/07-len sweep period sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_07_len_sweep_period_sync_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/07-len sweep period sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_07_len_sweep_period_sync_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/07-len sweep period sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_07_len_sweep_period_sync_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/07-len sweep period sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_08_len_ctr_during_power_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/08-len ctr during power.gb")
                 },
@@ -873,7 +3098,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -882,10 +3107,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_09_wave_read_while_on() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_08_len_ctr_during_power_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/08-len ctr during power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_08_len_ctr_during_power_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/08-len ctr during power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_08_len_ctr_during_power_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/08-len ctr during power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_08_len_ctr_during_power_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/08-len ctr during power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_09_wave_read_while_on_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/09-wave read while on.gb")
                 },
@@ -898,7 +3223,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -907,10 +3232,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_10_wave_trigger_while_on() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_09_wave_read_while_on_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/09-wave read while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_09_wave_read_while_on_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/09-wave read while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_09_wave_read_while_on_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/09-wave read while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_09_wave_read_while_on_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/09-wave read while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_10_wave_trigger_while_on_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/10-wave trigger while on.gb")
                 },
@@ -923,7 +3348,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -932,10 +3357,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_11_regs_after_power() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_10_wave_trigger_while_on_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/10-wave trigger while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_10_wave_trigger_while_on_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/10-wave trigger while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_10_wave_trigger_while_on_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/10-wave trigger while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_10_wave_trigger_while_on_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/10-wave trigger while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_11_regs_after_power_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/11-regs after power.gb")
                 },
@@ -948,7 +3473,7 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -957,10 +3482,110 @@ mod dmg_sound {
 
 
         #[test]
-        fn rom_singles_12_wave_write_while_on() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_11_regs_after_power_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/11-regs after power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_11_regs_after_power_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/11-regs after power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_11_regs_after_power_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/11-regs after power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_11_regs_after_power_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/11-regs after power.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_write_while_on_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/12-wave write while on.gb")
                 },
@@ -973,7 +3598,107 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_write_while_on_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/12-wave write while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_write_while_on_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/12-wave write while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_write_while_on_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/12-wave write while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_12_wave_write_while_on_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/rom_singles/12-wave write while on.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -987,10 +3712,10 @@ mod dmg_sound {
 
 
         #[test]
-        fn dmg_sound() {
-            let cfg = EmulatorTestConfig {
+        fn dmg_sound_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
                 },
@@ -1003,7 +3728,107 @@ mod dmg_sound {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn dmg_sound_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn dmg_sound_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn dmg_sound_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn dmg_sound_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/dmg_sound/dmg_sound.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1018,10 +3843,10 @@ mod instr_timing {
 
 
     #[test]
-    fn instr_timing() {
-        let cfg = EmulatorTestConfig {
+    fn instr_timing_dmg() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyDmg,
             setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
                 enable_serial_output: true,
                 .. SetUpConfig::with_rom_file("blargg/instr_timing/instr_timing.gb")
             },
@@ -1034,7 +3859,107 @@ mod instr_timing {
             },
         };
 
-        let mut gb = run_with_config(cfg);
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    fn instr_timing_gbc() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyColor,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/instr_timing/instr_timing.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    fn instr_timing_gba() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyAdvance,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/instr_timing/instr_timing.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    fn instr_timing_sgb() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::SuperGameBoy,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/instr_timing/instr_timing.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    fn instr_timing_sgb2() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::SuperGameBoy2,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/instr_timing/instr_timing.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
 
         let result = check_blargg_test_passed(&mut gb);
         assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1049,10 +3974,10 @@ mod interrupt_time {
 
     #[test]
     #[ignore]
-    fn interrupt_time() {
-        let cfg = EmulatorTestConfig {
+    fn interrupt_time_dmg() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyDmg,
             setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
                 enable_serial_output: true,
                 .. SetUpConfig::with_rom_file("blargg/interrupt_time/interrupt_time.gb")
             },
@@ -1065,7 +3990,111 @@ mod interrupt_time {
             },
         };
 
-        let mut gb = run_with_config(cfg);
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn interrupt_time_gbc() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyColor,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/interrupt_time/interrupt_time.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn interrupt_time_gba() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyAdvance,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/interrupt_time/interrupt_time.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn interrupt_time_sgb() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::SuperGameBoy,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/interrupt_time/interrupt_time.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn interrupt_time_sgb2() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::SuperGameBoy2,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/interrupt_time/interrupt_time.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
 
         let result = check_blargg_test_passed(&mut gb);
         assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1082,10 +4111,10 @@ mod mem_timing {
 
 
         #[test]
-        fn individual_01_read_timing() {
-            let cfg = EmulatorTestConfig {
+        fn individual_01_read_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/01-read_timing.gb")
                 },
@@ -1098,7 +4127,7 @@ mod mem_timing {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1107,10 +4136,110 @@ mod mem_timing {
 
 
         #[test]
-        fn individual_02_write_timing() {
-            let cfg = EmulatorTestConfig {
+        fn individual_01_read_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_01_read_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_01_read_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_01_read_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_write_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/02-write_timing.gb")
                 },
@@ -1123,7 +4252,7 @@ mod mem_timing {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1132,10 +4261,110 @@ mod mem_timing {
 
 
         #[test]
-        fn individual_03_modify_timing() {
-            let cfg = EmulatorTestConfig {
+        fn individual_02_write_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_write_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_write_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_02_write_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_modify_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/03-modify_timing.gb")
                 },
@@ -1148,7 +4377,107 @@ mod mem_timing {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_modify_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_modify_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_modify_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn individual_03_modify_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/individual/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1162,10 +4491,10 @@ mod mem_timing {
 
 
         #[test]
-        fn mem_timing() {
-            let cfg = EmulatorTestConfig {
+        fn mem_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
                 },
@@ -1178,7 +4507,107 @@ mod mem_timing {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1196,10 +4625,10 @@ mod mem_timing_2 {
 
 
         #[test]
-        fn rom_singles_01_read_timing() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_01_read_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/01-read_timing.gb")
                 },
@@ -1212,7 +4641,7 @@ mod mem_timing_2 {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1221,10 +4650,110 @@ mod mem_timing_2 {
 
 
         #[test]
-        fn rom_singles_02_write_timing() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_01_read_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_01_read_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_01_read_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_01_read_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/01-read_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_write_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/02-write_timing.gb")
                 },
@@ -1237,7 +4766,7 @@ mod mem_timing_2 {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1246,10 +4775,110 @@ mod mem_timing_2 {
 
 
         #[test]
-        fn rom_singles_03_modify_timing() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_02_write_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_write_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_write_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_02_write_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/02-write_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_modify_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/03-modify_timing.gb")
                 },
@@ -1262,7 +4891,107 @@ mod mem_timing_2 {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_modify_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_modify_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_modify_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn rom_singles_03_modify_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/rom_singles/03-modify_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1276,10 +5005,10 @@ mod mem_timing_2 {
 
 
         #[test]
-        fn mem_timing() {
-            let cfg = EmulatorTestConfig {
+        fn mem_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
                 },
@@ -1292,7 +5021,107 @@ mod mem_timing_2 {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        fn mem_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/mem_timing-2/mem_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1311,10 +5140,10 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_1_lcd_sync() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_1_lcd_sync_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/1-lcd_sync.gb")
                 },
@@ -1327,7 +5156,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1337,10 +5166,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_2_causes() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_1_lcd_sync_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/1-lcd_sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_1_lcd_sync_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/1-lcd_sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_1_lcd_sync_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/1-lcd_sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_1_lcd_sync_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/1-lcd_sync.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_2_causes_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/2-causes.gb")
                 },
@@ -1353,7 +5286,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1363,10 +5296,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_3_non_causes() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_2_causes_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/2-causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_2_causes_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/2-causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_2_causes_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/2-causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_2_causes_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/2-causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_3_non_causes_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/3-non_causes.gb")
                 },
@@ -1379,7 +5416,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1389,10 +5426,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_4_scanline_timing() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_3_non_causes_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/3-non_causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_3_non_causes_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/3-non_causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_3_non_causes_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/3-non_causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_3_non_causes_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/3-non_causes.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_4_scanline_timing_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/4-scanline_timing.gb")
                 },
@@ -1405,7 +5546,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1415,10 +5556,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_5_timing_bug() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_4_scanline_timing_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/4-scanline_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_4_scanline_timing_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/4-scanline_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_4_scanline_timing_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/4-scanline_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_4_scanline_timing_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/4-scanline_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_5_timing_bug_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/5-timing_bug.gb")
                 },
@@ -1431,7 +5676,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1441,10 +5686,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_6_timing_no_bug() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_5_timing_bug_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/5-timing_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_5_timing_bug_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/5-timing_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_5_timing_bug_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/5-timing_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_5_timing_bug_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/5-timing_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_6_timing_no_bug_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/6-timing_no_bug.gb")
                 },
@@ -1457,7 +5806,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1467,10 +5816,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_7_timing_effect() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_6_timing_no_bug_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/6-timing_no_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_6_timing_no_bug_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/6-timing_no_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_6_timing_no_bug_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/6-timing_no_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_6_timing_no_bug_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/6-timing_no_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_7_timing_effect_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/7-timing_effect.gb")
                 },
@@ -1483,7 +5936,7 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1493,10 +5946,114 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn rom_singles_8_instr_effect() {
-            let cfg = EmulatorTestConfig {
+        fn rom_singles_7_timing_effect_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/7-timing_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_7_timing_effect_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/7-timing_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_7_timing_effect_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/7-timing_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_7_timing_effect_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/7-timing_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_8_instr_effect_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/8-instr_effect.gb")
                 },
@@ -1509,7 +6066,111 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_8_instr_effect_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/8-instr_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_8_instr_effect_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/8-instr_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_8_instr_effect_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/8-instr_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn rom_singles_8_instr_effect_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/rom_singles/8-instr_effect.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1524,10 +6185,10 @@ mod oam_bug {
 
         #[test]
         #[ignore]
-        fn oam_bug() {
-            let cfg = EmulatorTestConfig {
+        fn oam_bug_dmg() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyDmg,
                 setup: SetUpConfig {
-                    device: Some(DeviceType::GameBoyDmg),
                     enable_serial_output: true,
                     .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
                 },
@@ -1540,7 +6201,111 @@ mod oam_bug {
                 },
             };
 
-            let mut gb = run_with_config(cfg);
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_bug_gbc() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyColor,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_bug_gba() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyAdvance,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_bug_sgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
+
+            let result = check_blargg_test_passed(&mut gb);
+            assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+        }
+
+
+
+        #[test]
+        #[ignore]
+        fn oam_bug_sgb2() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::SuperGameBoy2,
+                setup: SetUpConfig {
+                    enable_serial_output: true,
+                    .. SetUpConfig::with_rom_file("blargg/oam_bug/oam_bug.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            let mut gb = run_test_case(test_case);
 
             let result = check_blargg_test_passed(&mut gb);
             assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
@@ -1556,10 +6321,10 @@ mod blargg_other {
 
     #[test]
     #[ignore]
-    fn halt_bug() {
-        let cfg = EmulatorTestConfig {
+    fn halt_bug_dmg() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyDmg,
             setup: SetUpConfig {
-                device: Some(DeviceType::GameBoyDmg),
                 enable_serial_output: true,
                 .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
             },
@@ -1572,7 +6337,111 @@ mod blargg_other {
             },
         };
 
-        let mut gb = run_with_config(cfg);
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn halt_bug_gbc() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyColor,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn halt_bug_gba() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::GameBoyAdvance,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn halt_bug_sgb() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::SuperGameBoy,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
+
+        let result = check_blargg_test_passed(&mut gb);
+        assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
+    }
+
+
+
+    #[test]
+    #[ignore]
+    fn halt_bug_sgb2() {
+        let test_case = EmulatorTestCase {
+            device: DeviceType::SuperGameBoy2,
+            setup: SetUpConfig {
+                enable_serial_output: true,
+                .. SetUpConfig::with_rom_file("blargg/halt_bug.gb")
+            },
+            run_config: RunConfig {
+                stop_on_infinite_loop: true,
+                .. RunConfig::default()
+            },
+            result: CheckResultConfig {
+                .. CheckResultConfig::default()
+            },
+        };
+
+        let mut gb = run_test_case(test_case);
 
         let result = check_blargg_test_passed(&mut gb);
         assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());

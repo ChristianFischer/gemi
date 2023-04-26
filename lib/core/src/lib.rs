@@ -19,6 +19,7 @@ pub mod apu;
 pub mod boot_rom;
 pub mod cartridge;
 pub mod cpu;
+pub mod device_type;
 pub mod gameboy;
 pub mod input;
 pub mod mmu;

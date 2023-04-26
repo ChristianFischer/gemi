@@ -16,15 +16,15 @@
  */
 
 use std::path::PathBuf;
-use gbemu_core::gameboy::DeviceType;
+use gbemu_core::gameboy::EmulationType;
 
 
 /// Checks whether a file contains a ROM and delivers the DeviceType
 /// suitable to run the ROM.
-pub fn file_is_rom(file: &PathBuf) -> Option<DeviceType> {
+pub fn file_is_rom(file: &PathBuf) -> Option<EmulationType> {
     match file.extension().map(|o| o.to_str().unwrap()) {
-        Some("gb")  => Some(DeviceType::GameBoyDmg),
-        Some("gbc") => Some(DeviceType::GameBoyColor),
+        Some("gb")  => Some(EmulationType::DMG),
+        Some("gbc") => Some(EmulationType::GBC),
         _ => None
     }
 }
