@@ -21,8 +21,10 @@ use gbemu_core::cartridge::Cartridge;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
 use gbemu_core::utils::to_u8;
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
+use crate::checks::blargg_checks::check_blargg_test_passed;
 use crate::checks::check_display::compare_display_with_image;
 use crate::checks::gambatte_checks::check_gambatte_display_code;
+use crate::checks::mooneye_checks::check_mooneye_test_passed;
 use crate::util::get_test_file;
 
 /// The maximum number of frames allowed per emulator run,
@@ -92,11 +94,6 @@ pub fn create_device_with_config(device_type: DeviceType, setup: SetUpConfig) ->
 
     // initialize
     gb.initialize();
-
-    // enable serial data output queue
-    if setup.enable_serial_output {
-        gb.get_peripherals_mut().serial.enable_output_queue(true);
-    }
 
     // set the color palette for DMG emulation
     if let Some(palette) = setup.dmg_display_palette {
@@ -200,9 +197,17 @@ pub fn check_results(gb: &GameBoy, result: &CheckResultConfig) {
     if let Some(image_path) = &result.compare_lcd_with_image {
         compare_display_with_image(gb, &image_path, &result.color_mod);
     }
-    
+
     if let Some(gambatte_display_result_code) = &result.gambatte_display_result_code {
         check_gambatte_display_code(gb, &gambatte_display_result_code);
+    }
+
+    if result.blargg_check_result_code {
+        check_blargg_test_passed(gb);
+    }
+
+    if result.mooneye_check_result_code {
+        check_mooneye_test_passed(gb);
     }
 }
 
@@ -221,6 +226,11 @@ pub fn run_test_case(test_case: EmulatorTestCase) -> GameBoy {
 
     // Construct
     let mut gb = create_device_with_config(device, setup);
+
+    // enable serial output, if required for any result check
+    if result.requires_serial_output() {
+        gb.get_peripherals_mut().serial.enable_output_queue(true);
+    }
 
     // Run
     run_to_stop_conditions(&mut gb, &run_cfg);

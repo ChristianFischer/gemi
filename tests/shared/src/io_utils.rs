@@ -15,13 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::borrow::Cow;
+use std::cell::RefCell;
 use std::fs;
 use std::ops::Add;
 use std::path::PathBuf;
+use std::rc::Rc;
+use crate::test_config::EmulatorTestConfig;
 
 pub type OnHandleDir<'a> = Box<dyn Fn(&PathBuf, &IteratorState) -> HandleDirectory + 'a>;
-pub type OnFileFound<'a> = Box<dyn Fn(&PathBuf, &IteratorState) -> String + 'a>;
+pub type OnFileFound<'a> = Box<dyn Fn(&PathBuf, &IteratorState) -> Vec<EmulatorTestConfig> + 'a>;
 
 
 /// A set of callbacks to let the caller generate code for each
@@ -33,6 +35,22 @@ pub struct FindRomCallbacks<'a> {
     /// Called for each file.
     pub on_file_found: OnFileFound<'a>,
 }
+
+
+/// A visitor trait to be implemented by objects to receive test configurations.
+pub trait TestConfigVisitor {
+    /// Called when a new module is opened.
+    fn on_open_module(&mut self, module_name: &str, state: &IteratorState);
+
+    /// Called when a previously opened module is closed.
+    fn on_close_module(&mut self, module_name: &str, state: &IteratorState);
+
+    /// Called when a test configuration is found.
+    fn on_visit_test(&mut self, test_cfg: &EmulatorTestConfig, state: &IteratorState);
+}
+
+/// Type alias for a reference to a test config visitor.
+pub type TestConfigVisitorRef = Rc<RefCell<dyn TestConfigVisitor>>;
 
 
 /// The current state while iterating through directories.
@@ -47,6 +65,37 @@ pub struct IteratorState {
 
     /// The stack of path elements leading to the current file to be tested.
     pub stack: Vec<String>,
+}
+
+
+/// An entry of the module stack inside [VisitorStateTracker].
+struct ModuleStackEntry {
+    /// The name of the module.
+    name: String,
+
+    /// The state of the module.
+    state: IteratorState,
+
+    /// Whether the module has been opened.
+    did_open: bool,
+}
+
+
+/// A tracker object storing the current state of the visitor.
+/// It stores in which module the visitor is currently in and
+/// delays the opening of modules until the first test is found.
+struct VisitorStateTracker {
+    /// The name of the top level module.
+    root_name: String,
+
+    /// The state of the top level module.
+    root_state: IteratorState,
+
+    /// The stack of all currently opened modules.
+    state_stack: Vec<ModuleStackEntry>,
+
+    /// The visitor to be notified for detected modules and tests.
+    visitor: TestConfigVisitorRef,
 }
 
 
@@ -83,33 +132,143 @@ impl IteratorState {
 }
 
 
+impl VisitorStateTracker {
+    pub fn new(root_name: String, visitor: TestConfigVisitorRef) -> Self {
+        Self {
+            root_name: root_name.clone(),
+            root_state: IteratorState {
+                indent: "".to_string(),
+                path:   root_name.clone(),
+                stack:  vec![root_name.clone()],
+            },
+            state_stack: vec![],
+            visitor,
+        }
+    }
+
+
+    /// Get the current module name.
+    pub fn get_current_module_name(&self) -> &str {
+        if let Some(entry) = self.state_stack.last() {
+            &entry.name
+        }
+        else {
+            &self.root_name
+        }
+    }
+
+
+    /// Get the current state of the module we're in.
+    pub fn get_current_state(&self) -> &IteratorState {
+        if let Some(entry) = self.state_stack.last() {
+            &entry.state
+        }
+        else {
+            &self.root_state
+        }
+    }
+
+
+    /// Open a new submodule. The call on the visitor will be delayed until a test is found.
+    pub fn open_module(&mut self, module_name: &str) {
+        let current_state = self.get_current_state();
+        let sub_state     = current_state.create_sub_state(module_name);
+
+        // push a new entry to the stack of opened modules
+        self.state_stack.push(ModuleStackEntry {
+            name: module_name.to_string(),
+            state: sub_state,
+            did_open: false,
+        });
+    }
+
+
+    /// Close the current module. This will be ignored unless the module was forwarded to the visitor as well.
+    pub fn close_module(&mut self, module_name: &str) {
+        assert!(!self.state_stack.is_empty(), "Module stack is empty");
+
+        // check whether there is a module to close and if it matches the given name
+        let (can_pop, was_opened) = if let Some(entry) = self.state_stack.last() {
+            assert_eq!(entry.name, module_name, "Module name mismatch");
+            let matching_name = entry.name == module_name;
+
+            (matching_name, entry.did_open)
+        }
+        else {
+            (false, false)
+        };
+
+        if can_pop {
+            // remove from the stack
+            self.state_stack.pop();
+
+            // when it was opened, send the closing event to the visitor
+            if was_opened {
+                self.visitor.borrow_mut().on_close_module(module_name, self.get_current_state());
+            }
+        }
+    }
+
+
+    /// Visit a test configuration.
+    /// This will invoke the module opening on the visitor if it wasn't done yet.
+    pub fn visit_test(&mut self, test_cfg: &EmulatorTestConfig) {
+        self.assure_modules_opened();
+
+        self.visitor.borrow_mut().on_visit_test(test_cfg, self.get_current_state());
+    }
+
+
+    /// Assure that all currently opened modules are opened on the visitor.
+    fn assure_modules_opened(&mut self) {
+        let mut parent_state: &IteratorState = &self.root_state;
+
+        // iterate through all modules
+        for entry in self.state_stack.iter_mut() {
+            // if the module wasn't opened yet...
+            if !entry.did_open {
+                // ... send the opening event to the visitor
+                self.visitor.borrow_mut().on_open_module(&entry.name, parent_state);
+                entry.did_open = true;
+            }
+
+            parent_state = &entry.state;
+        }
+    }
+}
+
+
 /// Recursively iterate through subdirectories to find ROM files.
 /// Invokes a callback for each directory and file found. Collects the generated code
 /// from each callback and creates file content with all generated tests.
-pub fn recursive_visit_directory(root_path: PathBuf, callbacks: &FindRomCallbacks) -> String {
+pub fn recursive_visit_directory(
+        root_path: PathBuf,
+        callbacks: &FindRomCallbacks,
+        visitor:   TestConfigVisitorRef
+) {
     let root_name = filename_to_symbol(root_path.file_name().unwrap().to_str().unwrap());
+    let mut state = VisitorStateTracker::new(root_name.clone(), visitor);
 
     recursive_visit_directory_step(
         &root_path,
-        &IteratorState {
-            indent: "".to_string(),
-            path:   root_name.clone(),
-            stack:  vec![root_name],
-        },
-        callbacks
-    )
+        callbacks,
+        &mut state
+    );
 }
 
 
 /// Internal part of recursive_find_roms which is called recursively.
-fn recursive_visit_directory_step(root_path: &PathBuf, state: &IteratorState, callbacks: &FindRomCallbacks) -> String {
+fn recursive_visit_directory_step(
+        current_path: &PathBuf,
+        callbacks: &FindRomCallbacks,
+        state: &mut VisitorStateTracker
+) {
     let mut subdir_list : Vec<PathBuf> = Vec::new();
     let mut files_list  : Vec<PathBuf> = Vec::new();
-    let mut content                    = String::new();
-    let mut had_submodules             = false;
+    let mut had_submodules = false;
 
     // iterate through all elements in the current path
-    for paths in root_path.read_dir().unwrap() {
+    for paths in current_path.read_dir().unwrap() {
         if let Ok(entry) = paths {
             let path      = entry.path();
             let file_type = entry.file_type().unwrap();
@@ -133,7 +292,7 @@ fn recursive_visit_directory_step(root_path: &PathBuf, state: &IteratorState, ca
         let module = filename_to_symbol(path.to_str().unwrap());
 
         // check how to handle the directory
-        let handle_dir : HandleDirectory = (callbacks.on_handle_dir)(&path, state);
+        let handle_dir : HandleDirectory = (callbacks.on_handle_dir)(&path, state.get_current_state());
 
         // recurse into subdirectory, if not skipped
         match handle_dir {
@@ -141,103 +300,68 @@ fn recursive_visit_directory_step(root_path: &PathBuf, state: &IteratorState, ca
 
             HandleDirectory::Enter => {
                 // recurse into the subdirectory
-                let subdir_content = recursive_visit_directory_step(
+                recursive_visit_directory_step(
                     &path,
-                    &state,
-                    callbacks
+                    callbacks,
+                    state
                 );
-
-                // add the content, if the subdirectory contained any tests
-                if !subdir_content.is_empty() {
-                    content.push_str("\n");
-                    content.push_str(&subdir_content);
-                }
             }
 
             HandleDirectory::CreateModule => {
+                // open a new module
+                state.open_module(&module);
+
                 // recurse into the subdirectory
-                let subdir_content = recursive_visit_directory_step(
+                recursive_visit_directory_step(
                     &path,
-                    &state.create_sub_state(&module),
-                    callbacks
+                    callbacks,
+                    state
                 );
 
-                // add the content, if the subdirectory contained any tests
-                if !subdir_content.is_empty() {
-                    content.push_str("\n");
+                // close the module created
+                state.close_module(&module);
 
-                    content.push_str(&format!(
-                        "{}mod {} {{\n{}    use super::*;\n",
-                        state.indent,
-                        filename_to_symbol(path.to_str().unwrap()),
-                        state.indent,
-                    ));
-
-                    content.push_str(&subdir_content);
-
-                    content.push_str(&format!("{}}}\n\n", state.indent));
-
-                    had_submodules = true;
-                }
+                // mark that we had submodules
+                had_submodules = true;
             }
         };
     }
 
-    // for each file..
+    // if any files were found..
     if files_list.len() > 0 {
-        let mut module_open = false;
+        // functor to visit all files, which can be run either in the current module
+        // or in a separate module
+        let visit_files = |files_list: &Vec<PathBuf>, state: &mut VisitorStateTracker| {
+            // iterate through all files
+            for path in files_list {
+                // call the on_file_found callback
+                let tests: Vec<EmulatorTestConfig> = (callbacks.on_file_found)(&path, state.get_current_state());
 
-        // determine a module name for files, if there were already submodules present
-        let files_module = if had_submodules {
-            Some(
-                state.get_top_module()
-                .map(|n| format!("{n}_other"))
-                .unwrap_or("other".to_string())
-            )
-        }
-        else {
-            None
-        };
-
-        // create sub state if required
-        let files_state = if let Some(module_name) = &files_module {
-            Cow::Owned(state.create_sub_state(module_name))
-        }
-        else {
-            Cow::Borrowed(state)
-        };
-
-        // iterate through all files
-        for path in files_list {
-            // call the on_file_found callback
-            let str = (callbacks.on_file_found)(&path, &files_state);
-
-            // add the result to the content, if any code was generated
-            if !str.is_empty() {
-                // module begin, if mandatory and not yet done
-                if !module_open {
-                    if let Some(module_name) = &files_module {
-                        content.push_str("\n");
-                        content.push_str(&format!("{}mod {} {{\n", state.indent, module_name));
-                        content.push_str(&format!("{}    use super::*;\n", state.indent));
-
-                        module_open = true;
-                    }
+                // visit each test found
+                for test_cfg in tests {
+                    state.visit_test(&test_cfg);
                 }
-
-                content.push('\n');
-                content.push('\n');
-                content.push_str(&str);
             }
-        }
+        };
 
-        // module end
-        if module_open {
-            content.push_str(&format!("{}}}\n", state.indent));
+        // if we have files in a directory which also contained submodules, we create
+        // a separate module for the files, so tests wont be mixed up with directories
+        if had_submodules {
+            // create a module for the files
+            let files_module = format!("{}_other", state.get_current_module_name());
+            state.open_module(&files_module);
+
+            // visit all files in the submodule
+            visit_files(&files_list, state);
+
+            // close the module
+            state.close_module(&files_module);
+        }
+        else {
+            // visit all files in the current module
+            visit_files(&files_list, state);
         }
     }
-
-    content
 }
 
 

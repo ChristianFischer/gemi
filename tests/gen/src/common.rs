@@ -36,4 +36,6 @@ use gbemu_core::gameboy::DeviceType;
 use testrunner::runner::run_test_case;
 use tests_shared::test_config::*;
 
+#[allow(unused_imports)]
+use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
 ";

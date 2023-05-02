@@ -18,3 +18,4 @@
 pub mod blargg_checks;
 pub mod check_display;
 pub mod gambatte_checks;
+pub mod mooneye_checks;

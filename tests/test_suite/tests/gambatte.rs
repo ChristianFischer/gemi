@@ -19,7 +19,10 @@ use gbemu_core::gameboy::DeviceType;
 use testrunner::runner::run_test_case;
 use tests_shared::test_config::*;
 
+#[allow(unused_imports)]
 use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
+
+
 
 mod bgen {
     use super::*;
@@ -52,6 +55,7 @@ mod bgen {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgoff_bgon_sprite_above_window_gbc() {
@@ -73,7 +77,6 @@ mod bgen {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -103,6 +106,7 @@ mod bgen {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgoff_bgon_sprite_below_window_gbc() {
@@ -124,7 +128,6 @@ mod bgen {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -159,6 +162,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx08_1_gbc() {
@@ -180,7 +184,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -210,6 +213,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx08_2_gbc() {
@@ -231,7 +235,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -261,6 +264,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx08_3_gbc() {
@@ -282,7 +286,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -312,6 +315,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx08_4_gbc() {
@@ -333,7 +337,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -359,7 +362,6 @@ mod bgtiledata {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtiledata_spx08_ds_2_gbc() {
@@ -381,7 +383,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -407,7 +408,6 @@ mod bgtiledata {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtiledata_spx08_ds_4_gbc() {
@@ -429,7 +429,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -459,6 +458,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx09_1_gbc() {
@@ -480,7 +480,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -510,6 +509,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx09_2_gbc() {
@@ -531,7 +531,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -561,6 +560,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx09_3_gbc() {
@@ -582,7 +582,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -612,6 +611,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx09_4_gbc() {
@@ -633,7 +633,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -659,7 +658,6 @@ mod bgtiledata {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtiledata_spx09_ds_2_gbc() {
@@ -681,7 +679,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -707,7 +704,6 @@ mod bgtiledata {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtiledata_spx09_ds_4_gbc() {
@@ -729,7 +725,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -759,6 +754,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0a_1_gbc() {
@@ -780,7 +776,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -810,6 +805,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0a_2_gbc() {
@@ -831,7 +827,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -861,6 +856,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0a_3_gbc() {
@@ -882,7 +878,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -912,6 +907,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0a_4_gbc() {
@@ -933,7 +929,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -963,6 +958,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0b_1_gbc() {
@@ -984,7 +980,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1014,6 +1009,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0b_2_gbc() {
@@ -1035,7 +1031,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1065,6 +1060,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0b_3_gbc() {
@@ -1086,7 +1082,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1116,6 +1111,7 @@ mod bgtiledata {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtiledata_spx0b_4_gbc() {
@@ -1137,7 +1133,6 @@ mod bgtiledata {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -1172,6 +1167,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx08_1_gbc() {
@@ -1193,7 +1189,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1223,6 +1218,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx08_2_gbc() {
@@ -1244,7 +1240,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1274,6 +1269,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx08_3_gbc() {
@@ -1295,7 +1291,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1325,6 +1320,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx08_4_gbc() {
@@ -1346,7 +1342,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1372,7 +1367,6 @@ mod bgtilemap {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtilemap_spx08_ds_2_gbc() {
@@ -1394,7 +1388,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1420,7 +1413,6 @@ mod bgtilemap {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtilemap_spx08_ds_4_gbc() {
@@ -1442,7 +1434,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1472,6 +1463,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx09_1_gbc() {
@@ -1493,7 +1485,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1523,6 +1514,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx09_2_gbc() {
@@ -1544,7 +1536,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1574,6 +1565,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx09_3_gbc() {
@@ -1595,7 +1587,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1625,6 +1616,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx09_4_gbc() {
@@ -1646,7 +1638,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1672,7 +1663,6 @@ mod bgtilemap {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtilemap_spx09_ds_2_gbc() {
@@ -1694,7 +1684,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1720,7 +1709,6 @@ mod bgtilemap {
     }
 
 
-
     #[test]
     #[ignore]
     fn bgtilemap_spx09_ds_4_gbc() {
@@ -1742,7 +1730,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1772,6 +1759,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0a_1_gbc() {
@@ -1793,7 +1781,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1823,6 +1810,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0a_2_gbc() {
@@ -1844,7 +1832,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1874,6 +1861,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0a_3_gbc() {
@@ -1895,7 +1883,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1925,6 +1912,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0a_4_gbc() {
@@ -1946,7 +1934,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -1976,6 +1963,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0b_1_gbc() {
@@ -1997,7 +1985,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2027,6 +2014,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0b_2_gbc() {
@@ -2048,7 +2036,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2078,6 +2065,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0b_3_gbc() {
@@ -2099,7 +2087,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2129,6 +2116,7 @@ mod bgtilemap {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn bgtilemap_spx0b_4_gbc() {
@@ -2150,7 +2138,6 @@ mod bgtilemap {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -2180,7 +2167,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_2_out0_gbc() {
@@ -2201,7 +2187,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2226,7 +2211,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_4_out1_gbc() {
@@ -2247,7 +2231,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2272,7 +2255,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_ds_2_out0_gbc() {
@@ -2293,7 +2275,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2318,7 +2299,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_ds_4_out1_gbc() {
@@ -2339,7 +2319,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2364,7 +2343,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx2_2_out0_gbc() {
@@ -2385,7 +2363,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2410,7 +2387,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx2_4_out1_gbc() {
@@ -2431,7 +2407,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2456,7 +2431,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx3_2_out0_gbc() {
@@ -2477,7 +2451,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2502,7 +2475,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx3_4_out1_gbc() {
@@ -2523,7 +2495,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2548,7 +2519,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx5_2_out0_gbc() {
@@ -2569,7 +2539,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2594,7 +2563,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx5_4_out1_gbc() {
@@ -2615,7 +2583,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2640,7 +2607,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx5_ds_2_out0_gbc() {
@@ -2661,7 +2627,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2686,7 +2651,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3end_scx5_ds_4_out1_gbc() {
@@ -2707,7 +2671,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2732,7 +2695,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3start_2_out0_gbc() {
@@ -2753,7 +2715,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2778,7 +2739,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_m3start_ds_2_out0_gbc() {
@@ -2799,7 +2759,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2824,7 +2783,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_read_m3start_2_outff_gbc() {
@@ -2845,7 +2803,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2870,7 +2827,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_read_m3start_ds_2_outff_gbc() {
@@ -2891,7 +2847,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2916,7 +2871,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_read_m3start_ds_lcdoffset1_2_outff_gbc() {
@@ -2937,7 +2891,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -2962,7 +2915,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_read_m3start_lcdoffset1_2_outff_gbc() {
@@ -2983,7 +2935,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3008,7 +2959,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_write_m3start_2_out00_gbc() {
@@ -3029,7 +2979,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3054,7 +3003,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_write_m3start_ds_2_out00_gbc() {
@@ -3075,7 +3023,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3100,7 +3047,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_write_m3start_ds_lcdoffset1_2_out00_gbc() {
@@ -3121,7 +3067,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3146,7 +3091,6 @@ mod cgbpal_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn cgbpal_write_m3start_lcdoffset1_2_out00_gbc() {
@@ -3167,7 +3111,6 @@ mod cgbpal_m3 {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -3197,7 +3140,6 @@ mod display_startstate {
     }
 
 
-
     #[test]
     #[ignore]
     fn irq_oute1_gbc() {
@@ -3218,7 +3160,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3242,6 +3183,7 @@ mod display_startstate {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ly_out90_gbc() {
@@ -3262,7 +3204,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3287,7 +3228,6 @@ mod display_startstate {
     }
 
 
-
     #[test]
     #[ignore]
     fn stat_1_out85_dmg() {
@@ -3308,7 +3248,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3333,7 +3272,6 @@ mod display_startstate {
     }
 
 
-
     #[test]
     #[ignore]
     fn stat_2_out84_dmg() {
@@ -3354,7 +3292,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3379,7 +3316,6 @@ mod display_startstate {
     }
 
 
-
     #[test]
     #[ignore]
     fn stat_scx2_2_out84_gbc() {
@@ -3400,7 +3336,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3425,7 +3360,6 @@ mod display_startstate {
     }
 
 
-
     #[test]
     #[ignore]
     fn stat_scx3_2_out84_gbc() {
@@ -3446,7 +3380,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3471,7 +3404,6 @@ mod display_startstate {
     }
 
 
-
     #[test]
     #[ignore]
     fn stat_scx5_2_out84_gbc() {
@@ -3492,7 +3424,6 @@ mod display_startstate {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -3522,7 +3453,6 @@ mod div {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_inc_1_outab_dmg() {
@@ -3543,7 +3473,6 @@ mod div {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3568,7 +3497,6 @@ mod div {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_inc_2_outac_dmg() {
@@ -3589,7 +3517,6 @@ mod div {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3614,7 +3541,6 @@ mod div {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_stop1_inc_2_out01_gbc() {
@@ -3635,7 +3561,6 @@ mod div {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3660,7 +3585,6 @@ mod div {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_stop2_inc_2_out01_gbc() {
@@ -3681,7 +3605,6 @@ mod div {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -3711,7 +3634,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn dma_dst_wrap_2_out0_gbc() {
@@ -3732,7 +3654,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3757,7 +3678,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn dma_hiram_read_result_out1_gbc() {
@@ -3778,7 +3698,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3803,7 +3722,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn dma_src_wrap_out1_gbc() {
@@ -3824,7 +3742,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3849,7 +3766,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff51_bits_outff_gbc() {
@@ -3870,7 +3786,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3895,7 +3810,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff53_bits_outff_gbc() {
@@ -3916,7 +3830,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3941,7 +3854,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_2xshort_ds_1_out3_gbc() {
@@ -3962,7 +3874,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -3987,7 +3898,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_2xshort_scx5_ds_1_out3_gbc() {
@@ -4008,7 +3918,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4033,7 +3942,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_long_1_out3_gbc() {
@@ -4054,7 +3962,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4079,7 +3986,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_long_ds_1_out3_gbc() {
@@ -4100,7 +4006,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4125,7 +4030,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_long_scx2_1_out3_gbc() {
@@ -4146,7 +4050,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4171,7 +4074,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_long_scx3_1_out3_gbc() {
@@ -4192,7 +4094,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4217,7 +4118,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_long_scx5_1_out3_gbc() {
@@ -4238,7 +4138,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4263,7 +4162,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_long_scx5_ds_1_out3_gbc() {
@@ -4284,7 +4182,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4309,7 +4206,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_short_1_out3_gbc() {
@@ -4330,7 +4226,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4355,7 +4250,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_short_ds_1_out3_gbc() {
@@ -4376,7 +4270,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4401,7 +4294,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_short_scx2_1_out3_gbc() {
@@ -4422,7 +4314,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4447,7 +4338,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_short_scx3_1_out3_gbc() {
@@ -4468,7 +4358,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4493,7 +4382,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_short_scx5_1_out3_gbc() {
@@ -4514,7 +4402,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4539,7 +4426,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_cycles_short_scx5_ds_1_out3_gbc() {
@@ -4560,7 +4446,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4585,7 +4470,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_start_1_out1_gbc() {
@@ -4606,7 +4490,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4631,7 +4514,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn gdma_weird_2_out0_gbc() {
@@ -4652,7 +4534,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4677,7 +4558,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_cycles_2_out0_gbc() {
@@ -4698,7 +4578,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4723,7 +4602,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_cycles_ds_2_out0_gbc() {
@@ -4744,7 +4622,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4769,7 +4646,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_cycles_scx2_2_out0_gbc() {
@@ -4790,7 +4666,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4815,7 +4690,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_cycles_scx3_2_out0_gbc() {
@@ -4836,7 +4710,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4861,7 +4734,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_cycles_scx5_2_out0_gbc() {
@@ -4882,7 +4754,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4907,7 +4778,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_cycles_scx5_ds_2_out0_gbc() {
@@ -4928,7 +4798,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4953,7 +4822,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_disable_display_2_out0_gbc() {
@@ -4974,7 +4842,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -4999,7 +4866,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_disabled_display_2_out0_gbc() {
@@ -5020,7 +4886,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5045,7 +4910,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_ei_m3halt_m0unhalt_ly_2_out03_gbc() {
@@ -5066,7 +4930,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5091,7 +4954,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_destl_2_out1_gbc() {
@@ -5112,7 +4974,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5137,7 +4998,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_disable_2_out1_gbc() {
@@ -5158,7 +5018,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5183,7 +5042,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_disable_ds_2_out1_gbc() {
@@ -5204,7 +5062,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5229,7 +5086,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_disable_scx2_2_out1_gbc() {
@@ -5250,7 +5106,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5275,7 +5130,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_disable_scx3_2_out1_gbc() {
@@ -5296,7 +5150,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5321,7 +5174,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_disable_scx5_2_out1_gbc() {
@@ -5342,7 +5194,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5367,7 +5218,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_disable_scx5_ds_2_out1_gbc() {
@@ -5388,7 +5238,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5413,7 +5262,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_ei_m3halt_m2unhalt_ly_scx1_2_out03_gbc() {
@@ -5434,7 +5282,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5459,7 +5306,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_ei_m3halt_m2unhalt_ly_scx1_4_out03_gbc() {
@@ -5480,7 +5326,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5505,7 +5350,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_ei_m3halt_m2unhalt_ly_scx1_6_out03_gbc() {
@@ -5526,7 +5370,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5551,7 +5394,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_ei_m3halt_m2unhalt_pc_scx1_2_outad_gbc() {
@@ -5572,7 +5414,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5597,7 +5438,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_enable_1_out1_gbc() {
@@ -5618,7 +5458,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5643,7 +5482,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_enable_ds_1_out1_gbc() {
@@ -5664,7 +5502,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5689,7 +5526,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_enable_ds_lcdoffset1_1_out1_gbc() {
@@ -5710,7 +5546,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5735,7 +5570,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_enable_lcdoffset3_1_out1_gbc() {
@@ -5756,7 +5590,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5781,7 +5614,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_if_and_ie_halt_1_out00_gbc() {
@@ -5802,7 +5634,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5827,7 +5658,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_length_1_out0_gbc() {
@@ -5848,7 +5678,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5873,7 +5702,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m0halt_1_out00_gbc() {
@@ -5894,7 +5722,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5919,7 +5746,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m0halt_ds_1_out00_gbc() {
@@ -5940,7 +5766,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -5965,7 +5790,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m0halt_ds_lcdoffset1_1_out00_gbc() {
@@ -5986,7 +5810,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6011,7 +5834,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m0halt_lcdoffset3_1_out00_gbc() {
@@ -6032,7 +5854,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6057,7 +5878,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m0unhalt_1_out00_gbc() {
@@ -6078,7 +5898,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6103,7 +5922,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m0unhalt_ds_1_out00_gbc() {
@@ -6124,7 +5942,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6149,7 +5966,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m0unhalt_scx1_1_outff_gbc() {
@@ -6170,7 +5986,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6195,7 +6010,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m0unhalt_scx1_3_outff_gbc() {
@@ -6216,7 +6030,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6241,7 +6054,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m0unhalt_scx2_1_outff_gbc() {
@@ -6262,7 +6074,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6287,7 +6098,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m0unhalt_scx2_3_outff_gbc() {
@@ -6308,7 +6118,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6333,7 +6142,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_inc_scx1_1_out01_gbc() {
@@ -6354,7 +6162,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6379,7 +6186,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_inc_scx1_3_out01_gbc() {
@@ -6400,7 +6206,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6425,7 +6230,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_inc_scx2_2_out02_gbc() {
@@ -6446,7 +6250,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6471,7 +6274,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_ly_scx1_1_out02_gbc() {
@@ -6492,7 +6294,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6517,7 +6318,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_ly_scx1_3_out02_gbc() {
@@ -6538,7 +6338,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6563,7 +6362,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_ly_scx1_5_out02_gbc() {
@@ -6584,7 +6382,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6609,7 +6406,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_ly_scx2_1_out02_gbc() {
@@ -6630,7 +6426,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6655,7 +6450,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_ly_scx2_3_out02_gbc() {
@@ -6676,7 +6470,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6701,7 +6494,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_ly_scx2_5_out02_gbc() {
@@ -6722,7 +6514,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6747,7 +6538,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_scx1_1_out00_gbc() {
@@ -6768,7 +6558,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6793,7 +6582,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3halt_m2unhalt_scx2_1_out00_gbc() {
@@ -6814,7 +6602,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6839,7 +6626,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_hdma5_scx1_1_out00_gbc() {
@@ -6860,7 +6646,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6885,7 +6670,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_hdma5_scx1_3_outff_gbc() {
@@ -6906,7 +6690,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6931,7 +6714,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_hdma5_scx1_ds_2_outff_gbc() {
@@ -6952,7 +6734,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -6977,7 +6758,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_hdma5_scx2_2_out80_gbc() {
@@ -6998,7 +6778,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7023,7 +6802,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_hdma5_scx2_ds_1_out00_gbc() {
@@ -7044,7 +6822,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7069,7 +6846,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_inc_scx1_1_out01_gbc() {
@@ -7090,7 +6866,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7115,7 +6890,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_inc_scx1_3_out01_gbc() {
@@ -7136,7 +6910,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7161,7 +6934,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_ly_scx1_2_out93_gbc() {
@@ -7182,7 +6954,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7207,7 +6978,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_ly_scx1_4_out93_gbc() {
@@ -7228,7 +6998,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7253,7 +7022,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_ly_scx1_6_out93_gbc() {
@@ -7274,7 +7042,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7299,7 +7066,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_read_hdmadst00_scx1_2_out9f_gbc() {
@@ -7320,7 +7086,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7345,7 +7110,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_read_hdmadst00_scx1_ds_2_out9f_gbc() {
@@ -7366,7 +7130,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7391,7 +7154,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_read_hdmadst00_scx2_2_out9f_gbc() {
@@ -7412,7 +7174,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7437,7 +7198,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_read_hdmadst00_scx2_ds_2_out9f_gbc() {
@@ -7458,7 +7218,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7483,7 +7242,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_tima_scx1_ds_2_outf4_gbc() {
@@ -7504,7 +7262,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7529,7 +7286,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_tima_scx1_ds_4_outf7_gbc() {
@@ -7550,7 +7306,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7575,7 +7330,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_m3speedchange_tima_scx1_ds_6_outf9_gbc() {
@@ -7596,7 +7350,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7621,7 +7374,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_speedchange_inc_scx1_ds_2_out02_gbc() {
@@ -7642,7 +7394,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7667,7 +7418,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_late_wrambank_1_out0_gbc() {
@@ -7688,7 +7438,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7713,7 +7462,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m0halt_late_m3unhalt_scx1_1_outff_gbc() {
@@ -7734,7 +7482,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7759,7 +7506,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m0speedchange_late_m3wakeup_scx1_1_outff_gbc() {
@@ -7780,7 +7526,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7805,7 +7550,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m0speedchange_late_m3wakeup_scx2_1_outff_gbc() {
@@ -7826,7 +7570,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7851,7 +7594,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m1halt_m0unhalt_hdma5_outff_gbc() {
@@ -7872,7 +7614,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7897,7 +7638,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m3halt_m0unhalt_ly_1_out02_gbc() {
@@ -7918,7 +7658,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7943,7 +7682,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m3halt_m1unhalt_hdma5_out00_gbc() {
@@ -7964,7 +7702,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -7989,7 +7726,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_m3speedchange_late_m0wakeup_2_out00_gbc() {
@@ -8010,7 +7746,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8035,7 +7770,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_1_out0_gbc() {
@@ -8056,7 +7790,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8081,7 +7814,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_ds_1_out0_gbc() {
@@ -8102,7 +7834,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8127,7 +7858,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_ly0_1_out0_gbc() {
@@ -8148,7 +7878,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8173,7 +7902,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_scx2_1_out0_gbc() {
@@ -8194,7 +7922,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8219,7 +7946,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_scx3_1_out0_gbc() {
@@ -8240,7 +7966,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8265,7 +7990,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_scx5_1_out0_gbc() {
@@ -8286,7 +8010,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8311,7 +8034,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_start_scx5_ds_1_out0_gbc() {
@@ -8332,7 +8054,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8357,7 +8078,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_7fffhalt_inc_m3unhalt_out01_gbc() {
@@ -8378,7 +8098,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8403,7 +8122,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_ei_halt_late_unhalt_ldaaimm_hdma_scx1_2_out02_gbc() {
@@ -8424,7 +8142,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8449,7 +8166,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_ei_halt_late_unhalt_scx1_2_outff_gbc() {
@@ -8470,7 +8186,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8495,7 +8210,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_halt_late_unhalt_ldaaimm_hdma_scx1_1_out00_gbc() {
@@ -8516,7 +8230,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8541,7 +8254,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_halt_late_unhalt_scx1_1_out00_gbc() {
@@ -8562,7 +8274,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8587,7 +8298,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_halt_m0unhalt_ldaaimm_scx1_out02_gbc() {
@@ -8608,7 +8318,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8633,7 +8342,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_speedchange_7fffstop_inc_out02_gbc() {
@@ -8654,7 +8362,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8679,7 +8386,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_speedchange_hdmalen01_hdma5_scx1_out81_gbc() {
@@ -8700,7 +8406,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8725,7 +8430,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_speedchange_hdmalen7f_hdma5_scx1_outff_gbc() {
@@ -8746,7 +8450,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8771,7 +8474,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_speedchange_ldaaimm_scx1_outff_gbc() {
@@ -8792,7 +8494,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8817,7 +8518,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn hdma_transition_speedchange_oamdma_out71_gbc() {
@@ -8838,7 +8538,6 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -8863,7 +8562,6 @@ mod dma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_gdma_pc_7ffe_2_out00_gbc() {
@@ -8884,12 +8582,12 @@ mod dma {
 
         run_test_case(test_case);
     }
-
 }
 
 
 mod dmgpalette_during_m3 {
     use super::*;
+
 
     mod scx3 {
         use super::*;
@@ -8923,7 +8621,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_2_dmg() {
@@ -8950,7 +8647,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -8981,7 +8677,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_4_dmg() {
@@ -9010,7 +8705,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_5_dmg() {
@@ -9037,7 +8731,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -9073,7 +8766,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_2_dmg() {
@@ -9100,7 +8792,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -9131,7 +8822,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_4_dmg() {
@@ -9158,7 +8848,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -9189,7 +8878,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_scx1_1_dmg() {
@@ -9216,7 +8904,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -9247,7 +8934,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn dmgpalette_during_m3_scx2_1_dmg() {
@@ -9274,7 +8960,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -9305,7 +8990,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn lycint_dmgpalette_during_m3_2_dmg() {
@@ -9332,7 +9016,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -9363,7 +9046,6 @@ mod dmgpalette_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn lycint_dmgpalette_during_m3_4_dmg() {
@@ -9390,7 +9072,6 @@ mod dmgpalette_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 }
 
@@ -9421,7 +9102,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_m0irq_trigger_out0_gbc() {
@@ -9442,7 +9122,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9466,6 +9145,7 @@ mod enable_display {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn enable_display_ly0_m2irq_out0_gbc() {
@@ -9486,7 +9166,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9511,7 +9190,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_oambusy_read_1_out0_gbc() {
@@ -9532,7 +9210,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9557,7 +9234,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_oambusy_read_2_out7_gbc() {
@@ -9578,7 +9254,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9603,7 +9278,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_oambusy_read_ds_2_out7_gbc() {
@@ -9624,7 +9298,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9649,7 +9322,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_sprites_m0stat_1_out3_gbc() {
@@ -9670,7 +9342,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9695,7 +9366,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_sprites_m0stat_2_out0_gbc() {
@@ -9716,7 +9386,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9741,7 +9410,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_wemaster_1_out3_gbc() {
@@ -9762,7 +9430,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9787,7 +9454,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_display_ly0_wemaster_2_out3_gbc() {
@@ -9808,7 +9474,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9833,7 +9498,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_ly_count_1_out99_gbc() {
@@ -9854,7 +9518,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9879,7 +9542,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_ly_count_2_out9a_gbc() {
@@ -9900,7 +9562,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9925,7 +9586,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_ly_count_ds_2_out9a_gbc() {
@@ -9946,7 +9606,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -9971,7 +9630,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m0irq_count_scx2_1_out90_gbc() {
@@ -9992,7 +9650,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10017,7 +9674,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m0irq_count_scx2_2_out90_gbc() {
@@ -10038,7 +9694,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10063,7 +9718,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m0irq_count_scx2_ds_2_out90_gbc() {
@@ -10084,7 +9738,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10109,7 +9762,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m0irq_count_scx3_1_out90_gbc() {
@@ -10130,7 +9782,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10155,7 +9806,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m0irq_count_scx3_2_out90_gbc() {
@@ -10176,7 +9826,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10201,7 +9850,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m0irq_count_scx3_ds_2_out90_gbc() {
@@ -10222,7 +9870,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10247,7 +9894,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m1stat_1_out80_gbc() {
@@ -10268,7 +9914,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10293,7 +9938,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m1stat_2_out81_gbc() {
@@ -10314,7 +9958,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10339,7 +9982,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m1stat_ds_2_out81_gbc() {
@@ -10360,7 +10002,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10385,7 +10026,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m2irq_count_1_out98_gbc() {
@@ -10406,7 +10046,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10431,7 +10070,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m2irq_count_2_out91_gbc() {
@@ -10452,7 +10090,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10477,7 +10114,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m2irq_count_ds_2_out91_gbc() {
@@ -10498,7 +10134,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10523,7 +10158,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m2stat_count_1_out91_gbc() {
@@ -10544,7 +10178,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10569,7 +10202,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m2stat_count_2_out90_gbc() {
@@ -10590,7 +10222,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10615,7 +10246,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m2stat_count_ds_2_out90_gbc() {
@@ -10636,7 +10266,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10661,7 +10290,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m3stat_count_1_out90_gbc() {
@@ -10682,7 +10310,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10707,7 +10334,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m3stat_count_2_out90_gbc() {
@@ -10728,7 +10354,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10753,7 +10378,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame0_m3stat_count_ds_2_out90_gbc() {
@@ -10774,7 +10398,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10799,7 +10422,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_ly_count_1_out99_gbc() {
@@ -10820,7 +10442,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10845,7 +10466,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_ly_count_2_out9a_gbc() {
@@ -10866,7 +10486,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10891,7 +10510,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_ly_count_ds_2_out9a_gbc() {
@@ -10912,7 +10530,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10937,7 +10554,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m0irq_count_scx2_1_out90_gbc() {
@@ -10958,7 +10574,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -10983,7 +10598,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m0irq_count_scx2_2_out90_gbc() {
@@ -11004,7 +10618,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11029,7 +10642,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m0irq_count_scx2_ds_2_out90_gbc() {
@@ -11050,7 +10662,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11075,7 +10686,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m0irq_count_scx3_1_out90_gbc() {
@@ -11096,7 +10706,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11121,7 +10730,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m0irq_count_scx3_2_out90_gbc() {
@@ -11142,7 +10750,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11167,7 +10774,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m0irq_count_scx3_ds_2_out90_gbc() {
@@ -11188,7 +10794,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11213,7 +10818,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m1stat_1_out80_gbc() {
@@ -11234,7 +10838,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11259,7 +10862,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m1stat_2_out81_gbc() {
@@ -11280,7 +10882,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11305,7 +10906,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m1stat_ds_2_out81_gbc() {
@@ -11326,7 +10926,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11351,7 +10950,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m2irq_count_1_out98_gbc() {
@@ -11372,7 +10970,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11397,7 +10994,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m2irq_count_2_out91_gbc() {
@@ -11418,7 +11014,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11443,7 +11038,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m2irq_count_ds_2_out91_gbc() {
@@ -11464,7 +11058,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11489,7 +11082,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m2stat_count_1_out91_gbc() {
@@ -11510,7 +11102,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11535,7 +11126,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m2stat_count_2_out90_gbc() {
@@ -11556,7 +11146,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11581,7 +11170,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m2stat_count_ds_2_out90_gbc() {
@@ -11602,7 +11190,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11627,7 +11214,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m3stat_count_1_out90_gbc() {
@@ -11648,7 +11234,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11673,7 +11258,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m3stat_count_2_out90_gbc() {
@@ -11694,7 +11278,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11719,7 +11302,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame1_m3stat_count_ds_2_out90_gbc() {
@@ -11740,7 +11322,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11765,7 +11346,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame2_m0irq_count_scx2_1_out90_gbc() {
@@ -11786,7 +11366,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11811,7 +11390,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame2_m0irq_count_scx2_2_out90_gbc() {
@@ -11832,7 +11410,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11857,7 +11434,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame2_m0irq_count_scx3_1_out90_gbc() {
@@ -11878,7 +11454,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11903,7 +11478,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn frame2_m0irq_count_scx3_2_out90_gbc() {
@@ -11924,7 +11498,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11949,7 +11522,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdcenable_lyc0irq_1_out2_gbc() {
@@ -11970,7 +11542,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -11995,7 +11566,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdcenable_lyc0irq_2_out0_gbc() {
@@ -12016,7 +11586,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12041,7 +11610,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_cgbpr_2_outff_gbc() {
@@ -12062,7 +11630,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12087,7 +11654,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_cgbpr_ds_2_outff_gbc() {
@@ -12108,7 +11674,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12133,7 +11698,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_cgbpw_2_out55_gbc() {
@@ -12154,7 +11718,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12179,7 +11742,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_cgbpw_ds_2_out55_gbc() {
@@ -12200,7 +11762,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12225,7 +11786,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_oamw_1_outaa_gbc() {
@@ -12246,7 +11806,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12271,7 +11830,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_oamw_2_out55_gbc() {
@@ -12292,7 +11850,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12317,7 +11874,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_oamw_ds_2_out55_gbc() {
@@ -12338,7 +11894,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12363,7 +11918,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx0_1_out87_gbc() {
@@ -12384,7 +11938,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12408,6 +11961,7 @@ mod enable_display {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx0_2_out84_gbc() {
@@ -12428,7 +11982,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12453,7 +12006,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx0_3_out84_gbc() {
@@ -12474,7 +12026,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12499,7 +12050,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx1_1_out87_gbc() {
@@ -12520,7 +12070,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12545,7 +12094,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx1_2_out84_gbc() {
@@ -12566,7 +12114,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12591,7 +12138,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx3_1_out87_gbc() {
@@ -12612,7 +12158,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12637,7 +12182,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_scx7_m3stat_scx3_2_out84_gbc() {
@@ -12658,7 +12202,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12683,7 +12226,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_vramr_1_out55_gbc() {
@@ -12704,7 +12246,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12728,6 +12269,7 @@ mod enable_display {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ly0_late_vramr_2_out55_gbc() {
@@ -12748,7 +12290,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12773,7 +12314,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_vramr_3_outff_gbc() {
@@ -12794,7 +12334,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12819,7 +12358,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_vramr_ds_2_outff_gbc() {
@@ -12840,7 +12378,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12865,7 +12402,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_vramw_1_outaa_gbc() {
@@ -12886,7 +12422,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12910,6 +12445,7 @@ mod enable_display {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ly0_late_vramw_2_outaa_gbc() {
@@ -12930,7 +12466,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -12955,7 +12490,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_late_vramw_3_out55_gbc() {
@@ -12976,7 +12510,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13001,7 +12534,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_m0irq_scx0_1_oute0_gbc() {
@@ -13022,7 +12554,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13047,7 +12578,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_m0irq_scx0_2_oute2_gbc() {
@@ -13068,7 +12598,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13093,7 +12622,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_m0irq_scx0_ds_2_oute2_gbc() {
@@ -13114,7 +12642,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13139,7 +12666,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_m0irq_scx1_1_oute0_gbc() {
@@ -13160,7 +12686,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13185,7 +12710,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_m0irq_scx1_2_oute2_gbc() {
@@ -13206,7 +12730,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13231,7 +12754,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly0_m0irq_scx1_ds_2_oute2_gbc() {
@@ -13252,7 +12774,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13277,7 +12798,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly1_late_cgbpw_2_out55_gbc() {
@@ -13298,7 +12818,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13323,7 +12842,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly_out00_gbc() {
@@ -13344,7 +12862,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13369,7 +12886,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn nextstat_1_out84_gbc() {
@@ -13390,7 +12906,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13415,7 +12930,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn nextstat_2_out87_gbc() {
@@ -13436,7 +12950,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13461,7 +12974,6 @@ mod enable_display {
     }
 
 
-
     #[test]
     #[ignore]
     fn stat_out84_gbc() {
@@ -13482,7 +12994,6 @@ mod enable_display {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -13512,7 +13023,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn ifandie_ei_halt_m2int_m0stat_1_out0_gbc() {
@@ -13533,7 +13043,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13558,7 +13067,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn ifandie_ei_halt_m2int_m0stat_2_out2_gbc() {
@@ -13579,7 +13087,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13604,7 +13111,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn ifandie_ei_halt_sra_out0a_gbc() {
@@ -13625,7 +13131,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13650,7 +13155,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_1a_out0_gbc() {
@@ -13671,7 +13175,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13696,7 +13199,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_1b_out2_gbc() {
@@ -13717,7 +13219,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13742,7 +13243,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_2a_out0_gbc() {
@@ -13763,7 +13263,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13788,7 +13287,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_2b_out2_gbc() {
@@ -13809,7 +13307,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13834,7 +13331,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_3a_out0_gbc() {
@@ -13855,7 +13351,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13880,7 +13375,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_3b_out2_gbc() {
@@ -13901,7 +13395,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13926,7 +13419,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_4a_out0_gbc() {
@@ -13947,7 +13439,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -13972,7 +13463,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx2_4b_out2_gbc() {
@@ -13993,7 +13483,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14018,7 +13507,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_1a_out0_gbc() {
@@ -14039,7 +13527,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14063,6 +13550,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_1b_out2_gbc() {
@@ -14083,7 +13571,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14108,7 +13595,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_1c_out2_gbc() {
@@ -14129,7 +13615,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14154,7 +13639,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_2a_out0_gbc() {
@@ -14175,7 +13659,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14200,7 +13683,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_2b_out2_gbc() {
@@ -14221,7 +13703,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14246,7 +13727,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_3a_out0_gbc() {
@@ -14267,7 +13747,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14291,6 +13770,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_3b_out2_gbc() {
@@ -14311,7 +13791,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14336,7 +13815,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_3c_out2_gbc() {
@@ -14357,7 +13835,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14382,7 +13859,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_4a_out0_gbc() {
@@ -14403,7 +13879,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14427,6 +13902,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_4b_out2_gbc() {
@@ -14447,7 +13923,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14472,7 +13947,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0int_halt_m0stat_scx3_4c_out2_gbc() {
@@ -14493,7 +13967,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14518,7 +13991,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_dec_scx2_1_out7_gbc() {
@@ -14539,7 +14011,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14564,7 +14035,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_dec_scx2_2_out6_gbc() {
@@ -14585,7 +14055,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14610,7 +14079,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_dec_scx3_1_out7_gbc() {
@@ -14631,7 +14099,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14656,7 +14123,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_dec_scx3_2_out6_gbc() {
@@ -14677,7 +14143,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14702,7 +14167,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_1a_out0_gbc() {
@@ -14723,7 +14187,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14748,7 +14211,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_1b_out2_gbc() {
@@ -14769,7 +14231,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14794,7 +14255,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_2a_out0_gbc() {
@@ -14815,7 +14275,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14840,7 +14299,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_2b_out2_gbc() {
@@ -14861,7 +14319,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14886,7 +14343,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_3a_out0_gbc() {
@@ -14907,7 +14363,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14932,7 +14387,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_3b_out2_gbc() {
@@ -14953,7 +14407,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -14978,7 +14431,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_4a_out0_gbc() {
@@ -14999,7 +14451,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15024,7 +14475,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx2_4b_out2_gbc() {
@@ -15045,7 +14495,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15070,7 +14519,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_1a_out0_gbc() {
@@ -15091,7 +14539,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15115,6 +14562,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_1b_out2_gbc() {
@@ -15135,7 +14583,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15160,7 +14607,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_1c_out2_gbc() {
@@ -15181,7 +14627,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15206,7 +14651,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_2a_out0_gbc() {
@@ -15227,7 +14671,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15252,7 +14695,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_2b_out2_gbc() {
@@ -15273,7 +14715,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15298,7 +14739,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_3a_out0_gbc() {
@@ -15319,7 +14759,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15344,7 +14783,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_3b_out2_gbc() {
@@ -15365,7 +14803,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15390,7 +14827,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_4a_out0_gbc() {
@@ -15411,7 +14847,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15436,7 +14871,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_halt_m0stat_scx3_4b_out2_gbc() {
@@ -15457,7 +14891,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15482,7 +14915,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_m2stat_1_out2_gbc() {
@@ -15503,7 +14935,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15527,6 +14958,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycirq_m2stat_2_out3_gbc() {
@@ -15547,7 +14979,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15572,7 +15003,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_m2stat_3_out3_gbc() {
@@ -15593,7 +15023,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15618,7 +15047,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx2_1_out0_gbc() {
@@ -15639,7 +15067,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15664,7 +15091,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx2_2_out2_gbc() {
@@ -15685,7 +15111,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15710,7 +15135,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx2_ds_2_out2_gbc() {
@@ -15731,7 +15155,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15756,7 +15179,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx3_1_out0_gbc() {
@@ -15777,7 +15199,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15801,6 +15222,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0int_m0stat_scx3_2_out2_gbc() {
@@ -15821,7 +15243,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15846,7 +15267,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx3_3_out2_gbc() {
@@ -15867,7 +15287,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15892,7 +15311,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx3_ds_2_out2_gbc() {
@@ -15913,7 +15331,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15938,7 +15355,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx4_1_out0_gbc() {
@@ -15959,7 +15375,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -15983,6 +15398,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0int_m0stat_scx4_2_out2_gbc() {
@@ -16003,7 +15419,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16028,7 +15443,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx4_3_out2_gbc() {
@@ -16049,7 +15463,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16074,7 +15487,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx5_1_out0_gbc() {
@@ -16095,7 +15507,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16120,7 +15531,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx5_2_out2_gbc() {
@@ -16141,7 +15551,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16166,7 +15575,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx2_1_out0_gbc() {
@@ -16187,7 +15595,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16212,7 +15619,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx2_2_out2_gbc() {
@@ -16233,7 +15639,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16258,7 +15663,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx2_ds_2_out2_gbc() {
@@ -16279,7 +15683,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16304,7 +15707,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx3_1_out0_gbc() {
@@ -16325,7 +15727,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16349,6 +15750,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx3_2_out2_gbc() {
@@ -16369,7 +15771,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16394,7 +15795,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx3_3_out2_gbc() {
@@ -16415,7 +15815,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16440,7 +15839,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx3_ds_2_out2_gbc() {
@@ -16461,7 +15859,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16486,7 +15883,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx4_1_out0_gbc() {
@@ -16507,7 +15903,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16531,6 +15926,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx4_2_out2_gbc() {
@@ -16551,7 +15947,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16576,7 +15971,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx4_3_out2_gbc() {
@@ -16597,7 +15991,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16622,7 +16015,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx5_1_out0_gbc() {
@@ -16643,7 +16035,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16668,7 +16059,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_m0stat_scx5_2_out2_gbc() {
@@ -16689,7 +16079,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16714,7 +16103,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1int_ly_1_out90_gbc() {
@@ -16735,7 +16123,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16759,6 +16146,7 @@ mod halt {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1int_ly_2_out91_gbc() {
@@ -16779,7 +16167,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16804,7 +16191,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1int_ly_3_out91_gbc() {
@@ -16825,7 +16211,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16850,7 +16235,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn noime_ifandie_halt_lda_3c_out3f_gbc() {
@@ -16871,7 +16255,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16896,7 +16279,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn noime_ifandie_halt_sra_outf1_gbc() {
@@ -16917,7 +16299,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16942,7 +16323,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn noime_ifandie_m2int_m0stat_1_out0_gbc() {
@@ -16963,7 +16343,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -16988,7 +16367,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn noime_ifandie_m2int_m0stat_2_out2_gbc() {
@@ -17009,7 +16387,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17034,7 +16411,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn noime_m2irq_m0stat_1_out0_gbc() {
@@ -17055,7 +16431,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17080,7 +16455,6 @@ mod halt {
     }
 
 
-
     #[test]
     #[ignore]
     fn noime_m2irq_m0stat_2_out2_gbc() {
@@ -17101,7 +16475,6 @@ mod halt {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -17131,7 +16504,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn if_and_ie_0_if_1_oute4_gbc() {
@@ -17152,7 +16524,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17177,7 +16548,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn if_and_ie_0_if_2_oute1_gbc() {
@@ -17198,7 +16568,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17223,7 +16592,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn if_and_ie_0_vector_1_out00_gbc() {
@@ -17244,7 +16612,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17269,7 +16636,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn if_and_ie_0_vector_2_out50_gbc() {
@@ -17290,7 +16656,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17315,7 +16680,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn if_and_ie_0_vector_3_out00_gbc() {
@@ -17336,7 +16700,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17361,7 +16724,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn if_and_ie_0_vector_4_out50_gbc() {
@@ -17382,7 +16744,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17407,7 +16768,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_if_via_sp_if_1_outfd_gbc() {
@@ -17428,7 +16788,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17453,7 +16812,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_if_via_sp_if_2_oute0_gbc() {
@@ -17474,7 +16832,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17499,7 +16856,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_retrigger_1_oute2_gbc() {
@@ -17520,7 +16876,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17545,7 +16900,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_retrigger_2_oute0_gbc() {
@@ -17566,7 +16920,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17591,7 +16944,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_retrigger_ds_2_oute0_gbc() {
@@ -17612,7 +16964,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17637,7 +16988,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_retrigger_scx1_1_oute2_gbc() {
@@ -17658,7 +17008,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17683,7 +17032,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_retrigger_scx1_2_oute0_gbc() {
@@ -17704,7 +17052,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17729,7 +17076,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_retrigger_scx1_ds_2_oute0_gbc() {
@@ -17750,7 +17096,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17775,7 +17120,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx2_1_out4_gbc() {
@@ -17796,7 +17140,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17821,7 +17164,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx2_2_out2_gbc() {
@@ -17842,7 +17184,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17867,7 +17208,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx2_halt_1_out4_gbc() {
@@ -17888,7 +17228,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17913,7 +17252,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx2_halt_2_out2_gbc() {
@@ -17934,7 +17272,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -17959,7 +17296,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx3_1_out4_gbc() {
@@ -17980,7 +17316,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18005,7 +17340,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx3_2_out2_gbc() {
@@ -18026,7 +17360,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18051,7 +17384,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx3_halt_1_out4_gbc() {
@@ -18072,7 +17404,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18097,7 +17428,6 @@ mod irq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m0irq_vs_tima_scx3_halt_2_out2_gbc() {
@@ -18118,7 +17448,6 @@ mod irq_precedence {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -18148,7 +17477,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc8fint_m1irq_ds_2_oute3_gbc() {
@@ -18169,7 +17497,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18194,7 +17521,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc8fint_m1stat_2_outc1_gbc() {
@@ -18215,7 +17541,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18240,7 +17565,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc8fint_m1stat_ds_2_outc1_gbc() {
@@ -18261,7 +17585,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18286,7 +17609,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc98int_ly_count_2_out9a_gbc() {
@@ -18307,7 +17629,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18332,7 +17653,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc98int_ly_count_ds_2_out9a_gbc() {
@@ -18353,7 +17673,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18378,7 +17697,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m0irq_count_scx1_ds_1_out90_gbc() {
@@ -18399,7 +17717,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18424,7 +17741,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m0irq_count_scx2_ds_1_out90_gbc() {
@@ -18445,7 +17761,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18470,7 +17785,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m0stat_count_scx1_ds_1_out90_gbc() {
@@ -18491,7 +17805,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18516,7 +17829,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m0stat_count_scx2_1_out90_gbc() {
@@ -18537,7 +17849,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18562,7 +17873,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m0stat_count_scx2_ds_1_out90_gbc() {
@@ -18583,7 +17893,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18608,7 +17917,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m0stat_count_scx3_1_out90_gbc() {
@@ -18629,7 +17937,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18654,7 +17961,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m2irq_count_1_out98_gbc() {
@@ -18675,7 +17981,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18700,7 +18005,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m2irq_count_ds_1_out98_gbc() {
@@ -18721,7 +18025,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18746,7 +18049,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m2stat_count_1_out91_gbc() {
@@ -18767,7 +18069,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18792,7 +18093,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m2stat_count_ds_1_out91_gbc() {
@@ -18813,7 +18113,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18838,7 +18137,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset1_lyc99int_m3stat_count_ds_1_out90_gbc() {
@@ -18859,7 +18157,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18884,7 +18181,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc8fint_m1irq_1_oute0_gbc() {
@@ -18905,7 +18201,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18930,7 +18225,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc8fint_m1stat_1_outc4_gbc() {
@@ -18951,7 +18245,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -18976,7 +18269,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc98int_ly_count_1_out99_gbc() {
@@ -18997,7 +18289,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19022,7 +18313,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc98int_ly_count_3_out9a_gbc() {
@@ -19043,7 +18333,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19068,7 +18357,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc99int_m0stat_count_scx1_2_out90_gbc() {
@@ -19089,7 +18377,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19114,7 +18401,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc99int_m0stat_count_scx2_2_out90_gbc() {
@@ -19135,7 +18421,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19160,7 +18445,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset2_lyc99int_m2irq_count_2_out90_gbc() {
@@ -19181,7 +18465,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19206,7 +18489,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc8fint_m1irq_2_oute3_gbc() {
@@ -19227,7 +18509,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19252,7 +18533,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc8fint_m1stat_2_outc1_gbc() {
@@ -19273,7 +18553,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19298,7 +18577,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc98int_ly_count_2_out9a_gbc() {
@@ -19319,7 +18597,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19344,7 +18621,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc99int_m0stat_count_scx0_2_out90_gbc() {
@@ -19365,7 +18641,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19390,7 +18665,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc99int_m0stat_count_scx1_2_out90_gbc() {
@@ -19411,7 +18685,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19436,7 +18709,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc99int_m2irq_count_2_out91_gbc() {
@@ -19457,7 +18729,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19482,7 +18753,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc99int_m2stat_count_2_out90_gbc() {
@@ -19503,7 +18773,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19528,7 +18797,6 @@ mod lcd_offset {
     }
 
 
-
     #[test]
     #[ignore]
     fn offset3_lyc99int_m3stat_count_2_out90_gbc() {
@@ -19549,7 +18817,6 @@ mod lcd_offset {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -19579,7 +18846,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_lycirq_ly44_lcdstat58_out2_gbc() {
@@ -19600,7 +18866,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19625,7 +18890,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_lycirq_ly44_lcdstat68_out0_gbc() {
@@ -19646,7 +18910,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19671,7 +18934,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_lycirq_ly90_lcdstat68_out1_gbc() {
@@ -19692,7 +18954,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19717,7 +18978,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_lycirq_ly91_lcdstat68_out2_gbc() {
@@ -19738,7 +18998,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19763,7 +19022,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_m0irq_ly00_lcdstat48_lyc00_out0_gbc() {
@@ -19784,7 +19042,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19809,7 +19066,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_m0irq_ly00_lcdstat48_lyc99_out2_gbc() {
@@ -19830,7 +19086,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19855,7 +19110,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_m0irq_ly00_lcdstat58_lyc00_out0_gbc() {
@@ -19876,7 +19130,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19901,7 +19154,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdirqprecedence_m0irq_ly00_lcdstat58_lyc99_out2_gbc() {
@@ -19922,7 +19174,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19947,7 +19198,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_ly00_lcdstat50_out0_gbc() {
@@ -19968,7 +19218,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -19993,7 +19242,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_ly44_lcdstat48_out2_gbc() {
@@ -20014,7 +19262,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20039,7 +19286,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_ly44_lcdstat50_out2_gbc() {
@@ -20060,7 +19306,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20085,7 +19330,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_ly8f_lcdstat50_out2_gbc() {
@@ -20106,7 +19350,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20131,7 +19374,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_ly91_lcdstat50_out0_gbc() {
@@ -20152,7 +19394,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20177,7 +19418,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycirq_ly99_lcdstat50_out0_gbc() {
@@ -20198,7 +19438,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20223,7 +19462,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly00_lcdstat18_out2_gbc() {
@@ -20244,7 +19482,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20269,7 +19506,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly44_lcdstat18_out2_gbc() {
@@ -20290,7 +19526,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20315,7 +19550,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly44_lcdstat28_out2_gbc() {
@@ -20336,7 +19570,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20361,7 +19594,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly44_lcdstat48_lyc43_out2_gbc() {
@@ -20382,7 +19614,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20407,7 +19638,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly44_lcdstat48_lyc44_out0_gbc() {
@@ -20428,7 +19658,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20453,7 +19682,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly44_lcdstat48_lyc45_out2_gbc() {
@@ -20474,7 +19702,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20499,7 +19726,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0irq_ly8f_lcdstat18_out2_gbc() {
@@ -20520,7 +19746,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20545,7 +19770,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_lcdstat18_out1_gbc() {
@@ -20566,7 +19790,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20591,7 +19814,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_lcdstat30_out3_gbc() {
@@ -20612,7 +19834,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20637,7 +19858,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_lcdstat50_lyc8f_out3_gbc() {
@@ -20658,7 +19878,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20683,7 +19902,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_lcdstat50_lyc90_out3_gbc() {
@@ -20704,7 +19922,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20729,7 +19946,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_lcdstat50_lyc91_out3_gbc() {
@@ -20750,7 +19966,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20775,7 +19990,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_ly00_lcdstat28_out2_gbc() {
@@ -20796,7 +20010,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20821,7 +20034,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_ly00_lcdstat30_out0_gbc() {
@@ -20842,7 +20054,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20867,7 +20078,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_ly44_lcdstat30_out2_gbc() {
@@ -20888,7 +20098,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20913,7 +20122,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_ly8f_lcdstat28_out0_gbc() {
@@ -20934,7 +20142,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -20959,7 +20166,6 @@ mod lcdirq_precedence {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_ly8f_lcdstat30_out2_gbc() {
@@ -20980,7 +20186,6 @@ mod lcdirq_precedence {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -21010,7 +20215,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly0stat_1_outc1_gbc() {
@@ -21031,7 +20235,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21056,7 +20259,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly0stat_2_outc0_gbc() {
@@ -21077,7 +20279,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21102,7 +20303,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly0stat_3_outc2_gbc() {
@@ -21123,7 +20323,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21148,7 +20347,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly0stat_ds_2_outc1_gbc() {
@@ -21169,7 +20367,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21194,7 +20391,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly153_1_out98_dmg() {
@@ -21215,7 +20411,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21240,7 +20435,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly153_2_out99_dmg() {
@@ -21261,7 +20455,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21286,7 +20479,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly153_3_out00_dmg() {
@@ -21307,7 +20499,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21332,7 +20523,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly153_ds_1_out98_gbc() {
@@ -21353,7 +20543,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21378,7 +20567,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly153_ds_3_out99_gbc() {
@@ -21399,7 +20587,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21424,7 +20611,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly153_ds_5_out00_gbc() {
@@ -21445,7 +20631,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21470,7 +20655,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly1_m2irq_1_oute0_gbc() {
@@ -21491,7 +20675,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21516,7 +20699,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_ly1_m2irq_2_oute2_gbc() {
@@ -21537,7 +20719,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21562,7 +20743,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0flag_1_outc1_gbc() {
@@ -21583,7 +20763,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21608,7 +20787,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0flag_2_outc5_gbc() {
@@ -21629,7 +20807,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21654,7 +20831,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0flag_3_outc4_gbc() {
@@ -21675,7 +20851,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21700,7 +20875,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0flag_4_outc0_gbc() {
@@ -21721,7 +20895,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21746,7 +20919,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0flag_ds_2_outc5_gbc() {
@@ -21767,7 +20939,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21792,7 +20963,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0flag_ds_4_outc2_gbc() {
@@ -21813,7 +20983,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21838,7 +21007,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_1_oute0_gbc() {
@@ -21859,7 +21027,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21884,7 +21051,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_2_oute2_gbc() {
@@ -21905,7 +21071,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21930,7 +21095,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_ds_2_oute2_gbc() {
@@ -21951,7 +21115,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -21976,7 +21139,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_ifw_1_oute2_gbc() {
@@ -21997,7 +21159,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22022,7 +21183,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_ifw_2_oute0_gbc() {
@@ -22043,7 +21203,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22068,7 +21227,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_ifw_ds_2_oute0_gbc() {
@@ -22089,7 +21247,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22114,7 +21271,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_late_retrigger_1_oute2_gbc() {
@@ -22135,7 +21291,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22160,7 +21315,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_late_retrigger_2_oute0_gbc() {
@@ -22181,7 +21335,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22206,7 +21359,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc0irq_late_retrigger_ds_2_oute0_gbc() {
@@ -22227,7 +21379,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22252,7 +21403,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153flag_1_outc1_gbc() {
@@ -22273,7 +21423,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22298,7 +21447,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153flag_2_outc5_gbc() {
@@ -22319,7 +21467,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22344,7 +21491,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153flag_3_outc1_gbc() {
@@ -22365,7 +21511,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22390,7 +21535,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153flag_ds_2_outc5_gbc() {
@@ -22411,7 +21555,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22436,7 +21579,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153flag_ds_4_outc1_gbc() {
@@ -22457,7 +21599,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22482,7 +21623,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_1_oute0_gbc() {
@@ -22503,7 +21643,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22528,7 +21667,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_2_oute2_gbc() {
@@ -22549,7 +21687,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22574,7 +21711,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_ds_2_oute2_gbc() {
@@ -22595,7 +21731,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22620,7 +21755,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_ifw_1_oute2_gbc() {
@@ -22641,7 +21775,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22666,7 +21799,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_ifw_2_oute0_gbc() {
@@ -22687,7 +21819,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22712,7 +21843,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_ifw_ds_2_oute0_gbc() {
@@ -22733,7 +21863,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22758,7 +21887,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_late_retrigger_1_oute2_gbc() {
@@ -22779,7 +21907,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22804,7 +21931,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_late_retrigger_2_oute0_gbc() {
@@ -22825,7 +21951,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22850,7 +21975,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_lyc153irq_late_retrigger_ds_2_oute0_gbc() {
@@ -22871,7 +21995,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22896,7 +22019,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m0irq_1_oute0_gbc() {
@@ -22917,7 +22039,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22942,7 +22063,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m0irq_2_oute2_gbc() {
@@ -22963,7 +22083,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -22988,7 +22107,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m2irq_1_oute0_gbc() {
@@ -23009,7 +22127,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23034,7 +22151,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m2irq_2_oute2_gbc() {
@@ -23055,7 +22171,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23080,7 +22195,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m2irq_ds_2_oute2_gbc() {
@@ -23101,7 +22215,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23126,7 +22239,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m2stat_1_outc2_gbc() {
@@ -23147,7 +22259,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23172,7 +22283,6 @@ mod ly0 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint152_m2stat_2_outc3_gbc() {
@@ -23193,7 +22303,6 @@ mod ly0 {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -23223,7 +22332,6 @@ mod lyc0int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0int_m0irq_1_out0_gbc() {
@@ -23244,7 +22352,6 @@ mod lyc0int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23269,7 +22376,6 @@ mod lyc0int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0int_m0irq_2_out2_gbc() {
@@ -23290,7 +22396,6 @@ mod lyc0int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23315,7 +22420,6 @@ mod lyc0int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0int_m0irq_ds_2_out2_gbc() {
@@ -23336,7 +22440,6 @@ mod lyc0int_m0irq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -23366,7 +22469,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_1_out0_gbc() {
@@ -23387,7 +22489,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23412,7 +22513,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_2_out2_gbc() {
@@ -23433,7 +22533,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23458,7 +22557,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_ifw_1_out2_gbc() {
@@ -23479,7 +22577,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23504,7 +22601,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_ifw_2_out0_gbc() {
@@ -23525,7 +22621,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23550,7 +22645,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_ifw_ds_2_out0_gbc() {
@@ -23571,7 +22665,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23596,7 +22689,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_late_retrigger_1_out2_gbc() {
@@ -23617,7 +22709,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23642,7 +22733,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_late_retrigger_2_out0_gbc() {
@@ -23663,7 +22753,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23688,7 +22777,6 @@ mod lyc153int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153int_m2irq_late_retrigger_ds_2_out0_gbc() {
@@ -23709,7 +22797,6 @@ mod lyc153int_m2irq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -23739,7 +22826,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn early_ff41_response_2_out7_gbc() {
@@ -23760,7 +22846,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23785,7 +22870,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn early_ff45_response_1_out0_gbc() {
@@ -23806,7 +22890,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23831,7 +22914,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn early_ff45_response_2_out7_gbc() {
@@ -23852,7 +22934,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23877,7 +22958,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff40_disable_1_out0_gbc() {
@@ -23898,7 +22978,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23923,7 +23002,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff40_disable_2_out2_gbc() {
@@ -23944,7 +23022,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -23969,7 +23046,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff41_disable_1_out0_gbc() {
@@ -23990,7 +23066,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24014,6 +23089,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ff41_disable_2_out2_gbc() {
@@ -24034,7 +23110,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24059,7 +23134,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff41_disable_3_out2_gbc() {
@@ -24080,7 +23154,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24105,7 +23178,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff41_disable_ds_2_out3_gbc() {
@@ -24126,7 +23198,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24151,7 +23222,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff41_reenable_1_out2_gbc() {
@@ -24172,7 +23242,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24197,7 +23266,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff41_reenable_2_out2_gbc() {
@@ -24218,7 +23286,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24243,7 +23310,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff41_reenable_3_out1_gbc() {
@@ -24264,7 +23330,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24289,7 +23354,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_disable_1_out1_gbc() {
@@ -24310,7 +23374,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24334,6 +23397,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ff45_disable_2_out3_gbc() {
@@ -24354,7 +23418,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24379,7 +23442,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_disable_3_out3_gbc() {
@@ -24400,7 +23462,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24425,7 +23486,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_disable_ds_2_out3_gbc() {
@@ -24446,7 +23506,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24471,7 +23530,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_1_out3_gbc() {
@@ -24492,7 +23550,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24516,6 +23573,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_2_out1_gbc() {
@@ -24536,7 +23594,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24560,6 +23617,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_3_out3_gbc() {
@@ -24580,7 +23638,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24605,7 +23662,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_4_out3_gbc() {
@@ -24626,7 +23682,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24651,7 +23706,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_ds_2_out1_gbc() {
@@ -24672,7 +23726,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24697,7 +23750,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_ds_4_out3_gbc() {
@@ -24718,7 +23770,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24743,7 +23794,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_ds_lcdoffset1_2_out0_gbc() {
@@ -24764,7 +23814,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24789,7 +23838,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_ds_lcdoffset1_4_out2_gbc() {
@@ -24810,7 +23858,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24835,7 +23882,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_enable_weirdpoint_lcdoffset1_2_out0_gbc() {
@@ -24856,7 +23902,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24881,7 +23926,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_reenable_1_out3_dmg() {
@@ -24902,7 +23946,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24927,7 +23970,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_reenable_2_out2_dmg() {
@@ -24948,7 +23990,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -24973,7 +24014,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn ff45_reenable_3_out1_dmg() {
@@ -24994,7 +24034,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25019,7 +24058,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_1_out2_dmg() {
@@ -25040,7 +24078,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25065,7 +24102,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_2_out2_dmg() {
@@ -25087,6 +24123,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_ff41_enable_2_out0_gbc() {
@@ -25107,7 +24144,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25132,7 +24168,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_3_out0_gbc() {
@@ -25153,7 +24188,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25178,7 +24212,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_after_m2int_disable_out2_gbc() {
@@ -25199,7 +24232,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25224,7 +24256,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_after_m2int_out2_gbc() {
@@ -25245,7 +24276,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25270,7 +24300,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_ds_2_out1_gbc() {
@@ -25291,7 +24320,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25316,7 +24344,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_ds_lcdoffset1_2_out0_gbc() {
@@ -25337,7 +24364,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25362,7 +24388,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff41_enable_lcdoffset1_2_out0_gbc() {
@@ -25383,7 +24408,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25408,7 +24432,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff45_enable_1_out3_gbc() {
@@ -25429,7 +24452,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25453,6 +24475,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_ff45_enable_2_out1_gbc() {
@@ -25473,7 +24496,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25498,7 +24520,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff45_enable_3_out1_gbc() {
@@ -25519,7 +24540,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25544,7 +24564,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff45_enable_after_m2int_out2_gbc() {
@@ -25565,7 +24584,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25590,7 +24608,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff45_enable_ds_2_out1_gbc() {
@@ -25611,7 +24628,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25636,7 +24652,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff45_enable_ds_lcdoffset1_2_out0_gbc() {
@@ -25657,7 +24672,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25682,7 +24696,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_ff45_enable_lcdoffset1_2_out0_gbc() {
@@ -25703,7 +24716,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25728,7 +24740,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdoff_lycirqen_1_oute2_gbc() {
@@ -25749,7 +24760,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25774,7 +24784,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdoff_lycirqen_2_oute0_gbc() {
@@ -25795,7 +24804,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25820,7 +24828,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdoff_lycirqen_3_oute0_gbc() {
@@ -25841,7 +24848,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25865,6 +24871,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lcdoff_lycirqen_4_oute0_gbc() {
@@ -25885,7 +24892,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25909,6 +24915,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc0_ff41_disable_1_oute0_gbc() {
@@ -25929,7 +24936,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -25954,7 +24960,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff41_disable_2_oute2_gbc() {
@@ -25975,7 +24980,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26000,7 +25004,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff41_disable_ds_2_oute2_gbc() {
@@ -26021,7 +25024,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26046,7 +25048,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_disable_1_oute0_gbc() {
@@ -26067,7 +25068,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26091,6 +25091,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc0_ff45_disable_2_oute2_gbc() {
@@ -26111,7 +25112,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26136,7 +25136,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_disable_3_oute2_gbc() {
@@ -26157,7 +25156,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26182,7 +25180,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_disable_ds_2_oute2_gbc() {
@@ -26203,7 +25200,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26228,7 +25224,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_enable_weirdpoint_1_oute2_gbc() {
@@ -26249,7 +25244,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26274,7 +25268,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_enable_weirdpoint_2_oute2_gbc() {
@@ -26295,7 +25288,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26320,7 +25312,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_enable_weirdpoint_3_oute2_gbc() {
@@ -26341,7 +25332,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26366,7 +25356,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_ff45_enable_weirdpoint_4_oute2_gbc() {
@@ -26387,7 +25376,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26412,7 +25400,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_late_ff45_enable_1_oute2_gbc() {
@@ -26433,7 +25420,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26457,6 +25443,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc0_late_ff45_enable_2_oute0_gbc() {
@@ -26477,7 +25464,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26502,7 +25488,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_late_ff45_enable_3_oute0_gbc() {
@@ -26523,7 +25508,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26548,7 +25532,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_m1disable_1_oute2_gbc() {
@@ -26569,7 +25552,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26593,6 +25575,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc0_m1disable_2_oute0_gbc() {
@@ -26613,7 +25596,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26638,7 +25620,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_m1disable_3_oute0_gbc() {
@@ -26659,7 +25640,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26684,7 +25664,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_m1disable_ds_2_oute0_gbc() {
@@ -26705,7 +25684,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26730,7 +25708,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_enable_m1disable_1_oute2_gbc() {
@@ -26751,7 +25728,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26775,6 +25751,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc153_late_enable_m1disable_2_oute0_gbc() {
@@ -26795,7 +25772,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26820,7 +25796,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_enable_m1disable_3_oute0_gbc() {
@@ -26841,7 +25816,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26866,7 +25840,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff41_enable_1_oute2_gbc() {
@@ -26887,7 +25860,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26911,6 +25883,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc153_late_ff41_enable_2_oute0_gbc() {
@@ -26931,7 +25904,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -26956,7 +25928,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff41_enable_ds_2_oute0_gbc() {
@@ -26977,7 +25948,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27002,7 +25972,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff41_enable_ds_lcdoffset1_2_oute0_gbc() {
@@ -27023,7 +25992,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27048,7 +26016,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff41_enable_lcdoffset1_2_oute0_gbc() {
@@ -27069,7 +26036,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27094,7 +26060,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_1_oute2_gbc() {
@@ -27115,7 +26080,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27139,6 +26103,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_2_oute0_gbc() {
@@ -27159,7 +26124,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27183,6 +26147,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_3_oute2_gbc() {
@@ -27203,7 +26168,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27227,6 +26191,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_4_oute0_gbc() {
@@ -27247,7 +26212,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27272,7 +26236,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_5_oute0_gbc() {
@@ -27293,7 +26256,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27318,7 +26280,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_ds_2_oute0_gbc() {
@@ -27339,7 +26300,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27364,7 +26324,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_ds_4_oute2_gbc() {
@@ -27385,7 +26344,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27410,7 +26368,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_ds_6_oute0_gbc() {
@@ -27431,7 +26388,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27456,7 +26412,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_ds_lcdoffset1_2_oute0_gbc() {
@@ -27477,7 +26432,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27502,7 +26456,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_ff45_enable_lcdoffset1_2_oute0_gbc() {
@@ -27523,7 +26476,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27548,7 +26500,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_m1disable_1_oute2_gbc() {
@@ -27569,7 +26520,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27593,6 +26543,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc153_late_m1disable_2_oute0_gbc() {
@@ -27613,7 +26564,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27638,7 +26588,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_late_m1disable_3_oute0_gbc() {
@@ -27659,7 +26608,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27684,7 +26632,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc153_m1disable_ds_2_oute0_gbc() {
@@ -27705,7 +26652,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27730,7 +26676,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_1_out2_gbc() {
@@ -27751,7 +26696,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27776,7 +26720,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_2_out2_gbc() {
@@ -27797,7 +26740,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27822,7 +26764,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_3_out2_gbc() {
@@ -27843,7 +26784,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27868,7 +26808,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_4_out2_gbc() {
@@ -27889,7 +26828,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27914,7 +26852,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_5_out2_gbc() {
@@ -27935,7 +26872,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -27960,7 +26896,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_ds_2_out2_gbc() {
@@ -27981,7 +26916,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28006,7 +26940,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_ds_4_out2_gbc() {
@@ -28027,7 +26960,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28052,7 +26984,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_enable_ds_6_out2_gbc() {
@@ -28073,7 +27004,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28098,7 +27028,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_trigger_delay_1_out0_gbc() {
@@ -28119,7 +27048,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28144,7 +27072,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff41_trigger_delay_2_out2_gbc() {
@@ -28165,7 +27092,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28190,7 +27116,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff45_disable2_1_out1_gbc() {
@@ -28211,7 +27136,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28235,6 +27159,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc_ff45_disable2_2_out3_gbc() {
@@ -28255,7 +27180,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28280,7 +27204,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff45_disable2_3_out3_gbc() {
@@ -28301,7 +27224,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28326,7 +27248,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff45_disable2_ds_2_out3_gbc() {
@@ -28347,7 +27268,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28372,7 +27292,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff45_trigger_delay_1_out0_gbc() {
@@ -28393,7 +27312,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28417,6 +27335,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc_ff45_trigger_delay_2_out2_gbc() {
@@ -28437,7 +27356,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28462,7 +27380,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff45_trigger_delay_3_out2_gbc() {
@@ -28483,7 +27400,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28508,7 +27424,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc_ff45_trigger_delay_ds_2_out2_gbc() {
@@ -28529,7 +27444,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28554,7 +27468,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly00_stat50_1_oute0_gbc() {
@@ -28575,7 +27488,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28599,6 +27511,7 @@ mod lycenable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly00_stat50_2_oute2_gbc() {
@@ -28619,7 +27532,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28644,7 +27556,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly00_stat50_3_oute2_gbc() {
@@ -28665,7 +27576,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28690,7 +27600,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly00_stat50_ds_2_oute2_gbc() {
@@ -28711,7 +27620,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28736,7 +27644,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly00_stat50_ds_lcdoffset1_2_oute2_gbc() {
@@ -28757,7 +27664,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28782,7 +27688,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly00_stat50_lcdoffset1_2_oute2_gbc() {
@@ -28803,7 +27708,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28828,7 +27732,6 @@ mod lycenable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_ly94_stat50_oute0_gbc() {
@@ -28849,7 +27752,6 @@ mod lycenable {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -28879,7 +27781,6 @@ mod lycint_ly {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_ly_1_out5_gbc() {
@@ -28900,7 +27801,6 @@ mod lycint_ly {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28925,7 +27825,6 @@ mod lycint_ly {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_ly_2_out6_gbc() {
@@ -28946,7 +27845,6 @@ mod lycint_ly {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -28971,7 +27869,6 @@ mod lycint_ly {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_ly_ds_2_out6_gbc() {
@@ -28992,7 +27889,6 @@ mod lycint_ly {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -29022,7 +27918,6 @@ mod lycint_lycflag {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycflag_1_out0_gbc() {
@@ -29043,7 +27938,6 @@ mod lycint_lycflag {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29068,7 +27962,6 @@ mod lycint_lycflag {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycflag_2_out6_gbc() {
@@ -29089,7 +27982,6 @@ mod lycint_lycflag {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29114,7 +28006,6 @@ mod lycint_lycflag {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycflag_3_out4_gbc() {
@@ -29135,7 +28026,6 @@ mod lycint_lycflag {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29160,7 +28050,6 @@ mod lycint_lycflag {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycflag_4_out0_gbc() {
@@ -29181,7 +28070,6 @@ mod lycint_lycflag {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29206,7 +28094,6 @@ mod lycint_lycflag {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycflag_ds_2_out6_gbc() {
@@ -29227,7 +28114,6 @@ mod lycint_lycflag {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29252,7 +28138,6 @@ mod lycint_lycflag {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycflag_ds_4_out2_gbc() {
@@ -29273,7 +28158,6 @@ mod lycint_lycflag {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -29303,7 +28187,6 @@ mod lycint_lycirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycirq_1_out1_gbc() {
@@ -29324,7 +28207,6 @@ mod lycint_lycirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29349,7 +28231,6 @@ mod lycint_lycirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_lycirq_2_out3_gbc() {
@@ -29370,7 +28251,6 @@ mod lycint_lycirq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -29400,7 +28280,6 @@ mod lycint_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m0stat_1_out0_gbc() {
@@ -29421,7 +28300,6 @@ mod lycint_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29446,7 +28324,6 @@ mod lycint_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m0stat_2_out2_gbc() {
@@ -29467,7 +28344,6 @@ mod lycint_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29492,7 +28368,6 @@ mod lycint_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m0stat_ds_2_out2_gbc() {
@@ -29513,7 +28388,6 @@ mod lycint_m0stat {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -29543,7 +28417,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0m2int_m2irq_1_out0_gbc() {
@@ -29564,7 +28437,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29589,7 +28461,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0m2int_m2irq_2_out2_gbc() {
@@ -29610,7 +28481,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29635,7 +28505,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0m2int_stat_out1_gbc() {
@@ -29656,7 +28525,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29681,7 +28549,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycm2int_m0stat_1_out0_gbc() {
@@ -29702,7 +28569,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29727,7 +28593,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycm2int_m0stat_2_out2_gbc() {
@@ -29748,7 +28613,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29773,7 +28637,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycm2int_m2irq_1_out1_gbc() {
@@ -29794,7 +28657,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29819,7 +28681,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycm2int_m2irq_2_out3_gbc() {
@@ -29840,7 +28701,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29865,7 +28725,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_before_lycint_1_out1_gbc() {
@@ -29886,7 +28745,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -29911,7 +28769,6 @@ mod lycm2int {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2irq_before_lycint_2_out3_gbc() {
@@ -29932,7 +28789,6 @@ mod lycm2int {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -29962,7 +28818,6 @@ mod lywrite {
     }
 
 
-
     #[test]
     #[ignore]
     fn lywrite77_ly44_m3_ly_out44_gbc() {
@@ -29983,7 +28838,6 @@ mod lywrite {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30008,7 +28862,6 @@ mod lywrite {
     }
 
 
-
     #[test]
     #[ignore]
     fn lywrite77_ly44_m3_stat_outc7_gbc() {
@@ -30029,7 +28882,6 @@ mod lywrite {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30054,7 +28906,6 @@ mod lywrite {
     }
 
 
-
     #[test]
     #[ignore]
     fn lywrite77_ly97_ly_out97_gbc() {
@@ -30075,7 +28926,6 @@ mod lywrite {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30100,7 +28950,6 @@ mod lywrite {
     }
 
 
-
     #[test]
     #[ignore]
     fn lywrite77_ly97_stat_outc5_gbc() {
@@ -30121,7 +28970,6 @@ mod lywrite {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -30151,7 +28999,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_1_out0_gbc() {
@@ -30172,7 +29019,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30196,6 +29042,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn disable_2_out2_gbc() {
@@ -30216,7 +29063,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30241,7 +29087,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_3_out2_gbc() {
@@ -30262,7 +29107,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30287,7 +29131,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_ds_2_out3_gbc() {
@@ -30308,7 +29151,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30333,7 +29175,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx1_1_out0_gbc() {
@@ -30354,7 +29195,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30379,7 +29219,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx1_2_out2_gbc() {
@@ -30400,7 +29239,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30425,7 +29263,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx2_1_out0_gbc() {
@@ -30446,7 +29283,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30471,7 +29307,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx2_2_out2_gbc() {
@@ -30492,7 +29327,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30517,7 +29351,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx3_1_out0_gbc() {
@@ -30538,7 +29371,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30562,6 +29394,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn disable_scx3_2_out2_gbc() {
@@ -30582,7 +29415,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30607,7 +29439,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx3_3_out2_gbc() {
@@ -30628,7 +29459,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30653,7 +29483,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx4_1_out0_gbc() {
@@ -30674,7 +29503,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30698,6 +29526,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn disable_scx4_2_out2_gbc() {
@@ -30718,7 +29547,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30743,7 +29571,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx4_3_out2_gbc() {
@@ -30764,7 +29591,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30789,7 +29615,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx5_1_out0_gbc() {
@@ -30810,7 +29635,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30835,7 +29659,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx5_2_out2_gbc() {
@@ -30856,7 +29679,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30881,7 +29703,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx5_ds_2_out3_gbc() {
@@ -30902,7 +29723,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30927,7 +29747,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx7_1_out0_gbc() {
@@ -30948,7 +29767,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -30972,6 +29790,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn disable_scx7_2_out2_gbc() {
@@ -30992,7 +29811,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31017,7 +29835,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_scx7_3_out2_gbc() {
@@ -31038,7 +29855,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31063,7 +29879,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lyc_during_1_out0_gbc() {
@@ -31084,7 +29899,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31109,7 +29923,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lyc_during_2_out0_gbc() {
@@ -31130,7 +29943,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31155,7 +29967,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lyc_prior_1_out2_gbc() {
@@ -31176,7 +29987,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31201,7 +30011,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lyc_prior_2_out0_gbc() {
@@ -31222,7 +30031,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31247,7 +30055,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_m2_during_1_out2_gbc() {
@@ -31268,7 +30075,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31293,7 +30099,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_m2_during_2_out2_gbc() {
@@ -31314,7 +30119,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31339,7 +30143,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_m2_prior_1_out2_gbc() {
@@ -31360,7 +30163,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31385,7 +30187,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_m2_prior_2_out2_gbc() {
@@ -31406,7 +30207,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31431,7 +30231,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_before_lycint_1_out0_gbc() {
@@ -31452,7 +30251,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31477,7 +30275,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_before_lycint_2_out2_gbc() {
@@ -31498,7 +30295,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31523,7 +30319,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_twice_1_out0_gbc() {
@@ -31544,7 +30339,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31569,7 +30363,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_wxa6_2x_spxa7_1_out2_gbc() {
@@ -31590,7 +30383,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31615,7 +30407,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_wxa6_2x_spxa7_2_out2_gbc() {
@@ -31636,7 +30427,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31661,7 +30451,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_wxa6_2x_spxa7_3_out2_gbc() {
@@ -31682,7 +30471,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31707,7 +30495,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_wxa6_2x_spxa7_4_out2_gbc() {
@@ -31728,7 +30515,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31753,7 +30539,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_wxa6_2x_spxa7_ds_2_out2_gbc() {
@@ -31774,7 +30559,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31799,7 +30583,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_wxa6_2x_spxa7_ds_4_out2_gbc() {
@@ -31820,7 +30603,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31845,7 +30627,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_1_out2_gbc() {
@@ -31866,7 +30647,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31890,6 +30670,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_enable_2_out0_gbc() {
@@ -31910,7 +30691,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31935,7 +30715,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_3_out0_gbc() {
@@ -31956,7 +30735,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -31981,7 +30759,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ds_2_out1_gbc() {
@@ -32002,7 +30779,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32027,7 +30803,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ds_lcdoffset1_2_out0_gbc() {
@@ -32048,7 +30823,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32073,7 +30847,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_lcdoffset1_2_out0_gbc() {
@@ -32094,7 +30867,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32119,7 +30891,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_1_out2_gbc() {
@@ -32140,7 +30911,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32164,6 +30934,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff41_2_out0_gbc() {
@@ -32184,7 +30955,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32209,7 +30979,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_3_out0_gbc() {
@@ -32230,7 +30999,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32255,7 +31023,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_ds_2_out0_gbc() {
@@ -32276,7 +31043,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32301,7 +31067,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx1_1_out2_gbc() {
@@ -32322,7 +31087,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32347,7 +31111,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx1_2_out0_gbc() {
@@ -32368,7 +31131,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32393,7 +31155,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx1_ds_2_out0_gbc() {
@@ -32414,7 +31175,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32439,7 +31199,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx2_1_out2_gbc() {
@@ -32460,7 +31219,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32485,7 +31243,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx2_2_out0_gbc() {
@@ -32506,7 +31263,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32531,7 +31287,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx3_1_out2_gbc() {
@@ -32552,7 +31307,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32576,6 +31330,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx3_2_out0_gbc() {
@@ -32596,7 +31351,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32621,7 +31375,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff41_scx3_3_out0_gbc() {
@@ -32642,7 +31395,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32667,7 +31419,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_1_out2_gbc() {
@@ -32688,7 +31439,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32712,6 +31462,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff45_2_out0_gbc() {
@@ -32732,7 +31483,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32756,6 +31506,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff45_3_out0_gbc() {
@@ -32776,7 +31527,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32801,7 +31551,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_4_out0_gbc() {
@@ -32822,7 +31571,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32847,7 +31595,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx1_1_out2_dmg() {
@@ -32868,7 +31615,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32893,7 +31639,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx1_2_out2_dmg() {
@@ -32915,6 +31660,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx1_2_out0_gbc() {
@@ -32935,7 +31681,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -32960,7 +31705,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx1_3_out0_gbc() {
@@ -32981,7 +31725,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33006,7 +31749,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx1_ds_2_out0_gbc() {
@@ -33027,7 +31769,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33052,7 +31793,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx2_1_out2_gbc() {
@@ -33073,7 +31813,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33097,6 +31836,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx2_2_out0_gbc() {
@@ -33117,7 +31857,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33142,7 +31881,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx2_3_out0_gbc() {
@@ -33163,7 +31901,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33188,7 +31925,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx3_1_out2_gbc() {
@@ -33209,7 +31945,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33233,6 +31968,7 @@ mod m0enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx3_2_out0_gbc() {
@@ -33253,7 +31989,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33278,7 +32013,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycdisable_ff45_scx3_3_out0_gbc() {
@@ -33299,7 +32033,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33324,7 +32057,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_1_out2_gbc() {
@@ -33345,7 +32077,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33370,7 +32101,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_2_out2_gbc() {
@@ -33391,7 +32121,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33416,7 +32145,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_3_out2_gbc() {
@@ -33437,7 +32165,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33462,7 +32189,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_4_out2_gbc() {
@@ -33483,7 +32209,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33508,7 +32233,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_5_out2_gbc() {
@@ -33529,7 +32253,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33554,7 +32277,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_ds_2_out2_gbc() {
@@ -33575,7 +32297,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33600,7 +32321,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_ds_4_out2_gbc() {
@@ -33621,7 +32341,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33646,7 +32365,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_ds_6_out2_gbc() {
@@ -33667,7 +32385,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33692,7 +32409,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_enable_ds_8_out2_gbc() {
@@ -33713,7 +32429,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33738,7 +32453,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_trigger_delay_1_out0_gbc() {
@@ -33759,7 +32473,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33784,7 +32497,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0_trigger_delay_2_out2_gbc() {
@@ -33805,7 +32517,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33830,7 +32541,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn reenable_1_out2_gbc() {
@@ -33851,7 +32561,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33876,7 +32585,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn reenable_2_out2_gbc() {
@@ -33897,7 +32605,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -33922,7 +32629,6 @@ mod m0enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn reenable_3_out0_gbc() {
@@ -33943,7 +32649,6 @@ mod m0enable {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -33973,7 +32678,6 @@ mod m0int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0irq_1_out0_gbc() {
@@ -33994,7 +32698,6 @@ mod m0int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34019,7 +32722,6 @@ mod m0int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0irq_2_out2_gbc() {
@@ -34040,7 +32742,6 @@ mod m0int_m0irq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -34070,7 +32771,6 @@ mod m0int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_ds_2_out2_gbc() {
@@ -34091,7 +32791,6 @@ mod m0int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34116,7 +32815,6 @@ mod m0int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx2_1_out0_gbc() {
@@ -34137,7 +32835,6 @@ mod m0int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34162,7 +32859,6 @@ mod m0int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx2_2_out2_gbc() {
@@ -34183,7 +32879,6 @@ mod m0int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34208,7 +32903,6 @@ mod m0int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx3_1_out0_gbc() {
@@ -34229,7 +32923,6 @@ mod m0int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34254,7 +32947,6 @@ mod m0int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx3_2_out2_gbc() {
@@ -34275,7 +32967,6 @@ mod m0int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34300,7 +32991,6 @@ mod m0int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m0stat_scx5_ds_2_out2_gbc() {
@@ -34321,7 +33011,6 @@ mod m0int_m0stat {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -34351,7 +33040,6 @@ mod m0int_m3stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m3stat_1_out3_gbc() {
@@ -34372,7 +33060,6 @@ mod m0int_m3stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34397,7 +33084,6 @@ mod m0int_m3stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m3stat_2_out0_gbc() {
@@ -34418,7 +33104,6 @@ mod m0int_m3stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34443,7 +33128,6 @@ mod m0int_m3stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0int_m3stat_ds_2_out0_gbc() {
@@ -34464,7 +33148,6 @@ mod m0int_m3stat {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -34494,7 +33177,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m0enable_1_out3_gbc() {
@@ -34515,7 +33197,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34539,6 +33220,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ly143_late_m0enable_2_out1_gbc() {
@@ -34559,7 +33241,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34584,7 +33265,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m0enable_ds_2_out1_gbc() {
@@ -34605,7 +33285,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34630,7 +33309,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m0enable_ds_lcdoffset1_2_out1_gbc() {
@@ -34651,7 +33329,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34676,7 +33353,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m0enable_lcdoffset1_2_out1_gbc() {
@@ -34697,7 +33373,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34722,7 +33397,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m2enable_1_out3_gbc() {
@@ -34743,7 +33417,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34767,6 +33440,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ly143_late_m2enable_2_out1_gbc() {
@@ -34787,7 +33461,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34812,7 +33485,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m2enable_ds_2_out1_gbc() {
@@ -34833,7 +33505,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34858,7 +33529,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn ly143_late_m2enable_ds_lcdoffset1_2_out1_gbc() {
@@ -34879,7 +33549,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34904,7 +33573,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc143_late_m0enable_lycdisable_1_out1_gbc() {
@@ -34925,7 +33593,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34950,7 +33617,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc143_late_m0enable_lycdisable_2_out1_gbc() {
@@ -34971,7 +33637,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -34995,6 +33660,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc143_late_m0enable_lycdisable_3_out1_gbc() {
@@ -35015,7 +33681,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35040,7 +33705,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc143_late_m0enable_lycdisable_ds_2_out1_gbc() {
@@ -35061,7 +33725,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35086,7 +33749,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc143_late_m2enable_lycdisable_1_out3_gbc() {
@@ -35107,7 +33769,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35132,7 +33793,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc143_late_m2enable_lycdisable_2_out1_gbc() {
@@ -35153,7 +33813,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35177,6 +33836,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc143_late_m2enable_lycdisable_3_out1_gbc() {
@@ -35197,7 +33857,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35222,7 +33881,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc143_late_m2enable_lycdisable_ds_2_out1_gbc() {
@@ -35243,7 +33901,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35268,7 +33925,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc147_ly148_push_m1irq_late_enable_out3_gbc() {
@@ -35289,7 +33945,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35314,7 +33969,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc147_ly148_push_m1irq_late_enable_out2_gbc() {
@@ -35335,7 +33989,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35360,7 +34013,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc148_ly148_m1irq_late_enable_out0_gbc() {
@@ -35381,7 +34033,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35406,7 +34057,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc148_ly148_push_m1irq_late_enable_out0_gbc() {
@@ -35427,7 +34077,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35452,7 +34101,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_1_out0_gbc() {
@@ -35473,7 +34121,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35498,7 +34145,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_2_out3_gbc() {
@@ -35519,7 +34165,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35544,7 +34189,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_ds_2_out3_gbc() {
@@ -35565,7 +34209,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35590,7 +34233,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_ifw_1_out3_gbc() {
@@ -35611,7 +34253,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35636,7 +34277,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_ifw_2_out0_gbc() {
@@ -35657,7 +34297,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35682,7 +34321,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_ifw_ds_2_out0_gbc() {
@@ -35703,7 +34341,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35728,7 +34365,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_late_retrigger_1_out3_gbc() {
@@ -35749,7 +34385,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35774,7 +34409,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_late_retrigger_2_out1_gbc() {
@@ -35795,7 +34429,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35820,7 +34453,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint143_m1irq_late_retrigger_ds_2_out1_gbc() {
@@ -35841,7 +34473,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35866,7 +34497,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m1intirq_1_out3_gbc() {
@@ -35887,7 +34517,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35912,7 +34541,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m1intirq_2_out1_gbc() {
@@ -35933,7 +34561,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -35958,7 +34585,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m1stat_1_out0_gbc() {
@@ -35979,7 +34605,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36004,7 +34629,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_m1stat_2_out1_gbc() {
@@ -36025,7 +34649,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36050,7 +34673,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankintirq_1_out1_gbc() {
@@ -36071,7 +34693,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36096,7 +34717,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankintirq_2_out0_gbc() {
@@ -36117,7 +34737,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36142,7 +34761,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankirq_1_out0_gbc() {
@@ -36163,7 +34781,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36188,7 +34805,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankirq_2_out1_gbc() {
@@ -36209,7 +34825,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36234,7 +34849,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankirq_late_retrigger_1_out1_gbc() {
@@ -36255,7 +34869,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36280,7 +34893,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankirq_late_retrigger_2_out0_gbc() {
@@ -36301,7 +34913,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36326,7 +34937,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycint_vblankirq_late_retrigger_ds_2_out0_gbc() {
@@ -36347,7 +34957,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36371,6 +34980,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1irq_disable_1_out1_gbc() {
@@ -36391,7 +35001,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36416,7 +35025,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_disable_2_out3_gbc() {
@@ -36437,7 +35045,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36462,7 +35069,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_disable_ds_2_out3_gbc() {
@@ -36483,7 +35089,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36508,7 +35113,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_1_out3_gbc() {
@@ -36529,7 +35133,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36554,7 +35157,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_2_out3_gbc() {
@@ -36575,7 +35177,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36600,7 +35201,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_3_out3_gbc() {
@@ -36621,7 +35221,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36646,7 +35245,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_4_out3_gbc() {
@@ -36667,7 +35265,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36692,7 +35289,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_after_lyc144_1_out1_gbc() {
@@ -36713,7 +35309,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36737,6 +35332,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1irq_enable_after_lyc144_2_out3_gbc() {
@@ -36757,7 +35353,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36782,7 +35377,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_after_lyc144_3_out3_gbc() {
@@ -36803,7 +35397,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36828,7 +35421,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_ds_1_out3_gbc() {
@@ -36849,7 +35441,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36874,7 +35465,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_enable_ds_3_out3_gbc() {
@@ -36895,7 +35485,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36920,7 +35509,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_late_enable_1_out2_dmg() {
@@ -36941,7 +35529,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -36966,7 +35553,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_late_enable_2_out2_dmg() {
@@ -36988,6 +35574,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1irq_late_enable_2_out0_gbc() {
@@ -37008,7 +35595,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37033,7 +35619,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_late_enable_3_out0_gbc() {
@@ -37054,7 +35639,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37079,7 +35663,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_late_enable_ds_2_out0_gbc() {
@@ -37100,7 +35683,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37125,7 +35707,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_late_enable_ds_lcdoffset1_2_out0_gbc() {
@@ -37146,7 +35727,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37171,7 +35751,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_late_enable_lcdoffset1_2_out0_gbc() {
@@ -37192,7 +35771,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37217,7 +35795,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0disable_1_out3_gbc() {
@@ -37238,7 +35815,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37262,6 +35838,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1irq_m0disable_2_out1_gbc() {
@@ -37282,7 +35859,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37307,7 +35883,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0disable_3_out1_gbc() {
@@ -37328,7 +35903,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37353,7 +35927,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0disable_ds_2_out1_gbc() {
@@ -37374,7 +35947,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37399,7 +35971,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0enable_1_out3_gbc() {
@@ -37420,7 +35991,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37445,7 +36015,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0enable_2_out3_gbc() {
@@ -37466,7 +36035,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37491,7 +36059,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0enable_3_out3_gbc() {
@@ -37512,7 +36079,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37537,7 +36103,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m0enable_ds_2_out3_gbc() {
@@ -37558,7 +36123,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37583,7 +36147,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2disable_lycdisable_1_out3_gbc() {
@@ -37604,7 +36167,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37628,6 +36190,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1irq_m2disable_lycdisable_2_out1_gbc() {
@@ -37648,7 +36211,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37673,7 +36235,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2disable_lycdisable_3_out1_gbc() {
@@ -37694,7 +36255,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37719,7 +36279,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2disable_lycdisable_ds_2_out1_gbc() {
@@ -37740,7 +36299,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37765,7 +36323,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_1_out3_gbc() {
@@ -37786,7 +36343,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37811,7 +36367,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_2_out3_gbc() {
@@ -37832,7 +36387,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37857,7 +36411,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_3_out3_gbc() {
@@ -37878,7 +36431,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37903,7 +36455,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_ds_2_out3_gbc() {
@@ -37924,7 +36475,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37949,7 +36499,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_lyc_1_out1_gbc() {
@@ -37970,7 +36519,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -37994,6 +36542,7 @@ mod m1 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1irq_m2enable_lyc_2_out3_gbc() {
@@ -38014,7 +36563,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38039,7 +36587,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_lyc_3_out3_gbc() {
@@ -38060,7 +36607,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38085,7 +36631,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1irq_m2enable_lyc_ds_2_out3_gbc() {
@@ -38106,7 +36651,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38131,7 +36675,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2m1irq_ifw_1_out3_gbc() {
@@ -38152,7 +36695,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38177,7 +36719,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2m1irq_ifw_2_out1_gbc() {
@@ -38198,7 +36739,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38223,7 +36763,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2m1irq_ifw_3_out0_gbc() {
@@ -38244,7 +36783,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38269,7 +36807,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2m1irq_ifw_ds_2_out1_gbc() {
@@ -38290,7 +36827,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38315,7 +36851,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn vblankint_lcd147_int_m1irq_enable_1_out2_dmg() {
@@ -38338,7 +36873,6 @@ mod m1 {
     }
 
 
-
     #[test]
     #[ignore]
     fn vblankint_lcd147_int_m1irq_enable_1_out2_gbc() {
@@ -38359,7 +36893,6 @@ mod m1 {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -38388,6 +36921,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn disable_1_out0_gbc() {
@@ -38408,7 +36942,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38433,7 +36966,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_2_out2_gbc() {
@@ -38454,7 +36986,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38479,7 +37010,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_by_m1enable_ly0_1_out2_gbc() {
@@ -38500,7 +37030,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38525,7 +37054,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_by_m1enable_ly0_2_out2_gbc() {
@@ -38546,7 +37074,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38571,7 +37098,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_ds_1_out1_gbc() {
@@ -38592,7 +37118,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38617,7 +37142,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_ly0_1_out2_dmg() {
@@ -38639,6 +37163,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn disable_ly0_1_out0_gbc() {
@@ -38659,7 +37184,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38684,7 +37208,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_ly0_2_out2_gbc() {
@@ -38705,7 +37228,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38730,7 +37252,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn disable_ly0_ds_2_out3_gbc() {
@@ -38751,7 +37272,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38776,7 +37296,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lycint_1_out1_gbc() {
@@ -38797,7 +37316,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38822,7 +37340,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lycint_2_out3_gbc() {
@@ -38843,7 +37360,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38868,7 +37384,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lycint_disable_1_out1_gbc() {
@@ -38889,7 +37404,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38914,7 +37428,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn enable_after_lycint_disable_2_out3_gbc() {
@@ -38935,7 +37448,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -38960,7 +37472,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_1_out2_gbc() {
@@ -38981,7 +37492,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39006,7 +37516,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_2_out0_gbc() {
@@ -39027,7 +37536,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39052,7 +37560,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_after_lycint_1_out0_gbc() {
@@ -39073,7 +37580,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39097,6 +37603,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_enable_after_lycint_2_out2_gbc() {
@@ -39117,7 +37624,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39142,7 +37648,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_after_lycint_3_out0_gbc() {
@@ -39163,7 +37668,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39188,7 +37692,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_after_lycint_4_out0_gbc() {
@@ -39209,7 +37712,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39234,7 +37736,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_after_lycint_disable_1_out2_gbc() {
@@ -39255,7 +37756,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39279,6 +37779,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_enable_after_lycint_disable_2_out2_gbc() {
@@ -39299,7 +37800,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39324,7 +37824,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_after_lycint_disable_3_out0_gbc() {
@@ -39345,7 +37844,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39370,7 +37868,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ds_2_out0_gbc() {
@@ -39391,7 +37888,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39416,7 +37912,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ds_lcdoffset1_2_out0_gbc() {
@@ -39437,7 +37932,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39462,7 +37956,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_lcdoffset2_2_out0_gbc() {
@@ -39483,7 +37976,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39508,7 +38000,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_lcdoffset3_2_out0_gbc() {
@@ -39529,7 +38020,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39554,7 +38044,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ly0_1_out2_gbc() {
@@ -39575,7 +38064,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39600,7 +38088,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ly0_2_out0_gbc() {
@@ -39621,7 +38108,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39646,7 +38132,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ly0_ds_2_out0_gbc() {
@@ -39667,7 +38152,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39692,7 +38176,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ly0_ds_lcdoffset1_2_out0_gbc() {
@@ -39713,7 +38196,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39738,7 +38220,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_ly0_lcdoffset2_2_out0_gbc() {
@@ -39759,7 +38240,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39784,7 +38264,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_m0disable_1_out2_gbc() {
@@ -39805,7 +38284,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39829,6 +38307,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_enable_m0disable_2_out2_gbc() {
@@ -39849,7 +38328,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39874,7 +38352,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_m0disable_3_out0_gbc() {
@@ -39895,7 +38372,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39920,7 +38396,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_m0disable_ds_2_out0_gbc() {
@@ -39941,7 +38416,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -39966,7 +38440,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_m1disable_ly0_1_out2_gbc() {
@@ -39987,7 +38460,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40011,6 +38483,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_enable_m1disable_ly0_2_out0_gbc() {
@@ -40031,7 +38504,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40056,7 +38528,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_m1disable_ly0_3_out0_gbc() {
@@ -40077,7 +38548,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40102,7 +38572,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_enable_m1disable_ly0_ds_2_out0_gbc() {
@@ -40123,7 +38592,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40148,7 +38616,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m1disable_ly0_1_out2_gbc() {
@@ -40169,7 +38636,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40193,6 +38659,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn late_m1disable_ly0_2_out0_gbc() {
@@ -40213,7 +38680,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40238,7 +38704,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_m1disable_ly0_3_out0_gbc() {
@@ -40259,7 +38724,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40284,7 +38748,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_late_m2enable_lycdisable_1_out2_gbc() {
@@ -40305,7 +38768,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40329,6 +38791,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc0_late_m2enable_lycdisable_2_out0_gbc() {
@@ -40349,7 +38812,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40374,7 +38836,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_late_m2enable_lycdisable_3_out0_gbc() {
@@ -40395,7 +38856,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40420,7 +38880,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc0_late_m2enable_lycdisable_ds_2_out0_gbc() {
@@ -40441,7 +38900,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40465,6 +38923,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc1_late_m2enable_lycdisable_1_out2_gbc() {
@@ -40485,7 +38944,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40510,7 +38968,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_late_m2enable_lycdisable_2_out0_gbc() {
@@ -40531,7 +38988,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40556,7 +39012,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_late_m2enable_lycdisable_ds_2_out0_gbc() {
@@ -40577,7 +39032,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40602,7 +39056,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lyc255_1_out2_dmg() {
@@ -40623,7 +39076,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40648,7 +39100,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lyc255_2_out2_dmg() {
@@ -40670,6 +39121,7 @@ mod m2enable {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lyc255_2_out0_gbc() {
@@ -40690,7 +39142,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40715,7 +39166,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lyc255_3_out0_gbc() {
@@ -40736,7 +39186,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40761,7 +39210,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lyc255_ds_2_out0_gbc() {
@@ -40782,7 +39230,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40807,7 +39254,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lycdisable_1_out2_gbc() {
@@ -40828,7 +39274,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40853,7 +39298,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lycdisable_2_out0_gbc() {
@@ -40874,7 +39318,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40899,7 +39342,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn lyc1_m2irq_late_lycdisable_ds_2_out0_gbc() {
@@ -40920,7 +39362,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40945,7 +39386,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2_late_m0disable_1_out2_gbc() {
@@ -40966,7 +39406,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -40991,7 +39430,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2_late_m0disable_2_out0_gbc() {
@@ -41012,7 +39450,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41037,7 +39474,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2_late_m0disable_ds_2_out0_gbc() {
@@ -41058,7 +39494,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41083,7 +39518,6 @@ mod m2enable {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2_late_m1disable_ly0_ds_2_out0_gbc() {
@@ -41104,7 +39538,6 @@ mod m2enable {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -41134,7 +39567,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_1_out0_gbc() {
@@ -41155,7 +39587,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41180,7 +39611,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_2_out2_gbc() {
@@ -41201,7 +39631,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41226,7 +39655,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_ds_2_out3_gbc() {
@@ -41247,7 +39675,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41272,7 +39699,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_1_out0_gbc() {
@@ -41293,7 +39719,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41318,7 +39743,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_2_out2_gbc() {
@@ -41339,7 +39763,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41364,7 +39787,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_di_1_out0_gbc() {
@@ -41385,7 +39807,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41410,7 +39831,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_di_1_out8_gbc() {
@@ -41431,7 +39851,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41456,7 +39875,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_ei_1_out0_gbc() {
@@ -41477,7 +39895,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41502,7 +39919,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_ei_2_out2_gbc() {
@@ -41523,7 +39939,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41548,7 +39963,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_ie_1_out0_gbc() {
@@ -41569,7 +39983,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41594,7 +40007,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_ie_2_out8_gbc() {
@@ -41615,7 +40027,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41640,7 +40051,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_reti_1_out0_gbc() {
@@ -41661,7 +40071,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41686,7 +40095,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx2_reti_2_out2_gbc() {
@@ -41707,7 +40115,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41732,7 +40139,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_1_out0_gbc() {
@@ -41753,7 +40159,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41778,7 +40183,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_2_out2_gbc() {
@@ -41799,7 +40203,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41824,7 +40227,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_di_1_out0_gbc() {
@@ -41845,7 +40247,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41870,7 +40271,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_di_2_out8_gbc() {
@@ -41891,7 +40291,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41916,7 +40315,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ei_1_out0_gbc() {
@@ -41937,7 +40335,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -41962,7 +40359,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ei_2_out2_gbc() {
@@ -41983,7 +40379,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42008,7 +40403,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ie_1_out0_gbc() {
@@ -42029,7 +40423,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42054,7 +40447,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ie_2_out8_gbc() {
@@ -42075,7 +40467,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42100,7 +40491,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ifw_1_out2_gbc() {
@@ -42121,7 +40511,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42146,7 +40535,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ifw_2_out0_gbc() {
@@ -42167,7 +40555,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42192,7 +40579,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ifw_3_out8_gbc() {
@@ -42213,7 +40599,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42238,7 +40623,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ifw_4_out0_gbc() {
@@ -42259,7 +40643,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42284,7 +40667,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_ifw_ds_2_out0_gbc() {
@@ -42305,7 +40687,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42330,7 +40711,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_reti_1_out0_gbc() {
@@ -42351,7 +40731,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42376,7 +40755,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx3_reti_2_out2_gbc() {
@@ -42397,7 +40775,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42422,7 +40799,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx4_ifw_1_out2_gbc() {
@@ -42443,7 +40819,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42468,7 +40843,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx4_ifw_2_out0_gbc() {
@@ -42489,7 +40863,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42514,7 +40887,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx4_ifw_3_out8_gbc() {
@@ -42535,7 +40907,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42560,7 +40931,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx4_ifw_4_out0_gbc() {
@@ -42581,7 +40951,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42606,7 +40975,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx4_ifw_ds_2_out0_gbc() {
@@ -42627,7 +40995,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42652,7 +41019,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx5_1_out0_gbc() {
@@ -42673,7 +41039,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42698,7 +41063,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx5_2_out2_gbc() {
@@ -42719,7 +41083,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42744,7 +41107,6 @@ mod m2int_m0irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0irq_scx5_ds_2_out3_gbc() {
@@ -42765,7 +41127,6 @@ mod m2int_m0irq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -42795,7 +41156,6 @@ mod m2int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0stat_1_out0_gbc() {
@@ -42816,7 +41176,6 @@ mod m2int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42841,7 +41200,6 @@ mod m2int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0stat_2_out2_gbc() {
@@ -42862,7 +41220,6 @@ mod m2int_m0stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42887,7 +41244,6 @@ mod m2int_m0stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m0stat_ds_2_out2_gbc() {
@@ -42908,7 +41264,6 @@ mod m2int_m0stat {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -42938,7 +41293,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_1_out0_gbc() {
@@ -42959,7 +41313,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -42984,7 +41337,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_2_out2_gbc() {
@@ -43005,7 +41357,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43030,7 +41381,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_ds_2_out3_gbc() {
@@ -43051,7 +41401,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43076,7 +41425,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_ifw_1_out2_gbc() {
@@ -43097,7 +41445,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43122,7 +41469,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_ifw_2_out0_gbc() {
@@ -43143,7 +41489,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43168,7 +41513,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_ifw_ds_2_out0_gbc() {
@@ -43189,7 +41533,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43214,7 +41557,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_late_retrigger_1_out2_gbc() {
@@ -43235,7 +41577,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43260,7 +41601,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_late_retrigger_2_out0_gbc() {
@@ -43281,7 +41621,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43306,7 +41645,6 @@ mod m2int_m2irq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2irq_late_retrigger_ds_2_out0_gbc() {
@@ -43327,7 +41665,6 @@ mod m2int_m2irq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -43357,7 +41694,6 @@ mod m2int_m2stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2stat_1_out2_gbc() {
@@ -43378,7 +41714,6 @@ mod m2int_m2stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43403,7 +41738,6 @@ mod m2int_m2stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2stat_2_out3_gbc() {
@@ -43424,7 +41758,6 @@ mod m2int_m2stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43449,7 +41782,6 @@ mod m2int_m2stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m2stat_ds_2_out3_gbc() {
@@ -43470,7 +41802,6 @@ mod m2int_m2stat {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -43495,7 +41826,6 @@ mod m2int_m2stat {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_scx4_m2stat_ds_2_out3_gbc() {
@@ -43516,12 +41846,12 @@ mod m2int_m2stat {
 
         run_test_case(test_case);
     }
-
 }
 
 
 mod m2int_m3stat {
     use super::*;
+
 
     mod nobg {
         use super::*;
@@ -43549,7 +41879,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_nobg_m3stat_2_out0_gbc() {
@@ -43570,7 +41899,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43595,7 +41923,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_nobg_scx7_m3stat_2_out0_gbc() {
@@ -43616,7 +41943,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -43646,7 +41972,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx4_1_out3_gbc() {
@@ -43667,7 +41992,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43692,7 +42016,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx4_2_out0_gbc() {
@@ -43713,7 +42036,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43738,7 +42060,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx4_ds_2_out0_gbc() {
@@ -43759,7 +42080,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43784,7 +42104,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx1_m3stat_ds_2_out0_gbc() {
@@ -43805,7 +42124,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43830,7 +42148,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx2_m3stat_1_out3_gbc() {
@@ -43851,7 +42168,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43876,7 +42192,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx2_m3stat_2_out0_gbc() {
@@ -43897,7 +42212,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43922,7 +42236,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx2_m3stat_ds_2_out0_gbc() {
@@ -43943,7 +42256,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -43968,7 +42280,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx3_m3stat_1_out3_gbc() {
@@ -43989,7 +42300,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44014,7 +42324,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx3_m3stat_2_out0_gbc() {
@@ -44035,7 +42344,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44060,7 +42368,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx3_m3stat_ds_2_out0_gbc() {
@@ -44081,7 +42388,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44106,7 +42412,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx4_m3stat_ds_2_out0_gbc() {
@@ -44127,7 +42432,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44152,7 +42456,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx5_m3stat_1_out3_gbc() {
@@ -44173,7 +42476,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44198,7 +42500,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx5_m3stat_2_out0_gbc() {
@@ -44219,7 +42520,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44244,7 +42544,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx5_m3stat_ds_2_out0_gbc() {
@@ -44265,7 +42564,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44290,7 +42588,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx6_m3stat_ds_2_out0_gbc() {
@@ -44311,7 +42608,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44336,7 +42632,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx7_m3stat_ds_2_out0_gbc() {
@@ -44357,7 +42652,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44382,7 +42676,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_scx8_m3stat_ds_2_out0_gbc() {
@@ -44403,7 +42696,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -44433,7 +42725,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_m3stat_1_out3_gbc() {
@@ -44454,7 +42745,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44479,7 +42769,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_m3stat_2_out0_gbc() {
@@ -44500,7 +42789,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -44525,7 +42813,6 @@ mod m2int_m3stat {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_m3stat_ds_2_out0_gbc() {
@@ -44546,7 +42833,6 @@ mod m2int_m3stat {
 
             run_test_case(test_case);
         }
-
     }
 }
 
@@ -44577,7 +42863,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lcdoff_statirqen_if_oute0_gbc() {
@@ -44598,7 +42883,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44623,7 +42907,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycflag_statwirq_2_out2_dmg() {
@@ -44644,7 +42927,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44669,7 +42951,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycflag_statwirq_4_out0_dmg() {
@@ -44690,7 +42971,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44714,6 +42994,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_00_00_out0_gbc() {
@@ -44734,7 +43015,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44758,6 +43038,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_00_40_out2_gbc() {
@@ -44778,7 +43059,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44802,6 +43082,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_00_bf_out0_gbc() {
@@ -44822,7 +43103,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44846,6 +43126,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_00_ff_out2_gbc() {
@@ -44866,7 +43147,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44891,7 +43171,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_40_00_out0_gbc() {
@@ -44912,7 +43191,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44937,7 +43215,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_40_40_out0_gbc() {
@@ -44958,7 +43235,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -44983,7 +43259,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_40_bf_out0_gbc() {
@@ -45004,7 +43279,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45029,7 +43303,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_40_ff_out0_gbc() {
@@ -45050,7 +43323,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45074,6 +43346,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_bf_00_out0_gbc() {
@@ -45094,7 +43367,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45118,6 +43390,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_bf_40_out2_gbc() {
@@ -45138,7 +43411,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45162,6 +43434,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_bf_bf_out0_gbc() {
@@ -45182,7 +43455,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45206,6 +43478,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_bf_ff_out2_gbc() {
@@ -45226,7 +43499,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45251,7 +43523,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ff_00_out0_gbc() {
@@ -45272,7 +43543,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45297,7 +43567,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ff_40_out0_gbc() {
@@ -45318,7 +43587,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45343,7 +43611,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ff_bf_out0_gbc() {
@@ -45364,7 +43631,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45389,7 +43655,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ff_ff_out0_gbc() {
@@ -45410,7 +43675,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45435,7 +43699,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly00_10_50_1_oute0_gbc() {
@@ -45456,7 +43719,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45481,7 +43743,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly00_10_50_2_oute2_gbc() {
@@ -45502,7 +43763,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45527,7 +43787,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly00_10_50_ds_2_oute2_gbc() {
@@ -45548,7 +43807,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45573,7 +43831,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly00_10_50_ds_lcdoffset1_2_oute2_gbc() {
@@ -45594,7 +43851,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45619,7 +43875,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly00_10_50_lcdoffset3_2_oute2_gbc() {
@@ -45640,7 +43895,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45665,7 +43919,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly94_00_50_oute2_gbc() {
@@ -45686,7 +43939,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45711,7 +43963,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly94_10_40_oute0_gbc() {
@@ -45732,7 +43983,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45757,7 +44007,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_ly94_10_50_oute0_gbc() {
@@ -45778,7 +44027,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45803,7 +44051,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_1_oute2_gbc() {
@@ -45824,7 +44071,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45849,7 +44095,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_2_oute2_gbc() {
@@ -45870,7 +44115,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45895,7 +44139,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_3_oute2_gbc() {
@@ -45916,7 +44159,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45941,7 +44183,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_4_oute2_gbc() {
@@ -45962,7 +44203,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -45987,7 +44227,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_5_oute2_gbc() {
@@ -46008,7 +44247,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46033,7 +44271,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_6_oute2_gbc() {
@@ -46054,7 +44291,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46079,7 +44315,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_7_oute2_gbc() {
@@ -46100,7 +44335,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46125,7 +44359,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_8_oute2_gbc() {
@@ -46146,7 +44379,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46171,7 +44403,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_9_oute0_gbc() {
@@ -46192,7 +44423,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46217,7 +44447,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_1_oute0_gbc() {
@@ -46238,7 +44467,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46263,7 +44491,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_2_oute0_gbc() {
@@ -46284,7 +44511,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46309,7 +44535,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_3_oute0_gbc() {
@@ -46330,7 +44555,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46355,7 +44579,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_4_oute0_gbc() {
@@ -46376,7 +44599,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46401,7 +44623,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_ds_2_oute0_gbc() {
@@ -46422,7 +44643,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46447,7 +44667,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_ds_4_oute0_gbc() {
@@ -46468,7 +44687,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46493,7 +44711,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_00_40_oute2_gbc() {
@@ -46514,7 +44731,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46539,7 +44755,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_00_48_oute2_gbc() {
@@ -46560,7 +44775,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46585,7 +44799,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_08_40_oute0_gbc() {
@@ -46606,7 +44819,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46631,7 +44843,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_08_48_oute0_gbc() {
@@ -46652,7 +44863,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46677,7 +44887,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_08_ff_oute0_gbc() {
@@ -46698,7 +44907,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46723,7 +44931,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_b7_40_oute2_gbc() {
@@ -46744,7 +44951,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46769,7 +44975,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_b7_f7_oute2_gbc() {
@@ -46790,7 +44995,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46815,7 +45019,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_bf_40_oute0_gbc() {
@@ -46836,7 +45039,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46861,7 +45063,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycstatwirq_trigger_m0_ly44_lyc44_bf_ff_oute0_gbc() {
@@ -46882,7 +45083,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46907,7 +45107,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_1_oute2_gbc() {
@@ -46928,7 +45127,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46953,7 +45151,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_2_oute2_gbc() {
@@ -46974,7 +45171,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -46999,7 +45195,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_3_oute2_gbc() {
@@ -47020,7 +45215,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47045,7 +45239,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_4_oute2_gbc() {
@@ -47066,7 +45259,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47091,7 +45283,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_5_oute2_gbc() {
@@ -47112,7 +45303,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47137,7 +45327,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_6_oute2_gbc() {
@@ -47158,7 +45347,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47183,7 +45371,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_7_oute2_gbc() {
@@ -47204,7 +45391,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47229,7 +45415,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_8_oute2_gbc() {
@@ -47250,7 +45435,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47275,7 +45459,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_early_ly44_9_oute0_gbc() {
@@ -47296,7 +45479,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47321,7 +45503,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_1_oute0_gbc() {
@@ -47342,7 +45523,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47367,7 +45547,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_2_oute0_gbc() {
@@ -47388,7 +45567,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47413,7 +45591,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_3_oute0_gbc() {
@@ -47434,7 +45611,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47459,7 +45635,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_4_oute0_gbc() {
@@ -47480,7 +45655,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47505,7 +45679,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_ds_2_oute0_gbc() {
@@ -47526,7 +45699,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47551,7 +45723,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_ds_4_oute0_gbc() {
@@ -47572,7 +45743,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47597,7 +45767,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_1_oute2_gbc() {
@@ -47618,7 +45787,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47643,7 +45811,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_2_oute2_gbc() {
@@ -47664,7 +45831,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47689,7 +45855,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_3_oute2_gbc() {
@@ -47710,7 +45875,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47735,7 +45899,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_4_oute2_gbc() {
@@ -47756,7 +45919,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47781,7 +45943,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_5_oute2_gbc() {
@@ -47802,7 +45963,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47827,7 +45987,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_ds_2_oute2_gbc() {
@@ -47848,7 +46007,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47873,7 +46031,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn lycwirq_trigger_m0_late_ly44_lyc45_ds_4_oute2_gbc() {
@@ -47894,7 +46051,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47919,7 +46075,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_2_out0_dmg() {
@@ -47940,7 +46095,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -47965,7 +46119,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_4_out2_dmg() {
@@ -47986,7 +46139,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48011,7 +46163,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_scx2_2_out2_dmg() {
@@ -48032,7 +46183,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48057,7 +46207,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_scx3_2_out2_dmg() {
@@ -48078,7 +46227,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48103,7 +46251,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_scx5_2_out2_dmg() {
@@ -48124,7 +46271,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48148,6 +46294,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_00_00_out0_gbc() {
@@ -48168,7 +46315,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48192,6 +46338,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_00_08_out2_gbc() {
@@ -48212,7 +46359,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48236,6 +46382,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_00_f7_out0_gbc() {
@@ -48256,7 +46403,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48280,6 +46426,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_00_ff_out2_gbc() {
@@ -48300,7 +46447,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48325,7 +46471,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_08_00_out0_gbc() {
@@ -48346,7 +46491,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48371,7 +46515,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_08_08_out0_gbc() {
@@ -48392,7 +46535,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48417,7 +46559,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_08_f7_out0_gbc() {
@@ -48438,7 +46579,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48463,7 +46603,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_08_ff_out0_gbc() {
@@ -48484,7 +46623,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48508,6 +46646,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_f7_00_out0_gbc() {
@@ -48528,7 +46667,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48552,6 +46690,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_f7_08_out2_gbc() {
@@ -48572,7 +46711,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48596,6 +46734,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_f7_f7_out0_gbc() {
@@ -48616,7 +46755,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48640,6 +46778,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m0statwirq_trigger_f7_ff_out2_gbc() {
@@ -48660,7 +46799,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48685,7 +46823,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ff_00_out0_gbc() {
@@ -48706,7 +46843,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48731,7 +46867,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ff_08_out0_gbc() {
@@ -48752,7 +46887,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48777,7 +46911,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ff_f7_out0_gbc() {
@@ -48798,7 +46931,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48823,7 +46955,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ff_ff_out0_gbc() {
@@ -48844,7 +46975,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48869,7 +46999,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ly44_lyc44_00_08_oute2_gbc() {
@@ -48890,7 +47019,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48915,7 +47043,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ly44_lyc44_40_08_oute0_gbc() {
@@ -48936,7 +47063,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -48961,7 +47087,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m0statwirq_trigger_ly44_lyc44_40_48_oute0_gbc() {
@@ -48982,7 +47107,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49007,7 +47131,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_2_out3_dmg() {
@@ -49028,7 +47151,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49053,7 +47175,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_4_out0_dmg() {
@@ -49074,7 +47195,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49098,6 +47218,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_00_00_out0_gbc() {
@@ -49118,7 +47239,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49142,6 +47262,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_00_10_out2_gbc() {
@@ -49162,7 +47283,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49186,6 +47306,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_00_ef_out0_gbc() {
@@ -49206,7 +47327,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49230,6 +47350,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_00_ff_out2_gbc() {
@@ -49250,7 +47371,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49275,7 +47395,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_10_00_out0_gbc() {
@@ -49296,7 +47415,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49321,7 +47439,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_10_10_out0_gbc() {
@@ -49342,7 +47459,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49367,7 +47483,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_10_ef_out0_gbc() {
@@ -49388,7 +47503,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49413,7 +47527,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_10_ff_out0_gbc() {
@@ -49434,7 +47547,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49458,6 +47570,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ef_00_out0_gbc() {
@@ -49478,7 +47591,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49502,6 +47614,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ef_10_out2_gbc() {
@@ -49522,7 +47635,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49546,6 +47658,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ef_ef_out0_gbc() {
@@ -49566,7 +47679,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49590,6 +47702,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ef_ff_out2_gbc() {
@@ -49610,7 +47723,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49635,7 +47747,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ff_00_out0_gbc() {
@@ -49656,7 +47767,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49681,7 +47791,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ff_10_out0_gbc() {
@@ -49702,7 +47811,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49727,7 +47835,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ff_ef_out0_gbc() {
@@ -49748,7 +47855,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49773,7 +47879,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ff_ff_out0_gbc() {
@@ -49794,7 +47899,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49819,7 +47923,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_00_10_oute2_gbc() {
@@ -49840,7 +47943,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49865,7 +47967,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_00_50_oute2_gbc() {
@@ -49886,7 +47987,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49911,7 +48011,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_40_10_oute0_gbc() {
@@ -49932,7 +48031,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -49957,7 +48055,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_40_50_1_oute0_gbc() {
@@ -49978,7 +48075,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50002,6 +48098,7 @@ mod miscmstatirq {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_40_50_2_oute2_gbc() {
@@ -50022,7 +48119,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50047,7 +48143,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_40_50_3_oute2_gbc() {
@@ -50068,7 +48163,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50093,7 +48187,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_40_50_oute0_gbc() {
@@ -50114,7 +48207,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50139,7 +48231,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m1statwirq_trigger_ly94_lyc94_40_50_ds_2_oute2_gbc() {
@@ -50160,7 +48251,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50185,7 +48275,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_00_00_out0_gbc() {
@@ -50206,7 +48295,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50231,7 +48319,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_00_20_out0_gbc() {
@@ -50252,7 +48339,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50277,7 +48363,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_00_df_out0_gbc() {
@@ -50298,7 +48383,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50323,7 +48407,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_00_ff_out0_gbc() {
@@ -50344,7 +48427,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50369,7 +48451,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_20_00_out0_gbc() {
@@ -50390,7 +48471,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50415,7 +48495,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_20_20_out0_gbc() {
@@ -50436,7 +48515,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50461,7 +48539,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_20_df_out0_gbc() {
@@ -50482,7 +48559,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50507,7 +48583,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_20_ff_out0_gbc() {
@@ -50528,7 +48603,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50553,7 +48627,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_df_00_out0_gbc() {
@@ -50574,7 +48647,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50599,7 +48671,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_df_20_out0_gbc() {
@@ -50620,7 +48691,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50645,7 +48715,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_df_df_out0_gbc() {
@@ -50666,7 +48735,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50691,7 +48759,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_df_ff_out0_gbc() {
@@ -50712,7 +48779,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50737,7 +48803,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_ff_00_out0_gbc() {
@@ -50758,7 +48823,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50783,7 +48847,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_ff_20_out0_gbc() {
@@ -50804,7 +48867,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50829,7 +48891,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_ff_df_out0_gbc() {
@@ -50850,7 +48911,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50875,7 +48935,6 @@ mod miscmstatirq {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2statwirq_trigger_ff_ff_out0_gbc() {
@@ -50896,7 +48955,6 @@ mod miscmstatirq {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -50926,7 +48984,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn oam_access_10spritesprline_postread_1_out3_gbc() {
@@ -50947,7 +49004,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -50972,7 +49028,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn oam_access_10spritesprline_postread_2_out0_gbc() {
@@ -50993,7 +49048,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51018,7 +49072,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn midread_1_out3_gbc() {
@@ -51039,7 +49092,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51064,7 +49116,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn midread_2_out3_gbc() {
@@ -51085,7 +49136,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51110,7 +49160,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn midread_3_out3_gbc() {
@@ -51131,7 +49180,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51156,7 +49204,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn midwrite_1_out0_gbc() {
@@ -51177,7 +49224,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51201,6 +49247,7 @@ mod oam_access {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn midwrite_2_out0_gbc() {
@@ -51221,7 +49268,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51246,7 +49292,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn midwrite_3_out0_gbc() {
@@ -51267,7 +49312,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51292,7 +49336,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_1_out3_gbc() {
@@ -51313,7 +49356,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51338,7 +49380,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_2_out0_gbc() {
@@ -51359,7 +49400,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51384,7 +49424,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_ds_2_out0_gbc() {
@@ -51405,7 +49444,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51430,7 +49468,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx2_1_out3_gbc() {
@@ -51451,7 +49488,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51476,7 +49512,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx2_2_out0_gbc() {
@@ -51497,7 +49532,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51522,7 +49556,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx3_1_out3_gbc() {
@@ -51543,7 +49576,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51568,7 +49600,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx3_3_out0_gbc() {
@@ -51589,7 +49620,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51614,7 +49644,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx5_1_out3_gbc() {
@@ -51635,7 +49664,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51660,7 +49688,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx5_2_out0_gbc() {
@@ -51681,7 +49708,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51706,7 +49732,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx5_ds_2_out0_gbc() {
@@ -51727,7 +49752,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51752,7 +49776,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postwrite_1_out0_gbc() {
@@ -51773,7 +49796,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51798,7 +49820,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postwrite_2_out1_gbc() {
@@ -51819,7 +49840,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51844,7 +49864,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postwrite_2_scx3_out1_gbc() {
@@ -51865,7 +49884,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51890,7 +49908,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postwrite_ds_2_out1_gbc() {
@@ -51911,7 +49928,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51936,7 +49952,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn postwrite_scx1_ds_2_out1_gbc() {
@@ -51957,7 +49972,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -51982,7 +49996,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_1_out0_gbc() {
@@ -52003,7 +50016,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52028,7 +50040,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_2_out3_gbc() {
@@ -52049,7 +50060,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52074,7 +50084,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_ds_2_out3_gbc() {
@@ -52095,7 +50104,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52120,7 +50128,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_ds_lcdoffset1_2_out3_gbc() {
@@ -52141,7 +50148,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52166,7 +50172,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_lcdoffset1_2_out3_gbc() {
@@ -52187,7 +50192,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52212,7 +50216,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_1_out1_gbc() {
@@ -52233,7 +50236,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52257,6 +50259,7 @@ mod oam_access {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn prewrite_2_out0_gbc() {
@@ -52277,7 +50280,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52302,7 +50304,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_3_out0_gbc() {
@@ -52323,7 +50324,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52348,7 +50348,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_ds_2_out0_gbc() {
@@ -52369,7 +50368,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52394,7 +50392,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_ds_lcdoffset1_2_out0_gbc() {
@@ -52415,7 +50412,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52440,7 +50436,6 @@ mod oam_access {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_lcdoffset1_2_out0_gbc() {
@@ -52461,7 +50456,6 @@ mod oam_access {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -52491,7 +50485,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp00x_1_out0_gbc() {
@@ -52512,7 +50505,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52537,7 +50529,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp00x_2_out3_gbc() {
@@ -52558,7 +50549,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52583,7 +50573,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp00x_ds_2_out3_gbc() {
@@ -52604,7 +50593,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52629,7 +50617,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp00y_1_out3_gbc() {
@@ -52650,7 +50637,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52675,7 +50661,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp00y_2_out0_gbc() {
@@ -52696,7 +50681,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52721,7 +50705,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp00y_ds_2_out0_gbc() {
@@ -52742,7 +50725,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52767,7 +50749,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp01x_1_out0_gbc() {
@@ -52788,7 +50769,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52813,7 +50793,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp01x_2_out3_gbc() {
@@ -52834,7 +50813,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52859,7 +50837,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp01x_ds_2_out3_gbc() {
@@ -52880,7 +50857,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52905,7 +50881,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp01y_1_out3_gbc() {
@@ -52926,7 +50901,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52951,7 +50925,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp01y_2_out0_gbc() {
@@ -52972,7 +50945,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -52997,7 +50969,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp01y_ds_2_out0_gbc() {
@@ -53018,7 +50989,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53043,7 +51013,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp02x_1_out0_gbc() {
@@ -53064,7 +51033,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53089,7 +51057,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp02x_2_out3_gbc() {
@@ -53110,7 +51077,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53135,7 +51101,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp02y_1_out3_gbc() {
@@ -53156,7 +51121,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53181,7 +51145,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp02y_2_out0_gbc() {
@@ -53202,7 +51165,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53227,7 +51189,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39x_1_out0_gbc() {
@@ -53248,7 +51209,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53273,7 +51233,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39x_2_out3_gbc() {
@@ -53294,7 +51253,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53319,7 +51277,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39x_4_out3_gbc() {
@@ -53340,7 +51297,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53365,7 +51321,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39x_ds_2_out3_gbc() {
@@ -53386,7 +51341,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53411,7 +51365,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39y_1_out3_gbc() {
@@ -53432,7 +51385,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53457,7 +51409,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39y_2_out0_gbc() {
@@ -53478,7 +51429,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53503,7 +51453,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn late_sp39y_ds_2_out0_gbc() {
@@ -53524,7 +51473,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53549,7 +51497,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_busydelay_1_out5_gbc() {
@@ -53570,7 +51517,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53595,7 +51541,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_late_halt_stat_1_out0_gbc() {
@@ -53616,7 +51561,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53641,7 +51585,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_late_halt_stat_2_out3_gbc() {
@@ -53662,7 +51605,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53687,7 +51629,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_late_speedchange_stat_2_out3_gbc() {
@@ -53708,7 +51649,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53733,7 +51673,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyread0000_1_out4_gbc() {
@@ -53754,7 +51693,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53779,7 +51717,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyread0000_2_out5_gbc() {
@@ -53800,7 +51737,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53825,7 +51761,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyread0000_3_out1_gbc() {
@@ -53846,7 +51781,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53871,7 +51805,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyread0000_4_out5_gbc() {
@@ -53892,7 +51825,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53917,7 +51849,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyread0000_ds_2_out5_gbc() {
@@ -53938,7 +51869,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -53963,7 +51893,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyread8000_out1_dmg() {
@@ -53984,7 +51913,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54009,7 +51937,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreada000_1_out5_dmg() {
@@ -54030,7 +51957,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54055,7 +51981,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreada000_2_out1_dmg() {
@@ -54076,7 +52001,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54101,7 +52025,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreadc000_1_out5_dmg() {
@@ -54123,6 +52046,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreadc000_1_out1_gbc() {
@@ -54143,7 +52067,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54168,7 +52091,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreadc000_2_out1_gbc() {
@@ -54189,7 +52111,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54214,7 +52135,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreadfe00_1_out0_gbc() {
@@ -54235,7 +52155,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54260,7 +52179,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreadfe00_2_out2_gbc() {
@@ -54281,7 +52199,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54306,7 +52223,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_busyreadff4b_out1_gbc() {
@@ -54327,7 +52243,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54352,7 +52267,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_rombankchange_1_out4_gbc() {
@@ -54373,7 +52287,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54398,7 +52311,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_rombankchange_2_out0_gbc() {
@@ -54419,7 +52331,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54444,7 +52355,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_srambankchange_1_out4_gbc() {
@@ -54465,7 +52375,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54490,7 +52399,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src0000_srambankchange_2_out0_gbc() {
@@ -54511,7 +52419,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54536,7 +52443,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_busyread0000_out1_dmg() {
@@ -54557,7 +52463,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54582,7 +52487,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_busyread8000_1_out5_dmg() {
@@ -54603,7 +52507,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54628,7 +52531,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_busyread8000_2_out1_dmg() {
@@ -54649,7 +52551,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54674,7 +52575,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_busyreada000_out1_dmg() {
@@ -54695,7 +52595,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54720,7 +52619,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_busyreadc000_out1_dmg() {
@@ -54741,7 +52639,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54766,7 +52663,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_busywrite8000_out0_dmg() {
@@ -54787,7 +52683,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54812,7 +52707,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_srcchange0000_busyinc_out0_dmg() {
@@ -54833,7 +52727,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54858,7 +52751,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_srcchange0000_busyread0000_1_out5_dmg() {
@@ -54879,7 +52771,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54904,7 +52795,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_srcchange0000_busyread0000_2_out1_dmg() {
@@ -54925,7 +52815,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54950,7 +52839,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_srcchangec000_busyread8000_out1_dmg() {
@@ -54971,7 +52859,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -54996,7 +52883,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_vrambankchange_1_out0_gbc() {
@@ -55017,7 +52903,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55042,7 +52927,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_src8000_vrambankchange_3_out0_gbc() {
@@ -55063,7 +52947,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55088,7 +52971,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_busyread0000_1_out5_dmg() {
@@ -55109,7 +52991,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55134,7 +53015,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_busyread0000_2_out1_dmg() {
@@ -55155,7 +53035,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55180,7 +53059,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_busyreadc000_1_out5_dmg() {
@@ -55202,6 +53080,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srca000_busyreadc000_1_out1_gbc() {
@@ -55222,7 +53101,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55247,7 +53125,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_busyreadc000_2_out1_gbc() {
@@ -55268,7 +53145,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55293,7 +53169,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_busywrite4000_out2_gbc() {
@@ -55314,7 +53189,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55339,7 +53213,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_srambankchange_1_out4_gbc() {
@@ -55360,7 +53233,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55385,7 +53257,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srca000_srambankchange_2_out0_gbc() {
@@ -55406,7 +53277,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55430,6 +53300,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcc000_busyreada000_1_out1_gbc() {
@@ -55450,7 +53321,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55475,7 +53345,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcc000_busyreada000_2_out1_gbc() {
@@ -55496,7 +53365,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55520,6 +53388,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcc000_srambankchange_1_out0_gbc() {
@@ -55540,7 +53409,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55565,7 +53433,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcc000_srambankchange_2_out0_gbc() {
@@ -55586,7 +53453,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55611,7 +53477,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcd000_wrambankchange_2_out4_gbc() {
@@ -55632,7 +53497,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55657,7 +53521,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcdf00_readfe00_out2_gbc() {
@@ -55678,7 +53541,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55702,6 +53564,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srce000_readfe00_out0_gbc() {
@@ -55722,7 +53585,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55746,6 +53608,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcf000_busyread0000_1_out0_gbc() {
@@ -55766,7 +53629,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55791,7 +53653,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcf000_busyread0000_2_out3_gbc() {
@@ -55812,7 +53673,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55837,7 +53697,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcf000_busyread8000_out3_gbc() {
@@ -55858,7 +53717,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55882,6 +53740,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcf000_busyreada000_out0_gbc() {
@@ -55902,7 +53761,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55927,7 +53785,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcfd00_readfe00_out2_dmg() {
@@ -55949,6 +53806,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcfd00_readfe00_out0_gbc() {
@@ -55969,7 +53827,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -55994,7 +53851,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcfe00_busyread0000_out0_gbc() {
@@ -56015,7 +53871,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56040,7 +53895,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcfe00_busyread8000_out3_gbc() {
@@ -56061,7 +53915,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56086,7 +53939,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcfe00_busyreada000_out0_gbc() {
@@ -56107,7 +53959,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56132,7 +53983,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcfe00_readfe00_out0_dmg() {
@@ -56153,7 +54003,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56178,7 +54027,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcff00_busyread0000_out1_dmg() {
@@ -56200,6 +54048,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcff00_busyread0000_out0_gbc() {
@@ -56220,7 +54069,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56245,7 +54093,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcff00_busyread8000_out3_gbc() {
@@ -56266,7 +54113,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56290,6 +54136,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcff00_busyreada000_out0_gbc() {
@@ -56310,7 +54157,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56335,7 +54181,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcff00_busyreadff4b_out3_dmg() {
@@ -56356,7 +54201,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56381,7 +54225,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcff00_readfe00_out1_dmg() {
@@ -56402,6 +54245,7 @@ mod oamdma {
 
         run_test_case(test_case);
     }
+
 
     #[test]
     #[ignore]
@@ -56425,7 +54269,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdma_srcff00_readfe45_out1_dmg() {
@@ -56447,6 +54290,7 @@ mod oamdma {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn oamdma_srcff00_readfe45_out0_gbc() {
@@ -56467,7 +54311,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56492,7 +54335,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdmasrc80_halt_lycirq_read8000_out81_gbc() {
@@ -56513,7 +54355,6 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -56538,7 +54379,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdmasrc80_halt_m2irq_read8000_out81_gbc() {
@@ -56561,7 +54401,6 @@ mod oamdma {
     }
 
 
-
     #[test]
     #[ignore]
     fn oamdmasrcc0_speedchange_readc000_out11_gbc() {
@@ -56582,12 +54421,12 @@ mod oamdma {
 
         run_test_case(test_case);
     }
-
 }
 
 
 mod scx_during_m3 {
     use super::*;
+
 
     mod scx_0060c0 {
         use super::*;
@@ -56620,6 +54459,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_1_gbc() {
@@ -56641,7 +54481,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56671,6 +54510,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_2_gbc() {
@@ -56692,7 +54532,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56722,6 +54561,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_3_gbc() {
@@ -56743,7 +54583,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56773,6 +54612,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_4_gbc() {
@@ -56794,7 +54634,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56824,6 +54663,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_5_gbc() {
@@ -56845,7 +54685,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56875,6 +54714,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_6_gbc() {
@@ -56896,7 +54736,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56922,7 +54761,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_2_gbc() {
@@ -56944,7 +54782,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -56970,7 +54807,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_4_gbc() {
@@ -56992,7 +54828,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57018,7 +54853,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_6_gbc() {
@@ -57040,7 +54874,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57066,7 +54899,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_8_gbc() {
@@ -57088,7 +54920,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -57123,6 +54954,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_1_gbc() {
@@ -57144,7 +54976,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57174,6 +55005,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_2_gbc() {
@@ -57195,7 +55027,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57225,6 +55056,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_3_gbc() {
@@ -57246,7 +55078,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57276,6 +55107,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_4_gbc() {
@@ -57297,7 +55129,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57327,6 +55158,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_5_gbc() {
@@ -57348,7 +55180,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57378,6 +55209,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_6_gbc() {
@@ -57399,7 +55231,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57425,7 +55256,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_2_gbc() {
@@ -57447,7 +55277,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57473,7 +55302,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_4_gbc() {
@@ -57495,7 +55323,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57521,7 +55348,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_6_gbc() {
@@ -57543,7 +55369,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57569,7 +55394,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_8_gbc() {
@@ -57591,7 +55415,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -57626,6 +55449,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_1_gbc() {
@@ -57647,7 +55471,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57677,6 +55500,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_2_gbc() {
@@ -57698,7 +55522,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57728,6 +55551,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_3_gbc() {
@@ -57749,7 +55573,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57779,6 +55602,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_4_gbc() {
@@ -57800,7 +55624,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57830,6 +55653,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_5_gbc() {
@@ -57851,7 +55675,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57881,6 +55704,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_6_gbc() {
@@ -57902,7 +55726,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57928,7 +55751,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_2_gbc() {
@@ -57950,7 +55772,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -57976,7 +55797,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_4_gbc() {
@@ -57998,7 +55818,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58024,7 +55843,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_6_gbc() {
@@ -58046,7 +55864,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58072,7 +55889,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_8_gbc() {
@@ -58094,7 +55910,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -58129,6 +55944,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_1_gbc() {
@@ -58150,7 +55966,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58180,6 +55995,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_2_gbc() {
@@ -58201,7 +56017,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58231,6 +56046,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_3_gbc() {
@@ -58252,7 +56068,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58282,6 +56097,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_4_gbc() {
@@ -58303,7 +56119,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58333,6 +56148,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_5_gbc() {
@@ -58354,7 +56170,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58384,6 +56199,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_6_gbc() {
@@ -58405,7 +56221,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58431,7 +56246,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_2_gbc() {
@@ -58453,7 +56267,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58479,7 +56292,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_4_gbc() {
@@ -58501,7 +56313,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58527,7 +56338,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_6_gbc() {
@@ -58549,7 +56359,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58575,7 +56384,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_8_gbc() {
@@ -58597,7 +56405,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -58632,6 +56439,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_1_gbc() {
@@ -58653,7 +56461,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58683,6 +56490,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_2_gbc() {
@@ -58704,7 +56512,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58734,6 +56541,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_3_gbc() {
@@ -58755,7 +56563,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58785,6 +56592,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_4_gbc() {
@@ -58806,7 +56614,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58836,6 +56643,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_5_gbc() {
@@ -58857,7 +56665,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58887,6 +56694,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_6_gbc() {
@@ -58908,7 +56716,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58934,7 +56741,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_2_gbc() {
@@ -58956,7 +56762,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -58982,7 +56787,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_4_gbc() {
@@ -59004,7 +56808,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59030,7 +56833,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_6_gbc() {
@@ -59052,7 +56854,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59078,7 +56879,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_8_gbc() {
@@ -59100,7 +56900,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -59135,6 +56934,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_1_gbc() {
@@ -59156,7 +56956,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59186,6 +56985,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_2_gbc() {
@@ -59207,7 +57007,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59237,6 +57036,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_3_gbc() {
@@ -59258,7 +57058,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59288,6 +57087,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_4_gbc() {
@@ -59309,7 +57109,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59339,6 +57138,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_5_gbc() {
@@ -59360,7 +57160,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59390,6 +57189,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_6_gbc() {
@@ -59411,7 +57211,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59437,7 +57236,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_2_gbc() {
@@ -59459,7 +57257,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59485,7 +57282,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_4_gbc() {
@@ -59507,7 +57303,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59533,7 +57328,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_6_gbc() {
@@ -59555,7 +57349,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59581,7 +57374,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_during_m3_ds_8_gbc() {
@@ -59603,7 +57395,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -59638,6 +57429,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx1_scx0_during_m3_1_gbc() {
@@ -59659,7 +57451,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59689,6 +57480,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx2_scx0_during_m3_1_gbc() {
@@ -59710,7 +57502,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59740,6 +57531,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx2_scx1_during_m3_1_gbc() {
@@ -59761,7 +57553,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59787,7 +57578,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_attrib_during_m3_spx2_ds_gbc() {
@@ -59809,7 +57599,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59839,6 +57628,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_spx0_gbc() {
@@ -59860,7 +57650,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59890,6 +57679,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_spx1_gbc() {
@@ -59911,7 +57701,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59941,6 +57730,7 @@ mod scx_during_m3 {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scx_during_m3_spx2_gbc() {
@@ -59962,7 +57752,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -59988,7 +57777,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_m3_extend_1_out3_dmg() {
@@ -60009,7 +57797,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60034,7 +57821,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_m3_extend_2_out0_dmg() {
@@ -60055,7 +57841,6 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60080,7 +57865,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_m3_extend_ds_1_out3_gbc() {
@@ -60103,7 +57887,6 @@ mod scx_during_m3 {
         }
 
 
-
         #[test]
         #[ignore]
         fn scx_m3_extend_ds_2_out0_gbc() {
@@ -60124,13 +57907,13 @@ mod scx_during_m3 {
 
             run_test_case(test_case);
         }
-
     }
 }
 
 
 mod scy {
     use super::*;
+
 
     mod scx3 {
         use super::*;
@@ -60163,6 +57946,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_1_gbc() {
@@ -60184,7 +57968,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60214,6 +57997,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_2_gbc() {
@@ -60235,7 +58019,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60265,6 +58048,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_3_gbc() {
@@ -60286,7 +58070,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60316,6 +58099,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_4_gbc() {
@@ -60337,7 +58121,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60367,6 +58150,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_5_gbc() {
@@ -60388,7 +58172,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60418,6 +58201,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_6_gbc() {
@@ -60439,7 +58223,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -60474,6 +58257,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_1_gbc() {
@@ -60495,7 +58279,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60525,6 +58308,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_2_gbc() {
@@ -60546,7 +58330,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60576,6 +58359,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_3_gbc() {
@@ -60597,7 +58381,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60627,6 +58410,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_4_gbc() {
@@ -60648,7 +58432,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60678,6 +58461,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_5_gbc() {
@@ -60699,7 +58483,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60729,6 +58512,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_6_gbc() {
@@ -60750,7 +58534,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60776,7 +58559,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_ds_2_gbc() {
@@ -60798,7 +58580,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60824,7 +58605,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_ds_4_gbc() {
@@ -60846,7 +58626,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60872,7 +58651,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_ds_6_gbc() {
@@ -60896,7 +58674,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_ds_7_gbc() {
@@ -60918,7 +58695,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60948,6 +58724,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx08_1_gbc() {
@@ -60969,7 +58746,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -60999,6 +58775,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx08_2_gbc() {
@@ -61020,7 +58797,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61050,6 +58826,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx08_3_gbc() {
@@ -61071,7 +58848,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61097,7 +58873,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx08_ds_1_gbc() {
@@ -61119,7 +58894,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61145,7 +58919,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx08_ds_3_gbc() {
@@ -61169,7 +58942,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx08_ds_4_gbc() {
@@ -61191,7 +58963,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61221,6 +58992,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx09_1_gbc() {
@@ -61242,7 +59014,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61272,6 +59043,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx09_2_gbc() {
@@ -61293,7 +59065,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61323,6 +59094,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx09_3_gbc() {
@@ -61344,7 +59116,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61370,7 +59141,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx09_ds_1_gbc() {
@@ -61392,7 +59162,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61418,7 +59187,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx09_ds_3_gbc() {
@@ -61442,7 +59210,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx09_ds_4_gbc() {
@@ -61464,7 +59231,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61494,6 +59260,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx0a_1_gbc() {
@@ -61515,7 +59282,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61545,6 +59311,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx0a_2_gbc() {
@@ -61566,7 +59333,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61596,6 +59362,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx0a_3_gbc() {
@@ -61619,7 +59386,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx0a_4_gbc() {
@@ -61641,7 +59407,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61671,6 +59436,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx0b_1_gbc() {
@@ -61692,7 +59458,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61722,6 +59487,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx0b_2_gbc() {
@@ -61743,7 +59509,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -61773,6 +59538,7 @@ mod scy {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn scy_during_m3_spx0b_3_gbc() {
@@ -61796,7 +59562,6 @@ mod scy {
         }
 
 
-
         #[test]
         #[ignore]
         fn scy_during_m3_spx0b_4_gbc() {
@@ -61818,7 +59583,6 @@ mod scy {
 
             run_test_case(test_case);
         }
-
     }
 }
 
@@ -61849,7 +59613,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn div_write_start_wait_read_if_1_oute0_gbc() {
@@ -61870,7 +59633,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -61895,7 +59657,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn div_write_start_wait_read_if_2_oute8_gbc() {
@@ -61916,7 +59677,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -61941,7 +59701,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx1_div_write_start_wait_read_if_1_oute0_gbc() {
@@ -61962,7 +59721,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -61987,7 +59745,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx1_div_write_start_wait_read_if_2_oute8_gbc() {
@@ -62008,7 +59765,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62033,7 +59789,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx1_start83_wait_read_if_1_oute0_gbc() {
@@ -62054,7 +59809,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62078,6 +59832,7 @@ mod serial {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn nopx1_start83_wait_read_if_2_oute8_gbc() {
@@ -62098,7 +59853,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62123,7 +59877,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx1_start_wait_read_if_1_oute0_gbc() {
@@ -62144,7 +59897,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62169,7 +59921,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx1_start_wait_read_if_2_oute8_gbc() {
@@ -62190,7 +59941,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62215,7 +59965,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx2_start83_wait_read_if_1_oute0_gbc() {
@@ -62236,7 +59985,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62260,6 +60008,7 @@ mod serial {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn nopx2_start83_wait_read_if_2_oute8_gbc() {
@@ -62280,7 +60029,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62305,7 +60053,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx2_start_wait_read_if_1_oute0_gbc() {
@@ -62326,7 +60073,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62351,7 +60097,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn nopx2_start_wait_read_if_2_oute8_gbc() {
@@ -62372,7 +60117,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62397,7 +60141,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start83_late_div_write_wait_read_if_1b_oute8_gbc() {
@@ -62418,7 +60161,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62443,7 +60185,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start83_late_div_write_wait_read_if_2b_oute8_gbc() {
@@ -62464,7 +60205,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62489,7 +60229,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_1a_oute0_gbc() {
@@ -62510,7 +60249,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62535,7 +60273,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_1b_oute8_gbc() {
@@ -62556,7 +60293,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62581,7 +60317,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_2a_oute0_gbc() {
@@ -62602,7 +60337,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62627,7 +60361,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_2b_oute8_gbc() {
@@ -62648,7 +60381,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62673,7 +60405,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_3a_oute0_gbc() {
@@ -62694,7 +60425,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62719,7 +60449,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_3b_oute8_gbc() {
@@ -62740,7 +60469,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62765,7 +60493,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_late_div_write_wait_read_if_4_oute8_gbc() {
@@ -62786,7 +60513,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62811,7 +60537,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_clear_if_read_if_1_oute8_gbc() {
@@ -62832,7 +60557,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62857,7 +60581,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_clear_if_read_if_2_oute0_gbc() {
@@ -62878,7 +60601,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62903,7 +60625,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_clear_if_read_if_ds_2_oute0_gbc() {
@@ -62924,7 +60645,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62949,7 +60669,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_read_if_1_oute0_gbc() {
@@ -62970,7 +60689,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -62995,7 +60713,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_read_if_2_oute8_gbc() {
@@ -63016,7 +60733,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63041,7 +60757,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_read_if_ds_2_oute8_gbc() {
@@ -63062,7 +60777,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63087,7 +60801,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_read_sb_1_out7f_gbc() {
@@ -63108,7 +60821,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63133,7 +60845,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_read_sb_2_outff_gbc() {
@@ -63154,7 +60865,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63178,6 +60888,7 @@ mod serial {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn start_wait_read_sc_1_outfd_gbc() {
@@ -63198,7 +60909,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63222,6 +60932,7 @@ mod serial {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn start_wait_read_sc_2_out7d_gbc() {
@@ -63242,7 +60953,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63267,7 +60977,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_restart_read_if_1_oute0_gbc() {
@@ -63288,7 +60997,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63313,7 +61021,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_restart_read_if_2_oute8_gbc() {
@@ -63334,7 +61041,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63359,7 +61065,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_sc80_read_if_1_oute0_gbc() {
@@ -63380,7 +61085,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63405,7 +61109,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_sc80_read_if_2_oute8_gbc() {
@@ -63426,7 +61129,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63451,7 +61153,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_stop_read_if_1_oute0_gbc() {
@@ -63472,7 +61173,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63497,7 +61197,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_stop_read_if_2_oute8_gbc() {
@@ -63518,7 +61217,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63543,7 +61241,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_trigger_int8_read_if_1_oute8_gbc() {
@@ -63564,7 +61261,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63588,6 +61284,7 @@ mod serial {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn start_wait_trigger_int8_read_if_2_oute0_gbc() {
@@ -63608,7 +61305,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63633,7 +61329,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_trigger_int8_read_if_3_oute0_gbc() {
@@ -63654,7 +61349,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63679,7 +61373,6 @@ mod serial {
     }
 
 
-
     #[test]
     #[ignore]
     fn start_wait_trigger_int8_read_if_ds_2_oute0_gbc() {
@@ -63700,7 +61393,6 @@ mod serial {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -63730,7 +61422,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_div_write_reset_length_counter_timing_nr52_1_outf1_gbc() {
@@ -63751,7 +61442,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63776,7 +61466,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_div_write_reset_length_counter_timing_nr52_2_outf0_gbc() {
@@ -63797,7 +61486,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63822,7 +61510,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_init_reset_sweep_counter_timing_nr52_1_out1_gbc() {
@@ -63843,7 +61530,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63867,6 +61553,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch1_init_reset_sweep_counter_timing_nr52_2_out1_gbc() {
@@ -63887,7 +61574,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63911,6 +61597,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch1_init_reset_sweep_counter_timing_nr52_3_out1_gbc() {
@@ -63931,7 +61618,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -63956,7 +61642,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_init_reset_sweep_counter_timing_nr52_4_out0_gbc() {
@@ -63977,7 +61662,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64002,7 +61686,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_late_div_write_nr52_1a_outf1_gbc() {
@@ -64023,7 +61706,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64048,7 +61730,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_late_div_write_nr52_1b_outf0_gbc() {
@@ -64069,7 +61750,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64094,7 +61774,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_late_div_write_nr52_2a_outf1_gbc() {
@@ -64115,7 +61794,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64140,7 +61818,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch1_late_div_write_nr52_2b_outf0_gbc() {
@@ -64161,7 +61838,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64186,7 +61862,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_div_write_reset_length_counter_timing_nr52_1_outf2_gbc() {
@@ -64207,7 +61882,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64232,7 +61906,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_div_write_reset_length_counter_timing_nr52_2_outf0_gbc() {
@@ -64253,7 +61926,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64277,6 +61949,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch2_init_reset_length_counter_timing_nr52_1_out0_gbc() {
@@ -64297,7 +61970,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64322,7 +61994,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_init_reset_length_counter_timing_nr52_2_out0_gbc() {
@@ -64343,7 +62014,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64368,7 +62038,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_init_reset_length_counter_timing_nr52_3_out2_gbc() {
@@ -64389,7 +62058,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64413,6 +62081,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch2_init_reset_length_counter_timing_nr52_4_out0_gbc() {
@@ -64433,7 +62102,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64458,7 +62126,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_div_write_nr52_1a_outf2_gbc() {
@@ -64479,7 +62146,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64504,7 +62170,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_div_write_nr52_1b_outf0_gbc() {
@@ -64525,7 +62190,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64550,7 +62214,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_div_write_nr52_2a_outf2_gbc() {
@@ -64571,7 +62234,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64596,7 +62258,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_div_write_nr52_2b_outf0_gbc() {
@@ -64617,7 +62278,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64642,7 +62302,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_div_write_nr52_ds_1b_outf0_gbc() {
@@ -64663,7 +62322,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64688,7 +62346,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_div_write_nr52_ds_2b_outf0_gbc() {
@@ -64709,7 +62366,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64734,7 +62390,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_reset_nr52_1a_out2_gbc() {
@@ -64755,7 +62410,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64780,7 +62434,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_reset_nr52_1b_out0_gbc() {
@@ -64801,7 +62454,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64826,7 +62478,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_reset_nr52_2a_out2_gbc() {
@@ -64847,7 +62498,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64872,7 +62522,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_reset_nr52_2b_out0_gbc() {
@@ -64893,7 +62542,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64918,7 +62566,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_reset_nr52_ds_1b_out0_gbc() {
@@ -64939,7 +62586,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -64964,7 +62610,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_late_reset_nr52_ds_2b_out0_gbc() {
@@ -64985,7 +62630,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65010,7 +62654,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch2_reset_length_counter_timing_nr52_ds_2_outf0_gbc() {
@@ -65031,7 +62674,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65056,7 +62698,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_div_write_reset_length_counter_timing_nr52_1_outf4_gbc() {
@@ -65077,7 +62718,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65102,7 +62742,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_div_write_reset_length_counter_timing_nr52_2_outf0_gbc() {
@@ -65123,7 +62762,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65148,7 +62786,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_late_div_write_nr52_1a_outf4_gbc() {
@@ -65169,7 +62806,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65194,7 +62830,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_late_div_write_nr52_1b_outf0_gbc() {
@@ -65215,7 +62850,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65240,7 +62874,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_late_div_write_nr52_2a_outf4_gbc() {
@@ -65261,7 +62894,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65286,7 +62918,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_late_div_write_nr52_2b_outf0_gbc() {
@@ -65307,7 +62938,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65332,7 +62962,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nop_nr4init_freq7ff_read_ff30_ds_2_out32_gbc() {
@@ -65353,7 +62982,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65378,7 +63006,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_read_ff30_1_out10_gbc() {
@@ -65399,7 +63026,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65423,6 +63049,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_read_ff30_2_out10_gbc() {
@@ -65443,7 +63070,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65467,6 +63093,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_read_ff30_3_out32_gbc() {
@@ -65487,7 +63114,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65512,7 +63138,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_read_ff30_4_out32_gbc() {
@@ -65533,7 +63158,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65558,7 +63182,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_write_ff30_1_out32_gbc() {
@@ -65579,7 +63202,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65603,6 +63225,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_write_ff30_2_out00_gbc() {
@@ -65623,7 +63246,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65648,7 +63270,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_write_ff30_3_out00_gbc() {
@@ -65669,7 +63290,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65693,6 +63313,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fd_write_ff30_4_out00_gbc() {
@@ -65713,7 +63334,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65737,6 +63357,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fe_read_ff30_1_out10_gbc() {
@@ -65757,7 +63378,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65781,6 +63401,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fe_read_ff30_2_out32_gbc() {
@@ -65801,7 +63422,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65825,6 +63445,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fe_read_ff30_3_out32_gbc() {
@@ -65845,7 +63466,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65869,6 +63489,7 @@ mod sound {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7fe_read_ff30_4_out54_gbc() {
@@ -65889,7 +63510,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65914,7 +63534,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7ff_read_ff30_1_out32_gbc() {
@@ -65935,7 +63554,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -65960,7 +63578,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7ff_read_ff30_2_out54_gbc() {
@@ -65981,7 +63598,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66006,7 +63622,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7ff_read_ff30_ds_2_out32_gbc() {
@@ -66027,7 +63642,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66052,7 +63666,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch3_reset_nr4init_freq7ff_write_ff30_ds_2_out00_gbc() {
@@ -66073,7 +63686,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66098,7 +63710,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch4_div_write_reset_length_counter_timing_nr52_1_outf8_gbc() {
@@ -66119,7 +63730,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66144,7 +63754,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch4_div_write_reset_length_counter_timing_nr52_2_outf0_gbc() {
@@ -66165,7 +63774,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66190,7 +63798,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch4_late_div_write_nr52_1a_outf8_gbc() {
@@ -66211,7 +63818,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66236,7 +63842,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch4_late_div_write_nr52_1b_outf0_gbc() {
@@ -66257,7 +63862,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66282,7 +63886,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch4_late_div_write_nr52_2a_outf8_gbc() {
@@ -66303,7 +63906,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66328,7 +63930,6 @@ mod sound {
     }
 
 
-
     #[test]
     #[ignore]
     fn ch4_late_div_write_nr52_2b_outf0_gbc() {
@@ -66349,7 +63950,6 @@ mod sound {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -66378,6 +63978,7 @@ mod speedchange {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn key1_set_out7f_gbc() {
@@ -66398,7 +63999,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66422,6 +64022,7 @@ mod speedchange {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn key1_set_unset_out7e_gbc() {
@@ -66442,7 +64043,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66467,7 +64067,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m3stat_lcdoffds_2_out0_gbc() {
@@ -66488,7 +64087,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66513,7 +64111,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn m2int_m3stat_scx1_lcdoffds_2_out0_gbc() {
@@ -66534,7 +64131,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66559,7 +64155,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ch2_nr52_1b_outf0_gbc() {
@@ -66580,7 +64175,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66605,7 +64199,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ch2_nr52_2b_outf0_gbc() {
@@ -66626,7 +64219,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66651,7 +64243,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ch2_nr52_ds_1b_outf0_gbc() {
@@ -66672,7 +64263,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66697,7 +64287,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ch2_nr52_ds_2b_outf0_gbc() {
@@ -66718,7 +64307,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66743,7 +64331,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_div_2_out01_gbc() {
@@ -66764,7 +64351,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66789,7 +64375,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_div_nop_2_out01_gbc() {
@@ -66810,7 +64395,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66835,7 +64419,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_frame1_m2int_m3stat_scx2_2_out0_gbc() {
@@ -66856,7 +64439,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66881,7 +64463,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_frame1_m2int_m3stat_scx3_2_out0_gbc() {
@@ -66902,7 +64483,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66927,7 +64507,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff2_m2int_m3stat_scx3_1_out3_gbc() {
@@ -66948,7 +64527,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -66973,7 +64551,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff2_m2int_m3stat_scx4_1_out3_gbc() {
@@ -66994,7 +64571,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67019,7 +64595,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff_m2int_m3stat_scx2_1_out3_gbc() {
@@ -67040,7 +64615,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67065,7 +64639,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff_m2int_m3stat_scx3_1_out3_gbc() {
@@ -67086,7 +64659,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67111,7 +64683,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff_nop_m2int_m3stat_scx1_1_out3_gbc() {
@@ -67132,7 +64703,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67157,7 +64727,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff_nop_m2int_m3stat_scx4_1_out3_gbc() {
@@ -67178,7 +64747,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67203,7 +64771,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff_nopx2_m2int_m3stat_scx2_1_out3_gbc() {
@@ -67224,7 +64791,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67249,7 +64815,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_lcdoff_nopx2_m2int_m3stat_scx3_1_out3_gbc() {
@@ -67270,7 +64835,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67295,7 +64859,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_ly_1_out25_gbc() {
@@ -67316,7 +64879,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67341,7 +64903,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -67362,7 +64923,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67387,7 +64947,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_m3stat_scx3_2_outc0_gbc() {
@@ -67408,7 +64967,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67433,7 +64991,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_nop_m3stat_scx1_2_outc0_gbc() {
@@ -67454,7 +65011,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67479,7 +65035,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_nop_m3stat_scx4_2_outc0_gbc() {
@@ -67500,7 +65055,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67525,7 +65079,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_nopx2_m3stat_scx2_2_outc0_gbc() {
@@ -67546,7 +65099,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67571,7 +65123,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_nopx2_m3stat_scx3_2_outc0_gbc() {
@@ -67592,7 +65143,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67617,7 +65167,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_stat_2_outc0_gbc() {
@@ -67638,7 +65187,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67663,7 +65211,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_ly44_m3_stat_4_outc2_gbc() {
@@ -67684,7 +65231,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67709,7 +65255,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_m2int_m3stat_scx2_2_out0_gbc() {
@@ -67730,7 +65275,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67755,7 +65299,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_m2int_m3stat_scx3_2_out0_gbc() {
@@ -67776,7 +65319,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67801,7 +65343,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_lcdoff_m2int_m3stat_scx2_2_out0_gbc() {
@@ -67822,7 +65363,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67847,7 +65387,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_lcdoff_m2int_m3stat_scx3_2_out0_gbc() {
@@ -67868,7 +65407,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67893,7 +65431,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_lcdoff_nop_m2int_m3stat_scx1_2_out0_gbc() {
@@ -67914,7 +65451,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67939,7 +65475,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_lcdoff_nop_m2int_m3stat_scx4_2_out0_gbc() {
@@ -67960,7 +65495,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -67985,7 +65519,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_lcdoff_nopx2_m2int_m3stat_scx2_2_out0_gbc() {
@@ -68006,7 +65539,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68031,7 +65563,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_lcdoff_nopx2_m2int_m3stat_scx3_2_out0_gbc() {
@@ -68052,7 +65583,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68077,7 +65607,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -68098,7 +65627,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68123,7 +65651,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_ly44_m3_m3stat_scx3_2_outc0_gbc() {
@@ -68144,7 +65671,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68169,7 +65695,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_ly44_m3_nop_m3stat_scx1_2_outc0_gbc() {
@@ -68190,7 +65715,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68215,7 +65739,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_ly44_m3_nop_m3stat_scx4_2_outc0_gbc() {
@@ -68236,7 +65759,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68261,7 +65783,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_m2int_m3stat_scx1_2_out0_gbc() {
@@ -68282,7 +65803,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68307,7 +65827,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_nop_m2int_m3stat_scx4_2_out0_gbc() {
@@ -68328,7 +65847,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68353,7 +65871,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima00_1b_out01_gbc() {
@@ -68374,7 +65891,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68399,7 +65915,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima00_2b_out02_gbc() {
@@ -68420,7 +65935,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68445,7 +65959,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima01_2_out0a_gbc() {
@@ -68466,7 +65979,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68491,7 +66003,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima01_nop_2_out0b_gbc() {
@@ -68512,7 +66023,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68537,7 +66047,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima02_1b_out03_gbc() {
@@ -68558,7 +66067,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68583,7 +66091,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima02_2b_out04_gbc() {
@@ -68604,7 +66111,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68629,7 +66135,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima03_1b_out01_gbc() {
@@ -68650,7 +66155,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68675,7 +66179,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange2_tima03_2b_out02_gbc() {
@@ -68696,7 +66199,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68721,7 +66223,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_ch2_nr52_1b_outf0_gbc() {
@@ -68742,7 +66243,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68767,7 +66267,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_ch2_nr52_2b_outf0_gbc() {
@@ -68788,7 +66287,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68813,7 +66311,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_ly44_m3_m3stat_scx1_2_outc0_gbc() {
@@ -68834,7 +66331,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68859,7 +66355,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -68880,7 +66375,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68905,7 +66399,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_ly44_m3_nop_m3stat_scx1_2_outc0_gbc() {
@@ -68926,7 +66419,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68951,7 +66443,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_ly44_m3_nop_m3stat_scx2_2_outc0_gbc() {
@@ -68972,7 +66463,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -68997,7 +66487,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_nop_ly44_m3_m3stat_scx1_2_outc0_gbc() {
@@ -69018,7 +66507,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69043,7 +66531,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange3_nop_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -69064,7 +66551,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69089,7 +66575,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_ch2_nr52_1b_outf0_gbc() {
@@ -69110,7 +66595,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69135,7 +66619,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_ch2_nr52_2b_outf0_gbc() {
@@ -69156,7 +66639,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69181,7 +66663,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_ly44_m3_m3stat_scx1_2_outc0_gbc() {
@@ -69202,7 +66683,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69227,7 +66707,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -69248,7 +66727,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69273,7 +66751,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_ly44_m3_nop_m3stat_scx3_2_outc0_gbc() {
@@ -69294,7 +66771,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69319,7 +66795,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_ly44_m3_nop_m3stat_scx4_2_outc0_gbc() {
@@ -69340,7 +66815,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69365,7 +66839,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_nop_ly44_m3_m3stat_scx1_2_outc0_gbc() {
@@ -69386,7 +66859,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69411,7 +66883,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange4_nop_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -69432,7 +66903,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69457,7 +66927,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_ch2_nr52_1b_outf0_gbc() {
@@ -69478,7 +66947,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69503,7 +66971,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_ch2_nr52_2b_outf0_gbc() {
@@ -69524,7 +66991,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69549,7 +67015,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_ly44_m3_m3stat_scx1_2_outc0_gbc() {
@@ -69570,7 +67035,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69595,7 +67059,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -69616,7 +67079,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69641,7 +67103,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_ly44_m3_nop_m3stat_scx1_2_outc0_gbc() {
@@ -69662,7 +67123,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69687,7 +67147,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_ly44_m3_nop_m3stat_scx2_2_outc0_gbc() {
@@ -69708,7 +67167,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69733,7 +67191,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_nop_ly44_m3_m3stat_scx1_2_outc0_gbc() {
@@ -69754,7 +67211,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69779,7 +67235,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange5_nop_ly44_m3_m3stat_scx2_2_outc0_gbc() {
@@ -69800,7 +67255,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69825,7 +67279,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ch2_nr52_1b_outf0_gbc() {
@@ -69846,7 +67299,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69871,7 +67323,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ch2_nr52_2b_outf0_gbc() {
@@ -69892,7 +67343,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69917,7 +67367,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ch2_nr52_ds_1b_outf0_gbc() {
@@ -69938,7 +67387,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -69963,7 +67411,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ch2_nr52_ds_2b_outf0_gbc() {
@@ -69984,7 +67431,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70009,7 +67455,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_div_2_out01_gbc() {
@@ -70030,7 +67475,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70055,7 +67499,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_div_nop_2_out01_gbc() {
@@ -70076,7 +67519,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70101,7 +67543,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_lcdoff_tima00_1_out80_gbc() {
@@ -70122,7 +67563,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70147,7 +67587,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_lcdoff_tima01_2_out09_gbc() {
@@ -70168,7 +67607,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70193,7 +67631,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_m3stat_1_outc3_gbc() {
@@ -70214,7 +67651,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70239,7 +67675,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_m3stat_scx1_1_outc3_gbc() {
@@ -70260,7 +67695,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70285,7 +67719,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nop_m3stat_1_outc3_gbc() {
@@ -70306,7 +67739,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70331,7 +67763,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nop_m3stat_scx1_1_outc3_gbc() {
@@ -70352,7 +67783,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70377,7 +67807,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nopx2_m3stat_1_outc3_gbc() {
@@ -70398,7 +67827,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70423,7 +67851,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nopx2_m3stat_scx1_1_outc3_gbc() {
@@ -70444,7 +67871,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70469,7 +67895,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nopx3_m3stat_1_outc3_gbc() {
@@ -70490,7 +67915,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70515,7 +67939,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nopx3_m3stat_scx1_1_outc3_gbc() {
@@ -70536,7 +67959,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70561,7 +67983,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nopx4_m3stat_1_outc3_gbc() {
@@ -70582,7 +68003,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70607,7 +68027,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_nopx4_m3stat_scx1_1_outc3_gbc() {
@@ -70628,7 +68047,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70653,7 +68071,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_stat_1_outc0_gbc() {
@@ -70674,7 +68091,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70699,7 +68115,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly44_m3_stat_outc0_gbc() {
@@ -70720,7 +68135,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70745,7 +68159,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_ly97_stat_outc0_gbc() {
@@ -70766,7 +68179,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70791,7 +68203,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima00_1b_out81_gbc() {
@@ -70812,7 +68223,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70837,7 +68247,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima00_2b_out82_gbc() {
@@ -70858,7 +68267,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70883,7 +68291,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima01_2_out08_gbc() {
@@ -70904,7 +68311,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70929,7 +68335,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima01_nop_2_out08_gbc() {
@@ -70950,7 +68355,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -70975,7 +68379,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima02_1b_out03_gbc() {
@@ -70996,7 +68399,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -71021,7 +68423,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima02_2b_out04_gbc() {
@@ -71042,7 +68443,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -71067,7 +68467,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima03_1b_out01_gbc() {
@@ -71088,7 +68487,6 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -71113,7 +68511,6 @@ mod speedchange {
     }
 
 
-
     #[test]
     #[ignore]
     fn speedchange_tima03_2b_out02_gbc() {
@@ -71134,12 +68531,12 @@ mod speedchange {
 
         run_test_case(test_case);
     }
-
 }
 
 
 mod sprites {
     use super::*;
+
 
     mod enable {
         use super::*;
@@ -71167,7 +68564,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_ds_2_out3_gbc() {
@@ -71188,7 +68584,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71213,7 +68608,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_ds_4_out0_gbc() {
@@ -71234,7 +68628,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -71264,7 +68657,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_late_scx4_ds_2_out3_gbc() {
@@ -71285,7 +68677,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71310,7 +68701,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space10_m3stat_ds_2_out0_gbc() {
@@ -71331,7 +68721,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71356,7 +68745,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space11_m3stat_ds_2_out0_gbc() {
@@ -71377,7 +68765,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71402,7 +68789,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space12_m3stat_ds_2_out0_gbc() {
@@ -71423,7 +68809,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71448,7 +68833,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space13_m3stat_ds_2_out0_gbc() {
@@ -71469,7 +68853,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71494,7 +68877,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space1_m3stat_ds_2_out0_gbc() {
@@ -71515,7 +68897,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71540,7 +68921,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space2_m3stat_ds_2_out0_gbc() {
@@ -71561,7 +68941,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71586,7 +68965,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space3_m3stat_ds_2_out0_gbc() {
@@ -71607,7 +68985,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71632,7 +69009,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space4_m3stat_ds_2_out0_gbc() {
@@ -71653,7 +69029,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71678,7 +69053,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space5_m3stat_ds_2_out0_gbc() {
@@ -71699,7 +69073,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71724,7 +69097,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space6_m3stat_ds_2_out0_gbc() {
@@ -71745,7 +69117,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71770,7 +69141,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space7_m3stat_ds_2_out0_gbc() {
@@ -71791,7 +69161,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71816,7 +69185,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space8_m3stat_ds_2_out0_gbc() {
@@ -71837,7 +69205,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71862,7 +69229,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr10space9_m3stat_ds_2_out0_gbc() {
@@ -71883,7 +69249,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71908,7 +69273,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_nr1space4_m3stat_ds_2_out0_gbc() {
@@ -71929,7 +69293,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -71954,7 +69317,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx1_m3stat_ds_2_out0_gbc() {
@@ -71975,7 +69337,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72000,7 +69361,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx2_m3stat_ds_2_out0_gbc() {
@@ -72021,7 +69381,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72046,7 +69405,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx3_m3stat_ds_2_out0_gbc() {
@@ -72067,7 +69425,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72092,7 +69449,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx4_m3stat_ds_2_out0_gbc() {
@@ -72113,7 +69469,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72138,7 +69493,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx4_nr1space4_m3stat_ds_2_out0_gbc() {
@@ -72159,7 +69513,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72184,7 +69537,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx5_m3stat_ds_2_out0_gbc() {
@@ -72205,7 +69557,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72230,7 +69581,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx6_m3stat_ds_2_out0_gbc() {
@@ -72251,7 +69601,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72276,7 +69625,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_scx7_m3stat_ds_2_out0_gbc() {
@@ -72297,7 +69645,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72322,7 +69669,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx0_m3stat_ds_2_out0_gbc() {
@@ -72343,7 +69689,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72368,7 +69713,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx1_m3stat_ds_2_out0_gbc() {
@@ -72389,7 +69733,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72414,7 +69757,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx2_m3stat_ds_2_out0_gbc() {
@@ -72435,7 +69777,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72460,7 +69801,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx3_m3stat_ds_2_out0_gbc() {
@@ -72481,7 +69821,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72506,7 +69845,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx4_m3stat_ds_2_out0_gbc() {
@@ -72527,7 +69865,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72552,7 +69889,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx5_m3stat_ds_2_out0_gbc() {
@@ -72573,7 +69909,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72598,7 +69933,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx6_m3stat_ds_2_out0_gbc() {
@@ -72619,7 +69953,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72644,7 +69977,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_10spritesprline_wx7_m3stat_ds_2_out0_gbc() {
@@ -72665,7 +69997,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72690,7 +70021,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_1pos8_8pos9_wx08_m3stat_ds_2_out0_gbc() {
@@ -72711,7 +70041,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72736,7 +70065,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap1_m3stat_ds_2_out0_gbc() {
@@ -72757,7 +70085,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72782,7 +70109,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap1_offset4_m3stat_ds_2_out0_gbc() {
@@ -72803,7 +70129,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72828,7 +70153,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap1_offset5_m3stat_ds_2_out0_gbc() {
@@ -72849,7 +70173,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72874,7 +70197,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap2_offset4_m3stat_ds_2_out0_gbc() {
@@ -72895,7 +70217,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72920,7 +70241,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap3_offset4_m3stat_ds_2_out0_gbc() {
@@ -72941,7 +70261,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -72966,7 +70285,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap4_offset4_m3stat_ds_2_out0_gbc() {
@@ -72987,7 +70305,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73012,7 +70329,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap5_offset4_m3stat_ds_2_out0_gbc() {
@@ -73033,7 +70349,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73058,7 +70373,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap6_offset4_m3stat_ds_2_out0_gbc() {
@@ -73079,7 +70393,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73104,7 +70417,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap7_offset4_m3stat_ds_2_out0_gbc() {
@@ -73125,7 +70437,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73150,7 +70461,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap8_m3stat_ds_2_out0_gbc() {
@@ -73171,7 +70481,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73196,7 +70505,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_2overlap8_offset4_m3stat_ds_2_out0_gbc() {
@@ -73217,7 +70525,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73242,7 +70549,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap1_scx5_m3stat_ds_2_out0_gbc() {
@@ -73263,7 +70569,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73288,7 +70593,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap1_scx6_m3stat_ds_2_out0_gbc() {
@@ -73309,7 +70613,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73334,7 +70637,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap1_scx7_m3stat_ds_2_out0_gbc() {
@@ -73355,7 +70657,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73380,7 +70681,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_m3stat_ds_2_out0_gbc() {
@@ -73401,7 +70701,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73426,7 +70725,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx1_m3stat_ds_2_out0_gbc() {
@@ -73447,7 +70745,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73472,7 +70769,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx2_m3stat_ds_2_out0_gbc() {
@@ -73493,7 +70789,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73518,7 +70813,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx3_m3stat_ds_2_out0_gbc() {
@@ -73539,7 +70833,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73564,7 +70857,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx4_m3stat_ds_2_out0_gbc() {
@@ -73585,7 +70877,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73610,7 +70901,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx5_m3stat_ds_2_out0_gbc() {
@@ -73631,7 +70921,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73656,7 +70945,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx6_m3stat_ds_2_out0_gbc() {
@@ -73677,7 +70965,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73702,7 +70989,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap2_scx7_m3stat_ds_2_out0_gbc() {
@@ -73723,7 +71009,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73748,7 +71033,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_m3stat_ds_2_out0_gbc() {
@@ -73769,7 +71053,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73794,7 +71077,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx1_m3stat_ds_2_out0_gbc() {
@@ -73815,7 +71097,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73840,7 +71121,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx2_m3stat_ds_2_out0_gbc() {
@@ -73861,7 +71141,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73886,7 +71165,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx3_m3stat_ds_2_out0_gbc() {
@@ -73907,7 +71185,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73932,7 +71209,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx4_m3stat_ds_2_out0_gbc() {
@@ -73953,7 +71229,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -73978,7 +71253,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx5_m3stat_ds_2_out0_gbc() {
@@ -73999,7 +71273,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74024,7 +71297,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx6_m3stat_ds_2_out0_gbc() {
@@ -74045,7 +71317,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74070,7 +71341,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap3_scx7_m3stat_ds_2_out0_gbc() {
@@ -74091,7 +71361,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74116,7 +71385,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_m3stat_ds_2_out0_gbc() {
@@ -74137,7 +71405,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74162,7 +71429,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx1_m3stat_ds_2_out0_gbc() {
@@ -74183,7 +71449,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74208,7 +71473,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx2_m3stat_ds_2_out0_gbc() {
@@ -74229,7 +71493,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74254,7 +71517,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx3_m3stat_ds_2_out0_gbc() {
@@ -74275,7 +71537,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74300,7 +71561,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx4_m3stat_ds_2_out0_gbc() {
@@ -74321,7 +71581,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74346,7 +71605,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx5_m3stat_ds_2_out0_gbc() {
@@ -74367,7 +71625,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74392,7 +71649,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx6_m3stat_ds_2_out0_gbc() {
@@ -74413,7 +71669,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74438,7 +71693,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap4_scx7_m3stat_ds_2_out0_gbc() {
@@ -74459,7 +71713,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74484,7 +71737,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_m3stat_ds_2_out0_gbc() {
@@ -74505,7 +71757,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74530,7 +71781,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_rev_m3stat_ds_2_out0_gbc() {
@@ -74551,7 +71801,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74576,7 +71825,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx1_m3stat_ds_2_out0_gbc() {
@@ -74597,7 +71845,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74622,7 +71869,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx2_m3stat_ds_2_out0_gbc() {
@@ -74643,7 +71889,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74668,7 +71913,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx3_m3stat_ds_2_out0_gbc() {
@@ -74689,7 +71933,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74714,7 +71957,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx4_m3stat_ds_2_out0_gbc() {
@@ -74735,7 +71977,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74760,7 +72001,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx5_m3stat_ds_2_out0_gbc() {
@@ -74781,7 +72021,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74806,7 +72045,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx6_m3stat_ds_2_out0_gbc() {
@@ -74827,7 +72065,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74852,7 +72089,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap5_scx7_m3stat_ds_2_out0_gbc() {
@@ -74873,7 +72109,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74898,7 +72133,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_m3stat_ds_2_out0_gbc() {
@@ -74919,7 +72153,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74944,7 +72177,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_rev_m3stat_ds_2_out0_gbc() {
@@ -74965,7 +72197,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -74990,7 +72221,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx1_m3stat_ds_2_out0_gbc() {
@@ -75011,7 +72241,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75036,7 +72265,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx2_m3stat_ds_2_out0_gbc() {
@@ -75057,7 +72285,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75082,7 +72309,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx3_m3stat_ds_2_out0_gbc() {
@@ -75103,7 +72329,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75128,7 +72353,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx4_m3stat_ds_2_out0_gbc() {
@@ -75149,7 +72373,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75174,7 +72397,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx5_m3stat_ds_2_out0_gbc() {
@@ -75195,7 +72417,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75220,7 +72441,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx6_m3stat_ds_2_out0_gbc() {
@@ -75241,7 +72461,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75266,7 +72485,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap6_scx7_m3stat_ds_2_out0_gbc() {
@@ -75287,7 +72505,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75312,7 +72529,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_m3stat_ds_2_out0_gbc() {
@@ -75333,7 +72549,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75358,7 +72573,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_rev_m3stat_ds_2_out0_gbc() {
@@ -75379,7 +72593,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75404,7 +72617,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx1_m3stat_ds_2_out0_gbc() {
@@ -75425,7 +72637,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75450,7 +72661,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx2_m3stat_ds_2_out0_gbc() {
@@ -75471,7 +72681,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75496,7 +72705,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx3_m3stat_ds_2_out0_gbc() {
@@ -75517,7 +72725,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75542,7 +72749,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx4_m3stat_ds_2_out0_gbc() {
@@ -75563,7 +72769,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75588,7 +72793,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx5_m3stat_ds_2_out0_gbc() {
@@ -75609,7 +72813,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75634,7 +72837,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx6_m3stat_ds_2_out0_gbc() {
@@ -75655,7 +72857,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75680,7 +72881,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap7_scx7_m3stat_ds_2_out0_gbc() {
@@ -75701,7 +72901,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75726,7 +72925,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_m3stat_ds_2_out0_gbc() {
@@ -75747,7 +72945,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75772,7 +72969,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx1_m3stat_ds_2_out0_gbc() {
@@ -75793,7 +72989,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75818,7 +73013,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx2_m3stat_ds_2_out0_gbc() {
@@ -75839,7 +73033,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75864,7 +73057,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx3_m3stat_ds_2_out0_gbc() {
@@ -75885,7 +73077,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75910,7 +73101,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx4_m3stat_ds_2_out0_gbc() {
@@ -75931,7 +73121,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -75956,7 +73145,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx5_m3stat_ds_2_out0_gbc() {
@@ -75977,7 +73165,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76002,7 +73189,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx6_m3stat_ds_2_out0_gbc() {
@@ -76023,7 +73209,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76048,7 +73233,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_3overlap8_scx7_m3stat_ds_2_out0_gbc() {
@@ -76069,7 +73253,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76094,7 +73277,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx08_m3stat_ds_2_out0_gbc() {
@@ -76115,7 +73297,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76140,7 +73321,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx08_scx5_m3stat_ds_2_out0_gbc() {
@@ -76161,7 +73341,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76186,7 +73365,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx09_m3stat_ds_2_out0_gbc() {
@@ -76207,7 +73385,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76232,7 +73409,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx0a_m3stat_ds_2_out0_gbc() {
@@ -76253,7 +73429,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76278,7 +73453,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx0b_m3stat_ds_2_out0_gbc() {
@@ -76299,7 +73473,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76324,7 +73497,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx0c_m3stat_ds_2_out0_gbc() {
@@ -76345,7 +73517,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76370,7 +73541,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx0d_m3stat_ds_2_out0_gbc() {
@@ -76391,7 +73561,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76416,7 +73585,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn space_9pos8_wx0e_m3stat_ds_2_out0_gbc() {
@@ -76437,7 +73605,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -76467,7 +73634,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_10xposa6_m0irq_1_out0_gbc() {
@@ -76488,7 +73654,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76513,7 +73678,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_10xposa6_m0irq_2_out2_gbc() {
@@ -76534,7 +73698,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76559,7 +73722,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_10xposa7_m0irq_1_out0_gbc() {
@@ -76580,7 +73742,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76605,7 +73766,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_10xposa7_m0irq_2_out2_gbc() {
@@ -76626,7 +73786,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76651,7 +73810,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_10xposa7_m3stat_1_out3_gbc() {
@@ -76672,7 +73830,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76697,7 +73854,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_10xposa7_m3stat_2_out0_gbc() {
@@ -76718,7 +73874,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76743,7 +73898,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xpos0_m3stat_1_out3_gbc() {
@@ -76764,7 +73918,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76789,7 +73942,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xpos0_m3stat_2_out0_gbc() {
@@ -76810,7 +73962,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76835,7 +73986,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa8_m3stat_1_out3_gbc() {
@@ -76856,7 +74006,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76881,7 +74030,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa8_m3stat_2_out0_gbc() {
@@ -76902,7 +74050,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76927,7 +74074,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m2stat_1_out2_gbc() {
@@ -76948,7 +74094,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -76973,7 +74118,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m2stat_2_out3_gbc() {
@@ -76994,7 +74138,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77019,7 +74162,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m3stat_1_out3_gbc() {
@@ -77040,7 +74182,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77065,7 +74206,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m3stat_2_out0_gbc() {
@@ -77086,7 +74226,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77111,7 +74250,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m3stat_ds_2_out0_gbc() {
@@ -77132,7 +74270,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77157,7 +74294,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa0_m3stat_ds_2_out0_gbc() {
@@ -77178,7 +74314,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77203,7 +74338,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa1_m3stat_ds_2_out0_gbc() {
@@ -77224,7 +74358,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77249,7 +74382,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa2_m3stat_ds_2_out0_gbc() {
@@ -77270,7 +74402,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77295,7 +74426,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa3_m3stat_ds_2_out0_gbc() {
@@ -77316,7 +74446,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77341,7 +74470,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa4_m3stat_ds_2_out0_gbc() {
@@ -77362,7 +74490,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77387,7 +74514,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa5_m3stat_ds_2_out0_gbc() {
@@ -77408,7 +74534,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77433,7 +74558,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa6_m3stat_ds_2_out0_gbc() {
@@ -77454,7 +74578,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77479,7 +74602,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_1xposa7_m3stat_ds_2_out0_gbc() {
@@ -77500,7 +74622,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77525,7 +74646,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap1_m3stat_ds_2_out0_gbc() {
@@ -77546,7 +74666,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77571,7 +74690,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap2_m3stat_ds_2_out0_gbc() {
@@ -77592,7 +74710,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77617,7 +74734,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap3_m3stat_ds_2_out0_gbc() {
@@ -77638,7 +74754,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77663,7 +74778,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap4_m3stat_ds_2_out0_gbc() {
@@ -77684,7 +74798,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77709,7 +74822,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap5_m3stat_ds_2_out0_gbc() {
@@ -77730,7 +74842,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77755,7 +74866,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap6_m3stat_ds_2_out0_gbc() {
@@ -77776,7 +74886,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77801,7 +74910,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap7_m3stat_ds_2_out0_gbc() {
@@ -77822,7 +74930,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77847,7 +74954,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2overlap8_m3stat_ds_2_out0_gbc() {
@@ -77868,7 +74974,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77893,7 +74998,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2xposa2overlap8_m3stat_ds_2_out0_gbc() {
@@ -77914,7 +75018,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77939,7 +75042,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_2xposa7overlap8_m3stat_ds_2_out0_gbc() {
@@ -77960,7 +75062,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -77985,7 +75086,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_3overlap8_m3stat_ds_2_out0_gbc() {
@@ -78006,7 +75106,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78031,7 +75130,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m0stat_1_out0_gbc() {
@@ -78052,7 +75150,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78077,7 +75174,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_10spritesprline_m0stat_2_out2_gbc() {
@@ -78098,7 +75194,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78123,7 +75218,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_1sprite8pbgcover_m3stat_ds_2_out0_gbc() {
@@ -78144,7 +75238,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78169,7 +75262,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_1sprite8pbgprior_m3stat_ds_2_out0_gbc() {
@@ -78190,7 +75282,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78215,7 +75306,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_m3stat_1_out3_gbc() {
@@ -78236,7 +75326,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78261,7 +75350,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_m3stat_2_out0_gbc() {
@@ -78282,7 +75370,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78307,7 +75394,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_m3stat_ds_2_out0_gbc() {
@@ -78328,7 +75414,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78353,7 +75438,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_offset7_m3stat_1_out3_gbc() {
@@ -78374,7 +75458,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78399,7 +75482,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_offset7_m3stat_2_out0_gbc() {
@@ -78420,7 +75502,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78445,7 +75526,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_scx1_offset7_m3stat_1_out3_gbc() {
@@ -78466,7 +75546,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78491,7 +75570,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_scx1_offset7_m3stat_2_out0_gbc() {
@@ -78512,7 +75590,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78537,7 +75614,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos01_m3stat_1_out3_gbc() {
@@ -78558,7 +75634,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78583,7 +75658,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos01_m3stat_2_out0_gbc() {
@@ -78604,7 +75678,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78629,7 +75702,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos01_scx4_m3stat_1_out3_gbc() {
@@ -78650,7 +75722,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78675,7 +75746,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos01_scx4_m3stat_2_out0_gbc() {
@@ -78696,7 +75766,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78721,7 +75790,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos07_m3stat_1_out3_gbc() {
@@ -78742,7 +75810,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78767,7 +75834,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos07_m3stat_2_out0_gbc() {
@@ -78788,7 +75854,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78813,7 +75878,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos09_scx4_m3stat_1_out3_gbc() {
@@ -78834,7 +75898,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78859,7 +75922,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_1spritesprline_xpos09_scx4_m3stat_2_out0_gbc() {
@@ -78880,7 +75942,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78905,7 +75966,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_2spritesprline_m3stat_1_out3_gbc() {
@@ -78926,7 +75986,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78951,7 +76010,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_2spritesprline_m3stat_2_out0_gbc() {
@@ -78972,7 +76030,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -78997,7 +76054,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_2spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79018,7 +76074,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79043,7 +76098,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_3spritesprline_m3stat_1_out3_gbc() {
@@ -79064,7 +76118,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79089,7 +76142,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_3spritesprline_m3stat_2_out0_gbc() {
@@ -79110,7 +76162,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79135,7 +76186,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_3spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79156,7 +76206,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79181,7 +76230,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_4spritesprline_m3stat_1_out3_gbc() {
@@ -79202,7 +76250,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79227,7 +76274,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_4spritesprline_m3stat_2_out0_gbc() {
@@ -79248,7 +76294,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79273,7 +76318,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_4spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79294,7 +76338,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79319,7 +76362,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_5spritesprline_m3stat_1_out3_gbc() {
@@ -79340,7 +76382,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79365,7 +76406,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_5spritesprline_m3stat_2_out0_gbc() {
@@ -79386,7 +76426,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79411,7 +76450,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_5spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79432,7 +76470,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79457,7 +76494,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_6spritesprline_m3stat_1_out3_gbc() {
@@ -79478,7 +76514,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79503,7 +76538,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_6spritesprline_m3stat_2_out0_gbc() {
@@ -79524,7 +76558,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79549,7 +76582,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_6spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79570,7 +76602,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79595,7 +76626,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_7spritesprline_m3stat_1_out3_gbc() {
@@ -79616,7 +76646,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79641,7 +76670,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_7spritesprline_m3stat_2_out0_gbc() {
@@ -79662,7 +76690,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79687,7 +76714,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_7spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79708,7 +76734,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79733,7 +76758,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_8spritesprline_m3stat_1_out3_gbc() {
@@ -79754,7 +76778,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79779,7 +76802,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_8spritesprline_m3stat_2_out0_gbc() {
@@ -79800,7 +76822,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79825,7 +76846,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_8spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79846,7 +76866,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79871,7 +76890,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_9spritesprline_m3stat_1_out3_gbc() {
@@ -79892,7 +76910,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79917,7 +76934,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_9spritesprline_m3stat_2_out0_gbc() {
@@ -79938,7 +76954,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -79963,7 +76978,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprites_other_9spritesprline_m3stat_ds_2_out0_gbc() {
@@ -79984,7 +76998,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80009,7 +77022,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_2_out3_dmg() {
@@ -80030,7 +77042,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80055,7 +77066,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp00_1_out3_dmg() {
@@ -80076,7 +77086,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80101,7 +77110,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp00_2_out0_dmg() {
@@ -80122,7 +77130,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80147,7 +77154,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp00_ds_1_out3_gbc() {
@@ -80168,7 +77174,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80193,7 +77198,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp01_1_out3_dmg() {
@@ -80214,7 +77218,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80239,7 +77242,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp01_2_out0_dmg() {
@@ -80260,7 +77262,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80285,7 +77286,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp01_ds_1_out3_gbc() {
@@ -80306,7 +77306,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80331,7 +77330,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp02_1_out3_dmg() {
@@ -80352,7 +77350,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80377,7 +77374,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp02_2_out0_dmg() {
@@ -80398,7 +77394,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80423,7 +77418,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp39_1_out3_dmg() {
@@ -80444,7 +77438,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80469,7 +77462,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp39_2_out0_dmg() {
@@ -80490,7 +77482,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80515,7 +77506,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange2_sp39_ds_1_out3_gbc() {
@@ -80536,7 +77526,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80561,7 +77550,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_1_out0_dmg() {
@@ -80582,7 +77570,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80607,7 +77594,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_2_out0_dmg() {
@@ -80629,6 +77615,7 @@ mod sprites {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_sizechange_2_out3_gbc() {
@@ -80649,7 +77636,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80674,7 +77660,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_3_out3_gbc() {
@@ -80695,7 +77680,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80720,7 +77704,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_ds_2_out3_gbc() {
@@ -80741,7 +77724,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80766,7 +77748,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp00_1_out0_gbc() {
@@ -80787,7 +77768,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80812,7 +77792,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp00_2_out3_gbc() {
@@ -80833,7 +77812,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80858,7 +77836,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp00_3_out3_gbc() {
@@ -80879,7 +77856,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80904,7 +77880,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp00_4_out0_gbc() {
@@ -80925,7 +77900,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80950,7 +77924,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp00_ds_2_out3_gbc() {
@@ -80971,7 +77944,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -80996,7 +77968,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp01_1_out0_gbc() {
@@ -81017,7 +77988,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81041,6 +78011,7 @@ mod sprites {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_sizechange_sp01_2_out3_gbc() {
@@ -81061,7 +78032,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81086,7 +78056,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp01_3_out3_gbc() {
@@ -81107,7 +78076,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81132,7 +78100,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp01_ds_2_out3_gbc() {
@@ -81153,7 +78120,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81178,7 +78144,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp02_1_out0_gbc() {
@@ -81199,7 +78164,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81224,7 +78188,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp02_2_out3_gbc() {
@@ -81245,7 +78208,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81270,7 +78232,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp39_1_out0_gbc() {
@@ -81291,7 +78252,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81315,6 +78275,7 @@ mod sprites {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_sizechange_sp39_2_out3_gbc() {
@@ -81335,7 +78296,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81360,7 +78320,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp39_3_out3_gbc() {
@@ -81381,7 +78340,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81406,7 +78364,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_sizechange_sp39_ds_2_out3_gbc() {
@@ -81427,7 +78384,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81452,7 +78408,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn mix_m3stat_1_out3_gbc() {
@@ -81473,7 +78428,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81498,7 +78452,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn mix_m3stat_2_out0_gbc() {
@@ -81519,7 +78472,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81544,7 +78496,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn mix_m3stat_ds_2_out0_gbc() {
@@ -81565,7 +78516,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81590,7 +78540,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_disable_spx18_2_out3_dmg() {
@@ -81611,7 +78560,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81636,7 +78584,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_disable_spx19_2_out3_dmg() {
@@ -81657,7 +78604,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81682,7 +78628,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_disable_spx1a_2_out3_dmg() {
@@ -81703,7 +78648,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81728,7 +78672,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_disable_spx1b_2_out3_dmg() {
@@ -81749,7 +78692,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81774,7 +78716,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_enable_spx18_2_out0_dmg() {
@@ -81795,7 +78736,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81820,7 +78760,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_enable_spx1a_1_out3_dmg() {
@@ -81841,7 +78780,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81866,7 +78804,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_enable_spx1b_1_out3_dmg() {
@@ -81887,7 +78824,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81912,7 +78848,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_late_disable_spx18_1_out0_dmg() {
@@ -81933,7 +78868,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -81958,7 +78892,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_late_disable_spx19_1_out0_dmg() {
@@ -81979,7 +78912,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -82004,7 +78936,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_late_disable_spx1a_1_out0_dmg() {
@@ -82025,7 +78956,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -82050,7 +78980,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_late_disable_spx1b_1_out0_dmg() {
@@ -82073,7 +79002,6 @@ mod sprites {
         }
 
 
-
         #[test]
         #[ignore]
         fn sprite_late_late_disable_spx1b_2_out3_dmg() {
@@ -82094,7 +79022,6 @@ mod sprites {
 
             run_test_case(test_case);
         }
-
     }
 }
 
@@ -82125,7 +79052,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_ff_tma_1_outff_gbc() {
@@ -82146,7 +79072,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82171,7 +79096,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_ff_tma_2_out00_gbc() {
@@ -82192,7 +79116,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82217,7 +79140,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_ff_tma_3_outfe_gbc() {
@@ -82238,7 +79160,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82263,7 +79184,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_offset1_ff_tma_1_outff_gbc() {
@@ -82284,7 +79204,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82309,7 +79228,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_offset1_ff_tma_2_out00_gbc() {
@@ -82330,7 +79248,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82355,7 +79272,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_offset1_ff_tma_3_outfe_gbc() {
@@ -82376,7 +79292,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82401,7 +79316,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_offset2_ff_tma_1_outff_gbc() {
@@ -82422,7 +79336,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82447,7 +79360,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_offset2_ff_tma_2_out00_gbc() {
@@ -82468,7 +79380,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82493,7 +79404,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_1stopstart_offset2_ff_tma_3_outfe_gbc() {
@@ -82514,7 +79424,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82539,7 +79448,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_div_write_start_1_outf0_gbc() {
@@ -82560,7 +79468,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82585,7 +79492,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_div_write_start_2_outf1_gbc() {
@@ -82606,7 +79512,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82631,7 +79536,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_fe_ff_1_outfe_gbc() {
@@ -82652,7 +79556,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82677,7 +79580,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_fe_ff_2_outff_gbc() {
@@ -82698,7 +79600,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82723,7 +79624,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_ff_tma_1_outff_gbc() {
@@ -82744,7 +79644,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82769,7 +79668,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_ff_tma_2_out00_gbc() {
@@ -82790,7 +79688,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82815,7 +79712,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_ff_tma_3_outfe_gbc() {
@@ -82836,7 +79732,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82861,7 +79756,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_1_oute0_gbc() {
@@ -82882,7 +79776,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82907,7 +79800,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_2_oute4_gbc() {
@@ -82928,7 +79820,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82953,7 +79844,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_ds_2_oute4_gbc() {
@@ -82974,7 +79864,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -82999,7 +79888,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_ifw_1_oute4_gbc() {
@@ -83020,7 +79908,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83045,7 +79932,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_ifw_2_oute0_gbc() {
@@ -83066,7 +79952,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83091,7 +79976,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_ifw_ds_2_oute0_gbc() {
@@ -83112,7 +79996,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83137,7 +80020,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_late_retrigger_1_oute4_gbc() {
@@ -83158,7 +80040,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83182,6 +80063,7 @@ mod tima {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn tc00_irq_late_retrigger_2_oute0_gbc() {
@@ -83202,7 +80084,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83227,7 +80108,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_late_retrigger_3_oute0_gbc() {
@@ -83248,7 +80128,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83273,7 +80152,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_irq_late_retrigger_ds_2_oute0_gbc() {
@@ -83294,7 +80172,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83319,7 +80196,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_1a_outff_gbc() {
@@ -83340,7 +80216,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83365,7 +80240,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_1b_out00_gbc() {
@@ -83386,7 +80260,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83411,7 +80284,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_2a_outfe_gbc() {
@@ -83432,7 +80304,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83457,7 +80328,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_2b_outff_gbc() {
@@ -83478,7 +80348,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83503,7 +80372,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_3a_outfe_gbc() {
@@ -83524,7 +80392,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83549,7 +80416,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_3b_outff_gbc() {
@@ -83570,7 +80436,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83595,7 +80460,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_4a_outfe_gbc() {
@@ -83616,7 +80480,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83641,7 +80504,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_4b_outff_gbc() {
@@ -83662,7 +80524,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83687,7 +80548,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_if_1a_oute0_gbc() {
@@ -83708,7 +80568,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83733,7 +80592,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_if_1b_oute4_gbc() {
@@ -83754,7 +80612,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83779,7 +80636,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_div_write_if_2_oute4_gbc() {
@@ -83800,7 +80656,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83825,7 +80680,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_stop_inc_1_outfe_gbc() {
@@ -83846,7 +80700,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83871,7 +80724,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_stop_inc_2_outff_gbc() {
@@ -83892,7 +80744,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83917,7 +80768,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_stop_irq_1_oute0_gbc() {
@@ -83938,7 +80788,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -83963,7 +80812,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_stop_irq_2_oute4_gbc() {
@@ -83984,7 +80832,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84009,7 +80856,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_stop_of_1_outff_gbc() {
@@ -84030,7 +80876,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84055,7 +80900,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_stop_of_2_outfe_gbc() {
@@ -84076,7 +80920,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84101,7 +80944,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_1_outff_gbc() {
@@ -84122,7 +80964,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84147,7 +80988,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_2_outff_gbc() {
@@ -84168,7 +81008,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84193,7 +81032,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_3_outff_gbc() {
@@ -84214,7 +81052,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84239,7 +81076,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_4_outff_gbc() {
@@ -84260,7 +81096,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84285,7 +81120,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_5_out00_gbc() {
@@ -84306,7 +81140,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84331,7 +81164,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_6_outfe_gbc() {
@@ -84352,7 +81184,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84377,7 +81208,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_7_outff_gbc() {
@@ -84398,7 +81228,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84423,7 +81252,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_late_tc01_8_outff_gbc() {
@@ -84444,7 +81272,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84469,7 +81296,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_nop_div_write_start_1_outf0_gbc() {
@@ -84490,7 +81316,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84515,7 +81340,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_nop_div_write_start_2_outf1_gbc() {
@@ -84536,7 +81360,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84561,7 +81384,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_start_2_outf1_gbc() {
@@ -84582,7 +81404,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84607,7 +81428,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_start_4_outf1_dmg() {
@@ -84628,7 +81448,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84653,7 +81472,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_tc01_ff_tma_1_outff_gbc() {
@@ -84674,7 +81492,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84699,7 +81516,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_tc01_ff_tma_2_out00_gbc() {
@@ -84720,7 +81536,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84745,7 +81560,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_tc01_ff_tma_3_outf0_gbc() {
@@ -84766,7 +81580,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84791,7 +81604,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_tc01_late_tc00_of_1_outff_gbc() {
@@ -84812,7 +81624,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84837,7 +81648,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc00_tc01_late_tc00_of_2_outf0_gbc() {
@@ -84858,7 +81668,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84883,7 +81692,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_ff_tma_1_outff_gbc() {
@@ -84904,7 +81712,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84929,7 +81736,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_ff_tma_2_out00_gbc() {
@@ -84950,7 +81756,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -84975,7 +81780,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_ff_tma_3_outf0_gbc() {
@@ -84996,7 +81800,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85021,7 +81824,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_irq_1_oute0_gbc() {
@@ -85042,7 +81844,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85067,7 +81868,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_irq_2_oute4_gbc() {
@@ -85088,7 +81888,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85113,7 +81912,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset1_ff_tma_1_outff_gbc() {
@@ -85134,7 +81932,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85159,7 +81956,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset1_ff_tma_2_out00_gbc() {
@@ -85180,7 +81976,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85205,7 +82000,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset1_ff_tma_3_outf0_gbc() {
@@ -85226,7 +82020,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85251,7 +82044,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset1_irq_1_oute0_gbc() {
@@ -85272,7 +82064,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85297,7 +82088,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset1_irq_2_oute4_gbc() {
@@ -85318,7 +82108,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85343,7 +82132,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset2_ff_tma_1_outff_gbc() {
@@ -85364,7 +82152,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85389,7 +82176,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset2_ff_tma_2_out00_gbc() {
@@ -85410,7 +82196,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85435,7 +82220,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset2_ff_tma_3_outf0_gbc() {
@@ -85456,7 +82240,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85481,7 +82264,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset2_irq_1_oute0_gbc() {
@@ -85502,7 +82284,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85527,7 +82308,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset2_irq_2_oute4_gbc() {
@@ -85548,7 +82328,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85573,7 +82352,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset3_ff_tma_1_outff_gbc() {
@@ -85594,7 +82372,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85619,7 +82396,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset3_ff_tma_2_out00_gbc() {
@@ -85640,7 +82416,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85665,7 +82440,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset3_ff_tma_3_outf0_gbc() {
@@ -85686,7 +82460,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85711,7 +82484,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset3_irq_1_oute0_gbc() {
@@ -85732,7 +82504,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85757,7 +82528,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_1stopstart_offset3_irq_2_oute4_gbc() {
@@ -85778,7 +82548,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85803,7 +82572,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_div_write_start_1_outf1_gbc() {
@@ -85824,7 +82592,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85849,7 +82616,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_div_write_start_2_outf2_gbc() {
@@ -85870,7 +82636,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85895,7 +82660,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_fe_ff_1_outfe_gbc() {
@@ -85916,7 +82680,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85941,7 +82704,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_fe_ff_2_outff_gbc() {
@@ -85962,7 +82724,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -85987,7 +82748,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_ff_tma_1_outff_gbc() {
@@ -86008,7 +82768,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86033,7 +82792,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_ff_tma_2_out00_gbc() {
@@ -86054,7 +82812,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86079,7 +82836,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_ff_tma_3_outf0_gbc() {
@@ -86100,7 +82856,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86125,7 +82880,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_irq_1_oute0_gbc() {
@@ -86146,7 +82900,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86171,7 +82924,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_irq_2_oute4_gbc() {
@@ -86192,7 +82944,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86217,7 +82968,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_1a_outff_gbc() {
@@ -86238,7 +82988,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86263,7 +83012,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_1b_out00_gbc() {
@@ -86284,7 +83032,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86309,7 +83056,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_2a_outfe_gbc() {
@@ -86330,7 +83076,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86355,7 +83100,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_2b_outff_gbc() {
@@ -86376,7 +83120,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86401,7 +83144,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_3a_outfe_gbc() {
@@ -86422,7 +83164,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86447,7 +83188,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_3b_outff_gbc() {
@@ -86468,7 +83208,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86493,7 +83232,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_4a_outfe_gbc() {
@@ -86514,7 +83252,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86539,7 +83276,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_div_write_4b_outff_gbc() {
@@ -86560,7 +83296,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86585,7 +83320,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_stop_inc_1_outfd_gbc() {
@@ -86606,7 +83340,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86631,7 +83364,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_stop_inc_2_outfe_gbc() {
@@ -86652,7 +83384,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86677,7 +83408,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_stop_irq_1_oute0_gbc() {
@@ -86698,7 +83428,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86723,7 +83452,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_stop_irq_2_oute4_gbc() {
@@ -86744,7 +83472,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86769,7 +83496,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_stop_of_1_outff_gbc() {
@@ -86790,7 +83516,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86815,7 +83540,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_stop_of_2_outf0_gbc() {
@@ -86836,7 +83560,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86861,7 +83584,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_inc_1_out11_gbc() {
@@ -86882,7 +83604,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86907,7 +83628,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_inc_2_out10_gbc() {
@@ -86928,7 +83648,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86953,7 +83672,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_irq_1_oute0_gbc() {
@@ -86974,7 +83692,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -86999,7 +83716,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_irq_2_oute4_gbc() {
@@ -87020,7 +83736,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87045,7 +83760,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_tma_1_out11_gbc() {
@@ -87066,7 +83780,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87091,7 +83804,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_tma_2_outf1_gbc() {
@@ -87112,7 +83824,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87137,7 +83848,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tima_tma_3_out11_gbc() {
@@ -87158,7 +83868,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87183,7 +83892,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tma_1_out11_gbc() {
@@ -87204,7 +83912,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87229,7 +83936,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_late_tma_2_outf1_gbc() {
@@ -87250,7 +83956,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87275,7 +83980,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_nop_div_write_start_1_outf1_gbc() {
@@ -87296,7 +84000,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87321,7 +84024,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_nop_div_write_start_2_outf2_gbc() {
@@ -87342,7 +84044,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87367,7 +84068,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_tma_next_1_outf0_gbc() {
@@ -87388,7 +84088,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87413,7 +84112,6 @@ mod tima {
     }
 
 
-
     #[test]
     #[ignore]
     fn tc01_tma_next_2_outf1_gbc() {
@@ -87434,7 +84132,6 @@ mod tima {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -87464,7 +84161,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_d3_out01_gbc() {
@@ -87485,7 +84181,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87510,7 +84205,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_db_out01_gbc() {
@@ -87531,7 +84225,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87556,7 +84249,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_e3_out01_gbc() {
@@ -87577,7 +84269,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87602,7 +84293,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_e4_out01_gbc() {
@@ -87623,7 +84313,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87648,7 +84337,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_eb_out01_gbc() {
@@ -87669,7 +84357,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87694,7 +84381,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_ec_out01_gbc() {
@@ -87715,7 +84401,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87740,7 +84425,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_ed_out01_gbc() {
@@ -87761,7 +84445,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87786,7 +84469,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_f4_out01_gbc() {
@@ -87807,7 +84489,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87832,7 +84513,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_fc_out01_gbc() {
@@ -87853,7 +84533,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87878,7 +84557,6 @@ mod undef_ops {
     }
 
 
-
     #[test]
     #[ignore]
     fn undef_op_fd_out01_gbc() {
@@ -87899,7 +84577,6 @@ mod undef_ops {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -87929,7 +84606,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn vram_m3_10spritesprline_postread_1_out3_gbc() {
@@ -87950,7 +84626,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -87975,7 +84650,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn vram_m3_10spritesprline_postread_2_out0_gbc() {
@@ -87996,7 +84670,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88021,7 +84694,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_1_out3_gbc() {
@@ -88042,7 +84714,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88067,7 +84738,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_2_out0_gbc() {
@@ -88088,7 +84758,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88113,7 +84782,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_ds_2_out0_gbc() {
@@ -88134,7 +84802,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88159,7 +84826,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx2_1_out3_gbc() {
@@ -88180,7 +84846,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88205,7 +84870,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx2_2_out0_gbc() {
@@ -88226,7 +84890,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88251,7 +84914,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx3_1_out3_gbc() {
@@ -88272,7 +84934,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88297,7 +84958,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx3_2_out0_gbc() {
@@ -88318,7 +84978,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88343,7 +85002,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx5_1_out3_gbc() {
@@ -88364,7 +85022,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88389,7 +85046,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx5_2_out0_gbc() {
@@ -88410,7 +85066,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88435,7 +85090,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn postread_scx5_ds_2_out0_gbc() {
@@ -88456,7 +85110,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88481,7 +85134,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_1_out0_gbc() {
@@ -88502,7 +85154,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88526,6 +85177,7 @@ mod vram_m3 {
         run_test_case(test_case);
     }
 
+
     #[test]
     #[ignore]
     fn preread_2_out0_gbc() {
@@ -88546,7 +85198,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88571,7 +85222,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_3_out3_gbc() {
@@ -88592,7 +85242,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88617,7 +85266,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_ds_2_out3_gbc() {
@@ -88638,7 +85286,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88663,7 +85310,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_ds_lcdoffset1_2_out3_gbc() {
@@ -88684,7 +85330,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88709,7 +85354,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_lcdoffset1_2_out3_gbc() {
@@ -88730,7 +85374,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88755,7 +85398,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn preread_lcdoffset2_2_out3_gbc() {
@@ -88776,7 +85418,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88801,7 +85442,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_ds_2_out0_gbc() {
@@ -88822,7 +85462,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88847,7 +85486,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_ds_lcdoffset1_2_out0_gbc() {
@@ -88868,7 +85506,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88893,7 +85530,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_lcdoffset1_2_out0_gbc() {
@@ -88914,7 +85550,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88939,7 +85574,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn prewrite_lcdoffset2_2_out0_gbc() {
@@ -88960,7 +85594,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -88985,7 +85618,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3start_1_out1_gbc() {
@@ -89006,7 +85638,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89031,7 +85662,6 @@ mod vram_m3 {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3start_2_out0_gbc() {
@@ -89052,7 +85682,6 @@ mod vram_m3 {
 
         run_test_case(test_case);
     }
-
 }
 
 
@@ -89082,7 +85711,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_1_out7_gbc() {
@@ -89103,7 +85731,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89128,7 +85755,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_2_out7_gbc() {
@@ -89149,7 +85775,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89174,7 +85799,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_3_out0_gbc() {
@@ -89195,7 +85819,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89220,7 +85843,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_4_out0_gbc() {
@@ -89241,7 +85863,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89266,7 +85887,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_5_out1_gbc() {
@@ -89287,7 +85907,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89312,7 +85931,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_6_out1_gbc() {
@@ -89333,7 +85951,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89358,7 +85975,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_ds_2_out7_gbc() {
@@ -89379,7 +85995,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89404,7 +86019,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_ds_4_out0_gbc() {
@@ -89425,7 +86039,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89450,7 +86063,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_ds_6_out1_gbc() {
@@ -89471,7 +86083,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89496,7 +86107,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx3_1_out7_gbc() {
@@ -89517,7 +86127,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89542,7 +86151,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx3_2_out7_gbc() {
@@ -89563,7 +86171,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89588,7 +86195,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx3_3_out0_gbc() {
@@ -89609,7 +86215,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89634,7 +86239,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx3_4_out0_gbc() {
@@ -89655,7 +86259,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89680,7 +86283,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx3_5_out3_gbc() {
@@ -89701,7 +86303,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89726,7 +86327,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx3_6_out3_gbc() {
@@ -89747,7 +86347,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89772,7 +86371,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx5_ds_2_out7_gbc() {
@@ -89793,7 +86391,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89818,7 +86415,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx5_ds_4_out0_gbc() {
@@ -89839,7 +86435,6 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 
 
     #[test]
@@ -89864,7 +86459,6 @@ mod vramw_m3end {
     }
 
 
-
     #[test]
     #[ignore]
     fn vramw_m3end_scx5_ds_6_out5_gbc() {
@@ -89885,12 +86479,12 @@ mod vramw_m3end {
 
         run_test_case(test_case);
     }
-
 }
 
 
 mod window {
     use super::*;
+
 
     mod arg {
         use super::*;
@@ -89918,7 +86512,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_3_out3_gbc() {
@@ -89939,7 +86532,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -89963,6 +86555,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_enable_aftervblank_4_out0_gbc() {
@@ -89983,7 +86576,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90008,7 +86600,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_5_out0_gbc() {
@@ -90029,7 +86620,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90054,7 +86644,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx_late_wy_ffto4_ly4_wx00_1_out3_gbc() {
@@ -90075,7 +86664,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90099,6 +86687,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_scx_late_wy_ffto4_ly4_wx00_2_out0_gbc() {
@@ -90119,7 +86708,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90144,7 +86732,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx_late_wy_ffto4_ly4_wx00_3_out0_gbc() {
@@ -90165,7 +86752,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90190,7 +86776,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx_late_wy_ffto4_ly4_wx20_1_out3_gbc() {
@@ -90211,7 +86796,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90235,6 +86819,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_scx_late_wy_ffto4_ly4_wx20_2_out0_gbc() {
@@ -90255,7 +86840,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90280,7 +86864,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx_late_wy_ffto4_ly4_wx20_3_out0_gbc() {
@@ -90301,7 +86884,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90326,7 +86908,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_late_wy_ffto2_ly2_1_out0_gbc() {
@@ -90347,7 +86928,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90372,7 +86952,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_late_wy_ffto2_ly2_2_out3_gbc() {
@@ -90393,7 +86972,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90418,7 +86996,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_10to0_ly1_1_out3_gbc() {
@@ -90439,7 +87016,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90463,6 +87039,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_10to0_ly1_2_out0_gbc() {
@@ -90483,7 +87060,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90508,7 +87084,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_10to0_ly1_3_out0_gbc() {
@@ -90529,7 +87104,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90554,7 +87128,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_10to1_ly1_1_out3_gbc() {
@@ -90575,7 +87148,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90599,6 +87171,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_10to1_ly1_2_out0_gbc() {
@@ -90619,7 +87192,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90644,7 +87216,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_10to1_ly1_3_out0_gbc() {
@@ -90665,7 +87236,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90690,7 +87260,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1_out0_gbc() {
@@ -90711,7 +87280,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90736,7 +87304,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1toff_1_out0_gbc() {
@@ -90757,7 +87324,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90781,6 +87347,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_1toff_2_out3_gbc() {
@@ -90801,7 +87368,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90826,7 +87392,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1toff_3_out3_gbc() {
@@ -90847,7 +87412,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90872,7 +87436,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1toff_ds_2_out3_gbc() {
@@ -90893,7 +87456,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90918,7 +87480,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1toff_ds_lcdoffset1_2_out3_gbc() {
@@ -90939,7 +87500,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -90964,7 +87524,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1toff_lcdoffset1_2_out3_gbc() {
@@ -90985,7 +87544,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91010,7 +87568,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_2_out3_gbc() {
@@ -91031,7 +87588,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91056,7 +87612,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_2toff_1_out0_gbc() {
@@ -91077,7 +87632,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91101,6 +87655,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_2toff_2_out3_gbc() {
@@ -91121,7 +87676,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91146,7 +87700,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_2toff_3_out3_gbc() {
@@ -91167,7 +87720,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91192,7 +87744,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly0_1_out3_gbc() {
@@ -91213,7 +87764,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91237,6 +87787,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly0_2_out0_gbc() {
@@ -91257,7 +87808,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91282,7 +87832,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly0_3_out0_gbc() {
@@ -91303,7 +87852,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91328,7 +87876,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly2_1_out3_gbc() {
@@ -91349,7 +87896,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91373,6 +87919,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly2_2_out0_gbc() {
@@ -91393,7 +87940,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91418,7 +87964,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly2_3_out0_gbc() {
@@ -91439,7 +87984,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91464,7 +88008,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto0_ly2_ds_2_out0_gbc() {
@@ -91485,7 +88028,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91510,7 +88052,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto1_ly2_1_out3_gbc() {
@@ -91531,7 +88072,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91555,6 +88095,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto1_ly2_2_out0_gbc() {
@@ -91575,7 +88116,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91600,7 +88140,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto1_ly2_3_out0_gbc() {
@@ -91621,7 +88160,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91646,7 +88184,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_1_out3_gbc() {
@@ -91667,7 +88204,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91691,6 +88227,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_2_out0_gbc() {
@@ -91711,7 +88248,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91736,7 +88272,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_3_out0_gbc() {
@@ -91757,7 +88292,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91782,7 +88316,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_ds_2_out0_gbc() {
@@ -91803,7 +88336,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91828,7 +88360,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx2_1_out3_gbc() {
@@ -91849,7 +88380,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91873,6 +88403,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx2_2_out0_gbc() {
@@ -91893,7 +88424,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91918,7 +88448,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx2_3_out0_gbc() {
@@ -91939,7 +88468,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -91964,7 +88492,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx3_1_out3_gbc() {
@@ -91985,7 +88512,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92009,6 +88535,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx3_2_out0_gbc() {
@@ -92029,7 +88556,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92054,7 +88580,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx3_3_out0_gbc() {
@@ -92075,7 +88600,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92100,7 +88624,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx5_1_out3_gbc() {
@@ -92121,7 +88644,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92145,6 +88667,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx5_2_out0_gbc() {
@@ -92165,7 +88688,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92190,7 +88712,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx5_3_out0_gbc() {
@@ -92211,7 +88732,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92236,7 +88756,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_scx5_ds_2_out0_gbc() {
@@ -92257,7 +88776,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92282,7 +88800,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_wx00_1_out3_gbc() {
@@ -92303,7 +88820,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92327,6 +88843,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_wx00_2_out0_gbc() {
@@ -92347,7 +88864,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92372,7 +88888,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_wx00_3_out0_gbc() {
@@ -92393,7 +88908,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92418,7 +88932,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_wx0f_1_out3_gbc() {
@@ -92439,7 +88952,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92463,6 +88975,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_wx0f_2_out0_gbc() {
@@ -92483,7 +88996,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92508,7 +89020,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ffto2_ly2_wx0f_3_out0_gbc() {
@@ -92529,7 +89040,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -92564,6 +89074,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn weon_wx18_weoff_weon_wx80_gbc() {
@@ -92585,7 +89096,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92615,6 +89125,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wx17_weoff_wxa5_weon_gbc() {
@@ -92636,7 +89147,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92666,6 +89176,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wx17_wxa5_gbc() {
@@ -92687,7 +89198,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92717,6 +89227,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa5_weoff_at_xposa5_gbc() {
@@ -92738,7 +89249,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92768,6 +89278,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_3_gbc() {
@@ -92789,7 +89300,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92819,6 +89329,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_late_we_reenable_1_gbc() {
@@ -92840,7 +89351,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92870,6 +89380,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_late_we_reenable_2_gbc() {
@@ -92891,7 +89402,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92921,6 +89431,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_late_we_reenable_3_gbc() {
@@ -92942,7 +89453,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -92972,6 +89482,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_late_we_reenable_4_gbc() {
@@ -92993,7 +89504,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93023,6 +89533,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_scx7_gbc() {
@@ -93044,7 +89555,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93074,6 +89584,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_weoff_at_xposa6_gbc() {
@@ -93095,7 +89606,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93125,6 +89635,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy00_gbc() {
@@ -93146,7 +89657,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93176,6 +89686,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy01_gbc() {
@@ -93197,7 +89708,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93227,6 +89737,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy01_weoff_ly02_gbc() {
@@ -93248,7 +89759,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93278,6 +89788,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy01_weoff_ly02_weon_ly60_gbc() {
@@ -93299,7 +89810,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93329,6 +89839,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy01_wxa5_ly02_gbc() {
@@ -93350,7 +89861,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93380,6 +89890,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy01_wxa7_ly02_gbc() {
@@ -93401,7 +89912,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93431,6 +89941,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn wxa6_wy8f_gbc() {
@@ -93452,7 +89963,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
     }
 
 
@@ -93482,7 +89992,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_0_out0_gbc() {
@@ -93503,7 +90012,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93527,6 +90035,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_1_out0_gbc() {
@@ -93547,7 +90056,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93572,7 +90080,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_2_out3_gbc() {
@@ -93593,7 +90100,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93618,7 +90124,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_ds_2_out3_gbc() {
@@ -93639,7 +90144,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93664,7 +90168,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx00_wx0f_ds_2_out3_gbc() {
@@ -93685,7 +90188,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93710,7 +90212,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx00_wx10_ds_2_out3_gbc() {
@@ -93731,7 +90232,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93756,7 +90256,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx00_wx11_ds_2_out3_gbc() {
@@ -93777,7 +90276,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93802,7 +90300,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx00_wx12_ds_2_out3_gbc() {
@@ -93823,7 +90320,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93848,7 +90344,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx0f_1_out0_gbc() {
@@ -93869,7 +90364,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93894,7 +90388,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx0f_2_out3_gbc() {
@@ -93915,7 +90408,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93940,7 +90432,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx10_1_out0_gbc() {
@@ -93961,7 +90452,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -93986,7 +90476,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx10_2_out3_gbc() {
@@ -94007,7 +90496,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94032,7 +90520,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx11_1_out0_gbc() {
@@ -94053,7 +90540,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94078,7 +90564,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx11_2_out3_gbc() {
@@ -94099,7 +90584,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94124,7 +90608,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx12_1_out0_gbc() {
@@ -94145,7 +90628,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94169,6 +90651,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx12_2_out3_gbc() {
@@ -94189,7 +90672,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94214,7 +90696,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_early_scx03_wx12_3_out3_gbc() {
@@ -94235,7 +90716,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94260,7 +90740,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx00_wx0f_ds_2_out3_gbc() {
@@ -94281,7 +90760,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94306,7 +90784,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx00_wx10_ds_2_out3_gbc() {
@@ -94327,7 +90804,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94352,7 +90828,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx0f_1_out0_gbc() {
@@ -94373,7 +90848,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94397,6 +90871,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx0f_2_out0_gbc() {
@@ -94417,7 +90892,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94442,7 +90916,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx0f_3_out3_gbc() {
@@ -94463,7 +90936,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94488,7 +90960,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx10_1_out0_gbc() {
@@ -94509,7 +90980,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94533,6 +91003,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx10_2_out0_gbc() {
@@ -94553,7 +91024,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94578,7 +91048,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx10_3_out3_gbc() {
@@ -94599,7 +91068,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94624,7 +91092,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx11_1_out0_gbc() {
@@ -94645,7 +91112,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94669,6 +91135,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx11_2_out0_gbc() {
@@ -94689,7 +91156,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94714,7 +91180,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx11_3_out3_gbc() {
@@ -94735,7 +91200,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94760,7 +91224,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx12_1_out0_gbc() {
@@ -94781,7 +91244,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94806,7 +91268,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_late_scx03_wx12_2_out3_gbc() {
@@ -94827,7 +91288,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94852,7 +91312,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx2_0_out0_gbc() {
@@ -94873,7 +91332,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94897,6 +91355,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_scx2_1_out0_gbc() {
@@ -94917,7 +91376,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94942,7 +91400,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx2_2_out3_gbc() {
@@ -94963,7 +91420,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -94988,7 +91444,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx3_0_out0_gbc() {
@@ -95009,7 +91464,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95033,6 +91487,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_scx3_1_out0_gbc() {
@@ -95053,7 +91508,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95078,7 +91532,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx3_2_out3_gbc() {
@@ -95099,7 +91552,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95124,7 +91576,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx5_0_out0_gbc() {
@@ -95145,7 +91596,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95169,6 +91619,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_scx5_1_out0_gbc() {
@@ -95189,7 +91640,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95214,7 +91664,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx5_2_out3_gbc() {
@@ -95235,7 +91684,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95260,7 +91708,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_scx5_ds_2_out3_gbc() {
@@ -95281,7 +91728,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95306,7 +91752,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_spx10_wx0f_1_out0_gbc() {
@@ -95327,7 +91772,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95352,7 +91796,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_spx10_wx0f_2_out3_gbc() {
@@ -95373,7 +91816,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95398,7 +91840,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_wx0f_0_out0_gbc() {
@@ -95419,7 +91860,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95443,6 +91883,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_disable_wx0f_1_out0_gbc() {
@@ -95463,7 +91904,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95488,7 +91928,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_disable_wx0f_2_out3_gbc() {
@@ -95509,7 +91948,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95534,7 +91972,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_1_out3_gbc() {
@@ -95555,7 +91992,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95579,6 +92015,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_enable_aftervblank_2_out0_gbc() {
@@ -95599,7 +92036,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95624,7 +92060,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_3_out0_gbc() {
@@ -95645,7 +92080,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95670,7 +92104,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_ds_2_out0_gbc() {
@@ -95691,7 +92124,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95716,7 +92148,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_ds_lcdoffset1_2_out0_gbc() {
@@ -95737,7 +92168,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95762,7 +92192,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_aftervblank_lcdoffset1_2_out0_gbc() {
@@ -95783,7 +92212,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95808,7 +92236,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_enable_ly0_ds_2_out0_gbc() {
@@ -95829,7 +92256,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95854,7 +92280,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_1_out3_gbc() {
@@ -95875,7 +92300,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95900,7 +92324,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_2_out0_gbc() {
@@ -95921,7 +92344,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95946,7 +92368,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_ds_2_out0_gbc() {
@@ -95967,7 +92388,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -95992,7 +92412,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx2_1_out3_gbc() {
@@ -96013,7 +92432,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96037,6 +92455,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_reenable_scx2_2_out0_gbc() {
@@ -96057,7 +92476,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96082,7 +92500,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx2_3_out0_gbc() {
@@ -96103,7 +92520,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96128,7 +92544,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx3_1_out3_gbc() {
@@ -96149,7 +92564,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96173,6 +92587,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_reenable_scx3_2_out0_gbc() {
@@ -96193,7 +92608,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96218,7 +92632,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx3_3_out0_gbc() {
@@ -96239,7 +92652,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96264,7 +92676,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx5_1_out3_gbc() {
@@ -96285,7 +92696,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96309,6 +92719,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_reenable_scx5_2_out0_gbc() {
@@ -96329,7 +92740,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96354,7 +92764,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx5_3_out0_gbc() {
@@ -96375,7 +92784,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96400,7 +92808,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_scx5_ds_2_out0_gbc() {
@@ -96421,7 +92828,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96446,7 +92852,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_wx0f_1_out3_gbc() {
@@ -96467,7 +92872,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96492,7 +92896,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_reenable_wx0f_2_out0_gbc() {
@@ -96513,7 +92916,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96538,7 +92940,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx_late_disable_0_out0_gbc() {
@@ -96559,7 +92960,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96583,6 +92983,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_scx_late_disable_1_out0_gbc() {
@@ -96603,7 +93004,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96628,7 +93028,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_scx_late_disable_2_out3_gbc() {
@@ -96649,7 +93048,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96674,7 +93072,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_1_out0_gbc() {
@@ -96695,7 +93092,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96720,7 +93116,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_2_out3_gbc() {
@@ -96741,7 +93136,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96766,7 +93160,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_ds_2_out3_gbc() {
@@ -96787,7 +93180,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96812,7 +93204,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_ff_07_1_out3_gbc() {
@@ -96833,7 +93224,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96858,7 +93248,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_ff_07_2_out0_gbc() {
@@ -96879,7 +93268,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96904,7 +93292,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_ff_0f_1_out3_gbc() {
@@ -96925,7 +93312,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96950,7 +93336,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_ff_0f_2_out0_gbc() {
@@ -96971,7 +93356,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -96996,7 +93380,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx2_1_out0_gbc() {
@@ -97017,7 +93400,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97042,7 +93424,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx2_2_out3_gbc() {
@@ -97063,7 +93444,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97088,7 +93468,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx3_1_out0_gbc() {
@@ -97109,7 +93488,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97133,6 +93511,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn late_wx_scx3_2_out3_gbc() {
@@ -97153,7 +93532,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97178,7 +93556,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx3_3_out3_gbc() {
@@ -97199,7 +93576,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97224,7 +93600,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx5_1_out0_gbc() {
@@ -97245,7 +93620,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97270,7 +93644,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx5_2_out3_gbc() {
@@ -97291,7 +93664,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97316,7 +93688,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_scx5_ds_2_out3_gbc() {
@@ -97337,7 +93708,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97362,7 +93732,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_wx03_1_out0_gbc() {
@@ -97383,7 +93752,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97408,7 +93776,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_wx03_2_out3_gbc() {
@@ -97429,7 +93796,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97454,7 +93820,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_wx0f_1_out0_gbc() {
@@ -97475,7 +93840,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97500,7 +93864,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wx_wx0f_2_out3_gbc() {
@@ -97521,7 +93884,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97546,7 +93908,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_1_out0_gbc() {
@@ -97567,7 +93928,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97592,7 +93952,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_2_out3_gbc() {
@@ -97613,7 +93972,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97638,7 +93996,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ds_2_out3_gbc() {
@@ -97659,7 +94016,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97684,7 +94040,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_ds_lcdoffset1_2_out3_gbc() {
@@ -97705,7 +94060,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97730,7 +94084,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn late_wy_lcdoffset1_2_out3_gbc() {
@@ -97751,7 +94104,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97776,7 +94128,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx00_m3stat_1_out3_gbc() {
@@ -97797,7 +94148,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97822,7 +94172,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx00_m3stat_2_out0_gbc() {
@@ -97843,7 +94192,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97868,7 +94216,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_m3stat_1_out3_gbc() {
@@ -97889,7 +94236,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97914,7 +94260,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_m3stat_2_out0_gbc() {
@@ -97935,7 +94280,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -97960,7 +94304,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_m3stat_ds_2_out0_gbc() {
@@ -97981,7 +94324,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98006,7 +94348,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx2_m3stat_1_out3_gbc() {
@@ -98027,7 +94368,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98052,7 +94392,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx2_m3stat_2_out0_gbc() {
@@ -98073,7 +94412,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98098,7 +94436,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx3_m3stat_1_out3_gbc() {
@@ -98119,7 +94456,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98144,7 +94480,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx3_m3stat_2_out0_gbc() {
@@ -98165,7 +94500,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98190,7 +94524,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx5_m3stat_1_out3_gbc() {
@@ -98211,7 +94544,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98236,7 +94568,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx5_m3stat_2_out0_gbc() {
@@ -98257,7 +94588,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98282,7 +94612,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx03_scx5_m3stat_ds_2_out0_gbc() {
@@ -98303,7 +94632,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98328,7 +94656,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_m3stat_1_out3_gbc() {
@@ -98349,7 +94676,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98374,7 +94700,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_m3stat_2_out0_gbc() {
@@ -98395,7 +94720,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98420,7 +94744,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_m3stat_ds_2_out0_gbc() {
@@ -98441,7 +94764,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98466,7 +94788,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx2_m3stat_1_out3_gbc() {
@@ -98487,7 +94808,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98512,7 +94832,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx2_m3stat_2_out0_gbc() {
@@ -98533,7 +94852,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98558,7 +94876,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx3_m3stat_1_out3_gbc() {
@@ -98579,7 +94896,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98604,7 +94920,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx3_m3stat_2_out0_gbc() {
@@ -98625,7 +94940,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98650,7 +94964,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx5_m3stat_1_out3_gbc() {
@@ -98671,7 +94984,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98696,7 +95008,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx5_m3stat_2_out0_gbc() {
@@ -98717,7 +95028,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98742,7 +95052,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx07_scx5_m3stat_ds_2_out0_gbc() {
@@ -98763,7 +95072,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98788,7 +95096,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx0c_m3stat_ds_2_out0_gbc() {
@@ -98809,7 +95116,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98834,7 +95140,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx17_wxa5_m3stat_1_out3_gbc() {
@@ -98855,7 +95160,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98880,7 +95184,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx17_wxa5_m3stat_2_out0_gbc() {
@@ -98901,7 +95204,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98926,7 +95228,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wx57_m3stat_ds_2_out0_gbc() {
@@ -98947,7 +95248,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -98972,7 +95272,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa5_m0irq_1_out0_gbc() {
@@ -98993,7 +95292,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99018,7 +95316,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa5_m0irq_2_out2_gbc() {
@@ -99039,7 +95336,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99064,7 +95360,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa5_m3stat_1_out3_gbc() {
@@ -99085,7 +95380,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99110,7 +95404,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa5_m3stat_2_out0_gbc() {
@@ -99131,7 +95424,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99156,7 +95448,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_firstline_m3stat_1_out3_gbc() {
@@ -99177,7 +95468,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99201,6 +95491,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_firstline_m3stat_2_out3_gbc() {
@@ -99221,7 +95512,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99246,7 +95536,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_firstline_m3stat_3_out0_gbc() {
@@ -99267,7 +95556,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99292,7 +95580,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m0irq2_1_out0_gbc() {
@@ -99313,7 +95600,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99338,7 +95624,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m0irq2_2_out2_gbc() {
@@ -99359,7 +95644,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99384,7 +95668,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m0irq_1_out0_gbc() {
@@ -99405,7 +95688,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99430,7 +95712,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m0irq_2_out2_gbc() {
@@ -99451,7 +95732,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99476,7 +95756,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m3stat_1_out3_gbc() {
@@ -99497,7 +95776,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99521,6 +95799,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_m3stat_2_out3_gbc() {
@@ -99541,7 +95820,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99566,7 +95844,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m3stat_3_out0_gbc() {
@@ -99587,7 +95864,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99612,7 +95888,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_m3stat_ds_2_out0_gbc() {
@@ -99633,7 +95908,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99658,7 +95932,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_oambusyread_1_out0_gbc() {
@@ -99679,7 +95952,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99703,6 +95975,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_oambusyread_2_out0_gbc() {
@@ -99723,7 +95996,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99748,7 +96020,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_oambusyread_4_out5_dmg() {
@@ -99769,7 +96040,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99794,7 +96064,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx2_m3stat_1_out3_dmg() {
@@ -99815,7 +96084,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99840,7 +96108,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx2_m3stat_2_out0_dmg() {
@@ -99861,6 +96128,7 @@ mod window {
 
             run_test_case(test_case);
         }
+
 
         #[test]
         #[ignore]
@@ -99884,7 +96152,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx2_m3stat_3_out0_dmg() {
@@ -99906,6 +96173,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_scx2_m3stat_3_out3_gbc() {
@@ -99926,7 +96194,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99951,7 +96218,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx2_m3stat_4_out0_gbc() {
@@ -99972,7 +96238,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -99997,7 +96262,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx3_m3stat_1_out3_gbc() {
@@ -100018,7 +96282,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100042,6 +96305,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_scx3_m3stat_2_out3_gbc() {
@@ -100062,7 +96326,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100086,6 +96349,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_scx3_m3stat_3_out3_gbc() {
@@ -100106,7 +96370,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100131,7 +96394,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx3_m3stat_4_out0_gbc() {
@@ -100152,7 +96414,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100177,7 +96438,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx5_m3stat_1_out3_gbc() {
@@ -100198,7 +96458,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100222,6 +96481,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_scx5_m3stat_2_out3_gbc() {
@@ -100242,7 +96502,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100267,7 +96526,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx5_m3stat_3_out0_gbc() {
@@ -100288,7 +96546,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100313,7 +96570,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_scx5_m3stat_ds_2_out0_gbc() {
@@ -100334,7 +96590,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100359,7 +96614,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_spxa7_m0irq_1_out0_gbc() {
@@ -100380,7 +96634,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100405,7 +96658,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_spxa7_m0irq_2_out2_gbc() {
@@ -100426,7 +96678,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100451,7 +96702,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_spxa7_m3stat_1_out3_gbc() {
@@ -100472,7 +96722,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100496,6 +96745,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_spxa7_m3stat_2_out3_gbc() {
@@ -100516,7 +96766,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100540,6 +96789,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_spxa7_m3stat_4_out3_gbc() {
@@ -100560,7 +96810,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100585,7 +96834,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_spxa7_m3stat_5_out0_gbc() {
@@ -100606,7 +96854,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100631,7 +96878,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_vrambusyread_1_out0_gbc() {
@@ -100652,7 +96898,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100676,6 +96921,7 @@ mod window {
             run_test_case(test_case);
         }
 
+
         #[test]
         #[ignore]
         fn m2int_wxa6_vrambusyread_2_out0_gbc() {
@@ -100696,7 +96942,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100721,7 +96966,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa6_vrambusyread_3_out5_gbc() {
@@ -100742,7 +96986,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100767,7 +97010,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxa7_m3stat_ds_2_out0_gbc() {
@@ -100788,7 +97030,6 @@ mod window {
 
             run_test_case(test_case);
         }
-
 
 
         #[test]
@@ -100813,7 +97054,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn m2int_wxdefault_m3stat_ds_2_out0_gbc() {
@@ -100836,7 +97076,6 @@ mod window {
         }
 
 
-
         #[test]
         #[ignore]
         fn reenable_ds_out3_gbc() {
@@ -100857,7 +97096,5 @@ mod window {
 
             run_test_case(test_case);
         }
-
     }
 }
-

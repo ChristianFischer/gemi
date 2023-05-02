@@ -15,30 +15,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::collections::HashSet;
 use std::path::PathBuf;
-use gbemu_core::gameboy::DeviceType;
-use tests_shared::io_utils::{IteratorState, starts_with_number};
+use tests_shared::config::{BASE_PATH_ROM_FILES, TESTS_KNOWN_TO_FAIL};
+use tests_shared::io_utils::{IteratorState, starts_with_number, TestConfigVisitor, update_file};
 use tests_shared::test_config::{EmulatorTestCase, EmulatorTestConfig, LcdColorMod, RunConfig};
+use crate::common::TEST_FILE_HEADER;
 
 
-/// Configuration for generating tests.
-pub struct TestGenerator {
-    pub base_path_roms: PathBuf,
-    pub base_path_tests: PathBuf,
-    pub tests_known_to_fail: Vec<&'static str>,
+/// An object used to generate unit tests for the emulator based on the results of the file visitors.
+pub struct UnitTestGenerator {
+    content: String,
+    additional_imports: HashSet<String>,
 }
 
 
-impl TestGenerator {
+impl UnitTestGenerator {
+    pub fn new() -> Self {
+        Self {
+            content: String::new(),
+            additional_imports: HashSet::new(),
+        }
+    }
+
 
     /// Creates a set of tests using a given [EmulatorTestConfig] and
     /// optional a string containing rust code with additional checks.
     /// For each device configured in the [EmulatorTestConfig], a separate
     /// [EmulatorTestCase] will be created.
     pub fn create_tests(
-        &self,
-        test_cfg: EmulatorTestConfig,
-        additional_checks: Option<String>,
+        &mut self,
+        test_cfg: &EmulatorTestConfig,
         state: &IteratorState
     ) -> String {
         test_cfg
@@ -49,8 +56,7 @@ impl TestGenerator {
             .map(|test_case|
                 self.create_test(
                     test_cfg.name.as_str(),
-                    test_case,
-                    additional_checks.clone(),
+                    &test_case,
                     state
                 )
             )
@@ -64,10 +70,9 @@ impl TestGenerator {
     /// Creates a test using data from a given [EmulatorTestCase] and
     /// optional a string containing rust code with additional checks.
     pub fn create_test(
-            &self,
+            &mut self,
             name: &str,
-            test_case: EmulatorTestCase,
-            additional_checks: Option<String>,
+            test_case: &EmulatorTestCase,
             state: &IteratorState
     ) -> String {
         let mut test_code = String::new();
@@ -75,7 +80,7 @@ impl TestGenerator {
         // the ROM file being tested, stripping the BASE_PATH_ROM_FILES
         let rom_file = test_case.setup.cartridge_path
             .replace('\\', "/")
-            .replace(self.base_path_roms.to_str().unwrap(), "")
+            .replace(BASE_PATH_ROM_FILES, "")
         ;
 
         // the module path to the current test
@@ -128,11 +133,9 @@ impl TestGenerator {
                 test_code.push_str(&format!("                Color::from_rgba32(0x{:08x}),\n", palette_colors[2].to_u32()));
                 test_code.push_str(&format!("                Color::from_rgba32(0x{:08x}),\n", palette_colors[3].to_u32()));
                 test_code.push_str(&format!("            ])),\n"));
-            }
 
-            if test_case.setup.enable_serial_output != false {
-                let enable_serial_output = test_case.setup.enable_serial_output;
-                test_code.push_str(&format!("            enable_serial_output: {enable_serial_output},\n"));
+                // requires import for Color and palette
+                self.additional_imports.insert("use crate::video::palette::{Color.DmgDisplayPalette};".to_string());
             }
 
             test_code.push_str(&format!("            .. SetUpConfig::with_rom_file(\"{rom_file}\")\n"));
@@ -165,10 +168,10 @@ impl TestGenerator {
         {
             test_code.push_str("        result: CheckResultConfig {\n");
 
-            if let Some(ref_image) = test_case.result.compare_lcd_with_image {
+            if let Some(ref_image) = &test_case.result.compare_lcd_with_image {
                 let ref_image_path = ref_image
                     .replace('\\', "/")
-                    .replace(self.base_path_roms.to_str().unwrap(), "")
+                    .replace(BASE_PATH_ROM_FILES, "")
                 ;
 
                 test_code.push_str(&format!("            compare_lcd_with_image: Some(\"{ref_image_path}\".to_string()),\n"));
@@ -179,8 +182,16 @@ impl TestGenerator {
                 LcdColorMod::Gambatte => test_code.push_str("            color_mod: LcdColorMod::Gambatte,\n"),
             }
 
-            if let Some(gambatte_display_code) = test_case.result.gambatte_display_result_code {
+            if let Some(gambatte_display_code) = &test_case.result.gambatte_display_result_code {
                 test_code.push_str(&format!("            gambatte_display_result_code: Some(\"{gambatte_display_code}\".to_string()),\n"));
+            }
+
+            if test_case.result.blargg_check_result_code {
+                test_code.push_str(&format!("            blargg_check_result_code: true,\n"));
+            }
+
+            if test_case.result.mooneye_check_result_code {
+                test_code.push_str(&format!("            mooneye_check_result_code: true,\n"));
             }
 
             test_code.push_str("            .. CheckResultConfig::default()\n");
@@ -190,15 +201,7 @@ impl TestGenerator {
         // footer
         test_code.push_str("    };\n");
         test_code.push_str("\n");
-
-        if let Some(additional_checks) = additional_checks {
-            test_code.push_str("    let mut gb = run_test_case(test_case);\n");
-            test_code.push_str("\n");
-            test_code.push_str(&additional_checks);
-        }
-        else {
-            test_code.push_str("    run_test_case(test_case);\n");
-        }
+        test_code.push_str("    run_test_case(test_case);\n");
 
         test_code.push_str("}\n");
 
@@ -211,7 +214,7 @@ impl TestGenerator {
     /// Given a module path for any test, checks if this is known to fail
     /// and therefor should be ignored.
     pub fn is_test_known_to_fail(&self, path: &str) -> bool {
-        for to_ignore_test in &self.tests_known_to_fail {
+        for to_ignore_test in TESTS_KNOWN_TO_FAIL {
             if path.starts_with(to_ignore_test) {
                 return true;
             }
@@ -226,6 +229,7 @@ impl TestGenerator {
         let empty_newline = "\n".to_string();
 
         content
+            .trim_end()
             .split('\n')
             .into_iter()
             .map(|line| if !(line.is_empty()) {
@@ -236,5 +240,44 @@ impl TestGenerator {
                 }
             )
             .collect()
+    }
+
+
+    /// Updates the target file with the generated content.
+    /// The file won't be updated if the content is the same.
+    pub fn to_file(&self, path: &PathBuf) {
+        let final_content = format!(
+            "{}\n{}",
+            TEST_FILE_HEADER,
+            self.content
+        );
+
+        update_file(path, &final_content);
+    }
+}
+
+
+impl TestConfigVisitor for UnitTestGenerator {
+    fn on_open_module(&mut self, module_name: &str, state: &IteratorState) {
+        self.content.push_str("\n\n");
+        self.content.push_str(&format!("{}mod {} {{\n", state.indent, module_name));
+        self.content.push_str(&format!("{}    use super::*;\n", state.indent))
+    }
+
+
+    fn on_close_module(&mut self, _module_name: &str, state: &IteratorState) {
+        self.content.push_str(&format!("{}}}\n", state.indent));
+    }
+
+
+    fn on_visit_test(&mut self, test_cfg: &EmulatorTestConfig, state: &IteratorState) {
+        // generate source code for each single test
+        let tests_str = self.create_tests(test_cfg, state);
+
+        if !tests_str.is_empty() {
+            self.content.push_str("\n");
+            self.content.push_str("\n");
+            self.content.push_str(&tests_str);
+        }
     }
 }

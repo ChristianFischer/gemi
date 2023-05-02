@@ -42,9 +42,6 @@ pub struct SetUpConfig {
     /// Path to the ROM file to run.
     pub cartridge_path: String,
 
-    /// If true, output to the serial port will be stored.
-    pub enable_serial_output: bool,
-
     /// Optional: A palette to translate DMG color values into
     /// RGBA color values. Only used in DMG mode.
     pub dmg_display_palette: Option<DmgDisplayPalette>,
@@ -86,6 +83,14 @@ pub struct CheckResultConfig {
     /// Checks if the expected result code is the same as displayed
     /// on the emulator screen.
     pub gambatte_display_result_code: Option<String>,
+
+    /// For blargg test ROMs:
+    /// If true, check for the expected result code in the emulator's serial output.
+    pub blargg_check_result_code: bool,
+
+    /// For mooneye test ROMs:
+    /// If true, check for the expected result code in the emulator's serial output.
+    pub mooneye_check_result_code: bool,
 }
 
 
@@ -116,7 +121,6 @@ impl SetUpConfig {
         Self {
             cartridge_path:         cartridge_path.to_string(),
             boot_rom_path:          None,
-            enable_serial_output:   false,
             dmg_display_palette:    None,
         }
     }
@@ -145,7 +149,21 @@ impl CheckResultConfig {
             return true;
         }
 
+        if self.blargg_check_result_code || self.mooneye_check_result_code {
+            return true;
+        }
+
         false
+    }
+
+
+    /// Checks if one of the checks requires the serial output to be enabled.
+    pub fn requires_serial_output(&self) -> bool {
+        if self.blargg_check_result_code || self.mooneye_check_result_code {
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -156,6 +174,8 @@ impl Default for CheckResultConfig {
             compare_lcd_with_image: None,
             color_mod: LcdColorMod::None,
             gambatte_display_result_code: None,
+            blargg_check_result_code: false,
+            mooneye_check_result_code: false,
         }
     }
 }

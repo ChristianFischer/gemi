@@ -104,6 +104,21 @@ impl SerialPort {
     }
 
 
+    /// Get the data currently in the output queue.
+    pub fn get_output(&self) -> Vec<u8> {
+        self.output_queue.clone()
+    }
+
+
+    /// Get the data currently in the output queue interpreted as a text string.
+    pub fn get_output_as_text(&self) -> String {
+        self.get_output()
+            .into_iter()
+            .map(|b| b as char)
+            .collect()
+    }
+
+
     /// Takes the data currently in the output queue.
     /// The data will then be removed from the current output queue.
     pub fn take_output(&mut self) -> Vec<u8> {

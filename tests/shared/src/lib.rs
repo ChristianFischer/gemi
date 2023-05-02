@@ -15,5 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+pub mod config;
+pub mod download;
 pub mod io_utils;
+pub mod rom_utils;
 pub mod test_config;
+pub mod test_suites;

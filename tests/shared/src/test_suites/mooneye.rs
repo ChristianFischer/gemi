@@ -18,22 +18,8 @@
 use std::collections::HashSet;
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
-use tests_shared::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, update_file};
-use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
-use crate::generators::common::TEST_FILE_HEADER;
-use crate::test_generator::TestGenerator;
-
-
-const MOONEYE_TEST_FILE_HEADER : &str = /* language=rust */ r#"
-const MOONEYE_RESULT_SEQ_PASS : &[u8] = &[3, 5, 8, 13, 21, 34];
-const MOONEYE_RESULT_SEQ_FAIL : &[u8] = &[0x42, 0x42, 0x42, 0x42, 0x42, 0x42];
-
-"#;
-
-const MOONEYE_TEST_ADDITIONA_CHECKS : &str = /* language=rust */ r#"    let test_result_message = gb.get_peripherals_mut().serial.take_output();
-    assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-    assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
-"#;
+use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef};
+use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 
 
 /// Lookup table to extract device types from file names.
@@ -61,12 +47,12 @@ const DEVICE_TYPE_GROUP_LOOKUP_TABLE : &[(&str, &[DeviceType])] = &[
 /// Checks if a filename is a valid ROM of the mooneye test suite.
 /// If so, it returns the test name stripped away the device codes and a list
 /// of devices, this test is intended to run on.
-fn file_is_mooneye_test(file: &PathBuf) -> (String, HashSet<DeviceType>) {
+fn file_is_mooneye_test(file: &PathBuf) -> Option<(String, HashSet<DeviceType>)> {
     // check if it's a ROM file at all
     let is_gbc_rom = match file.extension().map(|o| o.to_str().unwrap()) {
         Some("gb")  => false,
         Some("gbc") => true,
-        _ => return (String::new(), HashSet::new()),
+        _ => return None,
     };
 
     // get the filename normalized to unix file separators
@@ -129,7 +115,7 @@ fn file_is_mooneye_test(file: &PathBuf) -> (String, HashSet<DeviceType>) {
         // done, if any devices were found
         if found_devices {
             let stripped_filename = &filename[.. last_dash];
-            return (filename_to_symbol(stripped_filename), devices);
+            return Some((filename_to_symbol(stripped_filename), devices));
         }
     }
 
@@ -142,7 +128,7 @@ fn file_is_mooneye_test(file: &PathBuf) -> (String, HashSet<DeviceType>) {
         EmulatorTestConfig::for_any_device()
     };
 
-    (filename_to_symbol(&filename), devices)
+    Some((filename_to_symbol(&filename), devices))
 }
 
 
@@ -207,12 +193,9 @@ fn eat_up_revision_codes(substr: &mut &str) -> u32 {
 
 
 /// Create tests for Mooneye test roms.
-pub fn generate_tests_mooneye(gen: &TestGenerator) {
-    let mooneye_root      = gen.base_path_roms.join("mooneye-test-suite");
-    let mooneye_test_file = gen.base_path_tests.join("mooneye.rs");
-
-    let tests_content = recursive_visit_directory(
-        mooneye_root,
+pub fn visit_tests_mooneye(path: PathBuf, visitor: TestConfigVisitorRef) {
+    recursive_visit_directory(
+        path,
         &FindRomCallbacks {
             // open module for new directories
             on_handle_dir: Box::new(|d, _| {
@@ -223,47 +206,29 @@ pub fn generate_tests_mooneye(gen: &TestGenerator) {
             }),
 
             // create tests for ROM files
-            on_file_found: Box::new(|f, state| {
-                let mut content = String::new();
-                let (test_name, devices) = file_is_mooneye_test(f);
+            on_file_found: Box::new(|f, _| {
+                if let Some((test_name, devices)) = file_is_mooneye_test(f) {
+                    let cfg = EmulatorTestConfig {
+                        name: test_name,
+                        devices,
+                        setup: SetUpConfig::with_rom_file(&f.to_str().unwrap()),
+                        run_config: RunConfig {
+                            stop_on_infinite_loop: true,
+                            .. RunConfig::default()
+                        },
+                        result: CheckResultConfig {
+                            mooneye_check_result_code: true,
+                            .. CheckResultConfig::default()
+                        },
+                    };
 
-                let cfg = EmulatorTestConfig {
-                    name: test_name,
-                    devices,
-                    setup: SetUpConfig {
-                        enable_serial_output: true,
-                        .. SetUpConfig::with_rom_file(&f.to_str().unwrap())
-                    },
-                    run_config: RunConfig {
-                        stop_on_infinite_loop: true,
-                        .. RunConfig::default()
-                    },
-                    result: CheckResultConfig::default(),
-                };
-
-                let test_content = gen.create_tests(
-                    cfg,
-                    Some(MOONEYE_TEST_ADDITIONA_CHECKS.to_string()),
-                    state
-                );
-
-                if !test_content.is_empty() {
-                    if !content.is_empty() {
-                        content.push_str("\n\n");
-                    }
-
-                    content.push_str(&test_content);
+                    vec![ cfg ]
                 }
-
-                content
+                else {
+                    vec![]
+                }
             }),
-        }
+        },
+        visitor
     );
-
-    let mut content = String::new();
-    content.push_str(TEST_FILE_HEADER);
-    content.push_str(MOONEYE_TEST_FILE_HEADER);
-    content.push_str(&tests_content);
-
-    update_file(&mooneye_test_file, &content);
 }

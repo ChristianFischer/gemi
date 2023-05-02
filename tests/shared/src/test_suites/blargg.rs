@@ -15,30 +15,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::path::PathBuf;
 use gbemu_core::device_type::EmulationType;
-use tests_shared::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, update_file};
-use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
-use crate::generators::common::TEST_FILE_HEADER;
+use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef};
 use crate::rom_utils::file_is_rom;
-use crate::test_generator::TestGenerator;
-
-const BLARGG_ADDITIONAL_SRC : &str = /* language=rust */
-    r#"use testrunner::checks::blargg_checks::check_blargg_test_passed;
-"#;
-
-const BLARGG_CHECK_TEST : &str = /* language=rust */ r#"    let result = check_blargg_test_passed(&mut gb);
-    assert!(result.is_ok(), "Failed test: '{}'", result.err().unwrap());
-"#;
+use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 
 
 /// Create tests for Blargg's test roms.
-pub fn generate_tests_blargg(gen: &TestGenerator) {
-    let blargg_root      = gen.base_path_roms.join("blargg");
-    let blargg_test_file = gen.base_path_tests.join("blargg.rs");
+pub fn visit_tests_blargg(path: PathBuf, visitor: TestConfigVisitorRef) {
     let cgb_sound_folder = String::from("cgb_sound");
 
-    let tests_content = recursive_visit_directory(
-        blargg_root,
+    recursive_visit_directory(
+        path,
         &FindRomCallbacks {
             // open module for new directories
             on_handle_dir: Box::new(|_, _| {
@@ -64,34 +53,24 @@ pub fn generate_tests_blargg(gen: &TestGenerator) {
                         let cfg = EmulatorTestConfig {
                             name: filename_to_symbol(f.to_str().unwrap()),
                             devices,
-                            setup: SetUpConfig {
-                                enable_serial_output: true,
-                                .. SetUpConfig::with_rom_file(&f.to_str().unwrap())
-                            },
+                            setup: SetUpConfig::with_rom_file(&f.to_str().unwrap()),
                             run_config: RunConfig {
                                 stop_on_infinite_loop: true,
                                 .. RunConfig::default()
                             },
-                            result: CheckResultConfig::default(),
+                            result: CheckResultConfig {
+                                blargg_check_result_code: true,
+                                .. CheckResultConfig::default()
+                            },
                         };
 
-                        gen.create_tests(
-                            cfg,
-                            Some(BLARGG_CHECK_TEST.to_string()),
-                            state
-                        )
+                        vec![ cfg ]
                     }
 
-                    _ => "".to_string()
+                    _ => vec![]
                 }
             }),
-        }
+        },
+        visitor
     );
-
-    let mut content = String::new();
-    content.push_str(TEST_FILE_HEADER);
-    content.push_str(BLARGG_ADDITIONAL_SRC);
-    content.push_str(&tests_content);
-
-    update_file(&blargg_test_file, &content);
 }

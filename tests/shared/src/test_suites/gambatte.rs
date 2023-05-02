@@ -19,16 +19,9 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
 use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
-use tests_shared::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, update_file};
-use tests_shared::test_config::{CheckResultConfig, EmulatorTestConfig, LcdColorMod, RunConfig, SetUpConfig};
-use crate::generators::common::TEST_FILE_HEADER;
+use crate::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef};
 use crate::rom_utils::file_is_rom;
-use crate::test_generator::TestGenerator;
-
-
-const GAMBATTE_ADDITIONAL_SRC : &str = /* language=rust */
-r#"use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
-"#;
+use crate::test_config::{CheckResultConfig, EmulatorTestConfig, LcdColorMod, RunConfig, SetUpConfig};
 
 
 /// Lookup table to check for device types within gambatte test rom file names.
@@ -231,12 +224,9 @@ fn filepart_is_display_check_code(part: &str) -> Option<String> {
 
 
 /// Create tests for Gambatte test roms.
-pub fn generate_tests_gambatte(gen: &TestGenerator) {
-    let gambatte_root      = gen.base_path_roms.join("gambatte");
-    let gambatte_test_file = gen.base_path_tests.join("gambatte.rs");
-
-    let tests_content = recursive_visit_directory(
-        gambatte_root,
+pub fn visit_tests_gambatte(path: PathBuf, visitor: TestConfigVisitorRef) {
+    recursive_visit_directory(
+        path,
         &FindRomCallbacks {
             // open module for new directories
             on_handle_dir: Box::new(|_, _| {
@@ -244,28 +234,10 @@ pub fn generate_tests_gambatte(gen: &TestGenerator) {
             }),
 
             // create tests for ROM files
-            on_file_found: Box::new(|f, state| {
-                let mut content = String::new();
-
-                for test_cfg in find_gambatte_checks(f) {
-                    let test_content = gen.create_tests(
-                        test_cfg,
-                        None,
-                        state
-                    );
-
-                    content.push_str(&test_content);
-                }
-
-                content
+            on_file_found: Box::new(|f, _| {
+                find_gambatte_checks(f)
             }),
-        }
+        },
+        visitor
     );
-
-    let mut content = String::new();
-    content.push_str(TEST_FILE_HEADER);
-    content.push_str(GAMBATTE_ADDITIONAL_SRC);
-    content.push_str(&tests_content);
-
-    update_file(&gambatte_test_file, &content);
 }
