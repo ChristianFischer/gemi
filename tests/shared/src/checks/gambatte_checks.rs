@@ -17,6 +17,7 @@
 
 use gbemu_core::gameboy::GameBoy;
 use gbemu_core::ppu::ppu::LcdBuffer;
+use crate::runner::TestCaseError;
 
 type BitmapDigit      = [u8; 8];
 type BitmapDigitEntry = (char, BitmapDigit);
@@ -204,16 +205,25 @@ const GAMBATTE_DIGIT_BITMAPS : BitmapDigitTable = [
 
 
 /// Checks if the emulator display is showing the expected result code.
-pub fn check_gambatte_display_code(gb: &GameBoy, display_code_expected: &str) {
+pub fn check_gambatte_display_code(gb: &GameBoy, display_code_expected: &str) -> Result<(), TestCaseError> {
     let length = display_code_expected.len();
 
     match read_characters_from_display(gb.get_peripherals().ppu.get_lcd(), length) {
         Some(display_code_read) => {
-            assert_eq!(display_code_expected, display_code_read);
+            if display_code_read != display_code_expected {
+                Err(TestCaseError::Failed(format!(
+                    "Display code does not match. Expected: '{}', got: '{}'",
+                    display_code_expected,
+                    display_code_read
+                )))
+            }
+            else {
+                Ok(())
+            }
         }
 
         None => {
-            panic!("Failed to read display code from display");
+            Err(TestCaseError::SetUpError("Failed to read display code from display".to_string()))
         }
     }
 }

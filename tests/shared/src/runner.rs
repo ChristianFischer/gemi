@@ -15,25 +15,50 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::env;
+use std::panic;
+use std::fmt::{Debug, Formatter};
 use gbemu_core::boot_rom::BootRom;
 use gbemu_core::cartridge::Cartridge;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
 use gbemu_core::utils::to_u8;
-use tests_shared::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
 use crate::checks::blargg_checks::check_blargg_test_passed;
 use crate::checks::check_display::compare_display_with_image;
 use crate::checks::gambatte_checks::check_gambatte_display_code;
 use crate::checks::mooneye_checks::check_mooneye_test_passed;
-use crate::util::get_test_file;
+use crate::io_utils::Workspace;
+use crate::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
+
 
 /// The maximum number of frames allowed per emulator run,
 /// before it's considered as an error.
 const MAX_FRAMES: u32 = 10_000;
 
 
+/// An enum containing an error code when a test failed to run.
+pub enum TestCaseError {
+    /// The test ran, but without success code.
+    Failed(String),
+
+    /// The emulator failed to run for some reason.
+    SetUpError(String),
+
+    /// The emulator panicked while running.
+    Panic(String),
+}
+
+impl Debug for TestCaseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TestCaseError::Failed(s)     => f.write_str(&format!("Failed: {}", s)),
+            TestCaseError::SetUpError(s) => f.write_str(&format!("Error: {}",  s)),
+            TestCaseError::Panic(s)      => f.write_str(&format!("Panic: {}",  s)),
+        }
+    }
+}
+
+
 /// Print the commandline to re-run this test ROM normally.
-pub fn print_run_command(device_type: DeviceType, setup: &SetUpConfig) {
+pub fn print_run_command(workspace: &Workspace, device_type: &DeviceType, setup: &SetUpConfig) {
     let mut cmd = String::new();
 
     // command
@@ -52,6 +77,12 @@ pub fn print_run_command(device_type: DeviceType, setup: &SetUpConfig) {
         cmd.push_str(&format!(" {}", device_type_arg));
     }
 
+    // add absolute file reference to the test rom
+    let absolute_cartridge_path = workspace.get_path_to_str(&setup.cartridge_path);
+    cmd.push_str(" ");
+    cmd.push_str(&absolute_cartridge_path);
+
+    /*
     // get the current working dir
     let working_dir = if let Ok(wd) = env::current_dir() {
         format!("{}/", wd.to_str().unwrap().to_string().replace("\\", "/"))
@@ -64,33 +95,42 @@ pub fn print_run_command(device_type: DeviceType, setup: &SetUpConfig) {
     cmd.push_str(&format!(
         " {}{}",
         working_dir,
-        get_test_file(&setup.cartridge_path)
+        &setup.cartridge_path
     ));
+    */
 
     println!("#> {cmd}");
 }
 
 
 /// Creates the device emulator based on a setup configuration.
-pub fn create_device_with_config(device_type: DeviceType, setup: SetUpConfig) -> GameBoy {
+pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType, setup: &SetUpConfig) -> Result<GameBoy, TestCaseError> {
     let mut builder = GameBoy::build();
 
     // set the device type to be emulated
-    builder.set_device_type(device_type);
+    builder.set_device_type(*device_type);
 
     // load the cartridge file
-    let cartridge_path = get_test_file(&setup.cartridge_path);
-    let cartridge = Cartridge::load_file(&cartridge_path).unwrap();
+    let cartridge_path = workspace.get_path_to_str(&setup.cartridge_path);
+    let cartridge = Cartridge::load_file(&cartridge_path)
+        .map_err(|e| TestCaseError::SetUpError(e.to_string()))
+        ?;
+
     builder.set_cartridge(cartridge);
 
     // load the boot ROM if any
-    if let Some(boot_rom_path) = setup.boot_rom_path {
-        let boot_rom = BootRom::load_file(&boot_rom_path).unwrap();
+    if let Some(boot_rom_path) = &setup.boot_rom_path {
+        let boot_rom = BootRom::load_file(&boot_rom_path)
+            .map_err(|e| TestCaseError::SetUpError(e.to_string()))
+            ?;
+
         builder.set_boot_rom(boot_rom);
     }
 
     // create the device emulator
-    let mut gb = builder.finish().unwrap();
+    let mut gb = builder.finish()
+        .map_err(|e| TestCaseError::SetUpError(e))
+        ?;
 
     // initialize
     gb.initialize();
@@ -100,12 +140,12 @@ pub fn create_device_with_config(device_type: DeviceType, setup: SetUpConfig) ->
         gb.get_peripherals_mut().ppu.set_dmg_display_palette(palette);
     }
 
-    gb
+    Ok(gb)
 }
 
 
 /// Run the emulator until any stop condition is met, which is defined in the RunConfig.
-pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> u32 {
+pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> Result<u32, TestCaseError> {
     let mut stop_next_frame   = false;
     let mut frames_to_process = config.run_frames;
     let mut frames = 0;
@@ -171,7 +211,7 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> u32 {
         )
     }
 
-    frames
+    Ok(frames)
 }
 
 
@@ -193,39 +233,40 @@ fn check_for_opcode_sequence(gb: &GameBoy, address: u16, sequence: &[u8]) -> boo
 
 
 /// After the emulator has been finished, run result checks on the current state.
-pub fn check_results(gb: &GameBoy, result: &CheckResultConfig) {
+pub fn check_results(gb: &GameBoy, workspace: &Workspace, result: &CheckResultConfig) -> Result<(), TestCaseError> {
     if let Some(image_path) = &result.compare_lcd_with_image {
-        compare_display_with_image(gb, &image_path, &result.color_mod);
+        let workspace_image_path = workspace.get_path_to_str(image_path);
+        compare_display_with_image(gb, &workspace_image_path, &result.color_mod)?;
     }
 
     if let Some(gambatte_display_result_code) = &result.gambatte_display_result_code {
-        check_gambatte_display_code(gb, &gambatte_display_result_code);
+        check_gambatte_display_code(gb, &gambatte_display_result_code)?;
     }
 
     if result.blargg_check_result_code {
-        check_blargg_test_passed(gb);
+        check_blargg_test_passed(gb)?;
     }
 
     if result.mooneye_check_result_code {
-        check_mooneye_test_passed(gb);
+        check_mooneye_test_passed(gb)?;
     }
+
+    Ok(())
 }
 
 
 /// Helper function to run a whole test case
 /// Constructs the emulator instance, runs the program and checks for results.
-/// Each failure will lead into panic!
-pub fn run_test_case(test_case: EmulatorTestCase) -> GameBoy {
-    let device  = test_case.device;
-    let setup   = test_case.setup;
-    let run_cfg = test_case.run_config;
-    let result  = test_case.result;
-
-    // print commandline arg to easily re-run the test
-    print_run_command(device, &setup);
+/// On failure, this will return an error with an attached [TestCaseError] item
+/// for more detailed information.
+pub fn run_test_case_for_result(workspace: &Workspace, test_case: &EmulatorTestCase) -> Result<GameBoy, TestCaseError> {
+    let device  = &test_case.device;
+    let setup   = &test_case.setup;
+    let run_cfg = &test_case.run_config;
+    let result  = &test_case.result;
 
     // Construct
-    let mut gb = create_device_with_config(device, setup);
+    let mut gb = create_device_with_config(workspace, device, setup)?;
 
     // enable serial output, if required for any result check
     if result.requires_serial_output() {
@@ -233,10 +274,21 @@ pub fn run_test_case(test_case: EmulatorTestCase) -> GameBoy {
     }
 
     // Run
-    run_to_stop_conditions(&mut gb, &run_cfg);
+    run_to_stop_conditions(&mut gb, &run_cfg)?;
 
     // Check
-    check_results(&gb, &result);
+    check_results(&gb, workspace, &result)?;
 
-    gb
+    Ok(gb)
 }
+
+
+/// Safely runs a test case.
+/// When the emulator panics, this will lead into a [TestCaseError::Panic] instead of
+/// crashing the application.
+pub fn run_test_case_safe(workspace: &Workspace, test_case: &EmulatorTestCase) -> Result<GameBoy, TestCaseError> {
+    panic::catch_unwind(|| {
+        run_test_case_for_result(workspace, test_case)
+    }).map_err(|e| TestCaseError::Panic(format!("{:?}", e)))?
+}
+

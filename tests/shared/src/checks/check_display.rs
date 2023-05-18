@@ -21,18 +21,20 @@ use image::io::Reader as ImageReader;
 use image::{Rgba, RgbaImage};
 use gbemu_core::ppu::graphic_data::Color;
 use gbemu_core::ppu::ppu::LcdBuffer;
-use tests_shared::test_config::LcdColorMod;
-use crate::util::get_test_file;
+use crate::runner::TestCaseError;
+use crate::test_config::LcdColorMod;
 
 
 /// Loads an image from any given file.
 /// Panics on Failure.
-pub fn load_image_from_file(image_path: &str) -> RgbaImage {
-    ImageReader::open(image_path)
-        .unwrap()
+pub fn load_image_from_file(image_path: &str) -> Result<RgbaImage, TestCaseError> {
+    Ok(
+        ImageReader::open(image_path)
+        .map_err(|e| TestCaseError::SetUpError(format!("Failed to open image file: {}", e)))?
         .decode()
-        .unwrap()
+        .map_err(|e| TestCaseError::SetUpError(format!("Failed to decode image file: {}", e)))?
         .to_rgba8()
+    )
 }
 
 
@@ -142,24 +144,34 @@ pub fn create_comparison_pattern(expected_image: &RgbaImage, lcd_buffer: &LcdBuf
 
 
 /// Compares the content of the emulators LCD buffer with a reference image.
-pub fn compare_display_with_image(gb: &GameBoy, image_path: &str, color_mod: &LcdColorMod) {
-    let image_res_path = get_test_file(image_path);
-    let expected_image = load_image_from_file(&image_res_path);
+pub fn compare_display_with_image(gb: &GameBoy, image_path: &str, color_mod: &LcdColorMod) -> Result<(), TestCaseError> {
+    let expected_image = load_image_from_file(&image_path)?;
     let lcd_buffer     = gb.get_peripherals().ppu.get_lcd();
     let compare_image  = apply_color_mod(&lcd_buffer, &color_mod);
 
     // check if both images have the same size
-    assert_eq!(expected_image.width(),  compare_image.get_width());
-    assert_eq!(expected_image.height(), compare_image.get_height());
+    if
+            expected_image.width()  != compare_image.get_width()
+        ||  expected_image.height() != compare_image.get_height()
+    {
+        return Err(TestCaseError::Failed(format!(
+            "Emulator Display has different size than reference image: {}x{} vs {}x{}",
+            compare_image.get_width(), compare_image.get_height(),
+            expected_image.width(),    expected_image.height()
+        )));
+    }
 
     // check for image equality
     let images_identical = compare_images(&expected_image, &compare_image);
 
-    // raise an error including a comparison pattern
-    assert!(
-        images_identical,
-        "Emulator Display different to reference image:\n{}",
-        create_comparison_pattern(&expected_image, &compare_image)
-    );
+    if !images_identical {
+        // raise an error including a comparison pattern
+        return Err(TestCaseError::Failed(format!(
+            "Emulator Display different to reference image:\n{}",
+            create_comparison_pattern(&expected_image, &compare_image)
+        )));
+    }
+
+    Ok(())
 }
 

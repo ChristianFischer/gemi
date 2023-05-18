@@ -18,7 +18,7 @@
 use std::collections::HashSet;
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
-use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef};
+use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef, Workspace};
 use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 
 
@@ -193,9 +193,10 @@ fn eat_up_revision_codes(substr: &mut &str) -> u32 {
 
 
 /// Create tests for Mooneye test roms.
-pub fn visit_tests_mooneye(path: PathBuf, visitor: TestConfigVisitorRef) {
+pub fn visit_tests_mooneye(workspace: &Workspace, subdir: &str, visitor: TestConfigVisitorRef) {
     recursive_visit_directory(
-        path,
+        workspace,
+        workspace.get_path(subdir),
         &FindRomCallbacks {
             // open module for new directories
             on_handle_dir: Box::new(|d, _| {

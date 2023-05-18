@@ -16,10 +16,11 @@
  */
 
 use std::cell::RefCell;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::rc::Rc;
-use tests_shared::config::{BASE_PATH_ROM_FILES, BASE_PATH_TESTS, SOURCE_URL};
+use tests_shared::config::{SOURCE_URL, TESTRUNNER_SUBDIR_ROM_FILES, TESTRUNNER_SUBDIR_TESTS};
 use tests_shared::download::download_test_roms;
+use tests_shared::io_utils::Workspace;
 use tests_shared::test_suites::ALL_TEST_SUITES;
 use crate::test_generator::UnitTestGenerator;
 
@@ -29,22 +30,23 @@ pub mod test_generator;
 
 /// Fetch all test roms from the internet and store them in the local file system.
 pub fn fetch_test_roms() {
-    let path = Path::new(BASE_PATH_ROM_FILES);
+    let path = PathBuf::from(TESTRUNNER_SUBDIR_ROM_FILES);
 
     if !path.is_dir() {
-        download_test_roms(path, &SOURCE_URL);
+        download_test_roms(&path, &SOURCE_URL);
     }
 }
 
 
 /// Generate all unit tests for the emulator.
 pub fn generate_all_tests() {
-    let base_path_roms  = PathBuf::from(BASE_PATH_ROM_FILES);
-    let base_path_tests = PathBuf::from(BASE_PATH_TESTS);
+    let base_path_roms  = PathBuf::from(TESTRUNNER_SUBDIR_ROM_FILES);
+    let base_path_tests = PathBuf::from(TESTRUNNER_SUBDIR_TESTS);
+    let workspace       = Workspace::for_root_path(base_path_roms);
 
     for test_suite in ALL_TEST_SUITES {
         let generator = Rc::new(RefCell::new(UnitTestGenerator::new()));
-        test_suite.start(&base_path_roms, generator.clone());
+        test_suite.start(&workspace, generator.clone());
 
         let tests_file = base_path_tests.join(format!("{}.rs", test_suite.name));
         generator.borrow().to_file(&tests_file);

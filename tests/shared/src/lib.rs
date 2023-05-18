@@ -16,8 +16,10 @@
  */
 
 pub mod config;
+pub mod checks;
 pub mod download;
 pub mod io_utils;
 pub mod rom_utils;
+pub mod runner;
 pub mod test_config;
 pub mod test_suites;

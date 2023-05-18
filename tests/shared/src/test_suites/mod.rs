@@ -15,8 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::path::PathBuf;
-use crate::io_utils::TestConfigVisitorRef;
+use crate::io_utils::{TestConfigVisitorRef, Workspace};
 use crate::test_suites::blargg::visit_tests_blargg;
 use crate::test_suites::gambatte::visit_tests_gambatte;
 use crate::test_suites::mooneye::visit_tests_mooneye;
@@ -26,7 +25,7 @@ mod gambatte;
 mod mooneye;
 
 
-type FileVisitor = fn(path: PathBuf, visitor: TestConfigVisitorRef);
+type FileVisitor = fn(workspace: &Workspace, subdir: &str, visitor: TestConfigVisitorRef);
 
 
 /// A reference to an existing test suite. This contains the name of the test suite, the
@@ -35,6 +34,9 @@ type FileVisitor = fn(path: PathBuf, visitor: TestConfigVisitorRef);
 pub struct TestSuite {
     /// The name of the test suite.
     pub name: &'static str,
+
+    /// A descriptive title for this test suite.
+    pub title: &'static str,
 
     /// The subdirectory where the test suite is located.
     pub subdir: &'static str,
@@ -46,9 +48,9 @@ pub struct TestSuite {
 
 /// A list of all known test suites.
 pub const ALL_TEST_SUITES : &'static [TestSuite] = &[
-    TestSuite { name: "blargg",     subdir: "blargg",               visitor: visit_tests_blargg    },
-    TestSuite { name: "gambatte",   subdir: "gambatte",             visitor: visit_tests_gambatte  },
-    TestSuite { name: "mooneye",    subdir: "mooneye-test-suite",   visitor: visit_tests_mooneye   },
+    TestSuite { name: "blargg",     title: "Blargg",    subdir: "blargg",               visitor: visit_tests_blargg    },
+    TestSuite { name: "gambatte",   title: "Gambatte",  subdir: "gambatte",             visitor: visit_tests_gambatte  },
+    TestSuite { name: "mooneye",    title: "Mooneye",   subdir: "mooneye-test-suite",   visitor: visit_tests_mooneye   },
 ];
 
 
@@ -57,12 +59,7 @@ impl TestSuite {
     /// The test suite's file visitor will check the files being present and create test
     /// configurations for each test being found.
     /// The [TestConfigVisitorRef] will be invoked for each test found.
-    pub fn start(&self, root_path: &PathBuf, visitor: TestConfigVisitorRef) {
-        let tests_path = root_path.join(self.subdir);
-        (self.visitor)(tests_path, visitor);
+    pub fn start(&self, workspace: &Workspace, visitor: TestConfigVisitorRef) {
+        (self.visitor)(workspace, self.subdir, visitor);
     }
-}
-
-
-pub fn generate_all_tests() {
 }

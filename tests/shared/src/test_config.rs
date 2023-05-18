@@ -107,6 +107,7 @@ pub struct EmulatorTestConfig {
 
 
 /// Configuration of a single test case.
+#[derive(Clone)]
 pub struct EmulatorTestCase {
     pub device:     DeviceType,
     pub setup:      SetUpConfig,

@@ -17,6 +17,7 @@
 
 use gbemu_core::gameboy::GameBoy;
 use gbemu_core::ppu::graphic_data::TileMap;
+use crate::runner::TestCaseError;
 
 
 /// sequence of tile numbers representing the text 'Passed'.
@@ -27,19 +28,19 @@ const TILE_SEQUENCE_PASSED : [u8; 6] = [ 0x50, 0x61, 0x73, 0x73, 0x65, 0x64 ];
 /// Usually blargg prints a message like 'Passed' or 'Passed all tests' to the serial port.
 /// Some tests are missing this output, for them we check if the 'Passed' text was written on the
 /// screen by searching for the according tiles on the tile map.
-pub fn check_blargg_test_passed(gb: &GameBoy) {
+pub fn check_blargg_test_passed(gb: &GameBoy) -> Result<(), TestCaseError> {
     // get any message written to the serial port
     let output_message = gb.get_peripherals().serial.get_output_as_text();
 
     match output_message.trim().split('\n').into_iter().last() {
         // Passed - return success
-        Some("Passed all tests") | Some("Passed") => return,
+        Some("Passed all tests") | Some("Passed") => return Ok(()),
 
         // no message, continue
         Some("") => { },
 
         // other message will be taken as error
-        _ => panic!("Unexpected output message: {output_message}"),
+        _ => return Err(TestCaseError::Failed(format!("Unexpected output message: {output_message}"))),
     };
 
     // Search for a 'Passed' message in the tile map
@@ -60,10 +61,10 @@ pub fn check_blargg_test_passed(gb: &GameBoy) {
 
         // success, if all tiles match the 'Passed' sequence
         if line_match {
-            return;
+            return Ok(());
         }
     }
 
     // no success message
-    panic!("No 'Passed' message received from the emulator.");
+    Err(TestCaseError::Failed("No 'Passed' message received from the emulator.".to_string()))
 }

@@ -15,19 +15,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::path::PathBuf;
 use gbemu_core::device_type::EmulationType;
-use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef};
+use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef, Workspace};
 use crate::rom_utils::file_is_rom;
 use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 
 
 /// Create tests for Blargg's test roms.
-pub fn visit_tests_blargg(path: PathBuf, visitor: TestConfigVisitorRef) {
+pub fn visit_tests_blargg(workspace: &Workspace, subdir: &str, visitor: TestConfigVisitorRef) {
     let cgb_sound_folder = String::from("cgb_sound");
 
     recursive_visit_directory(
-        path,
+        workspace,
+        workspace.get_path(subdir),
         &FindRomCallbacks {
             // open module for new directories
             on_handle_dir: Box::new(|_, _| {

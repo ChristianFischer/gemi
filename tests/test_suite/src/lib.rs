@@ -15,6 +15,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub mod checks;
-pub mod runner;
-pub mod util;
+
+use std::path::PathBuf;
+use tests_shared::config::TESTRUNNER_SUBDIR_ROM_FILES;
+use tests_shared::io_utils::Workspace;
+use tests_shared::runner::{print_run_command, run_test_case_for_result};
+use tests_shared::test_config::EmulatorTestCase;
+
+
+/// Runs a test case and checks for it's result.
+/// Passes on success, but panics on each error.
+pub fn run_test_case(test_case: EmulatorTestCase) {
+    // unit test workspace
+    let workspace = Workspace::for_root_path(PathBuf::from(TESTRUNNER_SUBDIR_ROM_FILES));
+
+    // print commandline arg to easily re-run the test
+    print_run_command(&workspace, &test_case.device, &test_case.setup);
+
+    // run the test case and fail on error
+    run_test_case_for_result(
+        &workspace,
+        &test_case
+    ).unwrap();
+}

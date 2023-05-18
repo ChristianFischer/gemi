@@ -1,12 +1,11 @@
 [package]
-name = "testrunner"
+name = "update-test-report"
 version = "0.1.0"
 edition = "2021"
-build = "build.rs"
 
 [dependencies]
+rpb = "0.1.5"
+tokio = { version = "1.28.0", features = ["rt-multi-thread", "macros"] }
+tokio-macros = "2.1.0"
 gbemu-core = { path = "../../lib/core" }
 tests-shared = { path = "../shared" }
-
-[build-dependencies]
-tests-generator = { path = "../gen" }

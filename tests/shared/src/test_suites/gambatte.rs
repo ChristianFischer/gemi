@@ -19,7 +19,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use gbemu_core::gameboy::DeviceType;
 use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
-use crate::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef};
+use crate::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef, Workspace};
 use crate::rom_utils::file_is_rom;
 use crate::test_config::{CheckResultConfig, EmulatorTestConfig, LcdColorMod, RunConfig, SetUpConfig};
 
@@ -62,14 +62,14 @@ fn make_config_for_file(
 
 
 /// Finds test configurations for a gambatte test rom.
-fn find_gambatte_checks(file: &PathBuf) -> Vec<EmulatorTestConfig> {
+fn find_gambatte_checks(workspace: &Workspace, file: &PathBuf) -> Vec<EmulatorTestConfig> {
     if let Some(_) = file_is_rom(file) {
         let mut configs : Vec<EmulatorTestConfig> = Vec::new();
         let filename = get_plain_filename(file);
 
         // check for comparison images
         {
-            let path = file.parent().unwrap();
+            let path = workspace.get_root_path().join(file).parent().unwrap().to_path_buf();
 
             for entry in GAMBATTE_DEVICE_CODE_TABLE {
                 let ref_image_name = format!("{}_{}.png", filename, entry.0);
@@ -86,7 +86,7 @@ fn find_gambatte_checks(file: &PathBuf) -> Vec<EmulatorTestConfig> {
                     );
 
                     config.result.compare_lcd_with_image = Some(
-                        ref_image_path.to_str().unwrap().to_string().replace('\\', "/")
+                        workspace.to_relative_path(&ref_image_path).to_str().unwrap().to_string().replace('\\', "/")
                     );
 
                     if device_types.contains(&DeviceType::GameBoyDmg) {
@@ -224,9 +224,10 @@ fn filepart_is_display_check_code(part: &str) -> Option<String> {
 
 
 /// Create tests for Gambatte test roms.
-pub fn visit_tests_gambatte(path: PathBuf, visitor: TestConfigVisitorRef) {
+pub fn visit_tests_gambatte(workspace: &Workspace, subdir: &str, visitor: TestConfigVisitorRef) {
     recursive_visit_directory(
-        path,
+        workspace,
+        workspace.get_path(subdir),
         &FindRomCallbacks {
             // open module for new directories
             on_handle_dir: Box::new(|_, _| {
@@ -235,7 +236,7 @@ pub fn visit_tests_gambatte(path: PathBuf, visitor: TestConfigVisitorRef) {
 
             // create tests for ROM files
             on_file_found: Box::new(|f, _| {
-                find_gambatte_checks(f)
+                find_gambatte_checks(workspace, f)
             }),
         },
         visitor

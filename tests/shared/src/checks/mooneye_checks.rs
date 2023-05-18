@@ -16,6 +16,7 @@
  */
 
 use gbemu_core::gameboy::GameBoy;
+use crate::runner::TestCaseError;
 
 const MOONEYE_RESULT_SEQ_PASS : &[u8] = &[3, 5, 8, 13, 21, 34];
 const MOONEYE_RESULT_SEQ_FAIL : &[u8] = &[0x42, 0x42, 0x42, 0x42, 0x42, 0x42];
@@ -23,12 +24,18 @@ const MOONEYE_RESULT_SEQ_FAIL : &[u8] = &[0x42, 0x42, 0x42, 0x42, 0x42, 0x42];
 
 /// Takes a reference to an emulator running a mooneye test rom and checks whether it's passed or not.
 /// Mooneye test roms send a specific sequence of bytes to the serial port to indicate whether they passed or not.
-pub fn check_mooneye_test_passed(gb: &GameBoy) {
+pub fn check_mooneye_test_passed(gb: &GameBoy) -> Result<(), TestCaseError> {
     let test_result_message = gb.get_peripherals().serial.get_output();
 
     // Fail if the test rom sent the fail sequence
-    assert_ne!(MOONEYE_RESULT_SEQ_FAIL, test_result_message, "ROM sent FAILED sequence.");
-
+    if test_result_message == MOONEYE_RESULT_SEQ_FAIL {
+        Err(TestCaseError::Failed(format!("ROM sent FAILED sequence.")))
+    }
     // Fail if the test rom didn't send the pass sequence
-    assert_eq!(MOONEYE_RESULT_SEQ_PASS, test_result_message, "Missing 'Passed' Sequence from ROM, got {test_result_message:?} instead.");
+    else if test_result_message != MOONEYE_RESULT_SEQ_PASS {
+        Err(TestCaseError::Failed(format!("ROM sent unknown sequence: {test_result_message:?}")))
+    }
+    else {
+        Ok(())
+    }
 }

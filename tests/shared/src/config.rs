@@ -15,9 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub const BASE_PATH_ROM_FILES:  &str = "res/test_roms/";
-pub const BASE_PATH_TESTS:      &str = "tests/";
-pub const SOURCE_URL:           &str = "https://github.com/c-sp/gameboy-test-roms/releases/download/v4.0/gameboy-test-roms-v4.0.zip";
+pub const TESTRUNNER_PATH:              &str = "tests/test_suite";
+pub const TESTRUNNER_SUBDIR_ROM_FILES:  &str = "res/test_roms";
+pub const TESTRUNNER_SUBDIR_TESTS:      &str = "tests";
+pub const SOURCE_URL:                   &str = "https://github.com/c-sp/gameboy-test-roms/releases/download/v4.0/gameboy-test-roms-v4.0.zip";
 
 /// A list of tests currently known to fail
 /// Those will be ignored until their functionality is fully supported.

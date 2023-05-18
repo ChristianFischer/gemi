@@ -17,7 +17,7 @@
 
 use std::collections::HashSet;
 use std::path::PathBuf;
-use tests_shared::config::{BASE_PATH_ROM_FILES, TESTS_KNOWN_TO_FAIL};
+use tests_shared::config::{TESTS_KNOWN_TO_FAIL};
 use tests_shared::io_utils::{IteratorState, starts_with_number, TestConfigVisitor, update_file};
 use tests_shared::test_config::{EmulatorTestCase, EmulatorTestConfig, LcdColorMod, RunConfig};
 use crate::common::TEST_FILE_HEADER;
@@ -77,10 +77,9 @@ impl UnitTestGenerator {
     ) -> String {
         let mut test_code = String::new();
 
-        // the ROM file being tested, stripping the BASE_PATH_ROM_FILES
+        // the ROM file being tested, relative to workspace root with normalized file separators
         let rom_file = test_case.setup.cartridge_path
             .replace('\\', "/")
-            .replace(BASE_PATH_ROM_FILES, "")
         ;
 
         // the module path to the current test
@@ -171,7 +170,6 @@ impl UnitTestGenerator {
             if let Some(ref_image) = &test_case.result.compare_lcd_with_image {
                 let ref_image_path = ref_image
                     .replace('\\', "/")
-                    .replace(BASE_PATH_ROM_FILES, "")
                 ;
 
                 test_code.push_str(&format!("            compare_lcd_with_image: Some(\"{ref_image_path}\".to_string()),\n"));

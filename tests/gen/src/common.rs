@@ -33,7 +33,7 @@ pub const TEST_FILE_HEADER: &str = /*language=rust*/ "/*
  */
 
 use gbemu_core::gameboy::DeviceType;
-use testrunner::runner::run_test_case;
+use testrunner::run_test_case;
 use tests_shared::test_config::*;
 
 #[allow(unused_imports)]

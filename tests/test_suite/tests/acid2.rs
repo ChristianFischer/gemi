@@ -17,7 +17,7 @@
 
 use gbemu_core::device_type::DeviceType;
 use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
-use testrunner::runner::run_test_case;
+use testrunner::run_test_case;
 use tests_shared::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
 
 

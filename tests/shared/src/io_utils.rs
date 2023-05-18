@@ -16,9 +16,9 @@
  */
 
 use std::cell::RefCell;
-use std::fs;
+use std::{fs, path};
 use std::ops::Add;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use crate::test_config::EmulatorTestConfig;
 
@@ -51,6 +51,13 @@ pub trait TestConfigVisitor {
 
 /// Type alias for a reference to a test config visitor.
 pub type TestConfigVisitorRef = Rc<RefCell<dyn TestConfigVisitor>>;
+
+
+/// A workspace to define the location where to look for test ROMs.
+#[derive(Clone)]
+pub struct Workspace {
+    root_path: PathBuf,
+}
 
 
 /// The current state while iterating through directories.
@@ -109,6 +116,63 @@ pub enum HandleDirectory {
 
     /// Ignores this directory and all of it's subdirectories.
     Ignore,
+}
+
+
+impl Workspace {
+    /// Construct a workspace based on a path which may be relative
+    /// to the path the program is currently running in.
+    pub fn for_root_path(path: PathBuf) -> Self {
+        Self {
+            root_path: path.canonicalize().unwrap_or(path)
+        }
+    }
+
+
+    /// Get the workspace root path.
+    pub fn get_root_path(&self) -> &PathBuf {
+        &self.root_path
+    }
+
+
+    /// Converts a path into a path relative to the workspace root path.
+    pub fn to_relative_path(&self, path: &Path) -> PathBuf {
+        (|| {
+            if path.starts_with(&self.root_path) {
+                let root_path_str = self.root_path.to_str()?;
+                let sub_path_str  = path.to_str()?;
+
+                // strip root path with it's separator
+                let relative_path_str = sub_path_str.replace(
+                        &format!("{}{}", root_path_str, path::MAIN_SEPARATOR),
+                        ""
+                );
+
+                Some(PathBuf::from(relative_path_str))
+            }
+            else {
+                None
+            }
+        })().unwrap_or_else(
+            || path.to_path_buf()
+        )
+    }
+
+
+    /// Get the path to an element inside the workspace.
+    pub fn get_path(&self, sub_path: &str) -> PathBuf {
+        self.root_path.join(sub_path)
+    }
+
+
+    /// Get the path to an element inside the workspace as string.
+    pub fn get_path_to_str(&self, sub_path: &str) -> String {
+        self.get_path(sub_path)
+            .to_str()
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| sub_path.to_string())
+            .replace("\\", "/")
+    }
 }
 
 
@@ -242,6 +306,7 @@ impl VisitorStateTracker {
 /// Invokes a callback for each directory and file found. Collects the generated code
 /// from each callback and creates file content with all generated tests.
 pub fn recursive_visit_directory(
+        workspace: &Workspace,
         root_path: PathBuf,
         callbacks: &FindRomCallbacks,
         visitor:   TestConfigVisitorRef
@@ -250,6 +315,7 @@ pub fn recursive_visit_directory(
     let mut state = VisitorStateTracker::new(root_name.clone(), visitor);
 
     recursive_visit_directory_step(
+        workspace,
         &root_path,
         callbacks,
         &mut state
@@ -259,6 +325,7 @@ pub fn recursive_visit_directory(
 
 /// Internal part of recursive_find_roms which is called recursively.
 fn recursive_visit_directory_step(
+        workspace: &Workspace,
         current_path: &PathBuf,
         callbacks: &FindRomCallbacks,
         state: &mut VisitorStateTracker
@@ -301,6 +368,7 @@ fn recursive_visit_directory_step(
             HandleDirectory::Enter => {
                 // recurse into the subdirectory
                 recursive_visit_directory_step(
+                    workspace,
                     &path,
                     callbacks,
                     state
@@ -313,6 +381,7 @@ fn recursive_visit_directory_step(
 
                 // recurse into the subdirectory
                 recursive_visit_directory_step(
+                    workspace,
                     &path,
                     callbacks,
                     state
@@ -334,8 +403,10 @@ fn recursive_visit_directory_step(
         let visit_files = |files_list: &Vec<PathBuf>, state: &mut VisitorStateTracker| {
             // iterate through all files
             for path in files_list {
+                let relative_path = workspace.to_relative_path(&path);
+
                 // call the on_file_found callback
-                let tests: Vec<EmulatorTestConfig> = (callbacks.on_file_found)(&path, state.get_current_state());
+                let tests: Vec<EmulatorTestConfig> = (callbacks.on_file_found)(&relative_path, state.get_current_state());
 
                 // visit each test found
                 for test_cfg in tests {
