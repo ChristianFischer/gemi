@@ -18,11 +18,10 @@
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::Arc;
-use rpb::bar::Bar;
-use rpb::styles::Themes;
-use tokio::task::JoinHandle;
+use futures::{future, StreamExt};
+use indicatif::ProgressBar;
 use gbemu_core::gameboy::DeviceType;
-use tests_shared::io_utils::{IteratorState, TestConfigVisitor, update_file, Workspace};
+use tests_shared::io_utils::{IteratorState, TestConfigVisitor, Workspace};
 use tests_shared::runner::{run_test_case_safe, TestCaseError};
 use tests_shared::test_config::{EmulatorTestCase, EmulatorTestConfig};
 
@@ -41,7 +40,6 @@ pub enum TestResult {
 /// A struct containing the statistics of how much tests ended in each state.
 #[derive(Default)]
 pub struct TestStats {
-    pub total:      u32,
     pub success:    u32,
     pub failed:     u32,
     pub errors:     u32,
@@ -49,15 +47,14 @@ pub struct TestStats {
 }
 
 
-/// A generic union type to store either one or the other type of value.
-#[derive(Copy, Clone)]
-pub enum Either<A, B> {
-    First(A),
-    Second(B),
-}
+/// An enum containing either a fixed string or a test case referenced by it's index.
+enum StringOrTestCaseRef {
+    /// A string to be added into the report file.
+    String(String),
 
-type StringOrTestCase         = Either<String, EmulatorTestCase>;
-type StringOrFutureTestResult = Either<String, JoinHandle<TestResult>>;
+    /// A reference to a test case, which result will be added to the report file.
+    TestCaseRef(usize),
+}
 
 
 /// A set of test cases which belong to a single test ROM.
@@ -83,7 +80,13 @@ pub struct TestReportGenerator {
     pending_tests: Option<TestCaseSet>,
 
     /// All entries found, which will be either a fixed string or a test case to be run.
-    entries: Vec<StringOrTestCase>,
+    entries: Vec<StringOrTestCaseRef>,
+
+    /// The collection of test cases to be run.
+    tests: Vec<EmulatorTestCase>,
+
+    /// The results of all tests after they were being executed.
+    test_results: Vec<TestResult>,
 }
 
 
@@ -95,7 +98,6 @@ impl TestResult {
             TestResult::Failed        => "❌",
             TestResult::Error         => "⚠️",
             TestResult::Panic         => "☠️",
-
         }
     }
 }
@@ -109,6 +111,8 @@ impl TestReportGenerator {
             pending_headline:   None,
             pending_tests:      None,
             entries:            Vec::new(),
+            tests:              Vec::new(),
+            test_results:       Vec::new(),
         }
     }
 
@@ -131,6 +135,12 @@ impl TestReportGenerator {
     }
 
 
+    /// Get the number of test cases tracked by this generator.
+    pub fn get_test_case_count(&self) -> usize {
+        self.tests.len()
+    }
+
+
     /// Adds an string entry immediately.
     pub fn add_str_entry(&mut self, s: &str) {
         self.add_string_entry(s.to_string());
@@ -139,7 +149,7 @@ impl TestReportGenerator {
 
     /// Adds an string entry immediately.
     pub fn add_string_entry(&mut self, s: String) {
-        self.entries.push(StringOrTestCase::First(s));
+        self.entries.push(StringOrTestCaseRef::String(s));
     }
 
 
@@ -194,12 +204,16 @@ impl TestReportGenerator {
                     // verify the test case contains the same rom file as our test set
                     assert_eq!(pending_test_set.rom, test_case.setup.cartridge_path);
 
-                    StringOrTestCase::Second(test_case.clone())
+                    // enlist the test case and remember its index
+                    let index = self.tests.len();
+                    self.tests.push(test_case.clone());
+
+                    StringOrTestCaseRef::TestCaseRef(index)
                 }
                 else {
                     // produce an empty cell for each not covered device
                     let result_string = String::from("      |");
-                    StringOrTestCase::First(result_string)
+                    StringOrTestCaseRef::String(result_string)
                 };
 
                 self.entries.push(entry);
@@ -267,51 +281,73 @@ impl TestReportGenerator {
     }
 
 
-    /// Runs all tests which were found in parallel, producing a string
-    /// containing the results in a markdown table.
-    #[tokio::main()]
-    pub async fn collect_contents(&self) -> (String, TestStats) {
-        // clone into Arc to make it accessible from multiple threads
+    /// Runs all tests which were found in parallel.
+    /// As a result of this function, the list of test results will be filled.
+    pub async fn run_all_tests(&mut self, bar: ProgressBar) {
         let workspace = Arc::new(self.workspace.clone());
 
-        // track statistics
-        let mut stats = TestStats::default();
+        // tokio stream of test cases
+        let test_results_stream =
+            // build a tokio stream based on clones of each test case,
+            // which can be sent to worker threads
+            tokio_stream::iter(self.tests.clone().into_iter())
 
-        let entries = self.entries
-            .clone().into_iter()
-            .map(|e| match e {
-                StringOrTestCase::First(s) => StringOrFutureTestResult::First(s),
+            // run all tests within a tokio task and return it's result
+            .map(|test_case| {
+                // create a clone of the Arc to be moved into the async closure
+                let workspace = workspace.clone();
+                let bar = bar.clone();
 
-                StringOrTestCase::Second(tc) => {
-                    // create a clone of the Arc to be moved into the async closure
-                    let workspace = workspace.clone();
+                tokio::spawn(async move {
+                    // log the current test
+                    bar.set_message(
+                        PathBuf::from(
+                            test_case
+                            .setup.cartridge_path
+                            .clone()
+                        )
+                        .file_name().unwrap()
+                        .to_str().unwrap()
+                        .to_string()
+                    );
 
-                    StringOrFutureTestResult::Second(tokio::spawn(async move {
-                        Self::run_test(&workspace, &tc)
-                    }))
-                },
+                    // run the actual test
+                    let result = Self::run_test(&workspace, &test_case);
+
+                    // increment progress bar
+                    bar.inc(1);
+
+                    // return the result
+                    result
+                })
             })
-            .collect::<Vec<StringOrFutureTestResult>>()
         ;
 
-        // stores the resulting string
-        let mut content = String::new();
+       // collect all test results
+        let test_results = future::join_all(
+            // take all futures from the stream and collect them into a vector
+            test_results_stream
+                .collect::<Vec<_>>().await
+                .into_iter()
+        )
+            .await
+            .into_iter()
+            .map(|entry| entry.unwrap())
+            .collect::<Vec<_>>()
+        ;
 
-        // the progress bar displaying the progress of the report generation
-        let mut bar = Bar::new(entries.len() as i64);
-        bar.set_theme(Themes::ColoredSmall);
+        self.test_results = test_results;
+    }
 
-        for entry in entries {
-            match entry {
-                StringOrFutureTestResult::First(s) => {
-                    content.push_str(&s);
-                }
 
-                StringOrFutureTestResult::Second(r) => {
-                    // wait for the result, which are computed in parallelized worker threads
-                    let result = r.await.unwrap();
-
-                    // track statistics
+    /// Collects statistics about the test results.
+    /// Expects the tests to be run first.
+    pub fn collect_stats(&self) -> TestStats {
+        self.test_results
+            .iter()
+            .fold(
+                TestStats::default(),
+                |mut stats, result| {
                     match result {
                         TestResult::Success => stats.success  += 1,
                         TestResult::Error   => stats.errors   += 1,
@@ -319,40 +355,35 @@ impl TestReportGenerator {
                         TestResult::Panic   => stats.panicked += 1,
                     }
 
-                    stats.total += 1;
-
-                    // create the table cell containing the test result
-                    content.push_str(&format!("  {}   |", result.get_icon()));
+                    stats
                 }
-            };
-
-            // increment the step for the progress bar
-            bar.inc();
-        }
-
-        (content, stats)
+            )
     }
 
 
-    /// Updates the target file with the generated content.
-    /// The file won't be updated if the content is the same.
-    pub fn export_to_file(&mut self, title: &str, path: &PathBuf) -> TestStats {
-        let (content, stats) = self.collect_contents();
-
-        let final_content = format!(
-r#"## {} Test ROM Results
+    /// Generates the content of the test report file.
+    /// Expects the tests to be run first.
+    pub fn generate_file_content(&self, title: &str) -> String {
+        format!(
+            // language=markdown
+            r#"## {} Test ROM Results
 
 {}
 {}
 "#,
             title,
             Self::create_devices_header(),
-            content
-        );
+            self.entries.iter()
+                .map(|e| match e {
+                    StringOrTestCaseRef::String(s) => s.clone(),
 
-        update_file(path, &final_content);
-
-        stats
+                    StringOrTestCaseRef::TestCaseRef(index) => {
+                        let result = self.test_results[*index];
+                        format!("  {}   |", result.get_icon())
+                    }
+                })
+                .collect::<String>()
+        )
     }
 }
 

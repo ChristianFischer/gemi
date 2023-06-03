@@ -18,11 +18,15 @@
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
+use std::sync::Arc;
+use futures::{future, StreamExt};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use tests_shared::config::{SOURCE_URL, TESTRUNNER_PATH, TESTRUNNER_SUBDIR_ROM_FILES};
 use tests_shared::download::download_test_roms;
 use tests_shared::io_utils::{update_file, Workspace};
-use tests_shared::test_suites::ALL_TEST_SUITES;
+use tests_shared::test_suites::{ALL_TEST_SUITES, TestSuite};
 use crate::report_generator::TestReportGenerator;
+
 
 mod report_generator;
 
@@ -56,10 +60,20 @@ const TEST_ROM_SUMMARY_FOOTER : &str = /* language=markdown */ r#"
 "#;
 
 
+/// Collection of all objects required to collect and process tests.
+struct ProcessTestSuiteEntry {
+    pub test_suite:     &'static TestSuite,
+    pub generator:      TestReportGenerator,
+    pub bar:            ProgressBar,
+}
 
-pub fn main() {
-    let workspace = Workspace::for_root_path(PathBuf::from(
-        format!("{}/{}", TESTRUNNER_PATH, TESTRUNNER_SUBDIR_ROM_FILES)
+
+#[tokio::main()]
+pub async fn main() {
+    let workspace = Arc::new(
+        Workspace::for_root_path(PathBuf::from(
+            format!("{}/{}", TESTRUNNER_PATH, TESTRUNNER_SUBDIR_ROM_FILES)
+        )
     ));
 
     // download test ROM archive, if the target directory does not exist yet
@@ -67,40 +81,129 @@ pub fn main() {
         download_test_roms(workspace.get_root_path(), &SOURCE_URL);
     }
 
-    // string to store the content of test_report.md, which contains the test summary
-    let mut test_summary_content = String::from(TEST_ROM_SUMMARY_HEADER);
+    // progress bar manager
+    let bar_manager = MultiProgress::new();
+    bar_manager.set_draw_target(indicatif::ProgressDrawTarget::stdout());
 
-    for test_suite in ALL_TEST_SUITES {
-        let generator = Rc::new(RefCell::new(TestReportGenerator::new(&workspace)));
+    // progress bar style
+    let progress_bar_template_str = "[{elapsed_precise}] [{bar:40.cyan/blue}] {pos:>7}/{len:7} {msg}";
+    let bar_style =
+        ProgressStyle::default_bar()
+        .progress_chars("━━┄")
+    ;
 
-        // visit all test ROMS and generate test cases for each of them
-        test_suite.start(&workspace, generator.clone());
+    // create an entry for each test suite and set them up
+    let process_test_suites_stream =
+        tokio_stream::iter(ALL_TEST_SUITES.iter())
 
-        // this will actually run the tests and generate the test report output
-        let stats = generator.borrow_mut().export_to_file(
-            test_suite.title,
-            &PathBuf::from(&format!("doc/test_report_{}.md", test_suite.name))
-        );
-
-        // add an entry into the summary file
-        {
-            let to_percent = 100.0 / (stats.total as f32);
-
-            test_summary_content.push_str(&format!(
-                "| {:50} | {:5.1}% | {:5.1}% | {:5.1}% | {:5.1}% |\n",
-                format!("[{}](test_report_{}.md)", test_suite.title, test_suite.name),
-                (stats.success  as f32) * to_percent,
-                (stats.failed   as f32) * to_percent,
-                (stats.errors   as f32) * to_percent,
-                (stats.panicked as f32) * to_percent
+        // setup each test suite and collect all test ROM files
+        .map(|test_suite| {
+            let generator_rc = Rc::new(RefCell::new(
+                TestReportGenerator::new(&workspace)
             ));
-        }
+
+            // visit all test ROMS and generate test cases for each of them
+            test_suite.start(&workspace, generator_rc.clone());
+
+            // take the generator out of the Rc, which is not required anymore
+            // so we're able to send the generator across thread boundaries
+            let generator = Rc::try_unwrap(generator_rc)
+                .unwrap_or_else(|_| panic!("Failed to unwrap Rc"))
+                .into_inner()
+            ;
+
+            // Progress bar
+            let num_tests = generator.get_test_case_count();
+            let bar = bar_manager.add(ProgressBar::new(num_tests as u64));
+            bar.set_style(bar_style
+                .clone()
+                .template(&format!(
+                    "{:10} {}",
+                    test_suite.name,
+                    progress_bar_template_str)
+                )
+                .unwrap_or_else(|_| bar_style.clone())
+            );
+
+            bar.set_position(0);
+
+            // pack together into an entry
+            ProcessTestSuiteEntry {
+                test_suite,
+                generator,
+                bar,
+            }
+        })
+
+        // run each test suite in a separate thread
+        .map(|mut entry| {
+            tokio::spawn(async move {
+                // this will actually run the tests and generate the test report output
+                entry.generator.run_all_tests(entry.bar.clone()).await;
+
+                // finish the progress bar
+                entry.bar.finish_with_message("done");
+
+                // forward the entry
+                entry
+            })
+        })
+
+        .collect::<Vec<_>>()
+        .await
+    ;
+
+    // await all futures
+    let test_suites = future::join_all(process_test_suites_stream.into_iter()).await
+        .into_iter()
+        .map(|entry| entry.unwrap())
+        .collect::<Vec<_>>()
+    ;
+
+    // try to update the target files of each test suite
+    for entry in &test_suites {
+        let file_path = PathBuf::from(&format!(
+            "doc/test_report_{}.md",
+            entry.test_suite.name
+        ));
+
+        // get the generated file content
+        let file_content = entry.generator.generate_file_content(entry.test_suite.title);
+
+        update_file(&file_path, &file_content);
     }
 
-    // update summary file
+    // generate the summary table
     {
-        test_summary_content.push_str(TEST_ROM_SUMMARY_FOOTER);
+        let test_summary_table = test_suites
+            .iter()
+            .map(|entry| {
+                let test_suite  = entry.test_suite;
+                let stats       = entry.generator.collect_stats();
+                let total_tests = entry.generator.get_test_case_count();
+                let to_percent  = 100.0 / (total_tests as f32);
 
-        update_file(&PathBuf::from("doc/test_report.md"), &test_summary_content);
+                format!(
+                    "| {:50} | {:5.1}% | {:5.1}% | {:5.1}% | {:5.1}% |\n",
+                    format!("[{}](test_report_{}.md)", test_suite.title, test_suite.name),
+                    (stats.success  as f32) * to_percent,
+                    (stats.failed   as f32) * to_percent,
+                    (stats.errors   as f32) * to_percent,
+                    (stats.panicked as f32) * to_percent
+                )
+            })
+            .collect::<String>()
+        ;
+
+        // update summary file
+        update_file(
+            &PathBuf::from("doc/test_report.md"),
+            &format!(
+                "{}{}{}",
+                TEST_ROM_SUMMARY_HEADER,
+                test_summary_table,
+                TEST_ROM_SUMMARY_FOOTER,
+            )
+        );
     }
 }
