@@ -287,8 +287,19 @@ pub fn run_test_case_for_result(workspace: &Workspace, test_case: &EmulatorTestC
 /// When the emulator panics, this will lead into a [TestCaseError::Panic] instead of
 /// crashing the application.
 pub fn run_test_case_safe(workspace: &Workspace, test_case: &EmulatorTestCase) -> Result<GameBoy, TestCaseError> {
-    panic::catch_unwind(|| {
+    // suppress default error handler to avoid printing the panic message
+    let old_panic_hook = panic::take_hook();
+    panic::set_hook(Box::new(|_|{}));
+
+    // run the actual test - if it panics, the error will be caught
+    let result = panic::catch_unwind(|| {
         run_test_case_for_result(workspace, test_case)
-    }).map_err(|e| TestCaseError::Panic(format!("{:?}", e)))?
+    }).map_err(|e| TestCaseError::Panic(format!("{:?}", e)))?;
+
+    // restore the old panic hook
+    panic::set_hook(old_panic_hook);
+
+    // finish
+    result
 }
 
