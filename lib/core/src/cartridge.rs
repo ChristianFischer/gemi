@@ -19,7 +19,8 @@ use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io;
 use std::io::Read;
-use std::ops::{Add, Range};
+use std::ops::Range;
+use std::path::{Path, PathBuf};
 use crate::mmu::mbc::MemoryBankController;
 use crate::mmu::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::utils::as_hex_digit;
@@ -65,7 +66,7 @@ pub struct RomData {
 
 /// This object represents a cartridge of a single game.
 pub struct Cartridge {
-    file: String,
+    source_file: Option<PathBuf>,
 
     title: String,
     rom: RomData,
@@ -173,34 +174,57 @@ pub fn compute_checksum(data: &[u8]) -> u8 {
 }
 
 
-/// Change the file extension of a filename.
-pub fn change_filename_ext(filepath: &str, ext: &str) -> String {
-    {
-        if filepath.ends_with(FILE_EXT_GB) {
-            &filepath[0 .. filepath.len() - 3]
-        }
-        else if filepath.ends_with(FILE_EXT_GBC) {
-            &filepath[0 .. filepath.len() - 4]
-        }
-        else {
-            filepath
-        }
-    }.to_string().add(ext)
+/// Load a file into a byte buffer.
+fn load_file(file_path: &Path) -> io::Result<Vec<u8>> {
+    let mut file   = File::open(file_path)?;
+    let metadata   = file.metadata()?;
+    let mut buffer = vec![0; metadata.len() as usize];
+
+    file.read_exact(&mut buffer)?;
+
+    Ok(buffer)
 }
 
 
 impl Cartridge {
-    /// Load a cartridge from a file.
-    /// * `filepath` - relative path to the file to be loaded
-    pub fn load_file(filepath: &str) -> Result<Cartridge, io::Error> {
-        let mut file = File::open(filepath)?;
-        let metadata = file.metadata()?;
-        let mut buffer = vec![0; metadata.len() as usize];
+    /// Load a cartridge from a ROM file and a RAM file with the same name.
+    pub fn load_files_with_default_ram(rom_file: &Path) -> io::Result<Cartridge> {
+        let ram_file = rom_file.with_extension(FILE_EXT_RAM);
+        Self::load_files(rom_file, Some(&ram_file))
+    }
 
-        file.read(&mut buffer)?;
 
+    /// Loads a cartridge from a ROM file.
+    pub fn load_file(rom_file: &Path) -> io::Result<Cartridge> {
+        Self::load_files(rom_file, None)
+    }
+
+
+    /// Loads a cartridge and it's RAM image from files.
+    pub fn load_files(rom_file: &Path, ram_file: Option<&Path>) -> io::Result<Cartridge> {
+        // load the cartridge from the ROM file
+        let rom_data      = load_file(rom_file)?;
+        let mut cartridge = Self::load_from_bytes(rom_data, None)?;
+
+        // when the cartridge has battery powered RAM support, load the RAM file
+        if cartridge.has_ram && cartridge.has_battery {
+            if let Some(ram_file) = ram_file {
+                let ram_data = load_file(ram_file)?;
+                cartridge.ram.read_from_bytes(ram_data.as_slice())?;
+            }
+        }
+
+        // store the source file path
+        cartridge.source_file = Some(rom_file.to_path_buf());
+
+        Ok(cartridge)
+    }
+
+
+    /// Loads a cartridge and optionally it's RAM from a byte buffer.
+    pub fn load_from_bytes(rom_data: Vec<u8>, ram_data: Option<Vec<u8>>) -> io::Result<Cartridge> {
         let rom = RomData {
-            data: buffer
+            data: rom_data,
         };
 
         let cgb_flag_value = rom.data[ROM_OFFSET_FLAG_CGB];
@@ -274,11 +298,8 @@ impl Cartridge {
         // if RAM is available and powered by a battery, it's persistent
         // and we can try to load the RAM image from a file.
         if has_ram && has_battery {
-            let ram_file = change_filename_ext(filepath, FILE_EXT_RAM);
-
-            if let Err(e) = ram.read_from_file(&ram_file) {
-                // don't fail when RAM could not be loaded, just print a message
-                println!("Failed to load Cartridge RAM: {}", e);
+            if let Some(ram_data_vec) = ram_data {
+                ram.read_from_bytes(&ram_data_vec)?;
             }
         }
 
@@ -301,7 +322,7 @@ impl Cartridge {
         };
 
         let cartridge = Cartridge {
-            file: filepath.to_string(),
+            source_file: None,
 
             title: rom.read_title(),
 
@@ -347,11 +368,11 @@ impl Cartridge {
     }
 
 
-    /// Get the cartridge filename with a different file extension.
-    pub fn get_filename_with_ext(&self, ext: &str) -> String {
-        change_filename_ext(&self.file, ext)
+    /// Get the source file of this cartridge, if any.
+    /// If the cartridge was loaded from a file, this is the source file where it was loaded from.
+    pub fn get_source_file(&self) -> &Option<PathBuf> {
+        &self.source_file
     }
-
 
     /// get the plain data of this cartridge
     pub fn get_rom(&self) -> &RomData {
@@ -369,10 +390,17 @@ impl Cartridge {
     }
 
     /// Saves the RAM to a file, if the cartridge has battery powered RAM.
-    pub fn save_ram_if_any(&self) -> io::Result<()> {
+    pub fn save_ram_to_file_if_any(&self) -> io::Result<()> {
         if self.has_ram && self.has_battery {
-            let ram_file = self.get_filename_with_ext(FILE_EXT_RAM);
-            self.get_ram().save_to_file(&ram_file)?;
+            if let Some(ram_file) = &self.source_file {
+                self.get_ram().save_to_file(ram_file)?;
+            }
+            else {
+                return Err(io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "Cannot save RAM to file, because cartridge was not loaded from a file."
+                ));
+            }
         }
 
         Ok(())

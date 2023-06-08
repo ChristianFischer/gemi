@@ -25,11 +25,12 @@ use gbemu_core::cartridge::GameBoyColorSupport;
 use gbemu_core::boot_rom::BootRom;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
 use std::{env, time};
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 use gbemu_core::cpu::cpu::CPU_CLOCK_SPEED;
 use crate::window::Window;
 
-fn print_rom_info(filename: &String, cartridge: &Cartridge) {
+fn print_rom_info(file: &Path, cartridge: &Cartridge) {
     let mut features: Vec<&str> = vec![];
 
     if cartridge.has_ram() {
@@ -54,7 +55,7 @@ fn print_rom_info(filename: &String, cartridge: &Cartridge) {
         GameBoyColorSupport::None => "-",
     };
 
-    println!("ROM file: {}", filename);
+    println!("ROM file: {}", file.display());
     println!("Title:         {}",     cartridge.get_title());
     println!("Manufacturer:  {}",     cartridge.get_manufacturer_code());
     println!("Licensee:      {}",     cartridge.get_licensee_code());
@@ -110,7 +111,7 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
 
 
 fn make_gameboy_instance() -> Result<GameBoy, String> {
-    let mut args = env::args().into_iter();
+    let mut args    = env::args().into_iter();
     let mut builder = GameBoy::build();
 
     // skip first argument, which is the executable name
@@ -153,9 +154,12 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
             }
 
             _ => {
-                let filename = arg;
-                let cart     = Cartridge::load_file(&filename).unwrap();
-                print_rom_info(&filename, &cart);
+                let file = PathBuf::from(arg);
+                let cart = Cartridge::load_files_with_default_ram(&file)
+                    .map_err(|e| format!("Failed to load cartridge: {}", e))
+                    ?;
+
+                print_rom_info(&file, &cart);
 
                 builder.set_cartridge(cart);
             }
@@ -184,8 +188,8 @@ fn main() -> Result<(), String> {
     run(&mut window, &mut gb);
 
     // after running the cartridge, save it's on-chip-RAM, if any
-    gb.get_peripherals().mem.save_cartridge_ram_if_any()
-        .map_err(|e| e.to_string())
+    gb.get_peripherals().mem.save_cartridge_ram_to_file_if_any()
+        .map_err(|e| format!("Failed to save cartridge RAM: {}", e))
         ?
     ;
 

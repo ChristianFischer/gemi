@@ -18,6 +18,7 @@
 use std::io;
 use std::fs::File;
 use std::io::{Read, Write};
+use std::path::Path;
 
 pub use dynamic_size::*;
 pub use fixed_size::*;
@@ -41,17 +42,33 @@ pub trait MemoryData {
     fn as_slice_mut(&mut self) -> &mut [u8];
 
     /// Save the RAM image into a file.
-    fn save_to_file(&self, filepath: &str) -> io::Result<()> {
+    fn save_to_file(&self, filepath: &Path) -> io::Result<()> {
         let mut file = File::create(filepath)?;
-        file.write(self.as_slice())?;
+        file.write_all(self.as_slice())?;
 
         Ok(())
     }
 
     /// Load the RAM image from a file.
-    fn read_from_file(&mut self, filepath: &str) -> io::Result<()> {
+    fn read_from_file(&mut self, filepath: &Path) -> io::Result<()> {
         let mut file = File::open(filepath)?;
-        file.read(self.as_slice_mut())?;
+        file.read_exact(self.as_slice_mut())?;
+
+        Ok(())
+    }
+
+
+    /// Reads the RAM data from a byte array slice.
+    /// Fails if the size of the byte array is not equal to the size of the RAM data.
+    fn read_from_bytes(&mut self, bytes: &[u8]) -> io::Result<()> {
+        if bytes.len() != self.size() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("Invalid size of bytes: {} (expected: {})", bytes.len(), self.size())
+            ));
+        }
+
+        self.as_slice_mut().copy_from_slice(bytes);
 
         Ok(())
     }

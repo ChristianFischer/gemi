@@ -17,6 +17,7 @@
 
 use std::panic;
 use std::fmt::{Debug, Formatter};
+use std::path::PathBuf;
 use gbemu_core::boot_rom::BootRom;
 use gbemu_core::cartridge::Cartridge;
 use gbemu_core::gameboy::{DeviceType, GameBoy};
@@ -111,7 +112,7 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
     builder.set_device_type(*device_type);
 
     // load the cartridge file
-    let cartridge_path = workspace.get_path_to_str(&setup.cartridge_path);
+    let cartridge_path = PathBuf::from(workspace.get_path_to_str(&setup.cartridge_path));
     let cartridge = Cartridge::load_file(&cartridge_path)
         .map_err(|e| TestCaseError::SetUpError(e.to_string()))
         ?;

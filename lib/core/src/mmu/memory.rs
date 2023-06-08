@@ -130,9 +130,9 @@ impl Memory {
     }
 
     /// Save the cartridge RAM, if any.
-    pub fn save_cartridge_ram_if_any(&self) -> io::Result<()> {
+    pub fn save_cartridge_ram_to_file_if_any(&self) -> io::Result<()> {
         if let Some(cartridge) = &self.cartridge {
-            cartridge.save_ram_if_any()?;
+            cartridge.save_ram_to_file_if_any()?;
         }
 
         Ok(())
