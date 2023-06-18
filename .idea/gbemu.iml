@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests/test_suite/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/lib/core/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests/update_test_report/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bin/wasm-player/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/tests/test_suite/res/test_roms" />
     </content>

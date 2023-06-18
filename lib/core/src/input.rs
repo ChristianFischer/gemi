@@ -22,6 +22,7 @@ use crate::utils::{change_bit, get_bit};
 
 
 /// A list of all buttons available on the GameBoy
+#[derive(Copy, Clone)]
 pub enum InputButton {
     DPadRight   = 0,
     DPadLeft    = 1,

@@ -256,6 +256,11 @@ impl LcdBuffer {
     pub fn get_pixels(&self) -> &PixelBuffer160x144 {
         &self.pixels
     }
+
+    /// Get the pixel data to be displayed as a slice of bytes.
+    pub fn get_pixels_as_slice(&self) -> &[u8] {
+        self.pixels.as_slice()
+    }
 }
 
 
