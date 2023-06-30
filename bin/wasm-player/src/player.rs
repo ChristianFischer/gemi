@@ -20,6 +20,7 @@ use wasm_bindgen::JsValue;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
+use gbemu_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
 use gbemu_core::gameboy::GameBoy;
 use gbemu_core::input::InputButton;
 use crate::cartridge::Cartridge;
@@ -34,6 +35,9 @@ pub struct WasmPlayer {
 
     /// The rendering context of the canvas element assigned to receive the frames rendered.
     rc: CanvasRenderingContext2d,
+
+    /// The channel receiver to receive audio samples from the emulator's APU.
+    samples_receiver: Option<SamplesReceiver>,
 
     /// The key map to use for mapping JS key events to emulator input.
     key_map: KeyMap,
@@ -98,6 +102,8 @@ impl WasmPlayer {
                 gb: builder.finish()?,
                 rc,
 
+                samples_receiver: None,
+
                 key_map: default_keymap(),
                 keys_pressed: HashMap::new(),
             }
@@ -115,9 +121,47 @@ impl WasmPlayer {
     }
 
 
+    /// Open the audio channel to the emulator.
+    /// After doing so, audio samples may be received via [take_audio_samples].
+    #[wasm_bindgen]
+    pub fn open_audio(&mut self, sample_rate: u32) -> Result<(), JsValue> {
+        self.samples_receiver = self.gb.get_peripherals_mut().apu.get_audio_output().open_channel(AudioOutputSpec {
+            sample_rate
+        });
+
+        Ok(())
+    }
+
+
+    /// Takes all pending audio samples from the audio channel.
+    /// This channel has to be opened via [open_audio] first.
+    /// All pending samples will be put together into a continuous array with alternating between
+    /// left and right channel samples.
+    #[wasm_bindgen]
+    pub fn take_audio_samples(&mut self) -> Result<Vec<f32>, JsValue> {
+        match &self.samples_receiver {
+            Some(receiver) => {
+                Ok(
+                    receiver
+                        .try_iter()
+                        .fuse()
+                        .flat_map(|samples| samples.into_iter())
+                        .flat_map(|sample| [sample.left.get_value(), sample.right.get_value()])
+                        .collect::<Vec<_>>()
+                )
+            }
+
+            None => {
+                Err(JsValue::from_str("No audio channel available. Invoke open_audio first."))
+            }
+        }
+    }
+
+
     /// Set the pressed state of a key.
     /// `key` is the key identifier as provided by the JS key event and will be mapped into
     /// the corresponding emulator [InputButton] value.
+    #[wasm_bindgen]
     pub fn set_key_pressed(&mut self, key: String, pressed: bool) {
         self.keys_pressed.insert(key.clone(), pressed);
 
