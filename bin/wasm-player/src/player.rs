@@ -21,8 +21,9 @@ use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
 use gbemu_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
-use gbemu_core::gameboy::GameBoy;
+use gbemu_core::gameboy::{DeviceType, EmulationType, GameBoy};
 use gbemu_core::input::InputButton;
+use gbemu_core::mmu::memory_data::MemoryData;
 use crate::cartridge::Cartridge;
 
 
@@ -76,17 +77,36 @@ impl WasmPlayer {
     #[wasm_bindgen]
     pub fn create_with_cartridge(
             cartridge: Cartridge,
-            canvas: HtmlCanvasElement
+            canvas: HtmlCanvasElement,
+            desired_device: Option<String>,
     ) -> Result<WasmPlayer, JsValue> {
         // initialize GameBoy setup
         let mut builder = GameBoy::build();
 
-        // set the device type based on whether the cartridge supports GBC or not
-        builder.set_device_type(if cartridge.is_gbc() {
-            gbemu_core::gameboy::DeviceType::GameBoyColor
-        } else {
-            gbemu_core::gameboy::DeviceType::GameBoyDmg
-        });
+        // select the device type to emulate
+        let device = {
+            match desired_device {
+                // when a device type is given, parse it and throw an error if the type is invalid
+                Some(abbr) => {
+                    DeviceType::from_abbreviation(&abbr)
+                        .ok_or_else(|| JsValue::from_str(&format!("Invalid device type '{abbr}'")))
+                }?,
+
+                // without any specific device type, select the device type
+                // based on whether the cartridge supports GBC or not
+                None => {
+                    if cartridge.is_gbc() {
+                        DeviceType::GameBoyColor
+                    }
+                    else {
+                        DeviceType::GameBoyDmg
+                    }
+                }
+            }
+        };
+
+        // apply the selected device type
+        builder.set_device_type(device);
 
         // take the native cartridge out of it's wrapper
         builder.set_cartridge(cartridge.into());
@@ -97,9 +117,13 @@ impl WasmPlayer {
             .map(|obj| obj.dyn_into::<CanvasRenderingContext2d>())??
         ;
 
+        // finalize and initialize the emulator
+        let mut gb = builder.finish()?;
+        gb.initialize();
+
         Ok(
             WasmPlayer {
-                gb: builder.finish()?,
+                gb,
                 rc,
 
                 samples_receiver: None,
@@ -108,6 +132,23 @@ impl WasmPlayer {
                 keys_pressed: HashMap::new(),
             }
         )
+    }
+
+
+    /// Get the device type which is currently being emulated.
+    #[wasm_bindgen]
+    pub fn get_device_type(&self) -> String {
+        self.gb.get_config().device.get_abbreviation().to_string()
+    }
+
+
+    /// Checks whether the emulator is currently running in GBC mode.
+    #[wasm_bindgen]
+    pub fn is_gbc_mode(&self) -> bool {
+        match self.gb.get_config().emulation {
+            EmulationType::DMG => false,
+            EmulationType::GBC => true,
+        }
     }
 
 
