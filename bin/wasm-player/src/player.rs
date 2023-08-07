@@ -199,6 +199,26 @@ impl WasmPlayer {
     }
 
 
+    /// If the current cartridge has a battery supported RAM,
+    /// get the current RAM data as a byte array.
+    #[wasm_bindgen]
+    pub fn save_cartridge_ram(&self) -> Option<Vec<u8>> {
+        self.gb
+            .get_peripherals().mem
+            .get_cartridge()
+            .as_ref()
+            .map(|cartridge| {
+                if cartridge.has_ram() && cartridge.has_battery() {
+                    Some(cartridge.get_ram().as_slice().to_vec())
+                }
+                else {
+                    None
+                }
+            })
+            .flatten()
+   }
+
+
     /// Set the pressed state of a key.
     /// `key` is the key identifier as provided by the JS key event and will be mapped into
     /// the corresponding emulator [InputButton] value.

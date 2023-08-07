@@ -137,8 +137,8 @@ impl RomData {
         let title_end   = ROM_OFFSET_TITLE_STRING + title_length;
         let title_chars  = &self.data[title_start..title_end];
 
-        match std::str::from_utf8(&title_chars) {
-            Ok(v) => v.to_string(),
+        match std::str::from_utf8(title_chars) {
+            Ok(v) => v.trim().to_string(),
             Err(_) => String::new(),
         }
     }

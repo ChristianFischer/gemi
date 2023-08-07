@@ -17,6 +17,7 @@
 
 use wasm_bindgen::prelude::wasm_bindgen;
 use gbemu_core::cartridge::Cartridge as NativeCartridge;
+use gbemu_core::mmu::memory_data::MemoryData;
 
 
 /// A wrapper around the internal cartridge type to expose it to the JS side.
@@ -43,10 +44,19 @@ impl Cartridge {
     }
 
 
+    /// Load the cartridge RAM from a byte array.
+    pub fn load_ram_from_bytes(&mut self, bytes: Vec<u8>) -> Result<(), String> {
+        self.cartridge
+            .get_mut_ram()
+            .read_from_bytes(bytes.as_slice())
+            .map_err(|e| format!("Failed to load cartridge RAM: {}", e))
+    }
+
+
     /// Get the title of the cartridge.
     #[wasm_bindgen]
     pub fn get_title(&self) -> String {
-        self.cartridge.get_title().to_string()
+        self.cartridge.get_title().clone()
     }
 
 
