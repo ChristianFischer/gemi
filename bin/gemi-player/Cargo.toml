@@ -1,5 +1,5 @@
 [package]
-name = "gbemu"
+name = "gemi"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 
-[dependencies.gbemu-core]
+[dependencies.gemi-core]
 path = "../../lib/core"
 
 [dependencies.sdl2]

@@ -16,8 +16,8 @@
  */
 
 use wasm_bindgen::prelude::wasm_bindgen;
-use gbemu_core::cartridge::Cartridge as NativeCartridge;
-use gbemu_core::mmu::memory_data::MemoryData;
+use gemi_core::cartridge::Cartridge as NativeCartridge;
+use gemi_core::mmu::memory_data::MemoryData;
 
 
 /// A wrapper around the internal cartridge type to expose it to the JS side.

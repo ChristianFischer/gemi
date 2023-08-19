@@ -16,7 +16,7 @@
  */
 
 use std::path::PathBuf;
-use gbemu_core::gameboy::EmulationType;
+use gemi_core::gameboy::EmulationType;
 
 
 /// Checks whether a file contains a ROM and delivers the DeviceType

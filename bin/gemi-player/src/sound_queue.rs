@@ -17,9 +17,9 @@
 
 use sdl2::audio::*;
 use sdl2::Sdl;
-use gbemu_core::apu::apu::Apu;
-use gbemu_core::apu::{audio_output, sample};
-use gbemu_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
+use gemi_core::apu::apu::Apu;
+use gemi_core::apu::{audio_output, sample};
+use gemi_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
 
 
 const SAMPLE_FREQ    : u32   = 48_000;

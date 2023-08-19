@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/gbemu.iml" filepath="$PROJECT_DIR$/.idea/gbemu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/gemi.iml" filepath="$PROJECT_DIR$/.idea/gemi.iml" />
     </modules>
   </component>
 </project>

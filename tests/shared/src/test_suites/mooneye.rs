@@ -17,7 +17,7 @@
 
 use std::collections::HashSet;
 use std::path::PathBuf;
-use gbemu_core::gameboy::DeviceType;
+use gemi_core::gameboy::DeviceType;
 use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef, Workspace};
 use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 

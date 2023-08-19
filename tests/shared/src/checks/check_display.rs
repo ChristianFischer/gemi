@@ -16,11 +16,11 @@
  */
 
 use std::cmp::min;
-use gbemu_core::gameboy::GameBoy;
+use gemi_core::gameboy::GameBoy;
+use gemi_core::ppu::graphic_data::Color;
+use gemi_core::ppu::ppu::LcdBuffer;
 use image::io::Reader as ImageReader;
 use image::{Rgba, RgbaImage};
-use gbemu_core::ppu::graphic_data::Color;
-use gbemu_core::ppu::ppu::LcdBuffer;
 use crate::runner::TestCaseError;
 use crate::test_config::LcdColorMod;
 

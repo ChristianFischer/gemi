@@ -16,8 +16,8 @@
  */
 
 use std::collections::HashSet;
-use gbemu_core::gameboy::DeviceType;
-use gbemu_core::ppu::graphic_data::DmgDisplayPalette;
+use gemi_core::gameboy::DeviceType;
+use gemi_core::ppu::graphic_data::DmgDisplayPalette;
 use crate::io_utils::filename_to_symbol;
 
 

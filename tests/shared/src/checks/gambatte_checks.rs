@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use gbemu_core::gameboy::GameBoy;
-use gbemu_core::ppu::ppu::LcdBuffer;
+use gemi_core::gameboy::GameBoy;
+use gemi_core::ppu::ppu::LcdBuffer;
 use crate::runner::TestCaseError;
 
 type BitmapDigit      = [u8; 8];

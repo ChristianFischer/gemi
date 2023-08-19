@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "bin/gbemu",
+    "bin/gemi-player",
     "bin/wasm-player",
     "lib/core",
     "tests/gen",

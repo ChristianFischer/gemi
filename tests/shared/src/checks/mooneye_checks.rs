@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use gbemu_core::gameboy::GameBoy;
+use gemi_core::gameboy::GameBoy;
 use crate::runner::TestCaseError;
 
 const MOONEYE_RESULT_SEQ_PASS : &[u8] = &[3, 5, 8, 13, 21, 34];

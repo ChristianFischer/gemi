@@ -17,8 +17,8 @@
 
 use std::collections::HashSet;
 use std::path::PathBuf;
-use gbemu_core::gameboy::DeviceType;
-use gbemu_core::ppu::graphic_data::{Color, DmgDisplayPalette};
+use gemi_core::gameboy::DeviceType;
+use gemi_core::ppu::graphic_data::{Color, DmgDisplayPalette};
 use crate::io_utils::{filename_to_symbol, FindRomCallbacks, get_plain_filename, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef, Workspace};
 use crate::rom_utils::file_is_rom;
 use crate::test_config::{CheckResultConfig, EmulatorTestConfig, LcdColorMod, RunConfig, SetUpConfig};

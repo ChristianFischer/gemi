@@ -17,17 +17,17 @@
 
 extern crate sdl2;
 
-use gbemu_core::input::{Input, InputButton};
-use gbemu_core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
-use gbemu_core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
-use gbemu_core::ppu::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
+use gemi_core::input::{Input, InputButton};
+use gemi_core::gameboy::GameBoy;
+use gemi_core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
+use gemi_core::ppu::flags::LcdControlFlag;
+use gemi_core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
+use gemi_core::ppu::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
 use std::collections::HashMap;
-use gbemu_core::gameboy::GameBoy;
-use gbemu_core::ppu::flags::LcdControlFlag;
 use crate::sound_queue::SoundQueue;
 
 

@@ -62,7 +62,7 @@ pub const fn set_bit(byte: u8, bit: u8) -> u8 {
 
 /// Creates a u8 integer with the n'th bit set to the given value.
 /// ```
-/// let x = gbemu_core::utils::as_bit_flag(true, 4);
+/// let x = gemi_core::utils::as_bit_flag(true, 4);
 /// assert_eq!(0b_0001_0000, x);
 /// ```
 pub const fn as_bit_flag(value: bool, bit: u8) -> u8 {

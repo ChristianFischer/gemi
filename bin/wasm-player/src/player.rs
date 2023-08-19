@@ -20,10 +20,10 @@ use wasm_bindgen::JsValue;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
-use gbemu_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
-use gbemu_core::gameboy::{DeviceType, EmulationType, GameBoy};
-use gbemu_core::input::InputButton;
-use gbemu_core::mmu::memory_data::MemoryData;
+use gemi_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
+use gemi_core::gameboy::{DeviceType, EmulationType, GameBoy};
+use gemi_core::input::InputButton;
+use gemi_core::mmu::memory_data::MemoryData;
 use crate::cartridge::Cartridge;
 
 

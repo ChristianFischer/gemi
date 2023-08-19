@@ -18,10 +18,10 @@
 use std::panic;
 use std::fmt::{Debug, Formatter};
 use std::path::PathBuf;
-use gbemu_core::boot_rom::BootRom;
-use gbemu_core::cartridge::Cartridge;
-use gbemu_core::gameboy::{DeviceType, GameBoy};
-use gbemu_core::utils::to_u8;
+use gemi_core::boot_rom::BootRom;
+use gemi_core::cartridge::Cartridge;
+use gemi_core::gameboy::{DeviceType, GameBoy};
+use gemi_core::utils::to_u8;
 use crate::checks::blargg_checks::check_blargg_test_passed;
 use crate::checks::check_display::compare_display_with_image;
 use crate::checks::gambatte_checks::check_gambatte_display_code;
@@ -63,7 +63,7 @@ pub fn print_run_command(workspace: &Workspace, device_type: &DeviceType, setup:
     let mut cmd = String::new();
 
     // command
-    cmd.push_str("cargo run --package gbemu --bin gbemu --");
+    cmd.push_str("cargo run --package gemi-player --bin gemi-player --");
 
     // add argument for specific device type
     {

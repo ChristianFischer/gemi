@@ -18,5 +18,5 @@ features = [
     "ImageData",
 ]
 
-[dependencies.gbemu-core]
+[dependencies.gemi-core]
 path = "../../lib/core"

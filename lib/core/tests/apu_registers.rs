@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use gbemu_core::mmu::locations::*;
+use gemi_core::mmu::locations::*;
 
 
 const APU_REGISTER_READABLE_BITS : [u8; 48] = [
@@ -44,7 +44,7 @@ fn test_apu_register(name: &str, address: u16) {
     let readable_bits     = get_readable_bits_for(address);
     let non_readable_bits = !readable_bits;
 
-    let mut gb = gbemu_core::gameboy::Builder::new()
+    let mut gb = gemi_core::gameboy::Builder::new()
         .finish()
         .unwrap()
     ;
@@ -127,7 +127,7 @@ mod apu_control {
 
 #[test]
 fn test_registers_after_reset() {
-    let mut gb = gbemu_core::gameboy::Builder::new()
+    let mut gb = gemi_core::gameboy::Builder::new()
         .finish()
         .unwrap()
     ;

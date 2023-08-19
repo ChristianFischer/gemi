@@ -518,15 +518,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "gbemu"
+name = "gemi"
 version = "0.1.0"
 dependencies = [
- "gbemu-core",
+ "gemi-core",
  "sdl2",
 ]
 
 [[package]]
-name = "gbemu-core"
+name = "gemi-core"
 version = "0.1.0"
 dependencies = [
  "flagset",
@@ -1413,7 +1413,7 @@ dependencies = [
 name = "testrunner"
 version = "0.1.0"
 dependencies = [
- "gbemu-core",
+ "gemi-core",
  "tests-generator",
  "tests-shared",
 ]
@@ -1422,7 +1422,7 @@ dependencies = [
 name = "tests-generator"
 version = "0.1.0"
 dependencies = [
- "gbemu-core",
+ "gemi-core",
  "tests-shared",
 ]
 
@@ -1430,7 +1430,7 @@ dependencies = [
 name = "tests-shared"
 version = "0.1.0"
 dependencies = [
- "gbemu-core",
+ "gemi-core",
  "image",
  "reqwest",
  "zip-extract",
@@ -1632,7 +1632,7 @@ name = "update-test-report"
 version = "0.1.0"
 dependencies = [
  "futures",
- "gbemu-core",
+ "gemi-core",
  "indicatif",
  "tests-shared",
  "tokio",
@@ -1754,7 +1754,7 @@ checksum = "ca6ad05a4870b2bf5fe995117d3728437bd27d7cd5f06f13c17443ef369775a1"
 name = "wasm-player"
 version = "0.1.0"
 dependencies = [
- "gbemu-core",
+ "gemi-core",
  "wasm-bindgen",
  "web-sys",
 ]

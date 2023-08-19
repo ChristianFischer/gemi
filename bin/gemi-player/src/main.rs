@@ -20,14 +20,14 @@ extern crate core;
 mod sound_queue;
 mod window;
 
-use gbemu_core::cartridge::Cartridge;
-use gbemu_core::cartridge::GameBoyColorSupport;
-use gbemu_core::boot_rom::BootRom;
-use gbemu_core::gameboy::{DeviceType, GameBoy};
+use gemi_core::boot_rom::BootRom;
+use gemi_core::cartridge::Cartridge;
+use gemi_core::cartridge::GameBoyColorSupport;
+use gemi_core::cpu::cpu::CPU_CLOCK_SPEED;
+use gemi_core::gameboy::{DeviceType, GameBoy};
 use std::{env, time};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
-use gbemu_core::cpu::cpu::CPU_CLOCK_SPEED;
 use crate::window::Window;
 
 fn print_rom_info(file: &Path, cartridge: &Cartridge) {
