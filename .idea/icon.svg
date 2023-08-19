@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16" height="16" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .light-gray { fill: #b4b4b4; stroke: none; }
+        .dark-gray  { fill: #464646; stroke: none; }
+        .screen-bg  { fill: #a8e61d; stroke: none; }
+        .button-blk { fill: #000000; stroke: none; }
+        .button-red { fill: #990030; stroke: none; }
+    </style>
+
+    <polygon class="light-gray" points="3,1 13,1 13,13 12,13 12,14 11,14 11,15 3,15" />
+    <polygon class="dark-gray"  points="4,2 12,2 12,8 4,8" />
+    <polygon class="screen-bg"  points="5,3 11,3 11,7 5,7" />
+
+    <polygon class="button-blk" points="5,9 6,9 6,10 7,10 7,11 6,11 6,12 5,12 5,11 4,11 4,10 5,10" />
+    <polygon class="button-blk" points="7,13 8,13 8,14 7,14" />
+    <polygon class="button-blk" points="9,13 10,13 10,14 9,14" />
+    <polygon class="button-red" points="9,10 10,10 10,11 9,11" />
+    <polygon class="button-red" points="11,9 12,9 12,10 11,10" />
+</svg>
