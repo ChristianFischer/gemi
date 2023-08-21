@@ -187,10 +187,24 @@ fn load_file(file_path: &Path) -> io::Result<Vec<u8>> {
 
 
 impl Cartridge {
-    /// Load a cartridge from a ROM file and a RAM file with the same name.
+    /// Load a cartridge from a ROM file.
+    /// If a RAM file with the same name exists, it tries to load it as well.
+    /// Failing to load the RAM file will cause an error, but if no RAM file
+    /// exists, the cartridge will be loaded with uninitialized RAM.
     pub fn load_files_with_default_ram(rom_file: &Path) -> io::Result<Cartridge> {
         let ram_file = rom_file.with_extension(FILE_EXT_RAM);
-        Self::load_files(rom_file, Some(&ram_file))
+
+        Self::load_files(
+            rom_file,
+
+            // only try to load the RAM file, if it exists
+            if ram_file.exists() {
+                Some(&ram_file)
+            }
+            else {
+                None
+            }
+        )
     }
 
 
@@ -424,7 +438,7 @@ impl Cartridge {
     }
 
     /// get the game's manufacturer code
-    pub fn get_manufacturer_code(&self) -> &str {
+    pub fn get_manufacturer_code(&self) -> &String {
         &self.manufacturer_code
     }
 
