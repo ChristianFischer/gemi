@@ -1,0 +1,16 @@
+[package]
+name = "gemi-debugger"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eframe = { version = "0.22", default-features = false, features = [ "default_fonts", "glow", "persistence", ] }
+egui = { version = "0.22", default-features = false }
+egui_extras = "0.22.0"
+egui_tiles = "0.1.0"
+nfd2 = "0.3.1"
+serde = "1.0.164"
+
+[dependencies.gemi-core]
+path = "../../lib/core"
+

@@ -55,8 +55,11 @@ or games which are not supported properly.
 * *bin/*
   * *bin/gemi-player* - The default emulator frontend, controlled via commandline
     options and using SDL to play audio and video or handle input.
+  * *bin/gemi-debugger* - A simple debugger frontend to observe a game's behaviour
+    during execution. This is planned to include viewing the device memory, CPU state
+    and PPU/APU data like sprites and tiles.
   * *bin/wasm-player* - A wrapper around the emulator core which provides bindings
-    to web assembly to allow to create a web frontend
+    to web assembly to allow to create a web frontend.
  
 * *tests/*
   * *tests/shared/* - A shared library providing functionality to automatically

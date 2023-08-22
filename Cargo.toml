@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "bin/gemi-debugger",
     "bin/gemi-player",
     "bin/wasm-player",
     "lib/core",
