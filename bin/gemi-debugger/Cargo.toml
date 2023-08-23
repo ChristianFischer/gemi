@@ -14,3 +14,6 @@ serde = "1.0.164"
 [dependencies.gemi-core]
 path = "../../lib/core"
 
+[dependencies.gemi-utils]
+path = "../../lib/utils"
+

@@ -4,6 +4,7 @@ members = [
     "bin/gemi-player",
     "bin/wasm-player",
     "lib/core",
+    "lib/utils",
     "tests/gen",
     "tests/shared",
     "tests/test_suite",

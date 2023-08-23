@@ -165,6 +165,7 @@ impl eframe::App for EmulatorApplication {
         self.update_menu_bar(ctx, frame);
         self.update_center_panel(ctx, frame);
         self.update_message_box(ctx, frame);
+        self.update_input(ctx);
 
         // when the emulator is still running, request an immediate repaint
         // to update the display instead of waiting for the next event
@@ -315,6 +316,32 @@ impl EmulatorApplication {
         if self.close_message {
             self.display_message = None;
             self.close_message = false;
+        }
+    }
+
+
+    /// Handles input events
+    fn update_input(&mut self, ctx: &Context) {
+        ctx.input(|input| {
+            input.events.iter().for_each(|event| {
+                match event {
+                    egui::Event::Key { key, pressed, repeat, .. } => {
+                        self.on_key_event(*key, *pressed, *repeat);
+                    }
+
+                    _ => { }
+                }
+            });
+        });
+    }
+
+
+    /// Handle key pressed or key released events and
+    /// forwards them into the emulator
+    fn on_key_event(&mut self, key: egui::Key, pressed: bool, repeat: bool) {
+        // ignore repeated events, since we only need to track the pressed state once
+        if !repeat {
+            self.get_state_mut().set_key_pressed(key, pressed);
         }
     }
 

@@ -1,0 +1,10 @@
+[package]
+name = "gemi-utils"
+description = "A collection of utilities for common functionality used by frontends of the gemi GameBoy emulator."
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dependencies.gemi-core]
+path = "../../lib/core"

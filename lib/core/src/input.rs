@@ -22,7 +22,7 @@ use crate::utils::{change_bit, get_bit};
 
 
 /// A list of all buttons available on the GameBoy
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub enum InputButton {
     DPadRight   = 0,
     DPadLeft    = 1,
@@ -51,6 +51,21 @@ pub struct Input {
     /// The pressed state of each button last time;
     /// used to detect changes in the pressed state of each button
     previous_button_states: u8,
+}
+
+
+impl InputButton {
+    /// A list of all buttons available on the GameBoy.
+    pub const ALL: [InputButton; 8] = [
+        InputButton::DPadRight,
+        InputButton::DPadLeft,
+        InputButton::DPadUp,
+        InputButton::DPadDown,
+        InputButton::A,
+        InputButton::B,
+        InputButton::Select,
+        InputButton::Start,
+    ];
 }
 
 

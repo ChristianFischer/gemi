@@ -1002,8 +1002,16 @@ dependencies = [
  "egui_extras",
  "egui_tiles",
  "gemi-core",
+ "gemi-utils",
  "nfd2",
  "serde",
+]
+
+[[package]]
+name = "gemi-utils"
+version = "0.1.0"
+dependencies = [
+ "gemi-core",
 ]
 
 [[package]]

@@ -18,6 +18,8 @@
 use std::path::Path;
 use gemi_core::cartridge::Cartridge;
 use gemi_core::gameboy::GameBoy;
+use gemi_core::input::InputButton;
+use gemi_utils::keybindings::KeyBindings;
 
 
 /// An enum to store the different update modes of the emulator
@@ -48,6 +50,10 @@ pub struct EmulatorState {
     #[serde(skip)]
     emu: Option<GameBoy>,
 
+    /// The key bindings used to control the emulator.
+    #[serde(skip)]
+    key_bindings: KeyBindings<egui::Key>,
+
     /// The current update mode of the emulator.
     #[serde(skip)]
     update_mode: UpdateMode,
@@ -75,11 +81,17 @@ impl EmulatorState {
         let mut builder = GameBoy::build();
         builder.set_cartridge(cartridge);
 
+        // finish & initialize
         let mut emu = builder.finish()?;
         emu.initialize();
 
+        // reset key states after emulator loading
+        self.key_bindings.reset_key_states(&mut emu);
+
+        // store the new emulator instance
         self.emu = Some(emu);
 
+        // success!
         Ok(())
     }
 
@@ -109,6 +121,14 @@ impl EmulatorState {
                 // not implemented yet
                 UpdateMode::Paused
             }
+        }
+    }
+
+
+    /// Forward key events into the emulator.
+    pub fn set_key_pressed(&mut self, key: egui::Key, pressed: bool) {
+        if let Some(emu) = &mut self.emu {
+            self.key_bindings.set_key_pressed(key, pressed, emu);
         }
     }
 
@@ -176,10 +196,28 @@ impl EmulatorState {
 }
 
 
+
+fn make_default_key_bindings() -> KeyBindings<egui::Key> {
+    KeyBindings::with_mapping(
+        vec![
+            (InputButton::DPadRight,    vec![egui::Key::D,      egui::Key::ArrowRight   ]),
+            (InputButton::DPadLeft,     vec![egui::Key::A,      egui::Key::ArrowLeft    ]),
+            (InputButton::DPadUp,       vec![egui::Key::W,      egui::Key::ArrowUp      ]),
+            (InputButton::DPadDown,     vec![egui::Key::S,      egui::Key::ArrowDown    ]),
+            (InputButton::A,            vec![egui::Key::E,      egui::Key::X            ]),
+            (InputButton::B,            vec![egui::Key::Q,      egui::Key::Y            ]),
+            (InputButton::Select,       vec![egui::Key::Num1,   egui::Key::Backspace    ]),
+            (InputButton::Start,        vec![egui::Key::Num2,   egui::Key::Enter        ]),
+        ]
+    )
+}
+
+
 impl Default for EmulatorState {
     fn default() -> Self {
         Self {
             emu: None,
+            key_bindings: make_default_key_bindings(),
             update_mode: UpdateMode::Paused,
         }
     }
