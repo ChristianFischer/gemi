@@ -15,7 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::collections::HashMap;
 use wasm_bindgen::JsValue;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -40,33 +39,27 @@ pub struct WasmPlayer {
     /// The channel receiver to receive audio samples from the emulator's APU.
     samples_receiver: Option<SamplesReceiver>,
 
-    /// The key map to use for mapping JS key events to emulator input.
-    key_map: KeyMap,
-
-    /// The keys currently pressed.
-    keys_pressed: HashMap<String, bool>,
+    /// The key bindings to use for mapping JS key events to emulator input.
+    key_bindings: KeyBindings,
 }
 
 
-type KeyMap = Vec<(InputButton, Vec<String>)>;
+type KeyBindings = gemi_utils::keybindings::KeyBindings<String>;
 
 /// The default key map to use.
-fn default_keymap() -> KeyMap {
-    let entry = |button: InputButton, keys: Vec<&str>| {
-        let keys = keys.iter().map(|s| s.to_string()).collect();
-        (button, keys)
-    };
-
-    vec![
-        entry(InputButton::DPadRight, vec!["d", "ArrowRight"]),
-        entry(InputButton::DPadLeft,  vec!["a", "ArrowLeft"]),
-        entry(InputButton::DPadUp,    vec!["w", "ArrowUp"]),
-        entry(InputButton::DPadDown,  vec!["s", "ArrowDown"]),
-        entry(InputButton::A,         vec!["e", "y"]),
-        entry(InputButton::B,         vec!["q", "x"]),
-        entry(InputButton::Select,    vec!["1", "Shift"]),
-        entry(InputButton::Start,     vec!["2", "Enter"]),
-    ]
+fn default_keymap() -> KeyBindings {
+    KeyBindings::with_mapping(
+        vec![
+            (InputButton::DPadRight, vec!["d", "ArrowRight" ]),
+            (InputButton::DPadLeft,  vec!["a", "ArrowLeft"  ]),
+            (InputButton::DPadUp,    vec!["w", "ArrowUp"    ]),
+            (InputButton::DPadDown,  vec!["s", "ArrowDown"  ]),
+            (InputButton::A,         vec!["e", "x"          ]),
+            (InputButton::B,         vec!["q", "y"          ]),
+            (InputButton::Select,    vec!["1", "Shift"      ]),
+            (InputButton::Start,     vec!["2", "Enter"      ]),
+        ]
+    )
 }
 
 
@@ -128,8 +121,7 @@ impl WasmPlayer {
 
                 samples_receiver: None,
 
-                key_map: default_keymap(),
-                keys_pressed: HashMap::new(),
+                key_bindings: default_keymap(),
             }
         )
     }
@@ -224,21 +216,7 @@ impl WasmPlayer {
     /// the corresponding emulator [InputButton] value.
     #[wasm_bindgen]
     pub fn set_key_pressed(&mut self, key: String, pressed: bool) {
-        self.keys_pressed.insert(key.clone(), pressed);
-
-        for (button, key_list) in self.key_map.iter() {
-            // find an entry in the keymap that contains the key
-            if key_list.contains(&key) {
-                // check if any of the keys in the list is pressed
-                let pressed = key_list.iter()
-                    .map(|key| self.keys_pressed.get(key).unwrap_or(&false))
-                    .any(|pressed| *pressed)
-                ;
-
-                // set the button state
-                self.gb.get_peripherals_mut().input.set_button_pressed(*button, pressed);
-            }
-        }
+        self.key_bindings.set_key_pressed_and_fwd(key, pressed, &mut self.gb);
     }
 }
 

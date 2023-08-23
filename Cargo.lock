@@ -983,6 +983,7 @@ name = "gemi"
 version = "0.1.0"
 dependencies = [
  "gemi-core",
+ "gemi-utils",
  "sdl2",
 ]
 
@@ -2915,6 +2916,7 @@ name = "wasm-player"
 version = "0.1.0"
 dependencies = [
  "gemi-core",
+ "gemi-utils",
  "wasm-bindgen",
  "web-sys",
 ]

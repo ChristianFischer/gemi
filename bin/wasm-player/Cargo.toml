@@ -20,3 +20,6 @@ features = [
 
 [dependencies.gemi-core]
 path = "../../lib/core"
+
+[dependencies.gemi-utils]
+path = "../../lib/utils"

@@ -27,7 +27,6 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
-use std::collections::HashMap;
 use crate::sound_queue::SoundQueue;
 
 
@@ -65,8 +64,28 @@ pub struct Window {
     texture_objects:    BufferedTexture,
     state:              State,
     display_mode:       DisplayMode,
-    key_states:         HashMap<Keycode, bool>,
+    key_bindings:       KeyBindings,
     audio:              SoundQueue,
+}
+
+
+/// Alias type for the key bindings used by this window.
+type KeyBindings = gemi_utils::keybindings::KeyBindings<Keycode>;
+
+/// Create the keybindings used by this window.
+fn make_keybindings() -> KeyBindings {
+    KeyBindings::with_mapping(
+        vec![
+            (InputButton::DPadRight,    vec![Keycode::D,    Keycode::Right  ]),
+            (InputButton::DPadLeft,     vec![Keycode::A,    Keycode::Left   ]),
+            (InputButton::DPadUp,       vec![Keycode::W,    Keycode::Up     ]),
+            (InputButton::DPadDown,     vec![Keycode::S,    Keycode::Down   ]),
+            (InputButton::A,            vec![Keycode::E,    Keycode::X      ]),
+            (InputButton::B,            vec![Keycode::Q,    Keycode::Y      ]),
+            (InputButton::Select,       vec![Keycode::Num1, Keycode::LShift ]),
+            (InputButton::Start,        vec![Keycode::Num2, Keycode::Return ]),
+        ]
+    )
 }
 
 
@@ -173,7 +192,7 @@ impl Window {
             texture_objects,
             state: State::Open,
             display_mode: DisplayMode::Game,
-            key_states: HashMap::new(),
+            key_bindings: make_keybindings(),
             audio,
         })
     }
@@ -214,9 +233,15 @@ impl Window {
         }
     }
 
-    fn handle_key_down(&mut self, keycode: Keycode) {
-        self.key_states.insert(keycode, true);
 
+    fn handle_key_down(&mut self, keycode: Keycode) {
+        // set the emulator button states
+        self.key_bindings.set_key_pressed(
+            keycode,
+            true
+        );
+
+        // handle key events for the player application itself
         match keycode {
             Keycode::Escape => { self.close(); },
             Keycode::F1     => { self.set_display_mode(DisplayMode::Game); }
@@ -237,59 +262,18 @@ impl Window {
         }
     }
 
+
     fn handle_key_up(&mut self, keycode: Keycode) {
-        self.key_states.insert(keycode, false);
+        self.key_bindings.set_key_pressed(
+            keycode,
+            false
+        );
     }
 
-    /// Checks whether a particular key is currently pressed.
-    pub fn is_key_pressed(&self, keycode: Keycode) -> bool {
-        match self.key_states.get(&keycode) {
-            Some(value) => *value,
-            None        => false
-        }
-    }
 
     /// Set the pressed state for gameboy buttons.
-    pub fn apply_key_states(&self, input: &mut Input) {
-        input.set_button_pressed(
-            InputButton::DPadLeft,
-            self.is_key_pressed(Keycode::A) || self.is_key_pressed(Keycode::Left)
-        );
-
-        input.set_button_pressed(
-            InputButton::DPadRight,
-            self.is_key_pressed(Keycode::D) || self.is_key_pressed(Keycode::Right)
-        );
-
-        input.set_button_pressed(
-            InputButton::DPadUp,
-            self.is_key_pressed(Keycode::W) || self.is_key_pressed(Keycode::Up)
-        );
-
-        input.set_button_pressed(
-            InputButton::DPadDown,
-            self.is_key_pressed(Keycode::S) || self.is_key_pressed(Keycode::Down)
-        );
-
-        input.set_button_pressed(
-            InputButton::A,
-            self.is_key_pressed(Keycode::E)
-        );
-
-        input.set_button_pressed(
-            InputButton::B,
-            self.is_key_pressed(Keycode::Q)
-        );
-
-        input.set_button_pressed(
-            InputButton::Select,
-            self.is_key_pressed(Keycode::Num1)
-        );
-
-        input.set_button_pressed(
-            InputButton::Start,
-            self.is_key_pressed(Keycode::Num2)
-        );
+    pub fn apply_button_states(&self, input: &mut Input) {
+        self.key_bindings.apply_button_states_to_input(input);
     }
 
 

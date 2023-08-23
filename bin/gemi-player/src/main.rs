@@ -81,7 +81,7 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
             let peripherals = gb.get_peripherals_mut();
 
             window.poll_events();
-            window.apply_key_states(&mut peripherals.input);
+            window.apply_button_states(&mut peripherals.input);
             window.present(peripherals.ppu.get_lcd(), &peripherals.ppu);
         }
 

@@ -16,7 +16,7 @@
  */
 
 use gemi_core::gameboy::GameBoy;
-use gemi_core::input::InputButton;
+use gemi_core::input::{Input, InputButton};
 
 
 /// An utility to map key bindings of a frontend system to emulator input buttons.
@@ -75,7 +75,7 @@ impl<KeyCode> KeyBindings<KeyCode>
     /// Creates a new [KeyBindings] object with a given key mapping.
     /// The mapping will consist of a list of tuples containing an [InputButton]
     /// and a list of [KeyCode] values.
-    pub fn with_mapping(key_binds: Vec<(InputButton, Vec<KeyCode>)>) -> Self {
+    pub fn with_mapping(key_binds: Vec<(InputButton, Vec<impl Into<KeyCode>>)>) -> Self {
         Self {
             bindings: key_binds
                 .into_iter()
@@ -83,6 +83,7 @@ impl<KeyCode> KeyBindings<KeyCode>
                     button,
                     keys: keys
                         .into_iter()
+                        .map(|key| key.into())
                         .map(|key| KeyCodeEntry::new_key(key))
                         .collect()
                 })
@@ -110,9 +111,20 @@ impl<KeyCode> KeyBindings<KeyCode>
 
 
     /// Set the pressed state of a single key.
+    /// This will update the state of any button key binding which contains the given key.
+    pub fn set_key_pressed(&mut self, key: KeyCode, pressed: bool) {
+        for entry in self.bindings.iter_mut() {
+            if let Some(key_entry) = entry.find_key_code_entry_mut(&key) {
+                key_entry.pressed = pressed;
+            }
+        }
+    }
+
+
+    /// Set the pressed state of a single key.
     /// This will update the state of any button key binding which contains the given key
     /// and then forward the [InputButton] state to the emulator reference.
-    pub fn set_key_pressed(&mut self, key: KeyCode, pressed: bool, gb: &mut GameBoy) {
+    pub fn set_key_pressed_and_fwd(&mut self, key: KeyCode, pressed: bool, gb: &mut GameBoy) {
         for entry in self.bindings.iter_mut() {
             if let Some(key_entry) = entry.find_key_code_entry_mut(&key) {
                 if key_entry.pressed != pressed {
@@ -125,6 +137,23 @@ impl<KeyCode> KeyBindings<KeyCode>
                     );
                 }
             }
+        }
+    }
+
+
+    /// Apply the current state of each [InputButton] to the emulator reference.
+    pub fn apply_button_states(&self, gb: &mut GameBoy) {
+        self.apply_button_states_to_input(&mut gb.get_peripherals_mut().input);
+    }
+
+
+    /// Apply the current state of each [InputButton] to the reference of the emulator input system.
+    pub fn apply_button_states_to_input(&self, input: &mut Input) {
+        for entry in self.bindings.iter() {
+            input.set_button_pressed(
+                entry.button,
+                entry.is_any_pressed(),
+            );
         }
     }
 

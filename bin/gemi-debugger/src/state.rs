@@ -128,7 +128,7 @@ impl EmulatorState {
     /// Forward key events into the emulator.
     pub fn set_key_pressed(&mut self, key: egui::Key, pressed: bool) {
         if let Some(emu) = &mut self.emu {
-            self.key_bindings.set_key_pressed(key, pressed, emu);
+            self.key_bindings.set_key_pressed_and_fwd(key, pressed, emu);
         }
     }
 

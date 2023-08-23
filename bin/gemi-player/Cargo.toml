@@ -10,6 +10,9 @@ edition = "2021"
 [dependencies.gemi-core]
 path = "../../lib/core"
 
+[dependencies.gemi-utils]
+path = "../../lib/utils"
+
 [dependencies.sdl2]
 version = "0.35.2"
 features = ["bundled", "static-link", "unsafe_textures"]
