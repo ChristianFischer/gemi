@@ -26,9 +26,9 @@ use crate::mmu::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::utils::as_hex_digit;
 
 
-pub const FILE_EXT_GB:  &str = ".gb";
-pub const FILE_EXT_GBC: &str = ".gbc";
-pub const FILE_EXT_RAM: &str = ".sav";
+pub const FILE_EXT_GB:  &str = "gb";
+pub const FILE_EXT_GBC: &str = "gbc";
+pub const FILE_EXT_RAM: &str = "sav";
 
 
 
@@ -406,8 +406,9 @@ impl Cartridge {
     /// Saves the RAM to a file, if the cartridge has battery powered RAM.
     pub fn save_ram_to_file_if_any(&self) -> io::Result<()> {
         if self.has_ram && self.has_battery {
-            if let Some(ram_file) = &self.source_file {
-                self.get_ram().save_to_file(ram_file)?;
+            if let Some(rom_file) = &self.source_file {
+                let ram_file = rom_file.with_extension(FILE_EXT_RAM);
+                self.get_ram().save_to_file(&ram_file)?;
             }
             else {
                 return Err(io::Error::new(
