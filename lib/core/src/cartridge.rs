@@ -384,8 +384,8 @@ impl Cartridge {
 
     /// Get the source file of this cartridge, if any.
     /// If the cartridge was loaded from a file, this is the source file where it was loaded from.
-    pub fn get_source_file(&self) -> &Option<PathBuf> {
-        &self.source_file
+    pub fn get_source_file(&self) -> Option<&PathBuf> {
+        self.source_file.as_ref()
     }
 
     /// get the plain data of this cartridge
@@ -399,7 +399,7 @@ impl Cartridge {
     }
 
     /// Get the mutable RAM banks of this cartridge.
-    pub fn get_mut_ram(&mut self) -> &mut MemoryDataDynamic {
+    pub fn get_ram_mut(&mut self) -> &mut MemoryDataDynamic {
         &mut self.ram
     }
 

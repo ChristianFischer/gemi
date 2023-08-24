@@ -154,8 +154,7 @@ impl EmulatorState {
     /// Get the cartridge of the currently running emulator instance, if any.
     pub fn get_cartridge(&self) -> Option<&Cartridge> {
         self.get_emulator()
-            .map(|emu| emu.get_peripherals().mem.get_cartridge().as_ref())
-            .flatten()
+            .and_then(|emu| emu.get_peripherals().mem.get_cartridge())
     }
 
 

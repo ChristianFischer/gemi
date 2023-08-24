@@ -125,8 +125,8 @@ impl Memory {
     }
 
     /// Get a reference to the currently assigned cartridge, if any.
-    pub fn get_cartridge(&self) -> &Option<Cartridge> {
-        &self.cartridge
+    pub fn get_cartridge(&self) -> Option<&Cartridge> {
+        self.cartridge.as_ref()
     }
 
     /// Save the cartridge RAM, if any.

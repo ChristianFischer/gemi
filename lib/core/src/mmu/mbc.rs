@@ -321,7 +321,7 @@ mod mbc1 {
                 0x05 => {
                     if cartridge.has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        cartridge.get_mut_ram().set_at(ram_address, value);
+                        cartridge.get_ram_mut().set_at(ram_address, value);
                     }
                 },
 
@@ -613,7 +613,7 @@ mod mbc5 {
                 0xa000 ..= 0xbfff => {
                     if cartridge.has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        cartridge.get_mut_ram().set_at(ram_address, value);
+                        cartridge.get_ram_mut().set_at(ram_address, value);
                     }
                 },
 

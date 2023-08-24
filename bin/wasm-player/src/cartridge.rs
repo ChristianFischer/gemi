@@ -47,7 +47,7 @@ impl Cartridge {
     /// Load the cartridge RAM from a byte array.
     pub fn load_ram_from_bytes(&mut self, bytes: Vec<u8>) -> Result<(), String> {
         self.cartridge
-            .get_mut_ram()
+            .get_ram_mut()
             .read_from_bytes(bytes.as_slice())
             .map_err(|e| format!("Failed to load cartridge RAM: {}", e))
     }
