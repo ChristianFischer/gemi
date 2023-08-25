@@ -19,10 +19,12 @@ use egui::Ui;
 use crate::state::EmulatorState;
 use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::display::EmulatorDisplayView;
+use crate::views::memory::MemoryView;
 use crate::views::placeholder::PlaceholderView;
 
 pub mod cartridge_info;
 pub mod display;
+pub mod memory;
 pub mod placeholder;
 
 
@@ -48,7 +50,7 @@ pub enum ViewClass {
     Display(EmulatorDisplayView),
     CartridgeInfo(CartridgeInfoView),
     Cpu(PlaceholderView),
-    Memory(PlaceholderView),
+    Memory(MemoryView),
     Disassembly(PlaceholderView),
     TileMap(PlaceholderView),
     Sprites(PlaceholderView),
@@ -76,7 +78,7 @@ impl ViewClass {
 
     /// Placeholder for the memory view.
     pub fn new_memory() -> ViewClass {
-        ViewClass::Memory(PlaceholderView::new("Memory"))
+        ViewClass::Memory(MemoryView::new())
     }
 
 

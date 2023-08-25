@@ -688,6 +688,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "egui_memory_editor"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fab79a75e3315c57e17eabf05513942bf66d73733745272e9160844bf6f483c3"
+dependencies = [
+ "egui",
+]
+
+[[package]]
 name = "egui_tiles"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1001,6 +1010,7 @@ dependencies = [
  "eframe",
  "egui",
  "egui_extras",
+ "egui_memory_editor",
  "egui_tiles",
  "gemi-core",
  "gemi-utils",

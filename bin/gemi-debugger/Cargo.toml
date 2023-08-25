@@ -8,6 +8,7 @@ eframe = { version = "0.22", default-features = false, features = [ "default_fon
 egui = { version = "0.22", default-features = false }
 egui_extras = "0.22.0"
 egui_tiles = "0.1.0"
+egui_memory_editor = "0.2.4"
 nfd2 = "0.3.1"
 serde = "1.0.164"
 
