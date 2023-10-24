@@ -18,11 +18,13 @@
 use egui::Ui;
 use crate::state::EmulatorState;
 use crate::views::cartridge_info::CartridgeInfoView;
+use crate::views::cpu::CpuView;
 use crate::views::display::EmulatorDisplayView;
 use crate::views::memory::MemoryView;
 use crate::views::placeholder::PlaceholderView;
 
 pub mod cartridge_info;
+pub mod cpu;
 pub mod display;
 pub mod memory;
 pub mod placeholder;
@@ -49,7 +51,7 @@ pub trait View: serde::Serialize + serde::de::DeserializeOwned {
 pub enum ViewClass {
     Display(EmulatorDisplayView),
     CartridgeInfo(CartridgeInfoView),
-    Cpu(PlaceholderView),
+    Cpu(CpuView),
     Memory(MemoryView),
     Disassembly(PlaceholderView),
     TileMap(PlaceholderView),
@@ -72,7 +74,7 @@ impl ViewClass {
 
     /// Placeholder for the CPU view.
     pub fn new_cpu() -> ViewClass {
-        ViewClass::Cpu(PlaceholderView::new("CPU"))
+        ViewClass::Cpu(CpuView::new())
     }
 
 

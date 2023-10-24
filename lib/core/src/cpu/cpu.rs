@@ -28,7 +28,7 @@ pub const CPU_CLOCK_SPEED: Clock = 4_194_304;
 
 
 /// Definition for each supported 8 bit Register.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum RegisterR8 {
     A,
     F,
@@ -41,7 +41,7 @@ pub enum RegisterR8 {
 }
 
 /// Definition for each supported 16 bit Register.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum RegisterR16 {
     AF,
     BC,
@@ -50,6 +50,7 @@ pub enum RegisterR16 {
 }
 
 /// A list of CPU flags.
+#[derive(Copy, Clone)]
 pub enum CpuFlag {
     Zero,
     Negative,
@@ -58,6 +59,7 @@ pub enum CpuFlag {
 }
 
 /// State of the interrupts enabled flag.
+#[derive(Copy, Clone)]
 pub enum ImeState {
     /// Interrupts are globally disabled.
     Disabled,
@@ -70,6 +72,7 @@ pub enum ImeState {
 }
 
 /// Determines the CPU's state, when suspended by the HALT instruction.
+#[derive(Copy, Clone)]
 pub enum HaltState {
     /// The CPU is running normally.
     Running,
