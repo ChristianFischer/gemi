@@ -16,5 +16,6 @@
  */
 
 pub mod data_list;
-pub mod utils;
+pub mod memory_editor;
 pub mod style;
+pub mod utils;

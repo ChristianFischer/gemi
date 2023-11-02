@@ -92,7 +92,7 @@ impl GemiStyle {
     /// Text formatting to display a read-only numeric value.
     pub const VALUE_READ_ONLY: TextFormatting = TextFormatting {
         style: TextStyle::Monospace,
-        color: Color32::from_rgb(0x99, 0xac, 0x7a),
+        color: Color32::from_rgb(0x7a, 0x89, 0x95),
         bold: false,
         italic: false,
     };

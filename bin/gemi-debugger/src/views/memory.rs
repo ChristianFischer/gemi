@@ -16,33 +16,16 @@
  */
 
 use egui::Ui;
-use egui_memory_editor::MemoryEditor;
+use gemi_core::gameboy::GameBoy;
 use crate::state::EmulatorState;
+use crate::ui::memory_editor::MemoryEditor;
 use crate::views::View;
 
 
 /// A view to display the emulator's memory.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct MemoryView {
-    #[serde(skip)]
-    #[serde(default = "make_memory_editor_default")]
-    memory_editor: MemoryEditor,
-}
-
-
-/// Creating the default instance of a memory editor with all relevant address ranges.
-fn make_memory_editor_default() -> MemoryEditor {
-    MemoryEditor::new()
-        .with_address_range("ALL",              0x0000..0x01_0000)
-        .with_address_range("ROM Bank #0",      0x0000..0x00_4000)
-        .with_address_range("ROM Bank #1",      0x4000..0x00_8000)
-        .with_address_range("VRAM",             0x8000..0x00_a000)
-        .with_address_range("Cartridge RAM",    0xa000..0x00_c000)
-        .with_address_range("WRAM Bank #0",     0xc000..0x00_d000)
-        .with_address_range("WRAM Bank #1",     0xd000..0x00_e000)
-        .with_address_range("OAM",              0xfe00..0x00_feA0)
-        .with_address_range("IO",               0xff00..0x00_ff80)
-        .with_address_range("HRAM",             0xff80..0x00_ffff)
+    memory_editor: MemoryEditor<GameBoy>,
 }
 
 
@@ -50,7 +33,7 @@ impl MemoryView {
     /// Creates a new [`MemoryView`] object.
     pub fn new() -> Self {
         Self {
-            memory_editor: make_memory_editor_default(),
+            memory_editor: MemoryEditor::new(),
         }
     }
 }
@@ -63,47 +46,76 @@ impl View for MemoryView {
 
 
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
-        self.memory_editor.draw_editor_contents(
-            ui,
-            state,
+        self.display_memory_editor(state, ui);
+    }
 
-            // reading memory
-            |state, address| {
-                match (state.get_emulator(), address) {
-                    // we can only read an address, if we have a running emulator and
-                    // the address is in a valid 16 bit range
-                    (Some(emu), 0x0000 ..= 0xffff) => {
-                        let value = emu.get_mmu().read_u8(address as u16);
-                        Some(value)
-                    }
 
-                    _ => None,
-                }
-            },
+    fn on_emulator_loaded(&mut self, _state: &mut EmulatorState) {
+        self.refresh_memory_map();
+    }
+}
 
-            // writing memory
-            |state, address, value| {
-                match state.get_emulator_mut() {
-                    // we can only read an address, if we have a running emulator
-                    Some(emu) => {
-                        // only some address ranges are writable
-                        match address {
-                            /* VRAM",             */    0x8000..=0x9FFF
-                            /* Cartridge RAM",    */  | 0xA000..=0xBFFF
-                            /* WRAM Bank #0",     */  | 0xC000..=0xCFFF
-                            /* WRAM Bank #1",     */  | 0xD000..=0xDFFF
-                            /* OAM",              */  | 0xFE00..=0xFE9F
-                            /* HRAM",             */  | 0xFF80..=0xFFFE => {
-                                emu.get_mmu_mut().write_u8(address as u16, value);
-                            }
 
-                            _ => { }
+impl MemoryView {
+    /// Refreshes the memory map of the editor.
+    fn refresh_memory_map(&mut self) {
+        self.memory_editor.clear_memory_areas();
+        self.memory_editor.add_memory_area("ROM Bank #0",      0x0000..=0x3fff, false);
+        self.memory_editor.add_memory_area("ROM Bank #1",      0x4000..=0x7fff, false);
+        self.memory_editor.add_memory_area("VRAM",             0x8000..=0x9fff, true);
+        self.memory_editor.add_memory_area("Cartridge RAM",    0xa000..=0xbfff, true);
+        self.memory_editor.add_memory_area("WRAM Bank #0",     0xc000..=0xcfff, true);
+        self.memory_editor.add_memory_area("WRAM Bank #1",     0xd000..=0xdfff, true);
+        self.memory_editor.add_memory_area("Mirror RAM",       0xe000..=0xfdff, true);
+        self.memory_editor.add_memory_area("OAM",              0xfe00..=0xfe9f, true);
+        self.memory_editor.add_memory_area("<unusable>",       0xfea0..=0xfeff, false);
+        self.memory_editor.add_memory_area("IO",               0xff00..=0xff79, false);
+        self.memory_editor.add_memory_area("HRAM",             0xff80..=0xfffe, true);
+    }
+
+
+    /// Display the memory editor.
+    fn display_memory_editor(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+        let is_paused = state.is_paused();
+
+        if let Some(emu) = state.get_emulator_mut() {
+            // allow editing while paused
+            self.memory_editor.set_editable(is_paused);
+
+            self.memory_editor.show(
+                ui,
+                emu,
+
+                // reading memory
+                |emu, address| {
+                    match address {
+                        // we can only read an address, if the address is in a valid 16 bit range
+                        0x0000 ..= 0xffff => {
+                            let value = emu.get_mmu().read_u8(address as u16);
+                            Some(value)
                         }
-                    }
 
-                    _ => { },
-                };
-            }
-        );
+                        _ => None,
+                    }
+                },
+
+                // writing memory
+                |emu, address, value| {
+                    // only some address ranges are writable
+                    match address {
+                        /* VRAM",             */    0x8000..=0x9FFF
+                        /* Cartridge RAM",    */  | 0xA000..=0xBFFF
+                        /* WRAM Bank #0",     */  | 0xC000..=0xCFFF
+                        /* WRAM Bank #1",     */  | 0xD000..=0xDFFF
+                        /* OAM",              */  | 0xFE00..=0xFE9F
+                        /* HRAM",             */  | 0xFF80..=0xFFFE => {
+                            emu.get_mmu_mut().write_u8(address as u16, value);
+                        }
+
+                        _ => { }
+                    }
+                }
+            );
+        }
     }
 }
