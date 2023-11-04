@@ -17,9 +17,9 @@
 
 use std::cmp::max;
 use std::marker::PhantomData;
-use std::ops::RangeInclusive;
+use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
-use egui::{Grid, Label, PointerButton, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
+use egui::{Grid, Id, Label, Link, PointerButton, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
 use crate::ui::style::GemiStyle;
 
 
@@ -83,9 +83,11 @@ struct MemoryEditorState {
 
 /// The internal data of the memory editor which will not be serialized.
 struct MemoryEditorRuntimeData {
-    /// Flag to store whether we need to measure UI sizes
-    /// next time before rendering.
-    need_to_measure: bool,
+    /// Root Id to serialize internal states.
+    id: Id,
+
+    /// Flag to store whether we need update the internal runtime data.
+    need_to_update_runtime: bool,
 
     /// The last measured width of the frame.
     /// If this is different next time, this will trigger a re-measurement.
@@ -168,7 +170,7 @@ impl<Source> MemoryEditor<Source> {
         self.update_memory_areas();
 
         // need to update measurements
-        self.rt.need_to_measure = true;
+        self.rt.need_to_update_runtime = true;
     }
 
 
@@ -195,6 +197,16 @@ impl<Source> MemoryEditor<Source> {
             _                         => 16,
         };
 
+    }
+
+
+    /// Count the summary of visible lines over all available memory areas.
+    /// This will consider whether a single memory area is expanded or collapsed.
+    pub fn count_visible_lines(&self) -> usize {
+        self.memory_areas
+            .iter()
+            .map(|area| area.count_visible_lines(self.rt.columns_per_line))
+            .sum()
     }
 
 
@@ -241,7 +253,7 @@ impl<Source> MemoryEditor<Source> {
             on_read: &Box<impl Fn(&Source, usize) -> Option<u8>>,
             on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
     ) {
-        self.measure_if_needed(ui);
+        self.update_runtime_data_if_needed(ui);
 
         // create the widget for the scroll area
         let scroll_area = ScrollArea::vertical()
@@ -250,28 +262,25 @@ impl<Source> MemoryEditor<Source> {
         ;
 
         // the maximum number of lines to be displayed
-        let max_lines = (self.rt.address_upper_bound + 1) / self.rt.columns_per_line;
+        let max_lines = self.count_visible_lines();
 
         // render the grid with all memory cells
         scroll_area.show_rows(
             ui,
             self.rt.line_content_height,
             max_lines,
-            |ui, rows| {
+            |ui, display_rows| {
                 Grid::new("memory_view_grid")
                     .num_columns(3)
                     .min_col_width(10.0)
                     .show(ui, |ui| {
-                        for row in rows {
-                            let start_address = row * self.rt.columns_per_line;
-                            self.display_memory_line(
-                                    ui,
-                                    source,
-                                    start_address,
-                                    on_read,
-                                    on_write
-                            );
-                        }
+                        self.display_visible_grid_content(
+                                ui,
+                                display_rows,
+                                source,
+                                on_read,
+                                on_write
+                        );
                     })
                 ;
             }
@@ -279,14 +288,170 @@ impl<Source> MemoryEditor<Source> {
     }
 
 
+    /// Display the part of the grid, which is visible within the scroll area.
+    fn display_visible_grid_content(
+            &mut self,
+            ui: &mut Ui,
+            visible_lines: Range<usize>,
+            source: &mut Source,
+            on_read: &Box<impl Fn(&Source, usize) -> Option<u8>>,
+            on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
+    ) {
+        let first_visible_line = visible_lines.start;
+        let last_visible_line  = visible_lines.end;
+        let mut current_line = 0;
+
+        for memory_area_index in 0..self.memory_areas.len() {
+            let (lines_in_area, aligned_first_address, is_writable, category_title, is_expanded) = {
+                let area = &self.memory_areas[memory_area_index];
+
+                (
+                    area.count_lines(self.rt.columns_per_line),
+                    *area.get_aligned_bounds(self.rt.columns_per_line).start(),
+                    area.writable,
+                    area.name.clone(),
+                    area.expanded
+                )
+            };
+
+            // check if any of the lines in this area is visible;
+            // if not, skip the whole area.
+            if (current_line + lines_in_area) < first_visible_line {
+                current_line += lines_in_area;
+                continue;
+            }
+
+            // display the first line with it's header
+            if current_line >= first_visible_line {
+                let change_expansion = self.display_memory_line_with_header(
+                        ui,
+                        source,
+                        aligned_first_address,
+                        category_title,
+                        is_writable,
+                        is_expanded,
+                        on_read,
+                        on_write
+                );
+
+                // store the changed state
+                if let Some(expanded) = change_expansion {
+                    self.memory_areas[memory_area_index].change_state(ui, &self.rt.id, expanded);
+                }
+            }
+
+            current_line += 1;
+
+            // display the remaining lines without header (if any)
+            if is_expanded {
+                for line in 1..lines_in_area {
+                    let start_address = aligned_first_address + line * self.rt.columns_per_line;
+
+                    if current_line >= first_visible_line {
+                        // stop if the reached the end
+                        if current_line > last_visible_line {
+                            break;
+                        }
+
+                        // display the line
+                        self.display_memory_line_no_header(
+                            ui,
+                            source,
+                            start_address,
+                            is_writable,
+                            on_read,
+                            on_write
+                        );
+                    }
+
+                    current_line += 1;
+                }
+            }
+
+            // done if the last visible line was reached
+            if current_line > last_visible_line {
+                break;
+            }
+        }
+    }
+
+
+    /// Display the first line of a memory area, which contains the category header.
+    fn display_memory_line_with_header(
+            &mut self,
+            ui: &mut Ui,
+            source: &mut Source,
+            start_address: usize,
+            category_title: String,
+            is_writable: bool,
+            is_expanded: bool,
+            on_read: &Box<impl Fn(&Source, usize) -> Option<u8>>,
+            on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
+    ) -> Option<bool> {
+        // display the category header, if any
+        let change_expansion = self.display_category_header(
+                ui,
+                category_title,
+                is_expanded
+        );
+
+        self.display_memory_line(
+                ui,
+                source,
+                start_address,
+                is_writable,
+                on_read,
+                on_write
+        );
+
+        change_expansion
+    }
+
+
+    /// Display any other than the first line of a memory area, which does
+    /// not contain a category header.
+    fn display_memory_line_no_header(
+            &mut self,
+            ui: &mut Ui,
+            source: &mut Source,
+            start_address: usize,
+            is_writable: bool,
+            on_read: &Box<impl Fn(&Source, usize) -> Option<u8>>,
+            on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
+    ) {
+        // the column for the category header is just empty here
+        ui.allocate_space(vec2(self.rt.column_width_category, 0.0));
+
+        self.display_memory_line(
+                ui,
+                source,
+                start_address,
+                is_writable,
+                on_read,
+                on_write
+        );
+    }
+
+
+    /// Display the header of a catagory.
+    fn display_category_header(&mut self, ui: &mut Ui, title: String, expanded: bool) -> Option<bool> {
+        if Link::new(title.clone()).ui(ui).clicked() {
+            Some(!expanded)
+        }
+        else {
+            None
+        }
+    }
+
+
     /// Renders a single line within the memory editor.
     /// Each line begins with the address label, followed by the configured amount of memory cells.
-    /// Optionally, each line may render an optional category header.
     fn display_memory_line(
             &mut self,
             ui: &mut Ui,
             source: &mut Source,
             start_address: usize,
+            is_writable: bool,
             on_read: &Box<impl Fn(&Source, usize) -> Option<u8>>,
             on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
     ) {
@@ -294,25 +459,12 @@ impl<Source> MemoryEditor<Source> {
         let is_line_selected   = line_address_range.contains(&self.state.selected_address);
         let item_spacing       = ui.spacing().item_spacing.x;
 
-        // get the category properties
-        let is_writable = match self.find_category_for_address(start_address) {
-            Some(memory_area) => memory_area.writable,
-            None => false,
-        };
-
-        // display the category header, if any
-        self.display_category_header_at(
-            ui,
-            start_address,
-            start_address + self.rt.columns_per_line - 1
-        );
-
         // display the address label
         {
             let address_str = format!(
-                "{:0width$x}",
-                start_address,
-                width = self.rt.number_of_address_characters
+                    "{:0width$x}",
+                    start_address,
+                    width = self.rt.number_of_address_characters
             );
 
             if is_line_selected {
@@ -352,24 +504,6 @@ impl<Source> MemoryEditor<Source> {
     }
 
 
-    /// Checks if the address range of a memory line contains the start address of a category.
-    /// If so, display the header of this category.
-    fn display_category_header_at(&mut self, ui: &mut Ui, line_start_address: usize, line_end_address: usize) {
-        for memory_area in &self.memory_areas {
-            let memory_area_begin = *memory_area.memory_range.start();
-
-            if memory_area_begin >= line_start_address && memory_area_begin <= line_end_address {
-                ui.label(&memory_area.name);
-
-                return;
-            }
-        }
-
-        // if not on the first line of a category, just take the space to fill the cell
-        ui.allocate_space(vec2(self.rt.column_width_category, 0.0));
-    }
-
-
     /// Display the label with the current value of a memory cell.
     /// The label will be clickable if the cell is writable and then
     /// switch into editor mode when clicked.
@@ -400,7 +534,7 @@ impl<Source> MemoryEditor<Source> {
         ;
 
         // when clicked, switch into edito mode
-        if self.state.is_editable && response.clicked_by(PointerButton::Primary) {
+        if self.is_editable() && response.clicked_by(PointerButton::Primary) {
             self.state.selected_address         = address;
             self.rt.is_editing                  = true;
             self.rt.edit_string                 = value_str;
@@ -456,16 +590,25 @@ impl<Source> MemoryEditor<Source> {
 
     /// Checks whether the UI parameters have changed and
     /// triggers a re-measurement if needed.
-    fn measure_if_needed(&mut self, ui: &mut Ui) {
+    fn update_runtime_data_if_needed(&mut self, ui: &mut Ui) {
         // check if the available width has changed
         let available_width = ui.available_width();
         if self.rt.last_frame_width != available_width {
             self.rt.last_frame_width = available_width;
-            self.rt.need_to_measure = true;
+            self.rt.need_to_update_runtime = true;
         }
 
-        if self.rt.need_to_measure {
+        // perform the updates, if necessary
+        if self.rt.need_to_update_runtime {
+            self.rt.id = ui.make_persistent_id("memory_editor_states");
+
+            for memory_area in &mut self.memory_areas {
+                memory_area.load_expanded_state(ui, &self.rt.id);
+            }
+
             self.measure(ui);
+
+            self.rt.need_to_update_runtime = false;
         }
     }
 
@@ -528,8 +671,6 @@ impl<Source> MemoryEditor<Source> {
             // reduce the size for the next iteration
             self.rt.columns_per_line /= 2;
         }
-
-        self.rt.need_to_measure = false;
     }
 
 
@@ -543,10 +684,75 @@ impl<Source> MemoryEditor<Source> {
 }
 
 
+impl MemoryArea {
+    /// Creates a persistent Id for this memory area.
+    fn make_expanded_state_id(&self, root_id: &Id) -> Id {
+        let id_source = format!("{}_expanded", self.name);
+        root_id.with(id_source.clone())
+    }
+
+
+    /// Change the 'expanded' state of this memory area and as well
+    /// stores it into persistent memory.
+    pub fn change_state(&mut self, ui: &mut Ui, root_id: &Id, expanded: bool) {
+        // store the state of this area in the persistent memory
+        let id = self.make_expanded_state_id(root_id);
+        ui.ctx().data_mut(|d| d.insert_persisted(id, expanded));
+
+        self.expanded = expanded;
+    }
+
+
+    /// Load the state of being expanded or collapsed from the persistent memory.
+    pub fn load_expanded_state(&mut self, ui: &mut Ui, root_id: &Id) {
+        let id       = self.make_expanded_state_id(root_id);
+        let expanded = ui.ctx().data_mut(|d| d.get_persisted::<bool>(id));
+
+        if let Some(expanded) = expanded {
+            self.expanded = expanded;
+        }
+    }
+
+
+    /// Get the bounds of this memory area, filled up to the first and last column per line.
+    pub fn get_aligned_bounds(&self, columns_per_line: usize) -> RangeInclusive<usize> {
+        let start = *self.memory_range.start();
+        let end   = *self.memory_range.end();
+
+        // compute begin and end of the range aligned to the first and last column per line
+        let start_aligned = start / columns_per_line * columns_per_line;
+        let end_aligned   = (end + columns_per_line - 1) / columns_per_line * columns_per_line;
+
+        start_aligned..=end_aligned
+    }
+
+
+    /// Count the number of lines to be displayed for this memory area.
+    pub fn count_lines(&self, columns_per_line: usize) -> usize {
+        let range = self.get_aligned_bounds(columns_per_line);
+        (range.end() - range.start() + 1) / columns_per_line
+    }
+
+
+    /// Count the number of lines which are actually visible.
+    /// This will also consider whether this area is collapsed or not.
+    pub fn count_visible_lines(&self, columns_per_line: usize) -> usize {
+        if self.expanded {
+            self.count_lines(columns_per_line)
+        }
+        else {
+            // if collapsed, there is only one visible line
+            1
+        }
+    }
+}
+
+
 impl Default for MemoryEditorRuntimeData {
     fn default() -> Self {
         Self {
-            need_to_measure:                true,
+            id:                             Id::new(""),
+            need_to_update_runtime:         true,
             last_frame_width:               0.0,
             line_content_height:            0.0,
             line_distance_y:                0.0,
