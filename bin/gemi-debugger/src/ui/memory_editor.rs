@@ -19,7 +19,8 @@ use std::cmp::max;
 use std::marker::PhantomData;
 use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
-use egui::{Grid, Id, Label, Link, PointerButton, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
+use egui::{Grid, Id, Label, PointerButton, pos2, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
+use egui::collapsing_header::{CollapsingState, paint_default_icon};
 use crate::ui::style::GemiStyle;
 
 
@@ -435,8 +436,65 @@ impl<Source> MemoryEditor<Source> {
 
     /// Display the header of a catagory.
     fn display_category_header(&mut self, ui: &mut Ui, title: String, expanded: bool) -> Option<bool> {
-        if Link::new(title.clone()).ui(ui).clicked() {
-            Some(!expanded)
+        let button_padding = ui.spacing().button_padding;
+        let desired_width  = self.rt.column_width_category;
+        let id             = ui.make_persistent_id(&title);
+        let widget_text    = WidgetText::from(title);
+        let title_galley   = widget_text.into_galley(ui, Some(false), desired_width, TextStyle::Body);
+
+        // take space for the category header
+        let desired_size = vec2(desired_width, title_galley.size().y + 2.0 * button_padding.y);
+        let (_, rect) = ui.allocate_space(desired_size);
+
+        // check for click events
+        let mut header_response = ui.interact(rect, id, Sense::click());
+
+        // where to draw the text
+        let text_pos = pos2(
+            header_response.rect.left() + ui.spacing().indent,
+            header_response.rect.center().y - title_galley.size().y / 2.0,
+        );
+
+        // create the state object which manages the header's expansion or collapsed state
+        let mut collapsing_state = CollapsingState::load_with_default_open(ui.ctx(), id, expanded);
+
+        // on click, toggle the state of the header
+        if header_response.clicked() {
+            collapsing_state.toggle(ui);
+            header_response.mark_changed();
+        }
+
+        let new_expanded_state = collapsing_state.is_open();
+        let openness = collapsing_state.openness(ui.ctx());
+
+        // render the header if it is visible
+        if ui.is_rect_visible(rect) {
+            let visuals = ui.style().interact_selectable(&header_response, false);
+
+            // render the expanded / collapsed icon
+            {
+                let (mut icon_rect, _) = ui.spacing().icon_rectangles(header_response.rect);
+                icon_rect.set_center(pos2(
+                    header_response.rect.left() + ui.spacing().indent / 2.0,
+                    header_response.rect.center().y,
+                ));
+
+                let icon_response = header_response.clone().with_new_rect(icon_rect);
+                paint_default_icon(ui, openness, &icon_response);
+            }
+
+            // render the text
+            title_galley.paint_with_visuals(ui.painter(), text_pos, &visuals);
+        }
+
+        // during animation, save the animation state
+        if openness > 0.0 && openness < 1.0 {
+            collapsing_state.store(ui.ctx());
+        }
+
+        // return the state, if changed
+        if expanded != new_expanded_state {
+            Some(new_expanded_state)
         }
         else {
             None
@@ -618,11 +676,12 @@ impl<Source> MemoryEditor<Source> {
         self.rt.line_content_height = ui.text_style_height(&TextStyle::Monospace);
         self.rt.line_distance_y     = self.rt.line_content_height + ui.spacing().item_spacing.y;
         let item_spacing            = ui.spacing().item_spacing.x;
+        let ui_indent               = ui.spacing().indent;
 
         // measure the size of the largest column label
         self.rt.column_width_category = self.memory_areas.iter()
             .map(|area| {
-                self.measure_text_width(ui, &area.name, TextStyle::Body).ceil() as i32
+                (ui_indent + self.measure_text_width(ui, &area.name, TextStyle::Body).ceil()) as i32
             })
             .max()
             .unwrap_or(10) as f32
