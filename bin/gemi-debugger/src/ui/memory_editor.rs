@@ -15,12 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::max;
+use std::cmp::{max, min};
 use std::marker::PhantomData;
 use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
-use egui::{Grid, Id, Label, PointerButton, pos2, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
+use egui::{Grid, Id, Label, Key, PointerButton, pos2, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
 use egui::collapsing_header::{CollapsingState, paint_default_icon};
+use egui::text_edit::TextEditOutput;
 use crate::ui::style::GemiStyle;
 
 
@@ -82,6 +83,19 @@ struct MemoryEditorState {
 }
 
 
+/// An enumeration defining whether we are currently editing or just reading.
+enum EditMode {
+    /// The memory editor is not in edit mode.
+    None,
+
+    /// The memory editor is about to enter edit mode on the selected cell.
+    Enter,
+
+    /// The memory editor is in edit mode.
+    Edit,
+}
+
+
 /// The internal data of the memory editor which will not be serialized.
 struct MemoryEditorRuntimeData {
     /// Root Id to serialize internal states.
@@ -107,17 +121,24 @@ struct MemoryEditorRuntimeData {
     /// The width of the 'address' column.
     column_width_address: f32,
 
+    /// The width of the 'values' column containing all memory cells of a single line.
+    column_width_values: f32,
+
     /// The number of columns to be displayed per line.
     columns_per_line: usize,
 
-    /// The upper bound of the address range (meaning the largest address to be displayed).
-    address_upper_bound: usize,
+    /// The address range bounds from the smallest to the largest displayed value.
+    address_range_bounds: RangeInclusive<usize>,
 
     /// The number of characters to be displayed for an address label.
     number_of_address_characters: usize,
 
+    /// If we want to enter the edit mode or switch into another cell to edit,
+    /// this is set to the address of the cell to be edited.
+    switch_to_edit_mode: Option<usize>,
+
     /// Stores whether the memory editor is currently in edit mode or not.
-    is_editing: bool,
+    edit_mode: EditMode,
 
     /// The current content of the text to be edited while in edit mode.
     edit_string: String,
@@ -125,9 +146,8 @@ struct MemoryEditorRuntimeData {
     /// The width of the current editor text box, inherited from it's previous label.
     edit_label_width: f32,
 
-    /// This flag intends to request focus for the edit box the first time
-    /// after entering edit mode.
-    edit_label_request_focus: bool,
+    /// The current cursor position within the editor text box.
+    edit_label_cursor_position: Option<usize>,
 }
 
 
@@ -184,20 +204,27 @@ impl<Source> MemoryEditor<Source> {
     /// To be called after changes of the memory areas to update
     /// internal data which depends on them.
     fn update_memory_areas(&mut self) {
-        self.rt.address_upper_bound = self.memory_areas.iter()
-            .map(|area| *area.memory_range.end())
-            .max()
-            .unwrap_or(0)
-        ;
+        self.rt.address_range_bounds = {
+            let (a, b) = self.memory_areas.iter()
+                    .fold(
+                        (usize::MAX, usize::MIN),
+                        |acc, area| (
+                            min(acc.0, *area.memory_range.start()),
+                            max(acc.1, *area.memory_range.end())
+                        )
+                    )
+            ;
+
+            min(a, b) ..= b
+        };
 
         // depending on the largest address, select the width of the address label
-        self.rt.number_of_address_characters = match self.rt.address_upper_bound {
+        self.rt.number_of_address_characters = match self.rt.address_range_bounds.end() {
             0x0000_0000..=0x0000_00ff => 2,
             0x0000_0100..=0x0000_ffff => 4,
             0x0001_0000..=0xffff_ffff => 8,
             _                         => 16,
         };
-
     }
 
 
@@ -223,6 +250,53 @@ impl<Source> MemoryEditor<Source> {
         }
 
         None
+    }
+
+
+    /// Stores the address which should be edited and let the memory
+    /// editor switch into edit mode at the beginning of the next frame.
+    pub fn edit(&mut self, address: usize) {
+        self.rt.switch_to_edit_mode = Some(address);
+    }
+
+
+    /// Move the editor cursor backwards relative to the current position.
+    /// Switches into edit mode if not already.
+    fn move_cursor_back(&mut self, delta: usize) {
+        let address_range = &self.rt.address_range_bounds;
+        let mut address   = self.state.selected_address;
+
+        // if it would underflow, move the cursor to the end first
+        // (this may overflow as well, but no need to care)
+        if address < (address_range.start() + delta) {
+            address = address.wrapping_add(address_range.end() - address_range.start());
+        }
+
+        // calculate the new address
+        address = address.wrapping_sub(delta);
+
+        // start editing on the new address
+        self.edit(address);
+    }
+
+
+    /// Move the editor cursor forwards relative to the current position.
+    /// Switches into edit mode if not already.
+    fn move_cursor_fwd(&mut self, delta: usize) {
+        let address_range = &self.rt.address_range_bounds;
+        let mut address   = self.state.selected_address;
+
+        // if it would overflow, move the cursor to the end first
+        // (this may overflow as well, but no need to care)
+        if address > (address_range.end() - delta) {
+            address = address.wrapping_sub(address_range.end() - address_range.start());
+        }
+
+        // calculate the new address
+        address = address.wrapping_add(delta);
+
+        // start editing on the new address
+        self.edit(address);
     }
 
 
@@ -255,6 +329,13 @@ impl<Source> MemoryEditor<Source> {
             on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
     ) {
         self.update_runtime_data_if_needed(ui);
+
+        // do we need to switch edit mode?
+        if let Some(new_address) = self.rt.switch_to_edit_mode {
+            self.state.selected_address = new_address;
+            self.rt.edit_mode           = EditMode::Enter;
+            self.rt.switch_to_edit_mode = None;
+        }
 
         // create the widget for the scroll area
         let scroll_area = ScrollArea::vertical()
@@ -517,6 +598,35 @@ impl<Source> MemoryEditor<Source> {
         let is_line_selected   = line_address_range.contains(&self.state.selected_address);
         let item_spacing       = ui.spacing().item_spacing.x;
 
+        // bounding box of the whole line
+        let line_bounds = egui::Rect::from_min_size(
+            pos2(
+                ui.cursor().left_top().x - 2.0,
+                ui.cursor().left_top().y
+            ),
+            vec2(
+                self.rt.column_width_address + self.rt.column_width_values + 5.0,
+                self.rt.line_distance_y
+            )
+        );
+
+        let hover_response = ui.interact(line_bounds, ui.id().with(1), Sense::hover());
+
+        if hover_response.hovered() {
+            ui.painter().rect_filled(
+                    line_bounds,
+                    2.0,
+                    ui.style().visuals.widgets.hovered.bg_fill
+            );
+        }
+        else if is_line_selected {
+            ui.painter().rect_filled(
+                    line_bounds,
+                    2.0,
+                    ui.style().visuals.widgets.active.weak_bg_fill
+            );
+        }
+
         // display the address label
         {
             let address_str = format!(
@@ -542,6 +652,7 @@ impl<Source> MemoryEditor<Source> {
 
             for i in 0..self.rt.columns_per_line {
                 let address = start_address + i;
+                let selected = address == self.state.selected_address;
 
                 // for each four bytes we add a gap
                 if address % 4 == 0 && i != 0 {
@@ -549,11 +660,19 @@ impl<Source> MemoryEditor<Source> {
                     ui.add_space(if address % 8 == 0 { space * 2.0 } else { space });
                 }
 
-                if self.rt.is_editing && self.state.selected_address == address {
-                    self.display_value_editor(ui, source, address, on_write);
-                }
-                else {
-                    self.display_value(ui, source, address, is_writable, on_read);
+                match (&self.rt.edit_mode, selected) {
+                    (EditMode::Enter, true) => {
+                        self.display_value_editor_on_enter(ui, source, address, on_read);
+                        self.rt.edit_mode = EditMode::Edit;
+                    }
+
+                    (EditMode::Edit, true) => {
+                        self.display_value_editor_on_typing(ui, source, address, on_write);
+                    }
+
+                    _ => {
+                        self.display_value(ui, source, address, is_writable, on_read);
+                    }
                 }
             }
         });
@@ -592,45 +711,75 @@ impl<Source> MemoryEditor<Source> {
         ;
 
         // when clicked, switch into edito mode
-        if self.is_editable() && response.clicked_by(PointerButton::Primary) {
-            self.state.selected_address         = address;
-            self.rt.is_editing                  = true;
-            self.rt.edit_string                 = value_str;
-            self.rt.edit_label_width            = response.rect.width();
-            self.rt.edit_label_request_focus    = true;
+        if self.is_editable() && writable && response.clicked_by(PointerButton::Primary) {
+            self.edit(address);
         }
     }
 
 
-    /// While in edit mode, this will handle the editor UI of the currently
-    /// selected memory cell.
+    /// While in edit mode, this will create the text edit box for the current cell.
+    /// This can be used with other functions which handle the response accordingly.
     fn display_value_editor(
+            &mut self,
+            ui: &mut Ui
+    ) -> TextEditOutput {
+        let style = GemiStyle::VALUE_HIGHLIGHTED;
+
+        // display the edit box
+        TextEdit::singleline(&mut self.rt.edit_string)
+                .desired_width(self.rt.edit_label_width)
+                .char_limit(2)
+                .clip_text(false)
+                .margin(Vec2::new(0.0, 0.0))
+                .horizontal_align(egui::Align::Center)
+                .frame(false)
+                .font(style.style.clone())
+                .text_color(style.color)
+                .show(ui)
+    }
+
+
+    /// Display the editor for a memory cell when entering edit mode.
+    /// This will initialize the text edit box and requests focus for it.
+    fn display_value_editor_on_enter(
+            &mut self,
+            ui: &mut Ui,
+            source: &mut Source,
+            address: usize,
+            on_read: &Box<impl Fn(&Source, usize) -> Option<u8>>
+    ) {
+        // read the value from the memory source
+        let value_str = match on_read(source, address) {
+            Some(value) => format!("{:02x}", value),
+            None => PLACEHOLDER_NO_VALUE.to_string()
+        };
+
+        // setup the state for editing and erase the position of the previous cursor
+        self.rt.edit_label_width            = self.measure_text_width(ui, &value_str, TextStyle::Monospace);
+        self.rt.edit_string                 = value_str;
+        self.rt.edit_label_cursor_position  = None;
+
+        // display the editor
+        let text_edit_output = self.display_value_editor(ui);
+        let response         = text_edit_output.response;
+
+        // on entering the edit mode, we have to request focus on the newly created editor.
+        response.request_focus();
+    }
+
+
+    /// Display the editor for the current memory cell and additionally handles
+    /// all input events.
+    fn display_value_editor_on_typing(
             &mut self,
             ui: &mut Ui,
             source: &mut Source,
             address: usize,
             on_write: &mut Box<impl FnMut(&mut Source, usize, u8)>
     ) {
-        let style = GemiStyle::VALUE_HIGHLIGHTED;
-
-        // display the edit box
-        let response = TextEdit::singleline(&mut self.rt.edit_string)
-            .desired_width(self.rt.edit_label_width)
-            .char_limit(2)
-            .clip_text(false)
-            .margin(Vec2::new(0.0, 0.0))
-            .horizontal_align(egui::Align::Center)
-            .frame(false)
-            .font(style.style.clone())
-            .text_color(style.color)
-            .ui(ui)
-        ;
-
-        // request focus the first time after entering edit mode
-        if self.rt.edit_label_request_focus {
-            self.rt.edit_label_request_focus = false;
-            response.request_focus();
-        }
+        // display the editor
+        let text_edit_output = self.display_value_editor(ui);
+        let response         = &text_edit_output.response;
 
         // on change use the on_write callback to apply the value
         if response.changed() {
@@ -639,9 +788,93 @@ impl<Source> MemoryEditor<Source> {
             }
         }
 
+        // handle input
+        self.handle_edit_mode_input(ui);
+
         // leave edit mode when out of focus
         if response.lost_focus() {
-            self.rt.is_editing = false;
+            self.rt.edit_mode = EditMode::None;
+        }
+
+        // store the cursor position of this frame
+        self.rt.edit_label_cursor_position = match text_edit_output.cursor_range {
+            Some(cursor) => {
+                let a = cursor.primary.ccursor.index;
+                let b = cursor.primary.ccursor.index;
+
+                // Only return a cursor position if both cursors are equal,
+                // meaning there is no selection
+                if a == b {
+                    Some(a)
+                }
+                else {
+                    None
+                }
+            },
+
+            None => None
+        };
+    }
+
+
+    /// Handles the input events while in edit mode.
+    fn handle_edit_mode_input(&mut self, ui: &mut Ui) {
+        let column_step = 1;
+        let line_step   = self.rt.columns_per_line;
+
+        // Utility function to compare the last frame's cursor position to an expected value
+        let last_frame_cursor_pos_was = |pos| {
+            match self.rt.edit_label_cursor_position {
+                Some(p) => p == pos,
+                None    => false
+            }
+        };
+
+        // check for key presses
+        let key_pressed = ui.input(|i| {
+            let keys_to_handle = [
+                Key::ArrowLeft, Key::ArrowRight, Key::ArrowUp, Key::ArrowDown,
+                Key::Home, Key::End,
+                Key::Escape
+            ];
+
+            for key in keys_to_handle {
+                if i.key_pressed(key) {
+                    return Some(key);
+                }
+            }
+
+            return None;
+        });
+
+        match key_pressed {
+            // Pressing "Left" moves to the previous memory cell, only if the cursor was already
+            // on the left side of the text edit box.
+            Some(Key::ArrowLeft) => {
+                if last_frame_cursor_pos_was(0) {
+                    self.move_cursor_back(column_step);
+                }
+            }
+
+            // Pressing "Right" moves to the next memory cell, only if the cursor is already
+            // on the right side of the text edit box.
+            Some(Key::ArrowRight) => {
+                if last_frame_cursor_pos_was(2) {
+                    self.move_cursor_fwd(column_step);
+                }
+            }
+
+            // Pressing "Down" moves the cursor to the same cell in the next line.
+            Some(Key::ArrowDown) => {
+                self.move_cursor_fwd(line_step);
+            }
+
+            // Pressing "Up" moves the cursor to the same cell in the previous line.
+            Some(Key::ArrowUp) => {
+                self.move_cursor_back(line_step);
+            }
+
+            _ => { }
         }
     }
 
@@ -717,13 +950,13 @@ impl<Source> MemoryEditor<Source> {
             ;
 
             // compute the total line length with all memory cells and gaps
-            let line_width =
+            self.rt.column_width_values =
                     ((memory_cell_width + item_spacing) * self.rt.columns_per_line as f32)
                 +   ((item_spacing) * (gaps as f32))
             ;
 
             // if the width fits, we are got the best fit
-            if line_width <= remaining_width {
+            if self.rt.column_width_values <= remaining_width {
                 break;
             }
 
@@ -817,13 +1050,15 @@ impl Default for MemoryEditorRuntimeData {
             line_distance_y:                0.0,
             column_width_category:          0.0,
             column_width_address:           0.0,
+            column_width_values:            0.0,
             columns_per_line:               32,
-            address_upper_bound:            0x00,
+            address_range_bounds:           0x00 ..= 0x00,
             number_of_address_characters:   4,
-            is_editing:                     false,
+            switch_to_edit_mode:            None,
+            edit_mode:                      EditMode::None,
             edit_string:                    String::new(),
             edit_label_width:               0.0,
-            edit_label_request_focus:       false,
+            edit_label_cursor_position:     None,
         }
     }
 }

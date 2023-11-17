@@ -50,20 +50,27 @@ impl View for MemoryView {
     }
 
 
-    fn on_emulator_loaded(&mut self, _state: &mut EmulatorState) {
-        self.refresh_memory_map();
+    fn on_emulator_loaded(&mut self, state: &mut EmulatorState) {
+        self.refresh_memory_map(state);
     }
 }
 
 
 impl MemoryView {
     /// Refreshes the memory map of the editor.
-    fn refresh_memory_map(&mut self) {
+    fn refresh_memory_map(&mut self, state: &mut EmulatorState) {
+        let has_cartridge_ram = if let Some(cart) = state.get_cartridge() {
+            cart.has_ram()
+        }
+        else {
+            false
+        };
+
         self.memory_editor.clear_memory_areas();
         self.memory_editor.add_memory_area("ROM Bank #0",      0x0000..=0x3fff, false);
         self.memory_editor.add_memory_area("ROM Bank #1",      0x4000..=0x7fff, false);
         self.memory_editor.add_memory_area("VRAM",             0x8000..=0x9fff, true);
-        self.memory_editor.add_memory_area("Cartridge RAM",    0xa000..=0xbfff, true);
+        self.memory_editor.add_memory_area("Cartridge RAM",    0xa000..=0xbfff, has_cartridge_ram);
         self.memory_editor.add_memory_area("WRAM Bank #0",     0xc000..=0xcfff, true);
         self.memory_editor.add_memory_area("WRAM Bank #1",     0xd000..=0xdfff, true);
         self.memory_editor.add_memory_area("Mirror RAM",       0xe000..=0xfdff, true);
