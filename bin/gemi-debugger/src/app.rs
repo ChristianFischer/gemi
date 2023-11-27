@@ -21,6 +21,7 @@ use egui::Context;
 use crate::behaviour::TreeBehaviour;
 use crate::state::{EmulatorState, UpdateMode};
 use crate::strings::*;
+use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
 use crate::views::{View, ViewClass};
 
@@ -160,6 +161,8 @@ impl Default for EmulatorApplication {
 
 impl eframe::App for EmulatorApplication {
     fn update(&mut self, ctx: &Context, frame: &mut Frame) {
+        sprite_cache::on_frame();
+
         self.get_state_mut().update();
 
         self.update_menu_bar(ctx, frame);

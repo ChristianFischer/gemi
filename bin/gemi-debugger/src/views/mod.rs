@@ -22,12 +22,14 @@ use crate::views::cpu::CpuView;
 use crate::views::display::EmulatorDisplayView;
 use crate::views::memory::MemoryView;
 use crate::views::placeholder::PlaceholderView;
+use crate::views::sprites::SpritesView;
 
 pub mod cartridge_info;
 pub mod cpu;
 pub mod display;
 pub mod memory;
 pub mod placeholder;
+pub mod sprites;
 
 
 /// A trait to be implemented by view objects of which each of them display
@@ -55,7 +57,7 @@ pub enum ViewClass {
     Memory(MemoryView),
     Disassembly(PlaceholderView),
     TileMap(PlaceholderView),
-    Sprites(PlaceholderView),
+    Sprites(SpritesView),
 }
 
 
@@ -98,7 +100,7 @@ impl ViewClass {
 
     /// Placeholder for the sprites view.
     pub fn new_sprites() -> ViewClass {
-        ViewClass::Sprites(PlaceholderView::new("Sprites"))
+        ViewClass::Sprites(SpritesView::new())
     }
 }
 

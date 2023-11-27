@@ -24,6 +24,7 @@ use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::MemoryData;
 use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
 use crate::ppu::graphic_data::*;
+use crate::ppu::sprite_image::SpriteImage;
 use crate::ppu::video_memory::{OamRam, OamRamBank, VideoMemory};
 use crate::utils::get_bit;
 
@@ -907,6 +908,19 @@ impl Ppu {
         ;
 
         SpritePixelValue::new(pixel)
+    }
+
+    /// Get the raw data of a sprite, as it is stored in the VRAM.
+    pub fn get_sprite_image(&self, sprite_index: usize, bank: u8) -> SpriteImage {
+        let vram = &self.memory.vram_banks[(bank & 0x01) as usize];
+        let sprite_address_begin = (sprite_index * 16);
+        let sprite_address_end   = (sprite_index * 16) + 16;
+
+        let slice = &vram.as_slice()[sprite_address_begin .. sprite_address_end];
+        let data = <[u8; 16]>::try_from(slice)
+                .unwrap_or([0x00; 16]);
+
+        SpriteImage::new(data)
     }
 }
 

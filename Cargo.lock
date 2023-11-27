@@ -1004,6 +1004,7 @@ dependencies = [
  "egui_tiles",
  "gemi-core",
  "gemi-utils",
+ "lazy_static",
  "nfd2",
  "serde",
 ]

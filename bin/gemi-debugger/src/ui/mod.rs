@@ -17,5 +17,6 @@
 
 pub mod data_list;
 pub mod memory_editor;
+pub mod sprite_cache;
 pub mod style;
 pub mod utils;
