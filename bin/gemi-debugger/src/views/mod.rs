@@ -16,7 +16,9 @@
  */
 
 use egui::Ui;
+use crate::event::UiEvent;
 use crate::state::EmulatorState;
+use crate::view_response::ViewResponse;
 use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::cpu::CpuView;
 use crate::views::display::EmulatorDisplayView;
@@ -39,7 +41,12 @@ pub trait View: serde::Serialize + serde::de::DeserializeOwned {
     fn title(&self, state: &mut EmulatorState) -> &str;
 
     /// Render the view UI.
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui);
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse;
+
+    /// Invoked when an UI Event occurred to be handled by views.
+    fn handle_ui_event(&mut self, event: &UiEvent) {
+        _ = event;
+    }
 
     /// Invoked when a new instance of the emulator was created.
     fn on_emulator_loaded(&mut self, state: &mut EmulatorState) {
@@ -119,7 +126,7 @@ impl View for ViewClass {
     }
 
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
         match self {
             ViewClass::Display(v)       => v.ui(state, ui),
             ViewClass::CartridgeInfo(v) => v.ui(state, ui),
@@ -128,6 +135,19 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.ui(state, ui),
             ViewClass::TileMap(v)       => v.ui(state, ui),
             ViewClass::Sprites(v)       => v.ui(state, ui),
+        }
+    }
+
+
+    fn handle_ui_event(&mut self, event: &UiEvent) {
+        match self {
+            ViewClass::Display(v)       => v.handle_ui_event(event),
+            ViewClass::CartridgeInfo(v) => v.handle_ui_event(event),
+            ViewClass::Cpu(v)           => v.handle_ui_event(event),
+            ViewClass::Memory(v)        => v.handle_ui_event(event),
+            ViewClass::Disassembly(v)   => v.handle_ui_event(event),
+            ViewClass::TileMap(v)       => v.handle_ui_event(event),
+            ViewClass::Sprites(v)       => v.handle_ui_event(event),
         }
     }
 

@@ -169,6 +169,7 @@ impl eframe::App for EmulatorApplication {
         self.update_center_panel(ctx, frame);
         self.update_message_box(ctx, frame);
         self.update_input(ctx);
+        self.handle_frame_response();
 
         // when the emulator is still running, request an immediate repaint
         // to update the display instead of waiting for the next event
@@ -261,7 +262,7 @@ impl EmulatorApplication {
     fn update_player_toolbar(&mut self, ui: &mut egui::Ui) {
         let state = self.get_state_mut();
         let mut is_running = state.is_running();
-        let mut is_paused  = state.is_paused();
+        let mut is_paused   = state.is_paused();
 
         // "Play" button
         if ui.toggle_value(&mut is_running, BUTTON_LABEL_PLAY).clicked() {
@@ -360,5 +361,22 @@ impl EmulatorApplication {
     /// Check if a message box is currently open.
     fn is_message_box_open(&self) -> bool {
         self.display_message.is_some()
+    }
+
+
+    /// Handle the response of the views during this frame.
+    fn handle_frame_response(&mut self) {
+        // forward ui events
+        if let Some(event) = &self.behaviour.get_frame_response().event {
+            visit_tiles(
+                &mut self.tree,
+                |tile| {
+                    tile.handle_ui_event(&event);
+                }
+            );
+        }
+
+        // reset frame variables
+        self.behaviour.reset_frame_data();
     }
 }

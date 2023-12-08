@@ -20,6 +20,7 @@ use eframe::epaint::textures::TextureOptions;
 use egui::Ui;
 use gemi_core::gameboy::GameBoy;
 use crate::state::EmulatorState;
+use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -36,7 +37,7 @@ impl View for EmulatorDisplayView {
     }
 
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
         match state.get_emulator() {
             None => {}
 
@@ -44,6 +45,8 @@ impl View for EmulatorDisplayView {
                 Self::render_display_image(ui, emu);
             }
         }
+
+        ViewResponse::none()
     }
 }
 

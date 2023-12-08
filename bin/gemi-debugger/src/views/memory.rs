@@ -15,10 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::ops::Range;
 use egui::Ui;
 use gemi_core::gameboy::GameBoy;
+use crate::event::UiEvent;
 use crate::state::EmulatorState;
 use crate::ui::memory_editor::MemoryEditor;
+use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -45,8 +48,14 @@ impl View for MemoryView {
     }
 
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
         self.display_memory_editor(state, ui);
+        ViewResponse::none()
+    }
+
+
+    fn handle_ui_event(&mut self, event: &UiEvent) {
+        self.on_ui_event(event);
     }
 
 
@@ -57,6 +66,27 @@ impl View for MemoryView {
 
 
 impl MemoryView {
+    fn on_ui_event(&mut self, event: &UiEvent) {
+        let get_sprite_address_range = |sprite_index: usize| -> Range<usize> {
+            let address_begin = (sprite_index * 16) + 0x8000;
+            let address_end   = address_begin + 16;
+            address_begin .. address_end
+        };
+
+        match event {
+            UiEvent::SpriteSelected(sprite_index) => {
+                let address_range = get_sprite_address_range(*sprite_index);
+                self.memory_editor.set_highlighted_range(address_range);
+            }
+
+            UiEvent::SpriteDeselected(sprite_index) => {
+                let address_range = get_sprite_address_range(*sprite_index);
+                self.memory_editor.clear_highlighted_range(address_range);
+            }
+        }
+    }
+
+
     /// Refreshes the memory map of the editor.
     fn refresh_memory_map(&mut self, state: &mut EmulatorState) {
         let has_cartridge_ram = if let Some(cart) = state.get_cartridge() {

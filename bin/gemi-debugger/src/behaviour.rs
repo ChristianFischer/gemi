@@ -16,9 +16,10 @@
  */
 
 
-use egui::{Ui, WidgetText};
+use egui::{Rect, Ui, WidgetText};
 use egui_tiles::{SimplificationOptions, TileId, UiResponse};
 use crate::state::EmulatorState;
+use crate::view_response::ViewResponse;
 use crate::views::{View, ViewClass};
 
 
@@ -34,10 +35,25 @@ pub struct TreeBehaviour {
     
     /// Some options to control the behaviour of the tiled UI.
     simplification_options: SimplificationOptions,
+
+    /// A response object collecting the results of the current frame.
+    this_frame_response: ViewResponse,
 }
 
 
 impl TreeBehaviour {
+    /// Reset the per-frame data of the behaviour.
+    pub fn reset_frame_data(&mut self) {
+        self.this_frame_response = ViewResponse::none();
+    }
+
+
+    /// Get the response object of the current frame.
+    pub fn get_frame_response(&self) -> &ViewResponse {
+        &self.this_frame_response
+    }
+
+
     /// Get a reference to the emulator state.
     pub fn get_state(&self) -> &EmulatorState {
         &self.state
@@ -60,6 +76,8 @@ impl Default for TreeBehaviour {
                 all_panes_must_have_tabs: true,
                 .. Default::default()
             },
+
+            this_frame_response: ViewResponse::none(),
         }
     }
 }
@@ -67,7 +85,25 @@ impl Default for TreeBehaviour {
 
 impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
     fn pane_ui(&mut self, ui: &mut Ui, _tile_id: TileId, pane: &mut ViewClass) -> UiResponse {
-        pane.ui(self.get_state_mut(), ui);
+        let available_rect = ui.available_rect_before_wrap();
+
+        // create a rectangle aligned to pixels for each child
+        let child_rect = Rect::from_two_pos(
+                available_rect.min.ceil(),
+                available_rect.max.floor(),
+        );
+
+        // new ui object using the child rectangle
+        let mut child_ui = Ui::new(
+                ui.ctx().clone(),
+                ui.layer_id(),
+                ui.id().with(_tile_id),
+                child_rect,
+                child_rect
+        );
+
+        let response = pane.ui(self.get_state_mut(), &mut child_ui);
+        self.this_frame_response.add(response);
 
         // Currently no drag option here
         UiResponse::None

@@ -21,6 +21,7 @@ use gemi_core::gameboy::GameBoy;
 use gemi_core::utils::to_u8;
 use crate::state::EmulatorState;
 use crate::ui::style::GemiStyle;
+use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -84,9 +85,11 @@ impl View for CpuView {
         "CPU"
     }
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
         self.display_registers(ui, state);
         self.display_cpu_flags(ui, state);
+
+        ViewResponse::none()
     }
 }
 

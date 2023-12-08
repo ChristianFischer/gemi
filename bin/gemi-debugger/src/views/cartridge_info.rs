@@ -19,6 +19,7 @@ use egui::Ui;
 use gemi_core::cartridge::GameBoyColorSupport;
 use crate::state::EmulatorState;
 use crate::ui::data_list::DataList;
+use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -56,8 +57,9 @@ impl View for CartridgeInfoView {
     }
 
 
-    fn ui(&mut self, _state: &mut EmulatorState, ui: &mut Ui) {
+    fn ui(&mut self, _state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
         self.data_list.ui(ui);
+        ViewResponse::none()
     }
 
 

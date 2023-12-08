@@ -73,6 +73,9 @@ impl Default for TextFormatting {
 
 
 impl GemiStyle {
+    /// The background color of highlighted areas.
+    pub const BACKGROUND_HIGHLIGHT: Color32 = Color32::from_rgb(0x00, 0x7e, 0xe1);
+
     /// Text formatting to display addresses.
     pub const ADDRESS: TextFormatting = TextFormatting {
         style: TextStyle::Monospace,

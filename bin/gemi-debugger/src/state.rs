@@ -73,8 +73,8 @@ impl EmulatorState {
     pub fn open_rom(&mut self, path: &Path) -> Result<(), String> {
         // load the cartridge from the given path
         let cartridge = Cartridge::load_files_with_default_ram(path)
-            .map_err(|e| format!("Failed to load ROM: {}", e))
-            ?
+                .map_err(|e| format!("Failed to load ROM: {}", e))
+                ?
         ;
 
         // on success build the new emulator instance

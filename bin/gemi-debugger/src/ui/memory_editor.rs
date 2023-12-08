@@ -19,7 +19,7 @@ use std::cmp::{max, min};
 use std::marker::PhantomData;
 use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
-use egui::{Grid, Id, Label, Key, PointerButton, pos2, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
+use egui::{Grid, Id, Label, Key, PointerButton, pos2, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText, Stroke};
 use egui::collapsing_header::{CollapsingState, paint_default_icon};
 use egui::text_edit::TextEditOutput;
 use crate::ui::style::GemiStyle;
@@ -78,6 +78,9 @@ struct MemoryEditorState {
     /// The currently selected memory address.
     selected_address: usize,
 
+    /// An address range to be highlighted, if set.
+    highlighted_address_range: Option<Range<usize>>,
+
     /// Whether editing the memory values is enabled or not.
     is_editable: bool,
 }
@@ -114,6 +117,9 @@ struct MemoryEditorRuntimeData {
     /// The distance between two lines on the Y axis.
     /// This is the sum of the content height and the spacing.
     line_distance_y: f32,
+
+    /// The width of a single editable memory cell.
+    memory_cell_width: f32,
 
     /// The width of the 'category' column.
     column_width_category: f32,
@@ -161,6 +167,7 @@ impl<Source> MemoryEditor<Source> {
 
             state: MemoryEditorState {
                 selected_address: 0,
+                highlighted_address_range: None,
                 is_editable: false,
             }
         }
@@ -250,6 +257,30 @@ impl<Source> MemoryEditor<Source> {
         }
 
         None
+    }
+
+
+    /// Get the currently highlighted address range.
+    pub fn get_highlighted_range(&self) -> Option<&Range<usize>> {
+        self.state.highlighted_address_range.as_ref()
+    }
+
+
+    /// Set the currently highlighted address range.
+    pub fn set_highlighted_range(&mut self, range: Range<usize>) {
+        self.state.highlighted_address_range = Some(range);
+    }
+
+
+    /// Clears a previously set highlight range.
+    pub fn clear_highlighted_range(&mut self, range: Range<usize>) {
+        match &self.state.highlighted_address_range {
+            Some(selected_range) if *selected_range == range => {
+                self.state.highlighted_address_range = None;
+            }
+
+            _ => {}
+        }
     }
 
 
@@ -610,9 +641,10 @@ impl<Source> MemoryEditor<Source> {
             )
         );
 
-        let hover_response = ui.interact(line_bounds, ui.id().with(1), Sense::hover());
+        let hover_response  = ui.interact(line_bounds, ui.id().with(1), Sense::hover());
+        let is_line_hovered = hover_response.hovered();
 
-        if hover_response.hovered() {
+        if is_line_hovered {
             ui.painter().rect_filled(
                     line_bounds,
                     2.0,
@@ -625,6 +657,53 @@ impl<Source> MemoryEditor<Source> {
                     2.0,
                     ui.style().visuals.widgets.active.weak_bg_fill
             );
+        }
+
+        // check if there is a memory range selected to be highlighted
+        if let Some(highlight_range) = &self.state.highlighted_address_range {
+            if
+                    highlight_range.start < line_address_range.end
+                &&  highlight_range.end   > line_address_range.start
+            {
+                // determine the start and end of the highlight capped to the line boundaries
+                let first_cell = max(line_address_range.start, highlight_range.start).saturating_sub(start_address);
+                let last_cell  = min(line_address_range.end, highlight_range.end).saturating_sub(start_address + 1);
+
+                // compute the position and size of the highlighted area
+                let offset_begin    = self.compute_memory_cell_offset(ui, first_cell);
+                let offset_end      = self.compute_memory_cell_offset(ui, last_cell) + self.rt.memory_cell_width;
+                let highlight_width = offset_end - offset_begin;
+
+                // the boundaries of the highlight
+                let highlight_bounds = egui::Rect::from_min_size(
+                    pos2(
+                        ui.cursor().left_top().x + self.rt.column_width_address + item_spacing + offset_begin - 2.0,
+                        ui.cursor().left_top().y
+                    ),
+                    vec2(
+                        highlight_width + 5.0,
+                        self.rt.line_distance_y
+                    )
+                );
+
+                // draw the highlight
+                if is_line_hovered || is_line_selected {
+                    // just an outline if selected
+                    ui.painter().rect_stroke(
+                            highlight_bounds,
+                            2.0,
+                            Stroke::new(2.0, GemiStyle::BACKGROUND_HIGHLIGHT)
+                    );
+                }
+                else {
+                    // fully filled if not selected
+                    ui.painter().rect_filled(
+                            highlight_bounds,
+                            2.0,
+                            GemiStyle::BACKGROUND_HIGHLIGHT
+                    );
+                }
+            }
         }
 
         // display the address label
@@ -928,7 +1007,7 @@ impl<Source> MemoryEditor<Source> {
         );
 
         // measure the size of a single memory cell (a single byte value)
-        let memory_cell_width = self.measure_text_width(ui, "00", TextStyle::Monospace);
+        self.rt.memory_cell_width = self.measure_text_width(ui, "00", TextStyle::Monospace);
 
         // compute the space left
         let remaining_width =
@@ -951,7 +1030,7 @@ impl<Source> MemoryEditor<Source> {
 
             // compute the total line length with all memory cells and gaps
             self.rt.column_width_values =
-                    ((memory_cell_width + item_spacing) * self.rt.columns_per_line as f32)
+                    ((self.rt.memory_cell_width + item_spacing) * self.rt.columns_per_line as f32)
                 +   ((item_spacing) * (gaps as f32))
             ;
 
@@ -972,6 +1051,27 @@ impl<Source> MemoryEditor<Source> {
             .into_galley(ui, Some(false), 0.0, style)
             .galley
             .rect.width()
+    }
+
+
+    /// Computes an offset relative to the very first cell of this line,
+    /// where the cell with the given index is located within the current line.
+    fn compute_memory_cell_offset(&self, ui: &mut Ui, index: usize) -> f32 {
+        let item_spacing = ui.spacing().item_spacing.x;
+
+        // one gap per 4-byte group and one additional gap per 8-byte group
+        let gaps =
+                (index / 4)
+            +   (index / 8)
+        ;
+
+        // compute the total line length with all memory cells and gaps
+        let offset =
+                ((self.rt.memory_cell_width + item_spacing) * (index as f32))
+            +   ((item_spacing) * (gaps as f32))
+        ;
+
+        offset
     }
 }
 
@@ -1048,6 +1148,7 @@ impl Default for MemoryEditorRuntimeData {
             last_frame_width:               0.0,
             line_content_height:            0.0,
             line_distance_y:                0.0,
+            memory_cell_width:              0.0,
             column_width_category:          0.0,
             column_width_address:           0.0,
             column_width_values:            0.0,
