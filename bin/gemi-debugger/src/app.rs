@@ -147,7 +147,7 @@ impl Default for EmulatorApplication {
         };
 
         // create the tree object
-        let tree = egui_tiles::Tree::new(h_split, tiles);
+        let tree = egui_tiles::Tree::new("gemi", h_split, tiles);
 
         Self {
             tree,
@@ -254,7 +254,7 @@ impl EmulatorApplication {
         // "Quit" button to close the application
         if ui.button("Quit").clicked() {
             ui.close_menu();
-            frame.close();
+            ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
         }
     }
 

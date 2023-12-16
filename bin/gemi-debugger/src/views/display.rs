@@ -17,7 +17,7 @@
 
 use eframe::epaint::ColorImage;
 use eframe::epaint::textures::TextureOptions;
-use egui::Ui;
+use egui::{Image, Ui, Widget};
 use gemi_core::gameboy::GameBoy;
 use crate::state::EmulatorState;
 use crate::view_response::ViewResponse;
@@ -76,9 +76,9 @@ impl EmulatorDisplayView {
         ).floor();
 
         // render the texture
-        ui.image(
-            &texture,
-            texture_size * scale
-        );
+        Image::new(&texture)
+                .fit_to_exact_size(texture_size * scale)
+                .ui(ui)
+        ;
     }
 }

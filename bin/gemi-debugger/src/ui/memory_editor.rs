@@ -596,7 +596,7 @@ impl<Source> MemoryEditor<Source> {
             }
 
             // render the text
-            title_galley.paint_with_visuals(ui.painter(), text_pos, &visuals);
+            ui.painter().galley(text_pos, title_galley, visuals.text_color());
         }
 
         // during animation, save the animation state
@@ -1049,7 +1049,6 @@ impl<Source> MemoryEditor<Source> {
     fn measure_text_width(&self, ui: &mut Ui, text: &str, style: TextStyle) -> f32 {
         WidgetText::from(text)
             .into_galley(ui, Some(false), 0.0, style)
-            .galley
             .rect.width()
     }
 

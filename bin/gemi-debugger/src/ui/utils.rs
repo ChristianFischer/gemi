@@ -23,7 +23,7 @@ pub fn visit_tiles(
     tree: &mut egui_tiles::Tree<ViewClass>,
     mut visitor: impl FnMut(&mut ViewClass),
 ) {
-    tree.tiles.tiles.iter_mut().for_each(|(_, tile)| {
+    tree.tiles.tiles_mut().into_iter().for_each(|tile| {
         match tile {
             egui_tiles::Tile::Pane(pane) => {
                 visitor(pane);

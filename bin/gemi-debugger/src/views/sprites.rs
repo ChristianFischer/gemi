@@ -164,10 +164,8 @@ impl SpritesView {
             );
         }
 
-        let response = Image::new(
-            &texture,
-            [SPRITE_DISPLAY_SIZE, SPRITE_DISPLAY_SIZE]
-        )
+        let response = Image::new(&texture)
+                .fit_to_exact_size(Vec2::splat(SPRITE_DISPLAY_SIZE))
                 .sense(egui::Sense::click())
                 .ui(ui)
         ;

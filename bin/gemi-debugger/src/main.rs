@@ -18,6 +18,7 @@
 use std::env;
 use std::path::PathBuf;
 use eframe::{CreationContext, NativeOptions, run_native};
+use egui::ViewportBuilder;
 use crate::app::EmulatorApplication;
 
 mod views;
@@ -56,7 +57,8 @@ fn load_application(cc: &CreationContext) -> EmulatorApplication {
 
 fn main() -> Result<(), eframe::Error> {
     let options = NativeOptions {
-        app_id: Some("gemi-debugger".to_string()),
+        viewport: ViewportBuilder::default()
+                .with_app_id("gemi-debugger"),
         .. NativeOptions::default()
     };
 
