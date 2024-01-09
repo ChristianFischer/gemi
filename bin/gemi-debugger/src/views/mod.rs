@@ -23,6 +23,7 @@ use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::cpu::CpuView;
 use crate::views::display::EmulatorDisplayView;
 use crate::views::memory::MemoryView;
+use crate::views::oam::OamView;
 use crate::views::placeholder::PlaceholderView;
 use crate::views::sprites::SpritesView;
 
@@ -30,6 +31,7 @@ pub mod cartridge_info;
 pub mod cpu;
 pub mod display;
 pub mod memory;
+pub mod oam;
 pub mod placeholder;
 pub mod sprites;
 
@@ -65,6 +67,7 @@ pub enum ViewClass {
     Disassembly(PlaceholderView),
     TileMap(PlaceholderView),
     Sprites(SpritesView),
+    Oam(OamView),
 }
 
 
@@ -109,6 +112,12 @@ impl ViewClass {
     pub fn new_sprites() -> ViewClass {
         ViewClass::Sprites(SpritesView::new())
     }
+
+
+    /// Placeholder for the OAM view.
+    pub fn new_oam() -> ViewClass {
+        ViewClass::Oam(OamView::new())
+    }
 }
 
 
@@ -122,6 +131,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.title(state),
             ViewClass::TileMap(v)       => v.title(state),
             ViewClass::Sprites(v)       => v.title(state),
+            ViewClass::Oam(v)           => v.title(state),
         }
     }
 
@@ -135,6 +145,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.ui(state, ui),
             ViewClass::TileMap(v)       => v.ui(state, ui),
             ViewClass::Sprites(v)       => v.ui(state, ui),
+            ViewClass::Oam(v)           => v.ui(state, ui),
         }
     }
 
@@ -148,6 +159,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.handle_ui_event(event),
             ViewClass::TileMap(v)       => v.handle_ui_event(event),
             ViewClass::Sprites(v)       => v.handle_ui_event(event),
+            ViewClass::Oam(v)           => v.handle_ui_event(event),
         }
     }
 
@@ -161,6 +173,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.on_emulator_loaded(state),
             ViewClass::TileMap(v)       => v.on_emulator_loaded(state),
             ViewClass::Sprites(v)       => v.on_emulator_loaded(state),
+            ViewClass::Oam(v)           => v.on_emulator_loaded(state),
         }
     }
 }

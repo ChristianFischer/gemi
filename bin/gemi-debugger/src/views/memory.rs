@@ -18,6 +18,7 @@
 use std::ops::Range;
 use egui::Ui;
 use gemi_core::gameboy::GameBoy;
+use gemi_core::mmu::locations::{MEMORY_LOCATION_OAM_BEGIN, MEMORY_LOCATION_SPRITES_BEGIN};
 use crate::event::UiEvent;
 use crate::state::EmulatorState;
 use crate::ui::memory_editor::MemoryEditor;
@@ -68,8 +69,14 @@ impl View for MemoryView {
 impl MemoryView {
     fn on_ui_event(&mut self, event: &UiEvent) {
         let get_sprite_address_range = |sprite_index: usize| -> Range<usize> {
-            let address_begin = (sprite_index * 16) + 0x8000;
+            let address_begin = (sprite_index * 16) + MEMORY_LOCATION_SPRITES_BEGIN as usize;
             let address_end   = address_begin + 16;
+            address_begin .. address_end
+        };
+
+        let get_oam_address_range = |oam_index: usize| -> Range<usize> {
+            let address_begin = (oam_index * 4) + MEMORY_LOCATION_OAM_BEGIN as usize;
+            let address_end   = address_begin + 4;
             address_begin .. address_end
         };
 
@@ -81,6 +88,16 @@ impl MemoryView {
 
             UiEvent::SpriteDeselected(sprite_index) => {
                 let address_range = get_sprite_address_range(*sprite_index);
+                self.memory_editor.clear_highlighted_range(address_range);
+            }
+
+            UiEvent::OamEntrySelected(oam_index) => {
+                let address_range = get_oam_address_range(*oam_index);
+                self.memory_editor.set_highlighted_range(address_range);
+            }
+
+            UiEvent::OamEntryDeselected(oam_index) => {
+                let address_range = get_oam_address_range(*oam_index);
                 self.memory_editor.clear_highlighted_range(address_range);
             }
         }

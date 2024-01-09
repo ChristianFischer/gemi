@@ -118,6 +118,7 @@ impl Default for EmulatorApplication {
         let tiles_bottom = add_views(vec![
             ViewClass::new_memory(),
             ViewClass::new_disassembly(),
+            ViewClass::new_oam(),
         ]);
 
         // create a split between the main area and a bottom area below
@@ -221,7 +222,7 @@ impl EmulatorApplication {
 
 
     /// Handle the "File" submenu of the menu bar.
-    fn update_submenu_file(&mut self, ui: &mut egui::Ui, frame: &mut Frame) {
+    fn update_submenu_file(&mut self, ui: &mut egui::Ui, _frame: &mut Frame) {
         // "Open" button to open a ROM file
         if ui.button("Open").clicked() {
             ui.close_menu();

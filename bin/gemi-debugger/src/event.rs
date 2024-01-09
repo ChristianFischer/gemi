@@ -25,4 +25,10 @@ pub enum UiEvent {
     /// A sprite was deselected.
     /// Contains the index of the deselected sprite.
     SpriteDeselected(usize),
+
+    /// An entry in the OAM table was selected.
+    OamEntrySelected(usize),
+
+    /// An entry in the OAM table was deselected.
+    OamEntryDeselected(usize),
 }
