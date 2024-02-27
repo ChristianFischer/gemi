@@ -16,15 +16,17 @@
  */
 
 use std::path::PathBuf;
+
 use eframe::{CreationContext, Frame};
 use egui::Context;
+
 use crate::behaviour::TreeBehaviour;
+use crate::event::UiEvent;
 use crate::state::{EmulatorState, UpdateMode};
 use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
 use crate::views::{View, ViewClass};
-
 
 /// The main application struct.
 /// This contains the root elements of the UI
@@ -60,7 +62,7 @@ impl EmulatorApplication {
         )?;
 
         // when successfully restored and there's a ROM loaded, notify all views
-        if app.get_state().is_emulator_loaded() {
+        if app.get_state().emu.is_emulator_loaded() {
             visit_tiles(
                 &mut app.tree,
                 |tile| {
@@ -263,25 +265,25 @@ impl EmulatorApplication {
     fn update_player_toolbar(&mut self, ui: &mut egui::Ui) {
         let state = self.get_state_mut();
         let mut is_running = state.is_running();
-        let mut is_paused   = state.is_paused();
+        let mut is_paused  = state.ui.is_paused();
 
         // "Play" button
         if ui.toggle_value(&mut is_running, BUTTON_LABEL_PLAY).clicked() {
             if is_running {
-                state.set_update_mode(UpdateMode::Continuous);
+                state.ui.set_update_mode(UpdateMode::Continuous);
             }
         }
 
         // "Pause" button
         if ui.toggle_value(&mut is_paused,  BUTTON_LABEL_PAUSE).clicked() {
             if is_paused {
-                state.set_update_mode(UpdateMode::Paused);
+                state.ui.set_update_mode(UpdateMode::Paused);
             }
         }
 
         // "Step" button
         if ui.button(BUTTON_LABEL_STEP).clicked() {
-            state.set_update_mode(UpdateMode::StepFrame);
+            state.ui.set_update_mode(UpdateMode::StepFrame);
         }
     }
 
@@ -367,17 +369,24 @@ impl EmulatorApplication {
 
     /// Handle the response of the views during this frame.
     fn handle_frame_response(&mut self) {
-        // forward ui events
-        if let Some(event) = &self.behaviour.get_frame_response().event {
-            visit_tiles(
-                &mut self.tree,
-                |tile| {
-                    tile.handle_ui_event(&event);
-                }
-            );
-        }
+        let events = [
+            self.behaviour.get_state_mut().ui.selection.take_ui_event(),
+            self.behaviour.get_state_mut().ui.hover.take_ui_event(),
+        ].into_iter().filter_map(|event| event);
 
-        // reset frame variables
-        self.behaviour.reset_frame_data();
+        for event in events {
+            self.send_event(event);
+        }
+    }
+    
+    
+    /// Send a single event to all views. 
+    fn send_event(&mut self, event: UiEvent) {
+        visit_tiles(
+            &mut self.tree,
+            |tile| {
+                tile.handle_ui_event(&event);
+            }
+        );
     }
 }

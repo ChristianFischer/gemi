@@ -15,20 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::selection::{Kind, Selected};
+
 /// An event risen by any UI component which will be sent to other components.
 #[derive(Clone)]
 pub enum UiEvent {
-    /// A sprite was selected.
-    /// Contains the index of the selected sprite.
-    SpriteSelected(usize),
-
-    /// A sprite was deselected.
-    /// Contains the index of the deselected sprite.
-    SpriteDeselected(usize),
-
-    /// An entry in the OAM table was selected.
-    OamEntrySelected(usize),
-
-    /// An entry in the OAM table was deselected.
-    OamEntryDeselected(usize),
+    /// The currently selected item has been changed.
+    SelectionChanged(Kind, Option<Selected>),
 }

@@ -19,7 +19,6 @@
 use egui::{Rect, Ui, WidgetText};
 use egui_tiles::{SimplificationOptions, TileId, UiResponse};
 use crate::state::EmulatorState;
-use crate::view_response::ViewResponse;
 use crate::views::{View, ViewClass};
 
 
@@ -35,25 +34,10 @@ pub struct TreeBehaviour {
     
     /// Some options to control the behaviour of the tiled UI.
     simplification_options: SimplificationOptions,
-
-    /// A response object collecting the results of the current frame.
-    this_frame_response: ViewResponse,
 }
 
 
 impl TreeBehaviour {
-    /// Reset the per-frame data of the behaviour.
-    pub fn reset_frame_data(&mut self) {
-        self.this_frame_response = ViewResponse::none();
-    }
-
-
-    /// Get the response object of the current frame.
-    pub fn get_frame_response(&self) -> &ViewResponse {
-        &self.this_frame_response
-    }
-
-
     /// Get a reference to the emulator state.
     pub fn get_state(&self) -> &EmulatorState {
         &self.state
@@ -76,8 +60,6 @@ impl Default for TreeBehaviour {
                 all_panes_must_have_tabs: true,
                 .. Default::default()
             },
-
-            this_frame_response: ViewResponse::none(),
         }
     }
 }
@@ -102,8 +84,7 @@ impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
                 child_rect
         );
 
-        let response = pane.ui(self.get_state_mut(), &mut child_ui);
-        self.this_frame_response.add(response);
+        pane.ui(self.get_state_mut(), &mut child_ui);
 
         // Currently no drag option here
         UiResponse::None

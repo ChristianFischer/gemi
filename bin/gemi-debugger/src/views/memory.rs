@@ -16,15 +16,18 @@
  */
 
 use std::ops::Range;
+
 use egui::Ui;
+
 use gemi_core::gameboy::GameBoy;
 use gemi_core::mmu::locations::{MEMORY_LOCATION_OAM_BEGIN, MEMORY_LOCATION_SPRITES_BEGIN};
+
 use crate::event::UiEvent;
+use crate::event::UiEvent::SelectionChanged;
+use crate::selection::{Kind, Selected};
 use crate::state::EmulatorState;
 use crate::ui::memory_editor::MemoryEditor;
-use crate::view_response::ViewResponse;
 use crate::views::View;
-
 
 /// A view to display the emulator's memory.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -49,9 +52,8 @@ impl View for MemoryView {
     }
 
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         self.display_memory_editor(state, ui);
-        ViewResponse::none()
     }
 
 
@@ -68,6 +70,9 @@ impl View for MemoryView {
 
 impl MemoryView {
     fn on_ui_event(&mut self, event: &UiEvent) {
+        use Selected::*;
+        use Kind::*;
+
         let get_sprite_address_range = |sprite_index: usize| -> Range<usize> {
             let address_begin = (sprite_index * 16) + MEMORY_LOCATION_SPRITES_BEGIN as usize;
             let address_end   = address_begin + 16;
@@ -81,32 +86,28 @@ impl MemoryView {
         };
 
         match event {
-            UiEvent::SpriteSelected(sprite_index) => {
+            SelectionChanged(Selection, Some(Sprite(sprite_index))) => {
                 let address_range = get_sprite_address_range(*sprite_index);
                 self.memory_editor.set_highlighted_range(address_range);
             }
 
-            UiEvent::SpriteDeselected(sprite_index) => {
-                let address_range = get_sprite_address_range(*sprite_index);
-                self.memory_editor.clear_highlighted_range(address_range);
-            }
-
-            UiEvent::OamEntrySelected(oam_index) => {
+            SelectionChanged(Selection, Some(OamEntry(oam_index))) => {
                 let address_range = get_oam_address_range(*oam_index);
                 self.memory_editor.set_highlighted_range(address_range);
             }
 
-            UiEvent::OamEntryDeselected(oam_index) => {
-                let address_range = get_oam_address_range(*oam_index);
-                self.memory_editor.clear_highlighted_range(address_range);
+            SelectionChanged(Selection, None) => {
+                self.memory_editor.clear_highlight();
             }
+
+            _ => { }
         }
     }
 
 
     /// Refreshes the memory map of the editor.
     fn refresh_memory_map(&mut self, state: &mut EmulatorState) {
-        let has_cartridge_ram = if let Some(cart) = state.get_cartridge() {
+        let has_cartridge_ram = if let Some(cart) = state.emu.get_cartridge() {
             cart.has_ram()
         }
         else {
@@ -130,9 +131,9 @@ impl MemoryView {
 
     /// Display the memory editor.
     fn display_memory_editor(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
-        let is_paused = state.is_paused();
+        let is_paused = state.ui.is_paused();
 
-        if let Some(emu) = state.get_emulator_mut() {
+        if let Some(emu) = state.emu.get_emulator_mut() {
             // allow editing while paused
             self.memory_editor.set_editable(is_paused);
 

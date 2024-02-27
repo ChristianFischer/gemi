@@ -20,10 +20,10 @@ use egui::{ComboBox, Direction, Image, Label, Layout, TextStyle, Ui, Widget};
 use egui_extras::{Column, TableBuilder, TableRow};
 use gemi_core::ppu::ppu::Ppu;
 use crate::event::UiEvent;
-use crate::state::EmulatorState;
+use crate::selection::Selected;
+use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
-use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -81,12 +81,12 @@ impl View for OamView {
     }
 
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
-        let mut response = ViewResponse::none();
-        let is_paused = state.is_paused();
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+        let is_paused = state.ui.is_paused();
 
-        if let Some(emu) = state.get_emulator_mut() {
+        if let Some(emu) = state.emu.get_emulator_mut() {
             let is_gbc      = emu.get_config().is_gbc_enabled();
+            let ui_states   = &mut state.ui;
             let text_height = ui.text_style_height(&TextStyle::Monospace);
 
             // take the highest value of either the text height or the sprite display size
@@ -131,22 +131,19 @@ impl View for OamView {
                                 item_height,
                                 OAM_ENTRIES,
                                 |row| {
-                                    let row_response = self.display_entry(
+                                    self.display_entry(
+                                            ui_states,
                                             row,
                                             &mut emu.get_peripherals_mut().ppu,
                                             item_height,
                                             is_paused,
                                             is_gbc
                                     );
-
-                                    response.add(row_response);
                                 }
                         )
                     })
             ;
         }
-
-        response
     }
 
 
@@ -163,22 +160,17 @@ impl View for OamView {
 
 impl OamView {
     /// Select a single entry in this list by it's index.
-    pub fn select_entry(&mut self, oam_index: usize) -> ViewResponse {
+    pub fn select_entry(&mut self, ui_states: &mut UiStates, oam_index: usize) {
+        ui_states.selection.select(Selected::OamEntry(oam_index));
         self.selected_entry = Some(oam_index);
-
-        ViewResponse::event(UiEvent::OamEntrySelected(oam_index))
     }
 
 
     /// Deselect a specific entry if it was selected before.
-    pub fn clear_selection(&mut self) -> ViewResponse {
+    pub fn clear_selection(&mut self, ui_states: &mut UiStates) {
         if let Some(oam_index) = self.selected_entry {
+            ui_states.selection.clear(Selected::OamEntry(oam_index));
             self.selected_entry = None;
-
-            ViewResponse::event(UiEvent::OamEntryDeselected(oam_index))
-        }
-        else {
-            ViewResponse::none()
         }
     }
 }
@@ -187,12 +179,13 @@ impl OamView {
 impl OamView {
     fn display_entry(
             &mut self,
+            ui_states: &mut UiStates,
             mut table_row: TableRow,
             ppu: &mut Ppu,
             row_height: f32,
             is_paused: bool,
             is_gbc: bool
-    ) -> ViewResponse {
+    ) {
         let oam_index  = table_row.index();
         let tile_index = ppu.get_oam_mut()[oam_index].tile as usize;
         let bank       = ppu.get_oam()[oam_index].get_gbc_vram_bank();
@@ -325,13 +318,11 @@ impl OamView {
         // handle click
         if table_row.response().clicked() {
             return if is_selected {
-                self.clear_selection()
+                self.clear_selection(ui_states)
             }
             else {
-                self.select_entry(oam_index)
+                self.select_entry(ui_states, oam_index)
             }
         }
-
-        ViewResponse::none()
     }
 }

@@ -282,6 +282,12 @@ impl<Source> MemoryEditor<Source> {
             _ => {}
         }
     }
+    
+    
+    /// Clears any highlighted address range.
+    pub fn clear_highlight(&mut self) {
+        self.state.highlighted_address_range = None;
+    }
 
 
     /// Stores the address which should be edited and let the memory

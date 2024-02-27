@@ -16,14 +16,17 @@
  */
 
 use std::path::Path;
+
 use gemi_core::cartridge::Cartridge;
 use gemi_core::gameboy::GameBoy;
 use gemi_core::input::InputButton;
 use gemi_utils::keybindings::KeyBindings;
 
+use crate::selection::{Kind, Selection};
 
 /// An enum to store the different update modes of the emulator
 /// inside of this debugger application.
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum UpdateMode {
     /// The execution of the emulator is currently paused.
     Paused,
@@ -45,18 +48,42 @@ pub enum UpdateMode {
 /// This provides functionality to load ROMs and serialize the emulator state.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct EmulatorState {
+    /// The actual state of the emulator, which also
+    /// contains the emulator instance itself.
+    pub emu: EmulatorInstance,
+
+    /// Various states of the UI, which contains the state of buttons
+    /// or any active selection.
+    pub ui: UiStates,
+}
+
+
+/// An object to store the instance of a running emulator
+/// and to provide functionality to run the emulation.
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct EmulatorInstance {
     /// The actual instance of the emulator.
     /// Will be [None] if no ROM is loaded.
     #[serde(skip)]
-    emu: Option<GameBoy>,
+    gb: Option<GameBoy>,
+}
 
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct UiStates {
     /// The key bindings used to control the emulator.
     #[serde(skip)]
     key_bindings: KeyBindings<egui::Key>,
 
     /// The current update mode of the emulator.
-    #[serde(skip)]
     update_mode: UpdateMode,
+
+    /// Describes the currently selected item within the UI.
+    pub selection: Selection,
+    
+    /// While moving the mouse cursor over the UI, this will contain the
+    /// currently hovered item.
+    pub hover: Selection,
 }
 
 
@@ -82,23 +109,30 @@ impl EmulatorState {
         builder.set_cartridge(cartridge);
 
         // finish & initialize
-        let mut emu = builder.finish()?;
-        emu.initialize();
+        let mut gb = builder.finish()?;
+        gb.initialize();
 
         // reset key states after emulator loading
-        self.key_bindings.reset_key_states(&mut emu);
+        self.ui.key_bindings.reset_key_states(&mut gb);
 
         // store the new emulator instance
-        self.emu = Some(emu);
+        self.emu.gb = Some(gb);
 
         // success!
         Ok(())
     }
 
 
+    /// Checks whether the emulator is currently running or not.
+    /// This will be the case if the emulator is loaded and not paused.
+    pub fn is_running(&self) -> bool {
+        self.emu.is_emulator_loaded() && !self.ui.is_paused()
+    }
+
+
     /// Update the emulator, if any.
     pub fn update(&mut self) {
-        self.update_mode = match self.update_mode {
+        self.ui.update_mode = match self.ui.update_mode {
             // stay in pause state
             UpdateMode::Paused => {
                 UpdateMode::Paused
@@ -106,13 +140,13 @@ impl EmulatorState {
 
             // process the next frame and stay in continuous mode
             UpdateMode::Continuous => {
-                self.process_frame();
+                self.emu.process_frame();
                 UpdateMode::Continuous
             }
 
             // process the next frame and switch into pause mode
             UpdateMode::StepFrame => {
-                self.process_frame();
+                self.emu.process_frame();
                 UpdateMode::Paused
             }
 
@@ -127,27 +161,29 @@ impl EmulatorState {
 
     /// Forward key events into the emulator.
     pub fn set_key_pressed(&mut self, key: egui::Key, pressed: bool) {
-        if let Some(emu) = &mut self.emu {
-            self.key_bindings.set_key_pressed_and_fwd(key, pressed, emu);
+        if let Some(gb) = &mut self.emu.gb {
+            self.ui.key_bindings.set_key_pressed_and_fwd(key, pressed, gb);
         }
     }
+}
 
 
+impl EmulatorInstance {
     /// Get the currently running emulator instance.
     pub fn get_emulator(&self) -> Option<&GameBoy> {
-        self.emu.as_ref()
+        self.gb.as_ref()
     }
 
 
     /// Get the currently running emulator instance.
     pub fn get_emulator_mut(&mut self) -> Option<&mut GameBoy> {
-        self.emu.as_mut()
+        self.gb.as_mut()
     }
 
 
     /// Check if an emulator instance is currently loaded.
     pub fn is_emulator_loaded(&self) -> bool {
-        self.emu.is_some()
+        self.gb.is_some()
     }
 
 
@@ -158,6 +194,16 @@ impl EmulatorState {
     }
 
 
+    /// Process a single frame of the emulator, if any.
+    pub fn process_frame(&mut self) {
+        if let Some(emu) = self.get_emulator_mut() {
+            emu.process_frame();
+        }
+    }
+}
+
+
+impl UiStates {
     /// Get the current update mode of the emulator.
     pub fn get_update_mode(&self) -> &UpdateMode {
         &self.update_mode
@@ -173,24 +219,9 @@ impl EmulatorState {
     }
 
 
-    /// Checks whether the emulator is currently running or not.
-    /// This will be the case if the emulator is loaded and not paused.
-    pub fn is_running(&self) -> bool {
-        self.is_emulator_loaded() && !self.is_paused()
-    }
-
-
     /// Change the emulator's update mode.
     pub fn set_update_mode(&mut self, mode: UpdateMode) {
         self.update_mode = mode;
-    }
-
-
-    /// Process a single frame of the emulator, if any.
-    pub fn process_frame(&mut self) {
-        if let Some(emu) = self.get_emulator_mut() {
-            emu.process_frame();
-        }
     }
 }
 
@@ -215,9 +246,16 @@ fn make_default_key_bindings() -> KeyBindings<egui::Key> {
 impl Default for EmulatorState {
     fn default() -> Self {
         Self {
-            emu: None,
-            key_bindings: make_default_key_bindings(),
-            update_mode: UpdateMode::Paused,
+            emu: EmulatorInstance {
+                gb: None,
+            },
+
+            ui: UiStates {
+                key_bindings: make_default_key_bindings(),
+                update_mode: UpdateMode::Paused,
+                selection: Selection::new(Kind::Selection),
+                hover: Selection::new(Kind::Hover),
+            },
         }
     }
 }

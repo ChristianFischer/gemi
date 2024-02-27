@@ -25,10 +25,10 @@ mod views;
 mod app;
 mod behaviour;
 mod event;
+mod selection;
 mod state;
 mod strings;
 mod ui;
-mod view_response;
 
 
 /// Load the application. If possible, try to load the application state

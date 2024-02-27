@@ -18,11 +18,10 @@
 use std::cmp::max;
 use egui::{Grid, Image, Label, ScrollArea, Ui, Vec2, Widget};
 use gemi_core::ppu::ppu::Ppu;
-use crate::event::UiEvent;
-use crate::state::EmulatorState;
+use crate::selection::Selected;
+use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
-use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -51,8 +50,10 @@ impl View for SpritesView {
     }
 
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
-        if let Some(emu) = state.get_emulator() {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+        if let Some(emu) = state.emu.get_emulator() {
+            let ui_states = &mut state.ui;
+
             let scroll_area = ScrollArea::vertical()
                     .id_source("sprites_scroll_area")
                     .auto_shrink([false, false])
@@ -76,8 +77,6 @@ impl View for SpritesView {
                                 .num_columns(items_per_row)
                                 .spacing([item_spacing, item_spacing])
                                 .show(ui, |ui| {
-                                    let mut response = ViewResponse::none();
-
                                     for row in display_rows {
                                         let first_sprite_in_row = row * items_per_row;
 
@@ -98,22 +97,19 @@ impl View for SpritesView {
                                             let sprite_index = first_sprite_in_row + item_in_row;
 
                                             if sprite_index < TOTAL_SPRITES {
-                                                let item_response = self.display_sprite(ui, ppu, sprite_index);
-                                                response.add(item_response);
+                                                self.display_sprite(
+                                                        ui,
+                                                        ui_states,
+                                                        ppu,
+                                                        sprite_index
+                                                );
                                             }
                                         }
 
                                         ui.end_row();
                                     }
-
-                                    response
                                 })
-                                .inner
-                    })
-                    .inner
-        }
-        else {
-            ViewResponse::none()
+                    });
         }
     }
 }
@@ -121,22 +117,17 @@ impl View for SpritesView {
 
 impl SpritesView {
     /// Select a single sprite in this list by it's index.
-    pub fn select_sprite(&mut self, sprite_index: usize) -> ViewResponse {
+    pub fn select_sprite(&mut self, ui_states: &mut UiStates, sprite_index: usize) {
+        ui_states.selection.select(Selected::Sprite(sprite_index));
         self.selected_sprite = Some(sprite_index);
-
-        ViewResponse::event(UiEvent::SpriteSelected(sprite_index))
     }
 
 
     /// Deselect a specific sprite if it was selected before.
-    pub fn clear_selection(&mut self) -> ViewResponse {
+    pub fn clear_selection(&mut self, ui_states: &mut UiStates) {
         if let Some(sprite_index) = self.selected_sprite {
+            ui_states.selection.clear(Selected::Sprite(sprite_index));
             self.selected_sprite = None;
-
-            ViewResponse::event(UiEvent::SpriteDeselected(sprite_index))
-        }
-        else {
-            ViewResponse::none()
         }
     }
 }
@@ -144,7 +135,7 @@ impl SpritesView {
 
 impl SpritesView {
     /// Display a single sprite within the grid.
-    fn display_sprite(&mut self, ui: &mut Ui, ppu: &Ppu, sprite_index: usize) -> ViewResponse {
+    fn display_sprite(&mut self, ui: &mut Ui, ui_states: &mut UiStates, ppu: &Ppu, sprite_index: usize) {
         let sprite  = ppu.get_sprite_image(sprite_index, 0);
         let texture = sprite_cache::get_texture_for(ui, &sprite);
 
@@ -172,13 +163,11 @@ impl SpritesView {
 
         if response.clicked() {
             return if is_selected {
-                self.clear_selection()
+                self.clear_selection(ui_states)
             }
             else {
-                self.select_sprite(sprite_index)
+                self.select_sprite(ui_states, sprite_index)
             }
         }
-
-        ViewResponse::none()
     }
 }

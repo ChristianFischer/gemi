@@ -21,7 +21,6 @@ use gemi_core::gameboy::GameBoy;
 use gemi_core::utils::to_u8;
 use crate::state::EmulatorState;
 use crate::ui::style::GemiStyle;
-use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -85,11 +84,9 @@ impl View for CpuView {
         "CPU"
     }
 
-    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) -> ViewResponse {
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         self.display_registers(ui, state);
         self.display_cpu_flags(ui, state);
-
-        ViewResponse::none()
     }
 }
 
@@ -162,7 +159,7 @@ impl CpuView {
         ui.separator();
 
         // Interrupts and HALT flags (readonly)
-        if let Some(emu) = state.get_emulator_mut() {
+        if let Some(emu) = state.emu.get_emulator_mut() {
             let mut is_ime  = emu.cpu.is_interrupts_enabled();
             let mut is_halt = emu.cpu.is_running() == false;
             ui.checkbox(&mut is_ime,  "Interrupts Enabled");
@@ -242,9 +239,9 @@ impl CpuView {
         on_read_value: impl FnOnce(&GameBoy) -> String,
         on_write_value: impl FnOnce(&mut GameBoy, &String)
     ) {
-        let is_paused = state.is_paused();
+        let is_paused = state.ui.is_paused();
 
-        if let Some(emu) = state.get_emulator_mut() {
+        if let Some(emu) = state.emu.get_emulator_mut() {
             let style = &GemiStyle::VALUE_HIGHLIGHTED;
             let is_in_edit_mode = self.rt.edit_mode == expected_edit_mode;
             let value_str = on_read_value(emu);
@@ -322,7 +319,7 @@ impl CpuView {
             CpuFlag::Carry     => "Carry",
         };
 
-        if let Some(emu) = state.get_emulator_mut() {
+        if let Some(emu) = state.emu.get_emulator_mut() {
             let mut flag_value = emu.cpu.is_flag_set(flag);
 
             if ui.checkbox(&mut flag_value, name).clicked_by(PointerButton::Primary) {

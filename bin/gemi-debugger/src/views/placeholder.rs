@@ -17,7 +17,6 @@
 
 use egui::Ui;
 use crate::state::EmulatorState;
-use crate::view_response::ViewResponse;
 use crate::views::View;
 
 
@@ -45,7 +44,6 @@ impl View for PlaceholderView {
     }
 
 
-    fn ui(&mut self, _state: &mut EmulatorState, _ui: &mut Ui) -> ViewResponse {
-        ViewResponse::none()
+    fn ui(&mut self, _state: &mut EmulatorState, _ui: &mut Ui) {
     }
 }
