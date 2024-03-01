@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,14 @@
  */
 
 use std::cmp::max;
-use egui::{Grid, Image, Label, ScrollArea, Ui, Vec2, Widget};
+
+use egui::{Color32, Grid, Image, Label, ScrollArea, Ui, Vec2, Widget};
+
 use gemi_core::ppu::ppu::Ppu;
-use crate::selection::Selected;
+
+use crate::event::UiEvent;
+use crate::selection::Kind;
+use crate::selection::Selected::Sprite;
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
@@ -31,14 +36,16 @@ const SPRITE_DISPLAY_SIZE : f32 = 64.0;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SpritesView {
-    selected_sprite: Option<usize>,
+    sprite_selected: Option<usize>,
+    sprite_hovered:  Option<usize>,
 }
 
 
 impl SpritesView {
     pub fn new() -> Self {
         Self {
-            selected_sprite: None,
+            sprite_selected: None,
+            sprite_hovered:  None,
         }
     }
 }
@@ -112,22 +119,23 @@ impl View for SpritesView {
                     });
         }
     }
-}
 
 
-impl SpritesView {
-    /// Select a single sprite in this list by it's index.
-    pub fn select_sprite(&mut self, ui_states: &mut UiStates, sprite_index: usize) {
-        ui_states.selection.select(Selected::Sprite(sprite_index));
-        self.selected_sprite = Some(sprite_index);
-    }
+    fn handle_ui_event(&mut self, event: &UiEvent) {
+        match event {
+            UiEvent::SelectionChanged(Kind::Selection, Some(Sprite(sprite_index))) => {
+                self.sprite_selected = Some(*sprite_index);
+            },
 
+            UiEvent::SelectionChanged(Kind::Hover, Some(Sprite(sprite_index))) => {
+                self.sprite_hovered = Some(*sprite_index);
+            },
 
-    /// Deselect a specific sprite if it was selected before.
-    pub fn clear_selection(&mut self, ui_states: &mut UiStates) {
-        if let Some(sprite_index) = self.selected_sprite {
-            ui_states.selection.clear(Selected::Sprite(sprite_index));
-            self.selected_sprite = None;
+            UiEvent::SelectionChanged(Kind::Hover, None) => {
+                self.sprite_hovered = None;
+            },
+
+            _ => { }
         }
     }
 }
@@ -139,20 +147,15 @@ impl SpritesView {
         let sprite  = ppu.get_sprite_image(sprite_index, 0);
         let texture = sprite_cache::get_texture_for(ui, &sprite);
 
-        let is_selected = self.selected_sprite == Some(sprite_index);
+        let is_selected = self.sprite_selected == Some(sprite_index);
+        let is_hovered  = self.sprite_hovered  == Some(sprite_index);
 
         // draw background if selected
         if is_selected {
-            let sprite_bounds = egui::Rect::from_min_size(
-                ui.cursor().left_top(),
-                Vec2::splat(SPRITE_DISPLAY_SIZE)
-            ).expand(3.0);
-
-            ui.painter().rect_filled(
-                sprite_bounds,
-                3.0,
-                GemiStyle::BACKGROUND_HIGHLIGHT,
-            );
+            Self::draw_highlight(ui, &GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION);
+        }
+        else if is_hovered {
+            Self::draw_highlight(ui, &GemiStyle::BACKGROUND_HIGHLIGHT_HOVER);
         }
 
         let response = Image::new(&texture)
@@ -161,13 +164,27 @@ impl SpritesView {
                 .ui(ui)
         ;
 
+        // handle hover state
+        ui_states.hover.set(Sprite(sprite_index), response.hovered());
+
+        // handle click
         if response.clicked() {
-            return if is_selected {
-                self.clear_selection(ui_states)
-            }
-            else {
-                self.select_sprite(ui_states, sprite_index)
-            }
+            ui_states.selection.toggle(Sprite(sprite_index));
         }
+    }
+
+
+    /// Draw a highlight for the current sprite.
+    fn draw_highlight(ui: &mut Ui, color: &Color32) {
+        let sprite_bounds = egui::Rect::from_min_size(
+            ui.cursor().left_top(),
+            Vec2::splat(SPRITE_DISPLAY_SIZE)
+        ).expand(3.0);
+
+        ui.painter().rect_filled(
+            sprite_bounds,
+            3.0,
+            *color,
+        );
     }
 }

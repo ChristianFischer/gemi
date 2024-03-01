@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ use crate::event::UiEvent::SelectionChanged;
 use crate::selection::{Kind, Selected};
 use crate::state::EmulatorState;
 use crate::ui::memory_editor::MemoryEditor;
+use crate::ui::style::GemiStyle;
 use crate::views::View;
 
 /// A view to display the emulator's memory.
@@ -39,8 +40,14 @@ pub struct MemoryView {
 impl MemoryView {
     /// Creates a new [`MemoryView`] object.
     pub fn new() -> Self {
+        let mut memory_editor = MemoryEditor::new();
+        
+        // prepare two types of highlights, one for selections one for hover
+        memory_editor.add_highlight_range(GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION);
+        memory_editor.add_highlight_range(GemiStyle::BACKGROUND_HIGHLIGHT_HOVER);
+
         Self {
-            memory_editor: MemoryEditor::new(),
+            memory_editor,
         }
     }
 }
@@ -73,6 +80,13 @@ impl MemoryView {
         use Selected::*;
         use Kind::*;
 
+        let get_highlight_index = |kind: &Kind| -> usize {
+            match kind {
+                Selection => 0,
+                Hover     => 1,
+            }
+        };
+
         let get_sprite_address_range = |sprite_index: usize| -> Range<usize> {
             let address_begin = (sprite_index * 16) + MEMORY_LOCATION_SPRITES_BEGIN as usize;
             let address_end   = address_begin + 16;
@@ -86,18 +100,24 @@ impl MemoryView {
         };
 
         match event {
-            SelectionChanged(Selection, Some(Sprite(sprite_index))) => {
-                let address_range = get_sprite_address_range(*sprite_index);
-                self.memory_editor.set_highlighted_range(address_range);
+            SelectionChanged(kind, Some(Sprite(sprite_index))) => {
+                self.memory_editor.set_highlighted_range(
+                        get_highlight_index(kind),
+                        get_sprite_address_range(*sprite_index)
+                );
             }
 
-            SelectionChanged(Selection, Some(OamEntry(oam_index))) => {
-                let address_range = get_oam_address_range(*oam_index);
-                self.memory_editor.set_highlighted_range(address_range);
+            SelectionChanged(kind, Some(OamEntry(oam_index))) => {
+                self.memory_editor.set_highlighted_range(
+                        get_highlight_index(kind),
+                        get_oam_address_range(*oam_index)
+                );
             }
 
-            SelectionChanged(Selection, None) => {
-                self.memory_editor.clear_highlight();
+            SelectionChanged(kind, None) => {
+                self.memory_editor.clear_highlight(
+                        get_highlight_index(kind)
+                );
             }
 
             _ => { }

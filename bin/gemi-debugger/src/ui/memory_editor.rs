@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@ use std::cmp::{max, min};
 use std::marker::PhantomData;
 use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
-use egui::{Grid, Id, Label, Key, PointerButton, pos2, ScrollArea, Sense, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText, Stroke};
+
+use eframe::epaint::Color32;
+use egui::{Grid, Id, Key, Label, PointerButton, pos2, ScrollArea, Sense, Stroke, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
 use egui::collapsing_header::{CollapsingState, paint_default_icon};
 use egui::text_edit::TextEditOutput;
+
 use crate::ui::style::GemiStyle;
 
 
@@ -78,11 +81,23 @@ struct MemoryEditorState {
     /// The currently selected memory address.
     selected_address: usize,
 
-    /// An address range to be highlighted, if set.
-    highlighted_address_range: Option<Range<usize>>,
+    /// A set of address ranges to be highlighted.
+    highlighted_address_ranges: Vec<HighlightAddressRange>,
 
     /// Whether editing the memory values is enabled or not.
     is_editable: bool,
+}
+
+
+/// A struct to describe highlighted areas within the memory editor.
+/// Each highlight has a color and a range, which should be displayed.
+#[derive(serde::Serialize, serde::Deserialize)]
+struct HighlightAddressRange {
+    /// This highlight's color.
+    color: Color32,
+
+    /// The actual range to be highlighted.
+    range: Option<Range<usize>>,
 }
 
 
@@ -167,7 +182,7 @@ impl<Source> MemoryEditor<Source> {
 
             state: MemoryEditorState {
                 selected_address: 0,
-                highlighted_address_range: None,
+                highlighted_address_ranges: Vec::new(),
                 is_editable: false,
             }
         }
@@ -258,35 +273,59 @@ impl<Source> MemoryEditor<Source> {
 
         None
     }
+    
+    
+    /// Adds a new highlight range to the memory editor.
+    /// The range will have a color assigned, but the actual range has to be set
+    /// using [set_highlight_range], given the index returned by this function.
+    pub fn add_highlight_range(&mut self, color: Color32) -> usize {
+        let new_index = self.state.highlighted_address_ranges.len();
+        
+        self.state.highlighted_address_ranges.push(HighlightAddressRange {
+            color,
+            range: None,
+        });
+        
+        new_index
+    }
 
 
     /// Get the currently highlighted address range.
-    pub fn get_highlighted_range(&self) -> Option<&Range<usize>> {
-        self.state.highlighted_address_range.as_ref()
+    pub fn get_highlighted_range(&self, index: usize) -> Option<&Range<usize>> {
+        self.state.highlighted_address_ranges
+                .get(index)
+                .map(|r| r.range.as_ref())
+                .flatten()
     }
 
 
     /// Set the currently highlighted address range.
-    pub fn set_highlighted_range(&mut self, range: Range<usize>) {
-        self.state.highlighted_address_range = Some(range);
+    pub fn set_highlighted_range(&mut self, index: usize, range: Range<usize>) {
+        if let Some(element) = self.state.highlighted_address_ranges.get_mut(index) {
+            element.range = Some(range);
+        }
     }
 
 
     /// Clears a previously set highlight range.
-    pub fn clear_highlighted_range(&mut self, range: Range<usize>) {
-        match &self.state.highlighted_address_range {
-            Some(selected_range) if *selected_range == range => {
-                self.state.highlighted_address_range = None;
-            }
+    pub fn clear_highlighted_range(&mut self, index: usize, range: Range<usize>) {
+        if let Some(element) = self.state.highlighted_address_ranges.get_mut(index) {
+            match &element.range {
+                Some(selected_range) if *selected_range == range => {
+                    element.range = None;
+                }
 
-            _ => {}
+                _ => {}
+            }
         }
     }
     
     
     /// Clears any highlighted address range.
-    pub fn clear_highlight(&mut self) {
-        self.state.highlighted_address_range = None;
+    pub fn clear_highlight(&mut self, index: usize) {
+        if let Some(element) = self.state.highlighted_address_ranges.get_mut(index) {
+            element.range = None;
+        }
     }
 
 
@@ -666,48 +705,50 @@ impl<Source> MemoryEditor<Source> {
         }
 
         // check if there is a memory range selected to be highlighted
-        if let Some(highlight_range) = &self.state.highlighted_address_range {
-            if
-                    highlight_range.start < line_address_range.end
-                &&  highlight_range.end   > line_address_range.start
-            {
-                // determine the start and end of the highlight capped to the line boundaries
-                let first_cell = max(line_address_range.start, highlight_range.start).saturating_sub(start_address);
-                let last_cell  = min(line_address_range.end, highlight_range.end).saturating_sub(start_address + 1);
+        for highlight in &self.state.highlighted_address_ranges {
+            if let Some(highlight_range) = &highlight.range {
+                if
+                        highlight_range.start < line_address_range.end 
+                    &&  highlight_range.end > line_address_range.start
+                {
+                    // determine the start and end of the highlight capped to the line boundaries
+                    let first_cell = max(line_address_range.start, highlight_range.start).saturating_sub(start_address);
+                    let last_cell  = min(line_address_range.end, highlight_range.end).saturating_sub(start_address + 1);
 
-                // compute the position and size of the highlighted area
-                let offset_begin    = self.compute_memory_cell_offset(ui, first_cell);
-                let offset_end      = self.compute_memory_cell_offset(ui, last_cell) + self.rt.memory_cell_width;
-                let highlight_width = offset_end - offset_begin;
+                    // compute the position and size of the highlighted area
+                    let offset_begin    = self.compute_memory_cell_offset(ui, first_cell);
+                    let offset_end      = self.compute_memory_cell_offset(ui, last_cell) + self.rt.memory_cell_width;
+                    let highlight_width = offset_end - offset_begin;
 
-                // the boundaries of the highlight
-                let highlight_bounds = egui::Rect::from_min_size(
-                    pos2(
-                        ui.cursor().left_top().x + self.rt.column_width_address + item_spacing + offset_begin - 2.0,
-                        ui.cursor().left_top().y
-                    ),
-                    vec2(
-                        highlight_width + 5.0,
-                        self.rt.line_distance_y
-                    )
-                );
+                    // the boundaries of the highlight
+                    let highlight_bounds = egui::Rect::from_min_size(
+                        pos2(
+                            ui.cursor().left_top().x + self.rt.column_width_address + item_spacing + offset_begin - 2.0,
+                            ui.cursor().left_top().y
+                        ),
+                        vec2(
+                            highlight_width + 5.0,
+                            self.rt.line_distance_y
+                        )
+                    );
 
-                // draw the highlight
-                if is_line_hovered || is_line_selected {
-                    // just an outline if selected
-                    ui.painter().rect_stroke(
+                    // draw the highlight
+                    if is_line_hovered || is_line_selected {
+                        // just an outline if selected
+                        ui.painter().rect_stroke(
                             highlight_bounds,
                             2.0,
-                            Stroke::new(2.0, GemiStyle::BACKGROUND_HIGHLIGHT)
-                    );
-                }
-                else {
-                    // fully filled if not selected
-                    ui.painter().rect_filled(
-                            highlight_bounds,
-                            2.0,
-                            GemiStyle::BACKGROUND_HIGHLIGHT
-                    );
+                            Stroke::new(2.0, highlight.color)
+                        );
+                    } 
+                    else {
+                        // fully filled if not selected
+                        ui.painter().rect_filled(
+                                highlight_bounds,
+                                2.0,
+                                highlight.color
+                        );
+                    }
                 }
             }
         }

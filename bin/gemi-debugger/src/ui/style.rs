@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  */
 
 use egui::{Color32, RichText, TextStyle};
-
 
 /// A collection of style values defining the application theme.
 pub struct GemiStyle;
@@ -74,7 +73,8 @@ impl Default for TextFormatting {
 
 impl GemiStyle {
     /// The background color of highlighted areas.
-    pub const BACKGROUND_HIGHLIGHT: Color32 = Color32::from_rgb(0x00, 0x7e, 0xe1);
+    pub const BACKGROUND_HIGHLIGHT_SELECTION: Color32 = Color32::from_rgb(0x00, 0x7e, 0xe1);
+    pub const BACKGROUND_HIGHLIGHT_HOVER:     Color32 = Color32::from_rgb(0x7e, 0xb5, 0xe1);
 
     /// Text formatting to display addresses.
     pub const ADDRESS: TextFormatting = TextFormatting {

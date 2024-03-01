@@ -17,6 +17,7 @@
 
 use crate::event::UiEvent;
 
+
 /// A struct describing an item currently being selected or highlighted.
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(PartialEq, Clone)]
@@ -24,7 +25,7 @@ pub enum Selected {
     /// The selection is on a sprite, which is defined by its index within
     /// the video memory.
     Sprite(usize),
-    
+
     /// The selection is on an entry within the OAM table, defined by its index.
     OamEntry(usize),
 }
@@ -83,6 +84,17 @@ impl Selection {
     }
 
 
+    /// Either sets or clears the given selection, depending on the flag.
+    pub fn set(&mut self, selection: Selected, is_selected: bool) {
+        if is_selected {
+            self.select(selection);
+        }
+        else {
+            self.clear(selection);
+        }
+    }
+
+
     /// Change the active selection by selecting a new item.
     /// This will cause a [UiEvent::SelectionChanged] event in the next frame.
     pub fn select(&mut self, selection: Selected) {
@@ -90,6 +102,20 @@ impl Selection {
             self.selection = Some(selection);
             self.changed   = true;
         }
+    }
+
+
+    /// Toggles a specific selection.
+    /// Either the given [Selection] becomes the active one, or, if already
+    /// selected, it will be deselected and the current selection being cleared.
+    pub fn toggle(&mut self, selection: Selected) {
+        if self.selection.as_ref() != Some(&selection) {
+            self.selection = Some(selection);
+        } else {
+            self.selection = None;
+        }
+
+        self.changed = true;
     }
 
 

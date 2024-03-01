@@ -18,9 +18,12 @@
 use eframe::emath::{Align, Vec2};
 use egui::{ComboBox, Direction, Image, Label, Layout, TextStyle, Ui, Widget};
 use egui_extras::{Column, TableBuilder, TableRow};
+
 use gemi_core::ppu::ppu::Ppu;
+
 use crate::event::UiEvent;
-use crate::selection::Selected;
+use crate::selection::Kind;
+use crate::selection::Selected::OamEntry;
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
@@ -148,30 +151,18 @@ impl View for OamView {
 
 
     fn handle_ui_event(&mut self, event: &UiEvent) {
-        _ = event;
+        match event {
+            UiEvent::SelectionChanged(Kind::Selection, Some(OamEntry(oam_index))) => {
+                self.selected_entry = Some(*oam_index);
+            }
+
+            _ => { }
+        }
     }
 
 
     fn on_emulator_loaded(&mut self, state: &mut EmulatorState) {
         _ = state;
-    }
-}
-
-
-impl OamView {
-    /// Select a single entry in this list by it's index.
-    pub fn select_entry(&mut self, ui_states: &mut UiStates, oam_index: usize) {
-        ui_states.selection.select(Selected::OamEntry(oam_index));
-        self.selected_entry = Some(oam_index);
-    }
-
-
-    /// Deselect a specific entry if it was selected before.
-    pub fn clear_selection(&mut self, ui_states: &mut UiStates) {
-        if let Some(oam_index) = self.selected_entry {
-            ui_states.selection.clear(Selected::OamEntry(oam_index));
-            self.selected_entry = None;
-        }
     }
 }
 
@@ -315,14 +306,12 @@ impl OamView {
         // Remainder
         table_row.col(|_| { });
 
+        // handle hover state
+        ui_states.hover.set(OamEntry(oam_index), table_row.response().hovered());
+
         // handle click
         if table_row.response().clicked() {
-            return if is_selected {
-                self.clear_selection(ui_states)
-            }
-            else {
-                self.select_entry(ui_states, oam_index)
-            }
+            ui_states.selection.toggle(OamEntry(oam_index));
         }
     }
 }
