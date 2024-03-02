@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 
 use std::fmt::{Debug, Display, Formatter, LowerHex, UpperHex};
+
 use crate::utils::get_bit;
 
 
@@ -305,6 +306,17 @@ impl TileSet {
     }
 
     /// Get the address of a tile when this tileset is used.
+    /// ````
+    /// use gemi_core::ppu::graphic_data::TileSet;
+    ///
+    /// assert_eq!(0x8000, TileSet::H8000.address_of_tile(0));
+    /// assert_eq!(0x8800, TileSet::H8000.address_of_tile(128));
+    /// assert_eq!(0x8ff0, TileSet::H8000.address_of_tile(255));
+    ///
+    /// assert_eq!(0x9000, TileSet::H8800.address_of_tile(0));
+    /// assert_eq!(0x8800, TileSet::H8800.address_of_tile(128));
+    /// assert_eq!(0x8ff0, TileSet::H8800.address_of_tile(255));
+    /// ````
     pub fn address_of_tile(&self, tile: u8) -> u16 {
         let tile_u16 = tile as u16;
 
@@ -312,6 +324,55 @@ impl TileSet {
             TileSet::H8000 => 0x8000 + (tile_u16 << 4),
             TileSet::H8800 => 0x9000 + (tile_u16 << 4) - ((tile_u16 & 0x80) << 5),
         }
+    }
+
+
+    /// Get the index of a tile with the current tileset in use.
+    /// This may result in [None] when the address is outside the range
+    /// of this tileset or if the address is not a multiple of 16.
+    /// ````
+    /// use gemi_core::ppu::graphic_data::TileSet;
+    ///
+    /// assert_eq!(Some(0),   TileSet::H8000.get_tile_index_by_address(0x8000));
+    /// assert_eq!(Some(128), TileSet::H8000.get_tile_index_by_address(0x8800));
+    /// assert_eq!(Some(255), TileSet::H8000.get_tile_index_by_address(0x8ff0));
+    /// assert_eq!(None,      TileSet::H8000.get_tile_index_by_address(0x9000));
+    ///
+    /// assert_eq!(None,      TileSet::H8800.get_tile_index_by_address(0x8000));
+    /// assert_eq!(Some(128), TileSet::H8800.get_tile_index_by_address(0x8800));
+    /// assert_eq!(Some(255), TileSet::H8800.get_tile_index_by_address(0x8ff0));
+    /// assert_eq!(Some(0),   TileSet::H8800.get_tile_index_by_address(0x9000));
+    ///
+    /// assert_eq!(None,      TileSet::H8000.get_tile_index_by_address(0x8801));
+    /// assert_eq!(None,      TileSet::H8800.get_tile_index_by_address(0x8801));
+    /// ````
+    pub fn get_tile_index_by_address(&self, address: u16) -> Option<u8> {
+        // fail when the address is not evenly divisible by 8.
+        if (address & 0b1111) != 0 {
+            return None;
+        }
+
+        match *self {
+            // tileset 0: 0x8000 - 0x8ff0
+            TileSet::H8000 => {
+               if address >= 0x8000 && address <= 0x8ff0 {
+                    return Some(((address - 0x8000) >> 4) as u8);
+                }
+            }
+
+            // tileset 1: 0x8800 - 0x97f0
+            TileSet::H8800 => {
+                if address >= 0x8800 && address <= 0x8ff0 {
+                    return Some(((address - 0x8000) >> 4) as u8);
+                }
+                
+                if address >= 0x9000 && address <= 0x97f0 {
+                    return Some(((address - 0x9000) >> 4) as u8);
+                }
+            }
+        }
+
+        None
     }
 }
 

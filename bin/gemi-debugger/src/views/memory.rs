@@ -30,6 +30,7 @@ use crate::ui::memory_editor::MemoryEditor;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
+
 /// A view to display the emulator's memory.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct MemoryView {
@@ -119,8 +120,6 @@ impl MemoryView {
                         get_highlight_index(kind)
                 );
             }
-
-            _ => { }
         }
     }
 
