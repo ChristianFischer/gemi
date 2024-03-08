@@ -385,6 +385,16 @@ impl TileMap {
             true  => TileMap::H9C00,
         }
     }
+    
+    
+    /// Get the selection bit, which belongs to the current TileMap.
+    pub fn to_select_bit(&self) -> bool {
+        match *self {
+            TileMap::H9800 => false,
+            TileMap::H9C00 => true,
+        }
+    }
+    
 
     /// Get the base address where the tilemap is stored.
     pub fn base_address(&self) -> u16 {

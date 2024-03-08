@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 
 use egui::Ui;
+
 use crate::event::UiEvent;
 use crate::state::EmulatorState;
 use crate::views::cartridge_info::CartridgeInfoView;
@@ -25,6 +26,8 @@ use crate::views::memory::MemoryView;
 use crate::views::oam::OamView;
 use crate::views::placeholder::PlaceholderView;
 use crate::views::sprites::SpritesView;
+use crate::views::tilemap::TileMapView;
+
 
 pub mod cartridge_info;
 pub mod cpu;
@@ -33,6 +36,7 @@ pub mod memory;
 pub mod oam;
 pub mod placeholder;
 pub mod sprites;
+pub mod tilemap;
 
 
 /// A trait to be implemented by view objects of which each of them display
@@ -64,7 +68,7 @@ pub enum ViewClass {
     Cpu(CpuView),
     Memory(MemoryView),
     Disassembly(PlaceholderView),
-    TileMap(PlaceholderView),
+    TileMap(TileMapView),
     Sprites(SpritesView),
     Oam(OamView),
 }
@@ -103,7 +107,7 @@ impl ViewClass {
 
     /// Placeholder for the tile map view.
     pub fn new_tile_map() -> ViewClass {
-        ViewClass::TileMap(PlaceholderView::new("Tile Map"))
+        ViewClass::TileMap(TileMapView::new())
     }
 
 

@@ -1,0 +1,248 @@
+/*
+ * Copyright (C) 2022-2024 by Christian Fischer
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+use eframe::epaint::{Color32, Stroke};
+use egui::{Grid, Image, pos2, Pos2, Rect, ScrollArea, Sense, Ui, vec2, Widget};
+use egui::scroll_area::ScrollBarVisibility;
+
+use gemi_core::gameboy::GameBoy;
+use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
+use gemi_core::ppu::flags::LcdControlFlag;
+use gemi_core::ppu::graphic_data::TileMap;
+
+use crate::event::UiEvent;
+use crate::selection::{Kind, Selected};
+use crate::selection::Selected::Tile;
+use crate::state::{EmulatorState, UiStates};
+use crate::ui::sprite_cache;
+use crate::ui::style::GemiStyle;
+use crate::views::View;
+
+
+const TILE_ROWS: usize      = 32;
+const TILE_COLS: usize      = 32;
+const TILE_WIDTH: usize     =  8;
+const TILE_HEIGHT: usize    =  8;
+const GAP: usize            =  1;
+const DEFAULT_SCALE: usize  =  5;
+
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct TileMapView {
+    tile_selected: Option<usize>,
+    tile_hovered:  Option<usize>,
+}
+
+
+impl TileMapView {
+    pub fn new() -> Self {
+        Self {
+            tile_selected: None,
+            tile_hovered:  None,
+        }
+    }
+}
+
+
+impl View for TileMapView {
+    fn title(&self, _state: &mut EmulatorState) -> &str {
+        "TileMap"
+    }
+
+
+    fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
+        match state.emu.get_emulator() {
+            None => {}
+
+            Some(emu) => {
+                self.render_tilemap(ui, emu, &mut state.ui);
+            }
+        }
+    }
+
+
+    fn handle_ui_event(&mut self, event: &UiEvent) {
+        match event {
+            UiEvent::SelectionChanged(Kind::Selection, Some(Tile(_, tile_index))) => {
+                self.tile_selected = Some(*tile_index);
+            },
+
+            UiEvent::SelectionChanged(Kind::Hover, Some(Tile(_, tile_index))) => {
+                self.tile_hovered = Some(*tile_index);
+            },
+
+            UiEvent::SelectionChanged(Kind::Hover, None) => {
+                self.tile_hovered = None;
+            },
+
+            _ => { }
+        }
+    }
+}
+
+
+impl TileMapView {
+    fn render_tilemap(&self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
+        let scale = DEFAULT_SCALE as f32;
+
+        // compute the size of a tile how it will be displayed
+        let tile_display_size = vec2(
+            (TILE_WIDTH  as f32) * scale,
+            (TILE_HEIGHT as f32) * scale
+        );
+
+        ScrollArea::new([true, true])
+                .auto_shrink([false, false])
+                .scroll_bar_visibility(ScrollBarVisibility::AlwaysVisible)
+                .drag_to_scroll(false)
+                .show(ui, |ui| {
+                    Grid::new("tilemap_grid")
+                            .num_columns(TILE_COLS)
+                            .spacing([GAP as f32, GAP as f32])
+                            .max_col_width(tile_display_size.x)
+                            .min_row_height(tile_display_size.y)
+                            .show(ui, |ui| {
+                                let origin = ui.cursor().left_top();
+                                self.render_tilemap_grid(ui, emu, ui_states);
+                                self.render_tilemap_highlights(ui, origin, emu, ui_states);
+                            })
+                    ;
+                })
+        ;
+    }
+
+
+    /// Renders the whole tilemap as a 32x32 grid.
+    fn render_tilemap_grid(&self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
+        let ppu     = &emu.get_peripherals().ppu;
+        let vram0   = ppu.get_vram(0);
+        let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
+
+        let scale = DEFAULT_SCALE as f32;
+
+        // compute the size of a tile how it will be displayed
+        let tile_display_size = vec2(
+            (TILE_WIDTH  as f32) * scale,
+            (TILE_HEIGHT as f32) * scale
+        );
+
+        for tile_row in 0..TILE_ROWS {
+            for tile_column in 0..TILE_COLS {
+                let tile_index       = tile_row * TILE_COLS + tile_column;
+                let tile_address     = tilemap.base_address() as usize + tile_index;
+                let tile_image_index = vram0[tile_address - MEMORY_LOCATION_VRAM_BEGIN as usize] as usize;
+
+                let tile_image = ppu.get_sprite_image(tile_image_index, 0);
+                let texture    = sprite_cache::get_texture_for(ui, &tile_image);
+
+                let response = Image::new(&texture)
+                        .fit_to_exact_size(tile_display_size)
+                        .sense(Sense::click())
+                        .ui(ui)
+                ;
+
+                // handle hover
+                ui_states.hover.set(Tile(tilemap.to_select_bit(), tile_index), response.hovered());
+
+                // handle click
+                if response.clicked() {
+                    ui_states.selection.toggle(Tile(tilemap.to_select_bit(), tile_index));
+                }
+            }
+
+            ui.end_row();
+        }
+    }
+
+
+    /// Renders an overlay for each selected tile on the tilemap.
+    fn render_tilemap_highlights(&self, ui: &mut Ui, origin: Pos2, emu: &GameBoy, ui_states: &mut UiStates) {
+        let scale = DEFAULT_SCALE as f32;
+
+        // compute the size of a tile how it will be displayed
+        let tile_display_size = vec2(
+            (TILE_WIDTH  as f32) * scale,
+            (TILE_HEIGHT as f32) * scale
+        );
+
+        for tile_row in 0..TILE_ROWS {
+            for tile_column in 0..TILE_COLS {
+                let tile_index  = tile_row * TILE_COLS + tile_column;
+                let is_selected = self.check_if_tile_is_selected(tile_index);
+                let is_hovered  = self.check_if_tile_is_hovered(emu, ui_states, tile_index);
+
+                let tile_bounds = Rect::from_min_size(
+                    pos2(
+                        origin.x + (tile_column * (tile_display_size.x as usize + GAP)) as f32,
+                        origin.y + (tile_row    * (tile_display_size.y as usize + GAP)) as f32
+                    ),
+                    tile_display_size
+                );
+
+                // draw background if selected
+                if is_hovered {
+                    Self::draw_highlight(ui, tile_bounds, &GemiStyle::BACKGROUND_HIGHLIGHT_HOVER);
+                }
+                else if is_selected {
+                    Self::draw_highlight(ui, tile_bounds, &GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION);
+                }
+            }
+        }
+    }
+
+
+    /// Checks whether a specific tile is currently selected or not.
+    fn check_if_tile_is_selected(&self, tile_index: usize) -> bool {
+        self.tile_selected == Some(tile_index)
+    }
+
+
+    /// Checks whether a specific tile is currently being hovered.
+    /// This also includes the case when the tile's sprite is currently being selected.
+    fn check_if_tile_is_hovered(&self, emu: &GameBoy, ui_states: &UiStates, tile_index: usize) -> bool {
+        if self.tile_hovered == Some(tile_index) {
+            return true;
+        }
+
+        let ppu     = &emu.get_peripherals().ppu;
+        let vram0   = ppu.get_vram(0);
+        let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
+
+        let tile_address     = tilemap.base_address() as usize + tile_index;
+        let tile_image_index = vram0[tile_address - MEMORY_LOCATION_VRAM_BEGIN as usize] as usize;
+
+        if ui_states.selection.is_selected(Selected::Sprite(tile_image_index)) {
+            return true;
+        }
+
+        if ui_states.hover.is_selected(Selected::Sprite(tile_image_index)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /// Draw a highlight for the current sprite.
+    fn draw_highlight(ui: &mut Ui, tile_bounds: Rect, color: &Color32) {
+        ui.painter().rect_stroke(
+                tile_bounds.expand(1.0),
+                3.0,
+                Stroke::new(2.0, *color)
+        );
+    }
+}

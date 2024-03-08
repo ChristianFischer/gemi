@@ -21,6 +21,7 @@ use egui::Ui;
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::mmu::locations::{MEMORY_LOCATION_OAM_BEGIN, MEMORY_LOCATION_SPRITES_BEGIN};
+use gemi_core::ppu::graphic_data::TileMap;
 
 use crate::event::UiEvent;
 use crate::event::UiEvent::SelectionChanged;
@@ -88,16 +89,26 @@ impl MemoryView {
             }
         };
 
+        // compute the address range of a selected sprite
         let get_sprite_address_range = |sprite_index: usize| -> Range<usize> {
             let address_begin = (sprite_index * 16) + MEMORY_LOCATION_SPRITES_BEGIN as usize;
             let address_end   = address_begin + 16;
             address_begin .. address_end
         };
 
+        // compute the address range of a selection within the OAM list
         let get_oam_address_range = |oam_index: usize| -> Range<usize> {
             let address_begin = (oam_index * 4) + MEMORY_LOCATION_OAM_BEGIN as usize;
             let address_end   = address_begin + 4;
             address_begin .. address_end
+        };
+
+        // compute the address range of a selected tile on a tilemap
+        let get_tile_address_range = |tilemap_bit: bool, tile_index: usize| -> Range<usize> {
+            let tilemap = TileMap::by_select_bit(tilemap_bit);
+            let address = tilemap.base_address() as usize + tile_index;
+
+            address .. (address + 1)
         };
 
         match event {
@@ -112,6 +123,13 @@ impl MemoryView {
                 self.memory_editor.set_highlighted_range(
                         get_highlight_index(kind),
                         get_oam_address_range(*oam_index)
+                );
+            }
+            
+            SelectionChanged(kind, Some(Tile(tilemap_bit, tile_index))) => {
+                self.memory_editor.set_highlighted_range(
+                        get_highlight_index(kind),
+                        get_tile_address_range(*tilemap_bit, *tile_index)
                 );
             }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 
 use std::cmp::min;
+
 use crate::cpu::interrupts::{Interrupt, Interrupts};
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
@@ -27,6 +28,7 @@ use crate::ppu::graphic_data::*;
 use crate::ppu::sprite_image::SpriteImage;
 use crate::ppu::video_memory::{OamRam, OamRamBank, VideoMemory};
 use crate::utils::get_bit;
+
 
 pub const SCREEN_W: u32 = 160;
 pub const SCREEN_H: u32 = 144;
@@ -680,6 +682,16 @@ impl Ppu {
     /// Get the OAM table.
     pub fn get_oam_bank_mut(&mut self) -> &mut OamRamBank {
         &mut self.memory.oam
+    }
+
+    /// Get a VRAM memory bank by its index.
+    pub fn get_vram(&self, bank: usize) -> &[u8] {
+        self.memory.vram_banks[bank].as_slice()
+    }
+
+    /// Get a VRAM memory bank by its index.
+    pub fn get_vram_mut(&mut self, bank: usize) -> &mut [u8] {
+        self.memory.vram_banks[bank].as_slice_mut()
     }
 
     /// Checks the LCD control register for a specific flag to be set.

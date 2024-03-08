@@ -28,6 +28,12 @@ pub enum Selected {
 
     /// The selection is on an entry within the OAM table, defined by its index.
     OamEntry(usize),
+    
+    /// The selection is on a tile.
+    /// The parameters contain the index of the tile and the
+    /// [TileMap] it belongs to, referred by its value of the selection bit
+    /// used in the LCDC register.
+    Tile(bool, usize),
 }
 
 
@@ -84,6 +90,12 @@ impl Selection {
     }
 
 
+    /// Checks whether a specific item is selected or not.
+    pub fn is_selected(&self, selection: Selected) -> bool {
+        self.selection == Some(selection)
+    }
+
+
     /// Either sets or clears the given selection, depending on the flag.
     pub fn set(&mut self, selection: Selected, is_selected: bool) {
         if is_selected {
@@ -111,7 +123,8 @@ impl Selection {
     pub fn toggle(&mut self, selection: Selected) {
         if self.selection.as_ref() != Some(&selection) {
             self.selection = Some(selection);
-        } else {
+        }
+        else {
             self.selection = None;
         }
 
@@ -126,12 +139,6 @@ impl Selection {
             self.selection = None;
             self.changed   = true;
         }
-    }
-
-
-    /// Checks whether the selection was changed during the last frame.
-    pub fn was_changed(&self) -> bool {
-        self.changed
     }
 
 
