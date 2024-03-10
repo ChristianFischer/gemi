@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 
 use std::env;
 use std::path::PathBuf;
+
 use eframe::{CreationContext, NativeOptions, run_native};
 use egui::ViewportBuilder;
+
 use crate::app::EmulatorApplication;
+
 
 mod views;
 mod app;
@@ -29,6 +32,7 @@ mod selection;
 mod state;
 mod strings;
 mod ui;
+mod highlight;
 
 
 /// Load the application. If possible, try to load the application state

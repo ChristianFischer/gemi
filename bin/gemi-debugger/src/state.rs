@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ use gemi_core::input::InputButton;
 use gemi_utils::keybindings::KeyBindings;
 
 use crate::selection::{Kind, Selection};
+
 
 /// An enum to store the different update modes of the emulator
 /// inside of this debugger application.
@@ -78,8 +79,8 @@ pub struct UiStates {
     /// The current update mode of the emulator.
     update_mode: UpdateMode,
 
-    /// Describes the currently selected item within the UI.
-    pub selection: Selection,
+    /// Describes the currently selected focus item within the UI.
+    pub focus: Selection,
     
     /// While moving the mouse cursor over the UI, this will contain the
     /// currently hovered item.
@@ -253,7 +254,7 @@ impl Default for EmulatorState {
             ui: UiStates {
                 key_bindings: make_default_key_bindings(),
                 update_mode: UpdateMode::Paused,
-                selection: Selection::new(Kind::Selection),
+                focus: Selection::new(Kind::Focus),
                 hover: Selection::new(Kind::Hover),
             },
         }

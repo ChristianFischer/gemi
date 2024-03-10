@@ -18,6 +18,7 @@
 use egui::Ui;
 
 use crate::event::UiEvent;
+use crate::selection::Selected;
 use crate::state::EmulatorState;
 use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::cpu::CpuView;
@@ -47,6 +48,11 @@ pub trait View: serde::Serialize + serde::de::DeserializeOwned {
 
     /// Render the view UI.
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui);
+
+    /// Get the currently selected item.
+    fn get_current_selection(&self) -> Option<Selected> {
+        None
+    }
 
     /// Invoked when an UI Event occurred to be handled by views.
     fn handle_ui_event(&mut self, event: &UiEvent) {
@@ -149,6 +155,20 @@ impl View for ViewClass {
             ViewClass::TileMap(v)       => v.ui(state, ui),
             ViewClass::Sprites(v)       => v.ui(state, ui),
             ViewClass::Oam(v)           => v.ui(state, ui),
+        }
+    }
+
+
+    fn get_current_selection(&self) -> Option<Selected> {
+        match self {
+            ViewClass::Display(v)       => v.get_current_selection(),
+            ViewClass::CartridgeInfo(v) => v.get_current_selection(),
+            ViewClass::Cpu(v)           => v.get_current_selection(),
+            ViewClass::Memory(v)        => v.get_current_selection(),
+            ViewClass::Disassembly(v)   => v.get_current_selection(),
+            ViewClass::TileMap(v)       => v.get_current_selection(),
+            ViewClass::Sprites(v)       => v.get_current_selection(),
+            ViewClass::Oam(v)           => v.get_current_selection(),
         }
     }
 

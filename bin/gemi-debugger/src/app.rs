@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
 use crate::views::{View, ViewClass};
+
 
 /// The main application struct.
 /// This contains the root elements of the UI
@@ -370,7 +371,7 @@ impl EmulatorApplication {
     /// Handle the response of the views during this frame.
     fn handle_frame_response(&mut self) {
         let events = [
-            self.behaviour.get_state_mut().ui.selection.take_ui_event(),
+            self.behaviour.get_state_mut().ui.focus.take_ui_event(),
             self.behaviour.get_state_mut().ui.hover.take_ui_event(),
         ].into_iter().filter_map(|event| event);
 

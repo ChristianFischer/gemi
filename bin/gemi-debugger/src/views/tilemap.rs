@@ -25,11 +25,10 @@ use gemi_core::ppu::flags::LcdControlFlag;
 use gemi_core::ppu::graphic_data::TileMap;
 
 use crate::event::UiEvent;
+use crate::highlight::test_selection;
 use crate::selection::{Kind, Selected};
-use crate::selection::Selected::Tile;
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
-use crate::ui::style::GemiStyle;
 use crate::views::View;
 
 
@@ -43,8 +42,7 @@ const DEFAULT_SCALE: usize  =  5;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TileMapView {
-    tile_selected: Option<usize>,
-    tile_hovered:  Option<usize>,
+    tile_selected: Option<(bool, usize)>,
 }
 
 
@@ -52,7 +50,6 @@ impl TileMapView {
     pub fn new() -> Self {
         Self {
             tile_selected: None,
-            tile_hovered:  None,
         }
     }
 }
@@ -75,18 +72,15 @@ impl View for TileMapView {
     }
 
 
+    fn get_current_selection(&self) -> Option<Selected> {
+        self.tile_selected.map(|(tilemap_bit, index)| Selected::Tile(tilemap_bit, index))
+    }
+
+
     fn handle_ui_event(&mut self, event: &UiEvent) {
         match event {
-            UiEvent::SelectionChanged(Kind::Selection, Some(Tile(_, tile_index))) => {
-                self.tile_selected = Some(*tile_index);
-            },
-
-            UiEvent::SelectionChanged(Kind::Hover, Some(Tile(_, tile_index))) => {
-                self.tile_hovered = Some(*tile_index);
-            },
-
-            UiEvent::SelectionChanged(Kind::Hover, None) => {
-                self.tile_hovered = None;
+            UiEvent::SelectionChanged(Kind::Focus, Some(Selected::Tile(tilemap_bit, tile_index))) => {
+                self.tile_selected = Some((*tilemap_bit, *tile_index));
             },
 
             _ => { }
@@ -156,11 +150,11 @@ impl TileMapView {
                 ;
 
                 // handle hover
-                ui_states.hover.set(Tile(tilemap.to_select_bit(), tile_index), response.hovered());
+                ui_states.hover.set(Selected::Tile(tilemap.to_select_bit(), tile_index), response.hovered());
 
                 // handle click
                 if response.clicked() {
-                    ui_states.selection.toggle(Tile(tilemap.to_select_bit(), tile_index));
+                    ui_states.focus.toggle(Selected::Tile(tilemap.to_select_bit(), tile_index));
                 }
             }
 
@@ -179,11 +173,22 @@ impl TileMapView {
             (TILE_HEIGHT as f32) * scale
         );
 
+        // check which tilemap is currently active
+        let current_tilemap = TileMap::by_select_bit(
+                emu.get_peripherals().ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect)
+        );
+
         for tile_row in 0..TILE_ROWS {
             for tile_column in 0..TILE_COLS {
-                let tile_index  = tile_row * TILE_COLS + tile_column;
-                let is_selected = self.check_if_tile_is_selected(tile_index);
-                let is_hovered  = self.check_if_tile_is_hovered(emu, ui_states, tile_index);
+                let tile_index = tile_row * TILE_COLS + tile_column;
+
+                let highlight_state = test_selection(Selected::Tile(
+                        current_tilemap.to_select_bit(),
+                        tile_index
+                ))
+                        .of_view(self)
+                        .compare_with_ui_states(ui_states, emu)
+                ;
 
                 let tile_bounds = Rect::from_min_size(
                     pos2(
@@ -194,55 +199,21 @@ impl TileMapView {
                 );
 
                 // draw background if selected
-                if is_hovered {
-                    Self::draw_highlight(ui, tile_bounds, &GemiStyle::BACKGROUND_HIGHLIGHT_HOVER);
-                }
-                else if is_selected {
-                    Self::draw_highlight(ui, tile_bounds, &GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION);
+                if let Some(highlight_state) = highlight_state {
+                    let highlight_color = highlight_state.get_color(ui);
+                    Self::draw_highlight(ui, tile_bounds, highlight_color);
                 }
             }
         }
     }
 
 
-    /// Checks whether a specific tile is currently selected or not.
-    fn check_if_tile_is_selected(&self, tile_index: usize) -> bool {
-        self.tile_selected == Some(tile_index)
-    }
-
-
-    /// Checks whether a specific tile is currently being hovered.
-    /// This also includes the case when the tile's sprite is currently being selected.
-    fn check_if_tile_is_hovered(&self, emu: &GameBoy, ui_states: &UiStates, tile_index: usize) -> bool {
-        if self.tile_hovered == Some(tile_index) {
-            return true;
-        }
-
-        let ppu     = &emu.get_peripherals().ppu;
-        let vram0   = ppu.get_vram(0);
-        let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
-
-        let tile_address     = tilemap.base_address() as usize + tile_index;
-        let tile_image_index = vram0[tile_address - MEMORY_LOCATION_VRAM_BEGIN as usize] as usize;
-
-        if ui_states.selection.is_selected(Selected::Sprite(tile_image_index)) {
-            return true;
-        }
-
-        if ui_states.hover.is_selected(Selected::Sprite(tile_image_index)) {
-            return true;
-        }
-
-        return false;
-    }
-
-
     /// Draw a highlight for the current sprite.
-    fn draw_highlight(ui: &mut Ui, tile_bounds: Rect, color: &Color32) {
+    fn draw_highlight(ui: &mut Ui, tile_bounds: Rect, color: Color32) {
         ui.painter().rect_stroke(
                 tile_bounds.expand(1.0),
                 3.0,
-                Stroke::new(2.0, *color)
+                Stroke::new(2.0, color)
         );
     }
 }

@@ -42,7 +42,9 @@ pub enum Selected {
 #[derive(PartialEq, Clone)]
 pub enum Kind {
     /// An item which was actively selected and brought to the user's focus.
-    Selection,
+    /// While a 'selection' is unique to its [View], the 'focus' is the 
+    /// application wide most recent selection.
+    Focus,
 
     /// An item currently hovered with the mouse cursor.
     Hover,
@@ -91,8 +93,8 @@ impl Selection {
 
 
     /// Checks whether a specific item is selected or not.
-    pub fn is_selected(&self, selection: Selected) -> bool {
-        self.selection == Some(selection)
+    pub fn is_selected(&self, selection: &Selected) -> bool {
+        self.selection.as_ref() == Some(selection)
     }
 
 

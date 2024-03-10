@@ -19,11 +19,11 @@ use std::cmp::max;
 
 use egui::{Color32, Grid, Image, Label, ScrollArea, Ui, Vec2, Widget};
 
-use gemi_core::ppu::ppu::Ppu;
+use gemi_core::gameboy::GameBoy;
 
 use crate::event::UiEvent;
-use crate::selection::Kind;
-use crate::selection::Selected::Sprite;
+use crate::highlight::test_selection;
+use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
@@ -37,7 +37,6 @@ const SPRITE_DISPLAY_SIZE : f32 = 64.0;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SpritesView {
     sprite_selected: Option<usize>,
-    sprite_hovered:  Option<usize>,
 }
 
 
@@ -45,7 +44,6 @@ impl SpritesView {
     pub fn new() -> Self {
         Self {
             sprite_selected: None,
-            sprite_hovered:  None,
         }
     }
 }
@@ -78,8 +76,6 @@ impl View for SpritesView {
                     item_height,
                     number_of_rows,
                     |ui, display_rows| {
-                        let ppu          = &emu.get_peripherals().ppu;
-
                         Grid::new("sprites_grid")
                                 .num_columns(items_per_row)
                                 .spacing([item_spacing, item_spacing])
@@ -107,7 +103,7 @@ impl View for SpritesView {
                                                 self.display_sprite(
                                                         ui,
                                                         ui_states,
-                                                        ppu,
+                                                        emu,
                                                         sprite_index
                                                 );
                                             }
@@ -121,18 +117,15 @@ impl View for SpritesView {
     }
 
 
+    fn get_current_selection(&self) -> Option<Selected> {
+        self.sprite_selected.map(|index| Selected::Sprite(index))
+    }
+
+
     fn handle_ui_event(&mut self, event: &UiEvent) {
         match event {
-            UiEvent::SelectionChanged(Kind::Selection, Some(Sprite(sprite_index))) => {
+            UiEvent::SelectionChanged(Kind::Focus, Some(Selected::Sprite(sprite_index))) => {
                 self.sprite_selected = Some(*sprite_index);
-            },
-
-            UiEvent::SelectionChanged(Kind::Hover, Some(Sprite(sprite_index))) => {
-                self.sprite_hovered = Some(*sprite_index);
-            },
-
-            UiEvent::SelectionChanged(Kind::Hover, None) => {
-                self.sprite_hovered = None;
             },
 
             _ => { }
@@ -143,21 +136,22 @@ impl View for SpritesView {
 
 impl SpritesView {
     /// Display a single sprite within the grid.
-    fn display_sprite(&mut self, ui: &mut Ui, ui_states: &mut UiStates, ppu: &Ppu, sprite_index: usize) {
+    fn display_sprite(&mut self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, sprite_index: usize) {
+        let ppu     = &emu.get_peripherals().ppu;
         let sprite  = ppu.get_sprite_image(sprite_index, 0);
         let texture = sprite_cache::get_texture_for(ui, &sprite);
 
-        let is_selected = self.sprite_selected == Some(sprite_index);
-        let is_hovered  = self.sprite_hovered  == Some(sprite_index);
+        let highlight_state = test_selection(Selected::Sprite(sprite_index))
+                .of_view(self)
+                .compare_with_ui_states(ui_states, emu)
+        ;
 
         // draw background if selected
-        if is_selected {
-            Self::draw_highlight(ui, &GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION);
-        }
-        else if is_hovered {
-            Self::draw_highlight(ui, &GemiStyle::BACKGROUND_HIGHLIGHT_HOVER);
+        if let Some(highlight_state) = highlight_state {
+            Self::draw_highlight(ui, highlight_state.get_color(ui));
         }
 
+        // render the image and receive input-response
         let response = Image::new(&texture)
                 .fit_to_exact_size(Vec2::splat(SPRITE_DISPLAY_SIZE))
                 .sense(egui::Sense::click())
@@ -165,17 +159,17 @@ impl SpritesView {
         ;
 
         // handle hover state
-        ui_states.hover.set(Sprite(sprite_index), response.hovered());
+        ui_states.hover.set(Selected::Sprite(sprite_index), response.hovered());
 
         // handle click
         if response.clicked() {
-            ui_states.selection.toggle(Sprite(sprite_index));
+            ui_states.focus.toggle(Selected::Sprite(sprite_index));
         }
     }
 
 
     /// Draw a highlight for the current sprite.
-    fn draw_highlight(ui: &mut Ui, color: &Color32) {
+    fn draw_highlight(ui: &mut Ui, color: Color32) {
         let sprite_bounds = egui::Rect::from_min_size(
             ui.cursor().left_top(),
             Vec2::splat(SPRITE_DISPLAY_SIZE)
@@ -184,7 +178,7 @@ impl SpritesView {
         ui.painter().rect_filled(
             sprite_bounds,
             3.0,
-            *color,
+            color,
         );
     }
 }

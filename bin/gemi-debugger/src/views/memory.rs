@@ -84,8 +84,8 @@ impl MemoryView {
 
         let get_highlight_index = |kind: &Kind| -> usize {
             match kind {
-                Selection => 0,
-                Hover     => 1,
+                Focus => 0,
+                Hover => 1,
             }
         };
 

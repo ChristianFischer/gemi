@@ -19,11 +19,11 @@ use eframe::emath::{Align, Vec2};
 use egui::{ComboBox, Direction, Image, Label, Layout, TextStyle, Ui, Widget};
 use egui_extras::{Column, TableBuilder, TableRow};
 
-use gemi_core::ppu::ppu::Ppu;
+use gemi_core::gameboy::GameBoy;
 
 use crate::event::UiEvent;
-use crate::selection::Kind;
-use crate::selection::Selected::OamEntry;
+use crate::highlight::{HighlightState, test_selection};
+use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
@@ -137,7 +137,7 @@ impl View for OamView {
                                     self.display_entry(
                                             ui_states,
                                             row,
-                                            &mut emu.get_peripherals_mut().ppu,
+                                            emu,
                                             item_height,
                                             is_paused,
                                             is_gbc
@@ -150,9 +150,14 @@ impl View for OamView {
     }
 
 
+    fn get_current_selection(&self) -> Option<Selected> {
+        self.selected_entry.map(|index| Selected::OamEntry(index))
+    }
+
+
     fn handle_ui_event(&mut self, event: &UiEvent) {
         match event {
-            UiEvent::SelectionChanged(Kind::Selection, Some(OamEntry(oam_index))) => {
+            UiEvent::SelectionChanged(Kind::Focus, Some(Selected::OamEntry(oam_index))) => {
                 self.selected_entry = Some(*oam_index);
             }
 
@@ -172,23 +177,27 @@ impl OamView {
             &mut self,
             ui_states: &mut UiStates,
             mut table_row: TableRow,
-            ppu: &mut Ppu,
+            emu: &mut GameBoy,
             row_height: f32,
             is_paused: bool,
             is_gbc: bool
     ) {
+        let highlight_state = test_selection(Selected::OamEntry(table_row.index()))
+                .of_view(self)
+                .compare_with_ui_states(ui_states, emu)
+        ;
+
         let oam_index  = table_row.index();
+        let ppu        = &mut emu.get_peripherals_mut().ppu;
         let tile_index = ppu.get_oam_mut()[oam_index].tile as usize;
         let bank       = ppu.get_oam()[oam_index].get_gbc_vram_bank();
         let sprite     = ppu.get_sprite_image(tile_index, bank);
         let entry      = &mut ppu.get_oam_mut()[oam_index];
         let style      = GemiStyle::VALUE_WRITABLE;
 
-        let is_selected = self.selected_entry == Some(oam_index);
-
-        // draw background if selected
-        if is_selected {
-            table_row.set_selected(true);
+        match highlight_state {
+            Some(HighlightState::Selected) => table_row.set_selected(true),
+            _ => { }
         }
 
         // Sprite image
@@ -307,11 +316,11 @@ impl OamView {
         table_row.col(|_| { });
 
         // handle hover state
-        ui_states.hover.set(OamEntry(oam_index), table_row.response().hovered());
+        ui_states.hover.set(Selected::OamEntry(oam_index), table_row.response().hovered());
 
         // handle click
         if table_row.response().clicked() {
-            ui_states.selection.toggle(OamEntry(oam_index));
+            ui_states.focus.toggle(Selected::OamEntry(oam_index));
         }
     }
 }

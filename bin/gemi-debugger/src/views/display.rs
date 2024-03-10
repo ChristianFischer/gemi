@@ -24,12 +24,12 @@ use egui::{Color32, Image, Pos2, Sense, Ui, Vec2, vec2, Widget};
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::ppu::flags::LcdControlFlag;
-use gemi_core::ppu::graphic_data::{Sprite, TileSet};
+use gemi_core::ppu::graphic_data::Sprite;
 use gemi_core::ppu::ppu::{SCREEN_H, SCREEN_W};
 
-use crate::selection::{Kind, Selected};
+use crate::highlight::test_selection;
+use crate::selection::Selected;
 use crate::state::{EmulatorState, UiStates};
-use crate::ui::style::GemiStyle;
 use crate::views::View;
 
 
@@ -51,7 +51,7 @@ impl View for EmulatorDisplayView {
             None => {}
 
             Some(emu) => {
-                Self::render_display_image(ui, emu, &mut state.ui);
+                self.render_display_image(ui, emu, &mut state.ui);
             }
         }
     }
@@ -60,7 +60,7 @@ impl View for EmulatorDisplayView {
 
 impl EmulatorDisplayView {
     /// Render the display image of the currently running emulator.
-    fn render_display_image(ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
+    fn render_display_image(&self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
         let lcd    = emu.get_peripherals().ppu.get_lcd();
         let size   = [lcd.get_width() as _, lcd.get_height() as _];
         let pixels = lcd.get_pixels_as_slice();
@@ -91,14 +91,14 @@ impl EmulatorDisplayView {
                 .ui(ui)
         ;
         
-        Self::handle_interactions(ui, emu, ui_states, origin, scale);
+        self.handle_interactions(ui, ui_states, emu, origin, scale);
 
-        Self::render_selection_overlays(ui, emu, ui_states, origin, scale);
+        self.render_selection_overlays(ui, ui_states, emu, origin, scale);
     }
 
 
     /// Handles interactions of the user with the UI.
-    fn handle_interactions(ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates, origin: Pos2, scale: f32) {
+    fn handle_interactions(&self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, origin: Pos2, scale: f32) {
         let display_bounds = Rect::from_min_size(
                 origin,
                 Vec2::new(
@@ -141,7 +141,7 @@ impl EmulatorDisplayView {
                     ui_states.hover.set(Selected::OamEntry(oam_index), hit);
 
                     if hit && response.clicked() {
-                        ui_states.selection.toggle(Selected::OamEntry(oam_index));
+                        ui_states.focus.toggle(Selected::OamEntry(oam_index));
                     }
                 }
             }
@@ -151,54 +151,32 @@ impl EmulatorDisplayView {
 
     /// Render overlays on the display of the currently running emulator to
     /// highlight any currently selected sprites and tiles.
-    fn render_selection_overlays(ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates, origin: Pos2, scale: f32) {
-        let selections    = [&ui_states.selection, &ui_states.hover];
+    fn render_selection_overlays(&self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, origin: Pos2, scale: f32) {
         let ppu           = &emu.get_peripherals().ppu;
         let oam           = ppu.get_oam();
         let large_sprites = ppu.check_lcdc(LcdControlFlag::SpritesSize);
 
-        for selection in selections {
-            let color = match selection.get_kind() {
-                Kind::Selection => &GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION,
-                Kind::Hover     => &GemiStyle::BACKGROUND_HIGHLIGHT_HOVER,
-            };
+        for oam_index in 0..40 {
+            let entry = &oam[oam_index];
 
-            match selection.get() {
-                Some(Selected::Sprite(sprite_index)) => {
-                    // translate the index of the sprite in video memory into a tile index,
-                    // which the OAM is referring to using the current tileset selection bit
-                    let tileset    = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
-                    let address    = 0x8000 + (sprite_index * 16);
-                    let tile_index = tileset.get_tile_index_by_address(address as u16);
+            // check whether this item is highlighted or not
+            let highlight_state = test_selection(Selected::OamEntry(oam_index))
+                    .of_view(self)
+                    .compare_with_ui_states(ui_states, emu)
+            ;
 
-                    if let Some(tile_index) = tile_index {
-                        for entry in oam {
-                            if entry.tile == tile_index {
-                                Self::render_sprite_outline(
-                                    ui,
-                                    &entry,
-                                    color,
-                                    origin,
-                                    large_sprites,
-                                    scale,
-                                );
-                            }
-                        }
-                    }
-                },
+            // render highlight if selected
+            if let Some(highlight_state) = highlight_state {
+                let highlight_color = highlight_state.get_color(ui);
 
-                Some(Selected::OamEntry(oam_index)) => {
-                    Self::render_sprite_outline(
+                Self::render_sprite_outline(
                         ui,
-                        &oam[*oam_index],
-                        color,
+                        &entry,
                         origin,
+                        highlight_color,
                         large_sprites,
-                        scale
-                    );
-                },
-
-                _ => { }
+                        scale,
+                );
             }
         }
     }
@@ -206,7 +184,7 @@ impl EmulatorDisplayView {
 
     /// Draws an outline on the location where an entry from the OAM will
     /// be displayed.
-    fn render_sprite_outline(ui: &mut Ui, sprite: &Sprite, color: &Color32, origin: Pos2, large: bool, scale: f32) {
+    fn render_sprite_outline(ui: &mut Ui, sprite: &Sprite, origin: Pos2, color: Color32, large: bool, scale: f32) {
         let sprite_size = if large { 16 } else { 8 };
 
         let sprite_bounds = Rect::from_min_size(
@@ -223,7 +201,7 @@ impl EmulatorDisplayView {
         ui.painter().rect_stroke(
             sprite_bounds,
             2.0,
-            Stroke::new(2.0, *color)
+            Stroke::new(2.0, color)
         );
     }
 }
