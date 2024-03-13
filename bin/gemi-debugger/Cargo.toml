@@ -4,15 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-eframe = { version = "0.25.0", default-features = false, features = [ "default_fonts", "glow", "persistence", ] }
-egui = { version = "0.25.0", default-features = false }
-egui_extras = "0.25.0"
-egui_tiles = "0.6.0"
+eframe = { version = "0.26.2", default-features = false, features = [ "default_fonts", "glow", "persistence", ] }
+egui = { version = "0.26.2", default-features = false }
+egui_extras = "0.26.2"
+egui_tiles = "0.7.2"
 egui_listview = "0.1.4"
-egui-modal = "0.3.1"
+egui-modal = "0.3.5"
 lazy_static = "1.4.0"
 nfd2 = "0.3.1"
-serde = "1.0.164"
+serde = "1.0.197"
 
 [dependencies.gemi-core]
 path = "../../lib/core"
