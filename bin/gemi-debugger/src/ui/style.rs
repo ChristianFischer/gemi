@@ -92,6 +92,22 @@ impl GemiStyle {
         italic: false,
     };
 
+    /// Text formatting to display keywords.
+    pub const KEYWORD: TextFormatting = TextFormatting {
+        style: TextStyle::Monospace,
+        color: Color32::from_rgb(0xcc, 0x78, 0x32),
+        bold: true,
+        italic: false,
+    };
+
+    /// Text formatting to display keywords.
+    pub const KEYWORD_LOW: TextFormatting = TextFormatting {
+        style: TextStyle::Monospace,
+        color: Color32::from_rgb(0xcc, 0x85, 0x4a),
+        bold: false,
+        italic: false,
+    };
+
     /// Text formatting to display a read-only numeric value.
     pub const VALUE_READ_ONLY: TextFormatting = TextFormatting {
         style: TextStyle::Monospace,

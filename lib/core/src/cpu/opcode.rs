@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,10 @@
  */
 
 use std::fmt::{Display, Formatter};
+
+use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::gameboy::{Clock, GameBoy};
+use crate::utils::{to_u16, to_u8};
 
 type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> OpCodeResult;
 
@@ -45,8 +48,6 @@ macro_rules! opcode {
 }
 
 pub(crate) use opcode;
-use crate::utils::to_u16;
-
 
 /// Data struct describing a single opcode.
 #[derive(Copy, Clone)]
@@ -100,6 +101,22 @@ pub enum OpCodeResult {
 
     /// The opcode was fully completed.
     Done,
+}
+
+
+/// When the opcode label gets tokenized, each of those tokens
+/// represent a part of the opcode label.
+/// See [OpCode::tokenize]
+pub enum Token<'a> {
+    /// Represents the actual opcode command.
+    Command(&'a str),
+
+    /// Represents any unspecified text part of the label.
+    Text(&'a str),
+
+    /// Represents a placeholder of an argument of the opcode label.
+    /// This needs to be resolved using [Instruction::resolve_argument].
+    Argument(&'a str),
 }
 
 
@@ -169,58 +186,173 @@ impl From<()> for OpCodeResult {
 }
 
 
+impl OpCode {
+    /// Split the attribute string into tokens.
+    pub fn tokenize(&self) -> Vec<Token> {
+        let mut characters = self.name;
+        let mut tokens     = Vec::new();
 
-fn get_arg(arg: &str, instruction: &Instruction) -> String {
-    let arg0 = instruction.arg[0];
-    let arg1 = instruction.arg[1];
-
-    match arg {
-        "i8" => {
-            let value = arg0 as i8;
-            format!("{}", value)
+        // take the text up to the first space as command
+        if let Some(space_index) = characters.find(' ') {
+            let opcode_name = &characters[..space_index];
+            let opcode_args = &characters[space_index + 1..];
+            tokens.push(Token::Command(opcode_name));
+            characters = opcode_args;
+        }
+        else {
+            tokens.push(Token::Command(characters));
+            characters = "";
         }
 
-        "u8" => {
-            let value = arg0;
-            format!("{}", value)
+        // parse remaining label
+        while !characters.is_empty() {
+            let begin = characters.find('{');
+            let end   = characters.find('}');
+
+            match (begin, end) {
+                // argument placeholder
+                (Some(begin_index), Some(end_index)) if begin_index < end_index => {
+                    // characters in front of the placeholder
+                    if begin_index > 0 {
+                        tokens.push(Token::Text(&characters[..begin_index]));
+                    }
+
+                    // the placeholder itself
+                    if (end_index - begin_index) > 0 {
+                        tokens.push(Token::Argument(&characters[begin_index+1..end_index]));
+                    }
+
+                    // remaining characters for the next iteration
+                    characters = &characters[end_index+1..];
+                }
+
+                // no placeholder found, take the whole line as text token
+                _ => {
+                    tokens.push(Token::Text(characters));
+                    characters = "";
+                }
+            }
         }
 
-        "x8" => {
-            let value = arg0;
-            format!("{:02x}", value)
-        }
-
-        "i16" => {
-            let value = to_u16(arg1, arg0) as i16;
-            format!("{}", value)
-        }
-
-        "u16" => {
-            let value = to_u16(arg1, arg0);
-            format!("{}", value)
-        }
-
-        "x16" => {
-            let value = to_u16(arg1, arg0);
-            format!("{:04x}", value)
-        }
-
-        _ => arg.to_string()
+        tokens
     }
 }
+
+
+impl Instruction {
+    /// Reads an instruction from a specific address and source.
+    /// The source is provided via a read function, that reads data from any address.
+    pub fn read_instruction<F>(address: u16, read: F) -> Self
+        where F: Fn(u16) -> u8
+    {
+        let mut cursor = address;
+        
+        // helper function to read from the current address cursor and then increment it
+        let mut read_at_cursor = || {
+            let value = read(cursor);
+            cursor = cursor.wrapping_add(1);
+            
+            value
+        };
+        
+        let opcode_address = address;
+        let opcode_byte    = read_at_cursor();
+
+        // read the opcode ID
+        let opcode_id = if opcode_byte == 0xCB {
+            let lo = opcode_byte;
+            let hi = read_at_cursor();
+
+            to_u16(hi, lo)
+        }
+        else {
+            opcode_byte as u16
+        };
+
+        // get the opcode, either extended or normal one
+        let opcode = if opcode_byte == 0xCB {
+            let (hi, lo) = to_u8(opcode_id);
+            &OPCODE_TABLE_EXTENDED[hi as usize]
+        }
+        else {
+            &OPCODE_TABLE[opcode_byte as usize]
+        };
+
+        // construct the instruction object
+        Self {
+            opcode,
+            opcode_id,
+            opcode_address,
+            arg: [
+                read_at_cursor(),
+                read_at_cursor()
+            ]
+        }
+    }
+
+
+    /// Get the number of bytes forming this instruction.
+    pub fn get_instruction_length(&self) -> u16 {
+        // opcode length + 1 byte for 0xcb opcodes
+            self.opcode.bytes as u16
+        +   if self.opcode_id > 0xff { 1 } else { 0 }
+    }
+
+
+    /// Get the replacement string for an argument placeholder.
+    pub fn resolve_argument(&self, arg: &str) -> String {
+        let arg0 = self.arg[0];
+        let arg1 = self.arg[1];
+
+        match arg {
+            "i8" => {
+                let value = arg0 as i8;
+                format!("{}", value)
+            }
+
+            "u8" => {
+                let value = arg0;
+                format!("{}", value)
+            }
+
+            "x8" | "#8" => {
+                let value = arg0;
+                format!("{:02x}", value)
+            }
+
+            "i16" => {
+                let value = to_u16(arg1, arg0) as i16;
+                format!("{}", value)
+            }
+
+            "u16" => {
+                let value = to_u16(arg1, arg0);
+                format!("{}", value)
+            }
+
+            "x16" | "#16" => {
+                let value = to_u16(arg1, arg0);
+                format!("{:04x}", value)
+            }
+
+            _ => arg.to_string()
+        }
+    }
+}
+
 
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut label = self.opcode.name.to_string();
 
         loop {
-            let begin = label.find("{");
+            let begin = label.find('{');
             match begin {
                 Some(begin_index) => {
-                    let end = label.find("}");
+                    let end = label.find('}');
                     if let Some(end_index) = end {
                         let substring = &label[begin_index+1 .. end_index];
-                        let formatted = get_arg(substring, &self);
+                        let formatted = self.resolve_argument(substring);
 
                         label.replace_range(begin_index .. end_index+1, formatted.as_str());
                     }

@@ -22,16 +22,17 @@ use crate::selection::Selected;
 use crate::state::EmulatorState;
 use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::cpu::CpuView;
+use crate::views::disassembly::DisassemblyView;
 use crate::views::display::EmulatorDisplayView;
 use crate::views::memory::MemoryView;
 use crate::views::oam::OamView;
-use crate::views::placeholder::PlaceholderView;
 use crate::views::sprites::SpritesView;
 use crate::views::tilemap::TileMapView;
 
 
 pub mod cartridge_info;
 pub mod cpu;
+pub mod disassembly;
 pub mod display;
 pub mod memory;
 pub mod oam;
@@ -73,7 +74,7 @@ pub enum ViewClass {
     CartridgeInfo(CartridgeInfoView),
     Cpu(CpuView),
     Memory(MemoryView),
-    Disassembly(PlaceholderView),
+    Disassembly(DisassemblyView),
     TileMap(TileMapView),
     Sprites(SpritesView),
     Oam(OamView),
@@ -107,7 +108,7 @@ impl ViewClass {
 
     /// Placeholder for the disassembly view.
     pub fn new_disassembly() -> ViewClass {
-        ViewClass::Disassembly(PlaceholderView::new("Disassembly"))
+        ViewClass::Disassembly(DisassemblyView::new())
     }
 
 
