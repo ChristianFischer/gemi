@@ -885,7 +885,7 @@
 | lyc_ff41_enable_2_dmg08_cgb04c_out2.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | lyc_ff41_enable_3_dmg08_cgb04c_out2.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | lyc_ff41_enable_4_dmg08_cgb04c_out2.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
-| lyc_ff41_enable_5_dmg08_cgb04c_out2.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
+| lyc_ff41_enable_5_dmg08_cgb04c_out2.gbc                                  |  ❌   |  ⚠️   |      |      |      |
 | lyc_ff41_enable_ds_1_cgb04c_out2.gbc                                     |      |  ⚠️   |      |      |      |
 | lyc_ff41_enable_ds_2_cgb04c_out2.gbc                                     |      |  ⚠️   |      |      |      |
 | lyc_ff41_enable_ds_3_cgb04c_out2.gbc                                     |      |  ⚠️   |      |      |      |
@@ -963,16 +963,16 @@
 | disable_scx2_2_dmg08_cgb04c_out2.gbc                                     |  ❌   |  ⚠️   |      |      |      |
 | disable_scx3_1_dmg08_cgb04c_out0.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | disable_scx3_2_dmg08_out0_cgb04c_out2.gbc                                |  ✔️   |  ⚠️   |      |      |      |
-| disable_scx3_3_dmg08_cgb04c_out2.gbc                                     |  ❌   |  ⚠️   |      |      |      |
+| disable_scx3_3_dmg08_cgb04c_out2.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | disable_scx4_1_dmg08_cgb04c_out0.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | disable_scx4_2_dmg08_out0_cgb04c_out2.gbc                                |  ✔️   |  ⚠️   |      |      |      |
-| disable_scx4_3_dmg08_cgb04c_out2.gbc                                     |  ❌   |  ⚠️   |      |      |      |
+| disable_scx4_3_dmg08_cgb04c_out2.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | disable_scx5_1_dmg08_cgb04c_out0.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
-| disable_scx5_2_dmg08_cgb04c_out2.gbc                                     |  ❌   |  ⚠️   |      |      |      |
+| disable_scx5_2_dmg08_cgb04c_out2.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | disable_scx5_ds_1_cgb04c_out1.gbc                                        |      |  ⚠️   |      |      |      |
 | disable_scx5_ds_2_cgb04c_out3.gbc                                        |      |  ⚠️   |      |      |      |
 | disable_scx7_1_dmg08_cgb04c_out0.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
-| disable_scx7_2_dmg08_out0_cgb04c_out2.gbc                                |  ✔️   |  ⚠️   |      |      |      |
+| disable_scx7_2_dmg08_out0_cgb04c_out2.gbc                                |  ❌   |  ⚠️   |      |      |      |
 | disable_scx7_3_dmg08_cgb04c_out2.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | enable_after_lyc_during_1_dmg08_cgb04c_out0.gbc                          |  ✔️   |  ⚠️   |      |      |      |
 | enable_after_lyc_during_2_dmg08_cgb04c_out0.gbc                          |  ✔️   |  ⚠️   |      |      |      |
@@ -1036,7 +1036,7 @@
 | m0_enable_2_dmg08_cgb04c_out2.gbc                                        |  ✔️   |  ⚠️   |      |      |      |
 | m0_enable_3_dmg08_cgb04c_out2.gbc                                        |  ✔️   |  ⚠️   |      |      |      |
 | m0_enable_4_dmg08_cgb04c_out2.gbc                                        |  ✔️   |  ⚠️   |      |      |      |
-| m0_enable_5_dmg08_cgb04c_out2.gbc                                        |  ✔️   |  ⚠️   |      |      |      |
+| m0_enable_5_dmg08_cgb04c_out2.gbc                                        |  ❌   |  ⚠️   |      |      |      |
 | m0_enable_ds_1_cgb04c_out2.gbc                                           |      |  ⚠️   |      |      |      |
 | m0_enable_ds_2_cgb04c_out2.gbc                                           |      |  ⚠️   |      |      |      |
 | m0_enable_ds_3_cgb04c_out2.gbc                                           |      |  ⚠️   |      |      |      |
@@ -1082,7 +1082,7 @@
 | ly143_late_m2enable_ds_2_cgb04c_out1.gbc                                 |      |  ⚠️   |      |      |      |
 | ly143_late_m2enable_ds_lcdoffset1_1_cgb04c_out3.gbc                      |      |  ⚠️   |      |      |      |
 | ly143_late_m2enable_ds_lcdoffset1_2_cgb04c_out1.gbc                      |      |  ⚠️   |      |      |      |
-| lyc143_late_m0enable_lycdisable_1_dmg08_cgb04c_out1.gbc                  |  ❌   |  ⚠️   |      |      |      |
+| lyc143_late_m0enable_lycdisable_1_dmg08_cgb04c_out1.gbc                  |  ✔️   |  ⚠️   |      |      |      |
 | lyc143_late_m0enable_lycdisable_2_dmg08_cgb04c_out1.gbc                  |  ✔️   |  ⚠️   |      |      |      |
 | lyc143_late_m0enable_lycdisable_3_dmg08_out3_cgb04c_out1.gbc             |  ❌   |  ⚠️   |      |      |      |
 | lyc143_late_m0enable_lycdisable_ds_1_cgb04c_out1.gbc                     |      |  ⚠️   |      |      |      |
@@ -1127,7 +1127,7 @@
 | m1irq_enable_1_dmg08_cgb04c_out3.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_enable_2_dmg08_cgb04c_out3.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_enable_3_dmg08_cgb04c_out3.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
-| m1irq_enable_4_dmg08_cgb04c_out3.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
+| m1irq_enable_4_dmg08_cgb04c_out3.gbc                                     |  ❌   |  ⚠️   |      |      |      |
 | m1irq_enable_after_lyc144_1_dmg08_cgb04c_out1.gbc                        |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_enable_after_lyc144_2_dmg08_out1_cgb04c_out3.gbc                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_enable_after_lyc144_3_dmg08_cgb04c_out3.gbc                        |  ❌   |  ⚠️   |      |      |      |
@@ -1150,17 +1150,17 @@
 | m1irq_m0disable_3_dmg08_cgb04c_out1.gbc                                  |  ❌   |  ⚠️   |      |      |      |
 | m1irq_m0disable_ds_1_cgb04c_out3.gbc                                     |      |  ⚠️   |      |      |      |
 | m1irq_m0disable_ds_2_cgb04c_out1.gbc                                     |      |  ⚠️   |      |      |      |
-| m1irq_m0enable_1_dmg08_cgb04c_out3.gbc                                   |  ❌   |  ⚠️   |      |      |      |
+| m1irq_m0enable_1_dmg08_cgb04c_out3.gbc                                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m0enable_2_dmg08_cgb04c_out3.gbc                                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m0enable_3_dmg08_cgb04c_out3.gbc                                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m0enable_ds_1_cgb04c_out3.gbc                                      |      |  ⚠️   |      |      |      |
 | m1irq_m0enable_ds_2_cgb04c_out3.gbc                                      |      |  ⚠️   |      |      |      |
-| m1irq_m2disable_lycdisable_1_dmg08_cgb04c_out3.gbc                       |  ❌   |  ⚠️   |      |      |      |
+| m1irq_m2disable_lycdisable_1_dmg08_cgb04c_out3.gbc                       |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m2disable_lycdisable_2_dmg08_out3_cgb04c_out1.gbc                  |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m2disable_lycdisable_3_dmg08_cgb04c_out1.gbc                       |  ❌   |  ⚠️   |      |      |      |
 | m1irq_m2disable_lycdisable_ds_1_cgb04c_out3.gbc                          |      |  ⚠️   |      |      |      |
 | m1irq_m2disable_lycdisable_ds_2_cgb04c_out1.gbc                          |      |  ⚠️   |      |      |      |
-| m1irq_m2enable_1_dmg08_cgb04c_out3.gbc                                   |  ❌   |  ⚠️   |      |      |      |
+| m1irq_m2enable_1_dmg08_cgb04c_out3.gbc                                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m2enable_2_dmg08_cgb04c_out3.gbc                                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m2enable_3_dmg08_cgb04c_out3.gbc                                   |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m2enable_ds_1_cgb04c_out3.gbc                                      |      |  ⚠️   |      |      |      |
@@ -1170,7 +1170,7 @@
 | m1irq_m2enable_lyc_3_dmg08_cgb04c_out3.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | m1irq_m2enable_lyc_ds_1_cgb04c_out1.gbc                                  |      |  ⚠️   |      |      |      |
 | m1irq_m2enable_lyc_ds_2_cgb04c_out3.gbc                                  |      |  ⚠️   |      |      |      |
-| m2m1irq_ifw_1_dmg08_cgb04c_out3.gbc                                      |  ❌   |  ⚠️   |      |      |      |
+| m2m1irq_ifw_1_dmg08_cgb04c_out3.gbc                                      |  ✔️   |  ⚠️   |      |      |      |
 | m2m1irq_ifw_2_dmg08_cgb04c_out1.gbc                                      |  ❌   |  ⚠️   |      |      |      |
 | m2m1irq_ifw_3_dmg08_cgb04c_out0.gbc                                      |  ❌   |  ⚠️   |      |      |      |
 | m2m1irq_ifw_ds_1_cgb04c_out3.gbc                                         |      |  ⚠️   |      |      |      |
@@ -1194,14 +1194,14 @@
 | enable_after_lycint_disable_1_dmg08_cgb04c_out1.gbc                      |  ✔️   |  ⚠️   |      |      |      |
 | enable_after_lycint_disable_2_dmg08_cgb04c_out3.gbc                      |  ❌   |  ⚠️   |      |      |      |
 | late_enable_1_dmg08_cgb04c_out2.gbc                                      |  ✔️   |  ⚠️   |      |      |      |
-| late_enable_2_dmg08_cgb04c_out0.gbc                                      |  ❌   |  ⚠️   |      |      |      |
+| late_enable_2_dmg08_cgb04c_out0.gbc                                      |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_after_lycint_1_dmg08_cgb04c_out0.gbc                         |  ❌   |  ⚠️   |      |      |      |
 | late_enable_after_lycint_2_dmg08_out0_cgb04c_out2.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| late_enable_after_lycint_3_dmg08_cgb04c_out0.gbc                         |  ❌   |  ⚠️   |      |      |      |
+| late_enable_after_lycint_3_dmg08_cgb04c_out0.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_after_lycint_4_dmg08_cgb04c_out0.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_after_lycint_disable_1_dmg08_cgb04c_out2.gbc                 |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_after_lycint_disable_2_dmg08_out0_cgb04c_out2.gbc            |  ❌   |  ⚠️   |      |      |      |
-| late_enable_after_lycint_disable_3_dmg08_cgb04c_out0.gbc                 |  ❌   |  ⚠️   |      |      |      |
+| late_enable_after_lycint_disable_3_dmg08_cgb04c_out0.gbc                 |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_ds_1_cgb04c_out2.gbc                                         |      |  ⚠️   |      |      |      |
 | late_enable_ds_2_cgb04c_out0.gbc                                         |      |  ⚠️   |      |      |      |
 | late_enable_ds_lcdoffset1_1_cgb04c_out2.gbc                              |      |  ⚠️   |      |      |      |
@@ -1220,7 +1220,7 @@
 | late_enable_ly0_lcdoffset2_2_cgb04c_out0.gbc                             |      |  ⚠️   |      |      |      |
 | late_enable_m0disable_1_dmg08_cgb04c_out2.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_m0disable_2_dmg08_out0_cgb04c_out2.gbc                       |  ❌   |  ⚠️   |      |      |      |
-| late_enable_m0disable_3_dmg08_cgb04c_out0.gbc                            |  ❌   |  ⚠️   |      |      |      |
+| late_enable_m0disable_3_dmg08_cgb04c_out0.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | late_enable_m0disable_ds_1_cgb04c_out2.gbc                               |      |  ⚠️   |      |      |      |
 | late_enable_m0disable_ds_2_cgb04c_out0.gbc                               |      |  ⚠️   |      |      |      |
 | late_enable_m1disable_ly0_1_dmg08_cgb04c_out2.gbc                        |  ✔️   |  ⚠️   |      |      |      |
@@ -1233,7 +1233,7 @@
 | late_m1disable_ly0_3_dmg08_cgb04c_out0.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | lyc0_late_m2enable_lycdisable_1_dmg08_cgb04c_out2.gbc                    |  ❌   |  ⚠️   |      |      |      |
 | lyc0_late_m2enable_lycdisable_2_dmg08_out2_cgb04c_out0.gbc               |  ❌   |  ⚠️   |      |      |      |
-| lyc0_late_m2enable_lycdisable_3_dmg08_cgb04c_out0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
+| lyc0_late_m2enable_lycdisable_3_dmg08_cgb04c_out0.gbc                    |  ❌   |  ⚠️   |      |      |      |
 | lyc0_late_m2enable_lycdisable_ds_1_cgb04c_out2.gbc                       |      |  ⚠️   |      |      |      |
 | lyc0_late_m2enable_lycdisable_ds_2_cgb04c_out0.gbc                       |      |  ⚠️   |      |      |      |
 | lyc1_late_m2enable_lycdisable_1_dmg08_out0_cgb04c_out2.gbc               |  ❌   |  ⚠️   |      |      |      |
@@ -1242,11 +1242,11 @@
 | lyc1_late_m2enable_lycdisable_ds_2_cgb04c_out0.gbc                       |      |  ⚠️   |      |      |      |
 | lyc1_late_m2enable_lycdisable_ds_3_cgb04c_out2.gbc                       |      |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lyc255_1_dmg08_cgb04c_out2.gbc                           |  ❌   |  ⚠️   |      |      |      |
-| lyc1_m2irq_late_lyc255_2_dmg08_out2_cgb04c_out0.gbc                      |  ❌   |  ⚠️   |      |      |      |
+| lyc1_m2irq_late_lyc255_2_dmg08_out2_cgb04c_out0.gbc                      |  ✔️   |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lyc255_3_dmg08_cgb04c_out0.gbc                           |  ❌   |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lyc255_ds_1_cgb04c_out2.gbc                              |      |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lyc255_ds_2_cgb04c_out0.gbc                              |      |  ⚠️   |      |      |      |
-| lyc1_m2irq_late_lycdisable_1_dmg08_cgb04c_out2.gbc                       |  ❌   |  ⚠️   |      |      |      |
+| lyc1_m2irq_late_lycdisable_1_dmg08_cgb04c_out2.gbc                       |  ✔️   |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lycdisable_2_dmg08_cgb04c_out0.gbc                       |  ❌   |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lycdisable_ds_1_cgb04c_out2.gbc                          |      |  ⚠️   |      |      |      |
 | lyc1_m2irq_late_lycdisable_ds_2_cgb04c_out0.gbc                          |      |  ⚠️   |      |      |      |

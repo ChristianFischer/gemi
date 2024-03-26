@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,13 @@ use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
 use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8};
 use crate::cpu::interrupts::InterruptRegisters;
+use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
+use crate::debug::{DebugEvent, DebugEvents};
 use crate::input::Input;
 use crate::mmu::memory::Memory;
+use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::mmu::mmu::Mmu;
-use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
-use crate::mmu::memory_bus::MemoryBusConnection;
-use crate::ppu::ppu::{FrameState, Ppu};
+use crate::ppu::ppu::Ppu;
 use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};
@@ -68,6 +69,8 @@ pub struct GameBoy {
     device_config: DeviceConfig,
 
     pub cpu: Cpu,
+
+    total_cycles: Clock,
 }
 
 
@@ -80,6 +83,17 @@ pub struct Peripherals {
     pub input: Input,
     pub serial: SerialPort,
     pub interrupts: InterruptRegisters,
+}
+
+
+/// An object containing feedback from running the emulator.
+#[derive(Default)]
+pub struct EmulatorUpdateResults {
+    /// The number of cycles being processed.
+    pub cycles: Clock,
+
+    /// Any debug events occurred during updating the emulator.
+    pub events: DebugEvents,
 }
 
 
@@ -221,7 +235,9 @@ impl GameBoy {
                             interrupts: InterruptRegisters::new(),
                         }
                     )
-                )
+                ),
+
+                total_cycles: 0,
             }
         )
     }
@@ -417,38 +433,37 @@ impl GameBoy {
     }
 
 
+    /// Runs the emulator for a single step, either an instruction
+    /// or to process a single HALT cycle.
+    pub fn run_single_step(&mut self) -> EmulatorUpdateResults {
+        self.process_next()
+    }
+
+
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
-    pub fn process_frame(&mut self) -> Clock {
-        let mut interval_cycles = 0;
+    pub fn run_frame(&mut self) -> EmulatorUpdateResults {
+        let mut results = EmulatorUpdateResults::default();
 
-        loop {
-            let cycles = self.process_next();
-
-            // count the total cycles per interval
-            interval_cycles += cycles;
-
-            // let the PPU run for the same amount of cycles
-            let ppu_state = self.get_peripherals_mut().ppu.update(cycles);
-
-            // forward interrupts requested by the ppu
-            let interrupts = self.get_peripherals_mut().ppu.take_requested_interrupts();
-            self.get_peripherals_mut().interrupts.request_interrupts(interrupts);
-
-            // When a frame completed, it should be presented
-            if let FrameState::FrameCompleted = ppu_state {
-                return interval_cycles;
-            }
+        // update until receiving the 'frame completed' event.
+        while !results.events.contains(DebugEvent::PpuFrameCompleted) {
+            results += self.process_next();
         }
+
+        results
     }
 
 
     /// Continues processing the next pending operation.
-    fn process_next(&mut self) -> Clock {
+    fn process_next(&mut self) -> EmulatorUpdateResults {
         if self.cpu.is_running() {
             if let Some(cycles) = self.cpu.handle_interrupts() {
-                self.update_components(cycles);
-                cycles
+                let signals = self.update_components(cycles);
+
+                EmulatorUpdateResults {
+                    cycles,
+                    events: signals.events,
+                }
             }
             else {
                 self.process_next_opcode()
@@ -458,16 +473,21 @@ impl GameBoy {
             // when in HALT state just pass 4 cycles
             // where the CPU idles
             let halt_cycle = 4;
-            self.update_components(halt_cycle);
-            halt_cycle
+            let signals    = self.update_components(halt_cycle);
+
+            EmulatorUpdateResults {
+                cycles: halt_cycle,
+                events: signals.events,
+            }
         }
     }
 
 
     /// Process the next opcode.
-    fn process_next_opcode(&mut self) -> Clock {
+    fn process_next_opcode(&mut self) -> EmulatorUpdateResults {
         let instruction = self.cpu.fetch_next_instruction();
         let mut context = OpCodeContext::for_instruction(&instruction);
+        let mut signals = MemoryBusSignals::default();
         let mut total_step_cycles : Clock = 0;
 
         // process cycles ahead of the actual opcode execution to get read/write operations
@@ -475,7 +495,7 @@ impl GameBoy {
         if instruction.opcode.cycles_ahead != 0 {
             let cycles_ahead = instruction.opcode.cycles_ahead;
             total_step_cycles += cycles_ahead;
-            self.update_components(cycles_ahead);
+            signals |= self.update_components(cycles_ahead);
         }
 
         loop {
@@ -487,17 +507,16 @@ impl GameBoy {
                 // to update timer or memory operations.
                 OpCodeResult::StageDone(step_cycles) => {
                     total_step_cycles += step_cycles;
-                    self.update_components(step_cycles);
+                    signals |= self.update_components(step_cycles);
                     context.enter_next_stage();
                 }
 
                 // the opcode is completed. the remaining time needs to be applied on components.
                 OpCodeResult::Done => {
-                    // get the total amount of cycles consumed by this opcode and subtract the
+                    // get the total number of cycles consumed by this opcode and subtract the
                     // number of cycles already applied to components
                     let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
-
-                    self.update_components(remaining_cycles);
+                    signals |= self.update_components(remaining_cycles);
 
                     break;
                 }
@@ -516,29 +535,59 @@ impl GameBoy {
             );
         }
 
-        context.get_cycles_consumed()
+        EmulatorUpdateResults {
+            cycles: context.get_cycles_consumed(),
+            events: signals.events,
+        }
     }
 
 
     /// Applies the time passed during CPU execution to other components as well.
-    fn update_components(&mut self, cycles: Clock) {
+    #[must_use]
+    fn update_components(&mut self, cycles: Clock) -> MemoryBusSignals {
         self.cpu.update(cycles);
         self.get_mmu_mut().update(cycles);
         self.get_peripherals_mut().apu.update(cycles);
+        self.get_peripherals_mut().ppu.update(cycles);
         self.get_peripherals_mut().timer.update(cycles);
         self.get_peripherals_mut().serial.update(cycles);
         self.get_peripherals_mut().input.update();
 
-        // collects all requested interrupts to forward them into the interrupts component
-        {
-            let interrupts =
-                    self.get_peripherals_mut().apu.take_requested_interrupts()
-                |   self.get_peripherals_mut().timer.take_requested_interrupts()
-                |   self.get_peripherals_mut().serial.take_requested_interrupts()
-                |   self.get_peripherals_mut().input.take_requested_interrupts()
-            ;
+        // collects all signals received from components
+        let signals =
+                self.get_peripherals_mut().apu.take_signals()
+            |   self.get_peripherals_mut().ppu.take_signals()
+            |   self.get_peripherals_mut().timer.take_signals()
+            |   self.get_peripherals_mut().serial.take_signals()
+            |   self.get_peripherals_mut().input.take_signals()
+        ;
 
-            self.get_peripherals_mut().interrupts.request_interrupts(interrupts);
+        // forward all requested interrupts into the Interrupts component.
+        self.get_peripherals_mut().interrupts.request_interrupts(signals.interrupts);
+
+        // increment clock counters
+        self.total_cycles += cycles;
+
+        signals
+    }
+}
+
+
+impl std::ops::Add for EmulatorUpdateResults {
+    type Output = EmulatorUpdateResults;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            cycles: self.cycles + rhs.cycles,
+            events: self.events | rhs.events,
         }
+    }
+}
+
+
+impl std::ops::AddAssign for EmulatorUpdateResults {
+    fn add_assign(&mut self, rhs: Self) {
+        self.cycles += rhs.cycles;
+        self.events |= rhs.events;
     }
 }

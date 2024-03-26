@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,41 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::ops::{BitOr, BitOrAssign};
+
 use crate::cpu::interrupts::Interrupts;
+use crate::debug::DebugEvents;
+
+/// Represents the signals sent from a component back to the memory bus.
+#[derive(Copy, Clone, Default)]
+pub struct MemoryBusSignals {
+    /// Interrupts risen by a component.
+    pub interrupts: Interrupts,
+
+    /// Flags of events which occurred during updating a component.
+    pub events: DebugEvents,
+
+}
+
+
+impl BitOr for MemoryBusSignals {
+    type Output = MemoryBusSignals;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self {
+            interrupts: self.interrupts | rhs.interrupts,
+            events:     self.events     | rhs.events,
+        }
+    }
+}
+
+
+impl BitOrAssign for MemoryBusSignals {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.interrupts |= rhs.interrupts;
+        self.events     |= rhs.events;
+    }
+}
 
 
 /// Trait for objects connected to the memory bus.
@@ -30,10 +64,10 @@ pub trait MemoryBusConnection {
     /// A request to write to a memory address in the components accountability.
     fn on_write(&mut self, address: u16, value: u8);
 
-    /// Takes the FlagSet containing all interrupts requested since the last call.
-    /// After calling this, the requested interrupts of this component are expected to be cleared.
-    fn take_requested_interrupts(&mut self) -> Interrupts {
-        Interrupts::default()
+    /// Takes the signals sent from a component since the last call.
+    /// After calling this, the pending signals of this component are expected to be cleared.
+    fn take_signals(&mut self) -> MemoryBusSignals {
+        MemoryBusSignals::default()
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use wasm_bindgen::JsValue;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
+
 use gemi_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
 use gemi_core::gameboy::{DeviceType, EmulationType, GameBoy};
 use gemi_core::input::InputButton;
 use gemi_core::mmu::memory_data::MemoryData;
-use crate::cartridge::Cartridge;
 
+use crate::cartridge::Cartridge;
 
 /// Web Assembly frontend for the emulator.
 /// This will be instantiated from JS provides an interface to the emulator backend.
@@ -224,7 +225,7 @@ impl WasmPlayer {
 impl WasmPlayer {
     /// Process a single frame until the next VBlank completion.
     pub fn process_frame(&mut self) {
-        self.gb.process_frame();
+        self.gb.run_frame();
     }
 
 

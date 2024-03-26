@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,20 +15,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::panic;
 use std::fmt::{Debug, Formatter};
+use std::panic;
 use std::path::PathBuf;
+
 use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::Cartridge;
 use gemi_core::gameboy::{DeviceType, GameBoy};
 use gemi_core::utils::to_u8;
+
 use crate::checks::blargg_checks::check_blargg_test_passed;
 use crate::checks::check_display::compare_display_with_image;
 use crate::checks::gambatte_checks::check_gambatte_display_code;
 use crate::checks::mooneye_checks::check_mooneye_test_passed;
 use crate::io_utils::Workspace;
 use crate::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
-
 
 /// The maximum number of frames allowed per emulator run,
 /// before it's considered as an error.
@@ -152,7 +153,7 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> Result<u3
     let mut frames = 0;
 
     loop {
-        gb.process_frame();
+        gb.run_frame();
         frames += 1;
 
         // stop when the flag was set

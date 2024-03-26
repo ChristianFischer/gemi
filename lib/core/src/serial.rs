@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::interrupts::{Interrupt, Interrupts};
+use std::mem::take;
+
+use crate::cpu::interrupts::Interrupt;
 use crate::gameboy::Clock;
 use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
-use crate::mmu::memory_bus::MemoryBusConnection;
+use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::utils::{as_bit_flag, get_bit};
-
 
 const UPDATE_TIME_SERIAL_TRANSFER:      Clock = 4096;
 
@@ -37,8 +38,8 @@ pub struct SerialPort {
     /// The SerialPort's clock to measure time between the transfer of each byte.
     clock: Clock,
 
-    /// Pending interrupts requested by this component.
-    interrupts: Interrupts,
+    /// Pending output to be sent back through the memory bus.
+    signals: MemoryBusSignals,
 
     /// The flag written by SC register to enable or disable serial data transfer.
     transfer_enabled: bool,
@@ -59,7 +60,7 @@ impl SerialPort {
     pub fn new() -> SerialPort {
         SerialPort {
             clock:                  0,
-            interrupts:             Interrupts::default(),
+            signals:                MemoryBusSignals::default(),
             transfer_enabled:       false,
             transfer_byte:          0x00,
             output_queue:           vec![],
@@ -94,7 +95,7 @@ impl SerialPort {
 
     /// Requests an interrupt to be fired.
     fn request_interrupt(&mut self, interrupt: Interrupt) {
-        self.interrupts |= interrupt;
+        self.signals.interrupts |= interrupt;
     }
 
 
@@ -122,10 +123,7 @@ impl SerialPort {
     /// Takes the data currently in the output queue.
     /// The data will then be removed from the current output queue.
     pub fn take_output(&mut self) -> Vec<u8> {
-        let result = self.output_queue.clone();
-        self.output_queue.clear();
-
-        result
+        take(&mut self.output_queue)
     }
 
 
@@ -170,10 +168,7 @@ impl MemoryBusConnection for SerialPort {
     }
 
 
-    fn take_requested_interrupts(&mut self) -> Interrupts {
-        let result = self.interrupts.clone();
-        self.interrupts.clear();
-
-        result
+    fn take_signals(&mut self) -> MemoryBusSignals {
+        take(&mut self.signals)
     }
 }

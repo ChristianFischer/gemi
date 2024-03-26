@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,14 @@
 
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
+use std::mem::take;
 use std::ops::Sub;
-use crate::cpu::interrupts::{Interrupt, Interrupts};
+
+use crate::cpu::interrupts::Interrupt;
 use crate::gameboy::Clock;
 use crate::mmu::locations::*;
-use crate::mmu::memory_bus::MemoryBusConnection;
+use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::utils::{as_bit_flag, get_bit, get_high};
-
 
 /// Represents the internal counter which will be incremented with the system clock
 /// and triggers incrementing the TIMA counter each time a specific bit, which is
@@ -84,8 +85,8 @@ enum TimaState {
 /// An object handling the gameboys internal timers,
 /// which are controlled by TIMA, TMA, TAC and DIV registers.
 pub struct Timer {
-    /// Pending interrupts requested by this component.
-    interrupts: Interrupts,
+    /// Pending output to be sent back through the memory bus.
+    signals: MemoryBusSignals,
 
     /// The internal counter used to trigger TIMA increments
     internal_counter: InternalCounter,
@@ -263,7 +264,7 @@ impl Timer {
     /// Creates an empty CPU object.
     pub fn new() -> Timer {
         Timer {
-            interrupts:         Interrupts::default(),
+            signals:            MemoryBusSignals::default(),
             internal_counter:   InternalCounter::new(),
             tima_state:         TimaState::Normal,
             tima:               0x00,
@@ -371,7 +372,7 @@ impl Timer {
 
     /// Requests an interrupt to be fired.
     fn request_interrupt(&mut self, interrupt: Interrupt) {
-        self.interrupts |= interrupt;
+        self.signals.interrupts |= interrupt;
     }
 }
 
@@ -434,10 +435,7 @@ impl MemoryBusConnection for Timer {
     }
 
 
-    fn take_requested_interrupts(&mut self) -> Interrupts {
-        let result = self.interrupts.clone();
-        self.interrupts.clear();
-
-        result
+    fn take_signals(&mut self) -> MemoryBusSignals {
+        take(&mut self.signals)
     }
 }

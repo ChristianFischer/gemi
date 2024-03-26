@@ -15,16 +15,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub mod apu;
-pub mod boot_rom;
-pub mod cartridge;
-pub mod cpu;
-pub mod debug;
-pub mod device_type;
-pub mod gameboy;
-pub mod input;
-pub mod mmu;
-pub mod ppu;
-pub mod serial;
-pub mod timer;
-pub mod utils;
+use flagset::{flags, FlagSet};
+
+flags! {
+    /// An enumeration events that may occur during updating the emulator.
+    /// This does not represent actual signals sent from a GameBoy's
+    /// original hardware, but is an additional signal to provide feedback
+    /// from the emulator's process to its frontend.
+    pub enum DebugEvent : u8 {
+        /// The PPU completed rendering a line.
+        PpuLineCompleted    = 0b_0000_0001,
+
+        /// The PPU completed rendering a frame.
+        PpuFrameCompleted   = 0b_0000_0010,
+    }
+}
+
+
+/// A set of events occurred during updating the emulator.
+pub type DebugEvents = FlagSet<DebugEvent>;

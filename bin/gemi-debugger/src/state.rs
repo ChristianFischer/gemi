@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::fmt::{Display, Formatter};
 use std::path::Path;
 
 use gemi_core::cartridge::Cartridge;
@@ -23,7 +24,6 @@ use gemi_core::input::InputButton;
 use gemi_utils::keybindings::KeyBindings;
 
 use crate::selection::{Kind, Selection};
-
 
 /// An enum to store the different update modes of the emulator
 /// inside of this debugger application.
@@ -36,11 +36,23 @@ pub enum UpdateMode {
     /// This will run the emulator in real time and continuously spawn new frames.
     Continuous,
 
-    /// Run the emulator until the next frame is finished and then switch into pause mode.
-    StepFrame,
+    /// Run the emulator for a single step and the switch into pause mode.
+    /// The type of step is determined by the [SingleStepMode] parameter.
+    Step,
+}
 
-    /// Executes the next instruction and then switches into pause mode.
-    StepInstruction,
+
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Copy, Clone)]
+/// an enum to define which step to be done when running the
+/// emulator in single step mode.
+/// See [UpdateMode::Step].
+pub enum UpdateStepMode {
+    /// Runs the emulator until the next frame was completed.
+    Frame,
+    
+    /// Runs the emulator for a single instruction only.
+    Instruction,
 }
 
 
@@ -79,6 +91,10 @@ pub struct UiStates {
     /// The current update mode of the emulator.
     update_mode: UpdateMode,
 
+    /// When [update_mode] is [UpdateMode::Step], this determines
+    /// which kind of step to perform.
+    update_step_mode: UpdateStepMode,
+
     /// Describes the currently selected focus item within the UI.
     pub focus: Selection,
     
@@ -91,6 +107,23 @@ pub struct UiStates {
 impl Default for UpdateMode {
     fn default() -> Self {
         Self::Paused
+    }
+}
+
+
+impl Default for UpdateStepMode {
+    fn default() -> Self {
+        Self::Frame
+    }
+}
+
+
+impl Display for UpdateStepMode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            UpdateStepMode::Frame       => write!(f, "Frame"),
+            UpdateStepMode::Instruction => write!(f, "Instruction"),
+        }
     }
 }
 
@@ -141,19 +174,17 @@ impl EmulatorState {
 
             // process the next frame and stay in continuous mode
             UpdateMode::Continuous => {
-                self.emu.process_frame();
+                self.emu.run_frame();
                 UpdateMode::Continuous
             }
 
-            // process the next frame and switch into pause mode
-            UpdateMode::StepFrame => {
-                self.emu.process_frame();
-                UpdateMode::Paused
-            }
+            // process the next step and switch into pause mode
+            UpdateMode::Step => {
+                match self.ui.update_step_mode {
+                    UpdateStepMode::Frame       => self.emu.run_frame(),
+                    UpdateStepMode::Instruction => self.emu.run_single_step(),
+                }
 
-            // process the next instruction and switch into pause mode
-            UpdateMode::StepInstruction => {
-                // not implemented yet
                 UpdateMode::Paused
             }
         }
@@ -196,9 +227,16 @@ impl EmulatorInstance {
 
 
     /// Process a single frame of the emulator, if any.
-    pub fn process_frame(&mut self) {
+    pub fn run_frame(&mut self) {
         if let Some(emu) = self.get_emulator_mut() {
-            emu.process_frame();
+            emu.run_frame();
+        }
+    }
+
+
+    pub fn run_single_step(&mut self) {
+        if let Some(emu) = self.get_emulator_mut() {
+            emu.run_single_step();
         }
     }
 }
@@ -223,6 +261,18 @@ impl UiStates {
     /// Change the emulator's update mode.
     pub fn set_update_mode(&mut self, mode: UpdateMode) {
         self.update_mode = mode;
+    }
+
+
+    /// Get what will be performed a single step.
+    pub fn get_update_step_mode(&self) -> &UpdateStepMode {
+        &self.update_step_mode
+    }
+
+
+    /// Set what will be performed a single step.
+    pub fn set_update_step_mode(&mut self, mode: UpdateStepMode) {
+        self.update_step_mode = mode;
     }
 }
 
@@ -252,10 +302,11 @@ impl Default for EmulatorState {
             },
 
             ui: UiStates {
-                key_bindings: make_default_key_bindings(),
-                update_mode: UpdateMode::Paused,
-                focus: Selection::new(Kind::Focus),
-                hover: Selection::new(Kind::Hover),
+                key_bindings:       make_default_key_bindings(),
+                update_mode:        UpdateMode::Paused,
+                update_step_mode:   UpdateStepMode::Frame,
+                focus:              Selection::new(Kind::Focus),
+                hover:              Selection::new(Kind::Hover),
             },
         }
     }

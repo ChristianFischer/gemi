@@ -16,11 +16,13 @@
  */
 
 use std::cmp::min;
+use std::mem::take;
 
-use crate::cpu::interrupts::{Interrupt, Interrupts};
+use crate::cpu::interrupts::Interrupt;
+use crate::debug::DebugEvent;
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
-use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
+use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::MemoryData;
 use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
@@ -28,7 +30,6 @@ use crate::ppu::graphic_data::*;
 use crate::ppu::sprite_image::SpriteImage;
 use crate::ppu::video_memory::{OamRam, OamRamBank, VideoMemory};
 use crate::utils::get_bit;
-
 
 pub const SCREEN_W: u32 = 160;
 pub const SCREEN_H: u32 = 144;
@@ -56,11 +57,6 @@ pub enum Mode {
     VBlank      = 1,
     OamScan     = 2,
     DrawLine    = 3,
-}
-
-pub enum FrameState {
-    Processing,
-    FrameCompleted,
 }
 
 
@@ -173,8 +169,8 @@ pub struct Ppu {
     /// Current device config
     device_config: DeviceConfig,
 
-    /// Pending interrupts requested by this component.
-    interrupts: Interrupts,
+    /// Pending output to be sent back through the memory bus.
+    signals: MemoryBusSignals,
 
     /// The PPU's current mode.
     mode: Mode,
@@ -285,7 +281,7 @@ impl Ppu {
         Ppu {
             clock: 0,
             device_config,
-            interrupts: Interrupts::default(),
+            signals: MemoryBusSignals::default(),
             mode: Mode::OamScan,
             memory: VideoMemory::new(device_config),
             registers: PpuRegisters::default(),
@@ -304,7 +300,7 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    pub fn update(&mut self, cycles: Clock) -> FrameState {
+    pub fn update(&mut self, cycles: Clock) {
         self.clock += cycles;
 
         match self.mode {
@@ -319,7 +315,7 @@ impl Ppu {
     /// Scans the object attribute memory for the current scanline
     /// to collect the objects to be drawn in this line.
     /// Enters Mode::DrawLine after the OAM scan was completed.
-    fn process_oam_scan(&mut self) -> FrameState {
+    fn process_oam_scan(&mut self) {
         if self.clock > 80 {
             self.clock -= 80;
 
@@ -329,18 +325,16 @@ impl Ppu {
 
             self.enter_mode(Mode::DrawLine);
         }
-
-        FrameState::Processing
     }
 
 
     /// Draws pixels of the current scanline into the LCD buffer.
     /// Enters Mode::HBlank after the drawing was completed.
-    fn process_draw_line(&mut self) -> FrameState {
+    fn process_draw_line(&mut self) {
         let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
         let pixels_to_update = min(self.clock / 2, pixels_remaining as u64);
         if pixels_to_update == 0 {
-            return FrameState::Processing;
+            return;
         }
 
         // update clock
@@ -417,8 +411,6 @@ impl Ppu {
         if self.current_line_pixel as u32 >= SCREEN_W {
             self.enter_mode(Mode::HBlank);
         }
-
-        FrameState::Processing
     }
 
 
@@ -528,7 +520,7 @@ impl Ppu {
     /// Process the HBlank mode after each drawn scanline.
     /// Enters Mode::OamScan for the next line or
     /// Mode::VBlank if the current line was the last one.
-    fn process_hblank(&mut self) -> FrameState {
+    fn process_hblank(&mut self) {
         let remaining_cycles = CPU_CYCLES_PER_LINE - self.current_line_cycles;
 
         if self.clock >= remaining_cycles {
@@ -536,22 +528,18 @@ impl Ppu {
 
             return self.enter_next_line();
         }
-
-        FrameState::Processing
     }
 
 
     /// Process the VBlank mode after all scanlines were drawn.
     /// Enters Mode::OamScan for the first scanline of the next frame,
     /// afters the VBlank was completed.
-    fn process_vblank(&mut self) -> FrameState {
+    fn process_vblank(&mut self) {
         if self.clock >= CPU_CYCLES_PER_LINE {
             self.clock -= CPU_CYCLES_PER_LINE;
 
             return self.enter_next_line();
         }
-
-        FrameState::Processing
     }
 
 
@@ -592,7 +580,7 @@ impl Ppu {
     /// LCD status byte as well as the current LY byte in memory.
     /// Enters either Mode::OamScan or Mode::VBlank depending on
     /// the next scanline.
-    fn enter_next_line(&mut self) -> FrameState {
+    fn enter_next_line(&mut self) {
         if self.current_line == 153 {
             self.current_line = 0;
         }
@@ -627,14 +615,13 @@ impl Ppu {
             _         => unreachable!()
         }
 
+        // notify LineCompleted after switching a line
+        self.signals.events |= DebugEvent::PpuLineCompleted;
+
         // notify FrameCompleted after switching back to line #0
         if self.current_line == 0 {
+            self.signals.events |= DebugEvent::PpuFrameCompleted;
             self.on_new_frame();
-
-            FrameState::FrameCompleted
-        }
-        else {
-            FrameState::Processing
         }
     }
 
@@ -646,7 +633,7 @@ impl Ppu {
 
     /// Requests an interrupt to be fired.
     fn request_interrupt(&mut self, interrupt: Interrupt) {
-        self.interrupts |= interrupt;
+        self.signals.interrupts |= interrupt;
     }
 
     /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
@@ -925,7 +912,7 @@ impl Ppu {
     /// Get the raw data of a sprite, as it is stored in the VRAM.
     pub fn get_sprite_image(&self, sprite_index: usize, bank: u8) -> SpriteImage {
         let vram = &self.memory.vram_banks[(bank & 0x01) as usize];
-        let sprite_address_begin = (sprite_index * 16);
+        let sprite_address_begin =  sprite_index * 16 ;
         let sprite_address_end   = (sprite_index * 16) + 16;
 
         let slice = &vram.as_slice()[sprite_address_begin .. sprite_address_end];
@@ -1086,11 +1073,8 @@ impl MemoryBusConnection for Ppu {
     }
 
 
-    fn take_requested_interrupts(&mut self) -> Interrupts {
-        let result = self.interrupts.clone();
-        self.interrupts.clear();
-
-        result
+    fn take_signals(&mut self) -> MemoryBusSignals {
+        take(&mut self.signals)
     }
 }
 

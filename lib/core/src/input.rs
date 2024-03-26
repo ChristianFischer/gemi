@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cpu::interrupts::{Interrupt, Interrupts};
-use crate::mmu::locations::MEMORY_LOCATION_JOYP;
-use crate::mmu::memory_bus::MemoryBusConnection;
-use crate::utils::{change_bit, get_bit};
+use std::mem::take;
 
+use crate::cpu::interrupts::Interrupt;
+use crate::mmu::locations::MEMORY_LOCATION_JOYP;
+use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
+use crate::utils::{change_bit, get_bit};
 
 /// A list of all buttons available on the GameBoy
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -36,8 +37,8 @@ pub enum InputButton {
 
 
 pub struct Input {
-    /// Pending interrupts requested by this component.
-    interrupts: Interrupts,
+    /// Pending output to be sent back through the memory bus.
+    signals: MemoryBusSignals,
 
     /// JOYP bits 4 + 5 used to select which button states are returned by reading JOYP:
     /// * 0b_0001_0000 -> direction buttons
@@ -73,7 +74,7 @@ impl Input {
     /// Creates a new Input object.
     pub fn new() -> Input {
         Input {
-            interrupts:             Interrupts::default(),
+            signals:                MemoryBusSignals::default(),
             button_selection:       0x00,
             button_states:          0x00,
             previous_button_states: 0x00,
@@ -109,7 +110,7 @@ impl Input {
 
     /// Requests an interrupt to be fired.
     fn request_interrupt(&mut self, interrupt: Interrupt) {
-        self.interrupts |= interrupt;
+        self.signals.interrupts |= interrupt;
     }
 }
 
@@ -144,10 +145,7 @@ impl MemoryBusConnection for Input {
     }
 
 
-    fn take_requested_interrupts(&mut self) -> Interrupts {
-        let result = self.interrupts.clone();
-        self.interrupts.clear();
-
-        result
+    fn take_signals(&mut self) -> MemoryBusSignals {
+        take(&mut self.signals)
     }
 }

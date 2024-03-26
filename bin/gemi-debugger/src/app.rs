@@ -18,16 +18,15 @@
 use std::path::PathBuf;
 
 use eframe::{CreationContext, Frame};
-use egui::Context;
+use egui::{ComboBox, Context};
 
 use crate::behaviour::TreeBehaviour;
 use crate::event::UiEvent;
-use crate::state::{EmulatorState, UpdateMode};
+use crate::state::{EmulatorState, UpdateMode, UpdateStepMode};
 use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
 use crate::views::{View, ViewClass};
-
 
 /// The main application struct.
 /// This contains the root elements of the UI
@@ -284,7 +283,30 @@ impl EmulatorApplication {
 
         // "Step" button
         if ui.button(BUTTON_LABEL_STEP).clicked() {
-            state.ui.set_update_mode(UpdateMode::StepFrame);
+            state.ui.set_update_mode(UpdateMode::Step);
+        }
+
+        // Step type
+        {
+            let mut selected_index = *state.ui.get_update_step_mode() as usize;
+
+            let all_modes = [
+                UpdateStepMode::Frame,
+                UpdateStepMode::Instruction
+            ];
+
+            let response = ComboBox::from_id_source("update_step")
+                    .show_index(
+                        ui,
+                        &mut selected_index,
+                        all_modes.len(),
+                        |i| all_modes[i].to_string()
+                    )
+            ;
+            
+            if response.changed() {
+                state.ui.set_update_step_mode(all_modes[selected_index]);
+            }
         }
     }
 

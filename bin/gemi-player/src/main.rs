@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,20 @@
 
 extern crate core;
 
-mod sound_queue;
-mod window;
+use std::{env, time};
+use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::Cartridge;
 use gemi_core::cartridge::GameBoyColorSupport;
 use gemi_core::cpu::cpu::CPU_CLOCK_SPEED;
 use gemi_core::gameboy::{DeviceType, GameBoy};
-use std::{env, time};
-use std::path::{Path, PathBuf};
-use std::time::Duration;
+
 use crate::window::Window;
+
+mod sound_queue;
+mod window;
 
 fn print_rom_info(file: &Path, cartridge: &Cartridge) {
     let mut features: Vec<&str> = vec![];
@@ -73,7 +75,8 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
     let mut interval_cycles = 0;
 
     while window.is_opened() {
-        let frame_cycles = gb.process_frame();
+        let frame_results = gb.run_frame();
+        let frame_cycles  = frame_results.cycles;
         interval_cycles += frame_cycles;
 
         // update window
