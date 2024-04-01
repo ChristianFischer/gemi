@@ -74,7 +74,11 @@ struct DisassemblyCache {
 /// The data of a single instruction, already prepared to be rendered with
 /// the least effort as possible.
 struct InstructionDisplayEntry {
+    /// The instruction to be displayed.
     instruction: Instruction,
+
+    /// The actual bytes forming the instruction.
+    instruction_bytes: Vec<u8>,
 
     label_address: RichText,
     label_opcode_bytes: RichText,
@@ -121,7 +125,7 @@ impl DisassemblyView {
                 // otherwise clear the cache. It will be regenerated from the current
                 // address on. After the CPU did jump out of the current disassembly,
                 // we cant be sure whether it's still valid or not
-                self.rt.disassembly_cache = Default::default();
+                self.rt.disassembly_cache.reset();
             }
         }
 
@@ -209,10 +213,10 @@ impl DisassemblyView {
                 }
 
                 // render the actual disassembly lines within a grid
-                Grid::new("grid")
+                let response = Grid::new("grid")
                         .min_col_width(0.0)
                         .num_columns(4)
-                        .show(ui, |ui| {
+                        .show(ui, |ui| -> Option<()> {
                             for row in display_rows {
                                 // bounding box of the whole line
                                 let line_bounds = egui::Rect::from_min_size(
@@ -230,11 +234,20 @@ impl DisassemblyView {
                                     );
                                 }
 
-                                let entry = &self.rt.disassembly_cache.instruction_entries[row];
+                                // get an entry, if still valid, otherwise will leave the rendering
+                                let entry = self.rt.disassembly_cache.verify_and_get_instruction(row, emu)?;
                                 entry.render_as_row(ui, emu);
                             }
+
+                            Some(())
                         })
                 ;
+
+                // when something failed at rendering, reset the disassembly cache
+                if response.inner.is_none() {
+                    self.rt.disassembly_cache.reset();
+                    ui.ctx().request_repaint();
+                }
             }
         );
     }
@@ -321,6 +334,12 @@ impl DisassemblyCache {
     }
 
 
+    /// Resets the disassembly cache.
+    fn reset(&mut self) {
+        *self = Default::default();
+    }
+
+
     /// Checks whether this cache is currently empty or not.
     fn is_empty(&self) -> bool {
         self.instruction_entries.is_empty()
@@ -364,6 +383,46 @@ impl DisassemblyCache {
 
         None
     }
+
+
+    /// Verifies the instruction of a specific line. If invalid, tries to re-read
+    /// the instruction.
+    /// Returns the reference to the requested instruction if possible, or `None`,
+    /// if there's no valid instruction available.
+    fn verify_and_get_instruction(&mut self, line: usize, emu: &GameBoy) -> Option<&InstructionDisplayEntry> {
+        // check whether the current line is still valid
+        {
+            if self.instruction_entries[line].verify(emu) {
+                return Some(&self.instruction_entries[line]);
+            }
+        }
+
+        // if not, try to fetch a new instruction from the same address
+        {
+            let original_instruction_address = self.instruction_entries[line].instruction.opcode_address;
+            let original_instruction_length = self.instruction_entries[line].get_length();
+
+            // read the instruction again from memory
+            let new_instruction = Instruction::read_instruction(
+                original_instruction_address,
+                |address| emu.get_mmu().read_u8(address)
+            );
+
+            // only if the length is matching, we can replace the old one with the new one
+            // otherwise this means all the following instructions are invalid as well
+            let new_instruction_length = new_instruction.get_instruction_length() as usize;
+            if new_instruction_length == original_instruction_length {
+                let new_entry = InstructionDisplayEntry::prepare_instruction_display(new_instruction, emu);
+                self.instruction_entries[line] = new_entry;
+
+                // return a reference to the new instruction
+                return Some(&self.instruction_entries[line]);
+            }
+        }
+
+        // instruction was invalid and couldn't be replaced
+        return None;
+    }
 }
 
 
@@ -379,15 +438,22 @@ impl InstructionDisplayEntry {
         };
 
         // instruction bytes
-        let label_opcode_bytes = {
+        let instruction_bytes = {
             // number of bytes for this instruction (+1 for 0xcb opcodes)
             let num_instruction_bytes = instruction.get_instruction_length();
 
-            let bytes_string =
-                    (0..num_instruction_bytes)
+            (0..num_instruction_bytes)
                     .into_iter()
                     .map(|offset| instruction.opcode_address.wrapping_add(offset))
                     .map(|address| emu.get_mmu().read_u8(address))
+                    .collect::<Vec<_>>()
+        };
+
+        // instruction bytes label
+        let label_opcode_bytes = {
+            let bytes_string =
+                    instruction_bytes
+                    .iter()
                     .fold(
                         String::new(),
                         |str, byte| format!("{str}{byte:02x} ")
@@ -425,10 +491,33 @@ impl InstructionDisplayEntry {
 
         Self {
             instruction,
+            instruction_bytes,
             label_address,
             label_opcode_bytes,
             label_opcode_desc,
         }
+    }
+
+
+    /// Get the instruction length.
+    fn get_length(&self) -> usize {
+        self.instruction_bytes.len()
+    }
+
+
+    /// Check if the instruction bytes still match the values received from the emulator.
+    fn verify(&self, emu: &GameBoy) -> bool {
+        for offset in 0..self.get_length() {
+            let address           = self.instruction.opcode_address + (offset as u16);
+            let value_at_address  = emu.get_mmu().read_u8(address);
+            let instruction_value = self.instruction_bytes[offset];
+
+            if value_at_address != instruction_value {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
