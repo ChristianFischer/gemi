@@ -15,8 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::event::UiEvent;
+use std::ops::Range;
 
+use crate::event::UiEvent;
 
 /// A struct describing an item currently being selected or highlighted.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -34,6 +35,10 @@ pub enum Selected {
     /// [TileMap] it belongs to, referred by its value of the selection bit
     /// used in the LCDC register.
     Tile(bool, usize),
+
+    /// The selection is on a disassembled instruction,
+    /// referred by its address range.
+    Instruction(Range<u16>),
 }
 
 

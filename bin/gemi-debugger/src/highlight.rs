@@ -26,7 +26,6 @@ use crate::state::UiStates;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
-
 /// The state how an item gets highlighted, based on the selections stored
 /// in the applications [UiStates].
 pub enum HighlightState {
@@ -159,11 +158,25 @@ impl HighlightTesting {
 
 impl HighlightState {
     /// Receive a color to highlight the current item.
+    /// This color is expected to be used as a foreground color for example
+    /// to draw a border around an item.
     pub fn get_color(&self, ui: &Ui) -> Color32 {
         let gray = Color32::from_rgba_unmultiplied(128, 128, 128, 255);
 
         match *self {
             HighlightState::Hovered         => Self::blend_colors(ui.visuals().selection.bg_fill, gray, 0.5),
+            HighlightState::Selected        => ui.visuals().selection.bg_fill,
+            HighlightState::FocusHovered    => GemiStyle::BACKGROUND_HIGHLIGHT_HOVER,
+            HighlightState::Focus           => GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION,
+        }
+    }
+
+
+    /// Receive a color to highlight the current item.
+    /// This color is expected to be used as a background behind an item.
+    pub fn get_background_color(&self, ui: &Ui) -> Color32 {
+        match *self {
+            HighlightState::Hovered         => ui.visuals().widgets.hovered.bg_fill,
             HighlightState::Selected        => ui.visuals().selection.bg_fill,
             HighlightState::FocusHovered    => GemiStyle::BACKGROUND_HIGHLIGHT_HOVER,
             HighlightState::Focus           => GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION,

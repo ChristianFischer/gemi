@@ -22,7 +22,10 @@ use egui::{Grid, RichText, ScrollArea, Sense, TextStyle, Ui, vec2};
 use gemi_core::cpu::opcode::{Instruction, Token};
 use gemi_core::gameboy::GameBoy;
 
-use crate::state::EmulatorState;
+use crate::event::UiEvent;
+use crate::highlight::test_selection;
+use crate::selection::{Kind, Selected};
+use crate::state::{EmulatorState, UiStates};
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
@@ -33,6 +36,9 @@ const ADDITIONAL_LINES_BEYOND_VIEW : usize = 10;
 pub struct DisassemblyView {
     #[serde(skip)]
     rt: RuntimeData,
+
+    /// The index of the currently selected line, if any.
+    line_selected: Option<usize>,
 }
 
 
@@ -95,8 +101,26 @@ impl View for DisassemblyView {
 
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         if let Some(emu) = state.emu.get_emulator() {
-            self.update_disassembly(ui, emu);
-            self.render_disassembly_list(ui, emu);
+            self.update_disassembly(ui, &mut state.ui, emu);
+            self.render_disassembly_list(ui, &mut state.ui, emu);
+        }
+    }
+
+
+    fn get_current_selection(&self) -> Option<Selected> {
+        self.line_selected
+                .and_then(|index| self.rt.disassembly_cache.get_instruction(index))
+                .map(|instruction| Selected::Instruction(instruction.get_address_range()))
+    }
+
+
+    fn handle_ui_event(&mut self, event: &UiEvent) {
+        match event {
+            UiEvent::SelectionChanged(Kind::Focus, Some(Selected::Instruction(address_range))) => {
+                self.line_selected = self.rt.disassembly_cache.find_line_of_address(address_range.start);
+            },
+
+            _ => { }
         }
     }
 }
@@ -106,12 +130,13 @@ impl DisassemblyView {
     pub fn new() -> Self {
         Self {
             rt: RuntimeData::default(),
+            line_selected: None,
         }
     }
 
 
     /// Updates the currently cached disassembly as needed.
-    fn update_disassembly(&mut self, ui: &mut Ui, emu: &GameBoy) {
+    fn update_disassembly(&mut self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy) {
         let current_pc = emu.cpu.get_instruction_pointer();
 
         // when the instruction pointer did change, we want to focus the new active line.
@@ -139,6 +164,14 @@ impl DisassemblyView {
                 visible_lines + ADDITIONAL_LINES_BEYOND_VIEW
             );
 
+            // clear the selected line, if any
+            if let Some(entry) = self.line_selected.and_then(|index| self.rt.disassembly_cache.get_instruction(index)) {
+                let key = Selected::Instruction(entry.get_address_range());
+
+                ui_states.focus.clear(key.clone());
+                ui_states.hover.clear(key.clone());
+            }
+
             // on reset the view, scroll back to top
             self.rt.scroll_to_line = Some(0);
         }
@@ -148,7 +181,7 @@ impl DisassemblyView {
 
 
     /// Renders the actual UI using the currently stored disassembly cache.
-    fn render_disassembly_list(&mut self, ui: &mut Ui, emu: &GameBoy) {
+    fn render_disassembly_list(&mut self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy) {
         let (line_content_height, line_height_padded) = Self::compute_line_height(ui);
         let available_rows = self.rt.disassembly_cache.get_lines_count();
 
@@ -217,26 +250,49 @@ impl DisassemblyView {
                         .min_col_width(0.0)
                         .num_columns(4)
                         .show(ui, |ui| -> Option<()> {
+                            // verify all lines which need to be drawn. 
+                            // Stops if at least one line fails to be verified
+                            self.rt.disassembly_cache.verify_lines(display_rows.clone(), emu)?;
+                            
                             for row in display_rows {
+                                // get an entry, if still valid, otherwise will leave the rendering
+                                let entry = self.rt.disassembly_cache.get_instruction(row)?;
+
                                 // bounding box of the whole line
                                 let line_bounds = egui::Rect::from_min_size(
                                     ui.cursor().left_top(),
                                     vec2(viewport_width, line_height_padded)
                                 );
 
-                                // mouse interaction with the current row
-                                let hover_response  = ui.interact(line_bounds, ui.id().with(1), Sense::hover());
-                                if hover_response.hovered() {
+                                // check whether it's selected or not
+                                let selection_key = Selected::Instruction(entry.get_address_range());
+                                let highlight_state = test_selection(selection_key.clone())
+                                        .of_view(self)
+                                        .compare_with_ui_states(ui_states, emu)
+                                ;
+
+                                // render line highlight, if any
+                                if let Some(highlight_state) = highlight_state {
                                     ui.painter().rect_filled(
                                         line_bounds,
                                         2.0,
-                                        ui.style().visuals.widgets.hovered.bg_fill
+                                        highlight_state.get_background_color(ui),
                                     );
                                 }
 
-                                // get an entry, if still valid, otherwise will leave the rendering
-                                let entry = self.rt.disassembly_cache.verify_and_get_instruction(row, emu)?;
+                                // render the actual element
                                 entry.render_as_row(ui, emu);
+
+                                // mouse interaction with the current row
+                                let line_response = ui.interact(line_bounds, ui.id().with(row), Sense::click());
+
+                                // handle hover state
+                                ui_states.hover.set(selection_key.clone(), line_response.hovered());
+
+                                // handle click
+                                if line_response.clicked() {
+                                    ui_states.focus.toggle(selection_key.clone());
+                                }
                             }
 
                             Some(())
@@ -385,6 +441,20 @@ impl DisassemblyCache {
     }
 
 
+    /// Verifies all lines in the given range. If one of them is invalid,
+    /// it tries to re-read them.
+    /// Returns `Some` if all lines are valid, `None` if at least one
+    /// line was invalid and couldn't be re-read.
+    fn verify_lines(&mut self, lines: Range<usize>, emu: &GameBoy) -> Option<()> {
+        // iterate over all lines, stop on the first failure
+        for line in lines {
+            self.verify_and_get_instruction(line, emu)?;
+        }
+
+        Some(())
+    }
+
+
     /// Verifies the instruction of a specific line. If invalid, tries to re-read
     /// the instruction.
     /// Returns the reference to the requested instruction if possible, or `None`,
@@ -422,6 +492,13 @@ impl DisassemblyCache {
 
         // instruction was invalid and couldn't be replaced
         return None;
+    }
+
+
+    /// Get a specific line.
+    /// This does not attempt to verify them, which has to be done in a separate step.
+    fn get_instruction(&self, line: usize) -> Option<&InstructionDisplayEntry> {
+        self.instruction_entries.get(line)
     }
 }
 
@@ -496,6 +573,15 @@ impl InstructionDisplayEntry {
             label_opcode_bytes,
             label_opcode_desc,
         }
+    }
+
+
+    /// Get the address range where this particular instruction is stored.
+    fn get_address_range(&self) -> Range<u16> {
+        let start = self.instruction.opcode_address;
+        let end   = self.instruction.opcode_address.saturating_add(self.instruction.get_instruction_length());
+
+        start..end
     }
 
 

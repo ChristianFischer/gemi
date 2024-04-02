@@ -31,7 +31,6 @@ use crate::ui::memory_editor::MemoryEditor;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
-
 /// A view to display the emulator's memory.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct MemoryView {
@@ -125,11 +124,18 @@ impl MemoryView {
                         get_oam_address_range(*oam_index)
                 );
             }
-            
+
             SelectionChanged(kind, Some(Tile(tilemap_bit, tile_index))) => {
                 self.memory_editor.set_highlighted_range(
                         get_highlight_index(kind),
                         get_tile_address_range(*tilemap_bit, *tile_index)
+                );
+            }
+
+            SelectionChanged(kind, Some(Instruction(range))) => {
+                self.memory_editor.set_highlighted_range(
+                        get_highlight_index(kind),
+                        range.start as usize .. range.end as usize,
                 );
             }
 
