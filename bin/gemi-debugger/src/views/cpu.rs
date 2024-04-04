@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,14 @@
  */
 
 use egui::{Grid, Label, PointerButton, Sense, TextEdit, Ui, Vec2, Widget};
+
 use gemi_core::cpu::cpu::{CpuFlag, RegisterR8};
 use gemi_core::gameboy::GameBoy;
 use gemi_core::utils::to_u8;
+
 use crate::state::EmulatorState;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
-
 
 /// A view to display runtime information about the CPU.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -134,12 +135,12 @@ impl CpuView {
 
                 // stack-pointer register
                 ui.label(address_style.rich_text("SP"));
-                self.display_register_pc(ui, state);
+                self.display_register_sp(ui, state);
                 ui.end_row();
 
                 // instruction-pointer register
                 ui.label(address_style.rich_text("PC"));
-                self.display_register_sp(ui, state);
+                self.display_register_pc(ui, state);
                 ui.end_row();
             })
         ;
