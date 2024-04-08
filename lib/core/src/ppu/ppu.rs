@@ -594,6 +594,9 @@ impl Ppu {
             self.window_line += 1;
         }
 
+        // reset the current line pixel
+        self.current_line_pixel = 0;
+
         // check for ly == lyc coincidence
         {
             let coincidence = self.current_line == self.registers.line_compare;
@@ -648,7 +651,17 @@ impl Ppu {
 
     /// Get the RGBA color for any color color index.
     pub fn translate_dmg_color_index(&self, pixel: &DmgLcdPixel) -> &Color {
-        self.get_dmg_display_palette().get_color(&pixel)
+        self.get_dmg_display_palette().get_color(pixel)
+    }
+
+    /// Get the index of the line currently being drawn.
+    pub fn get_current_line(&self) -> u8 {
+        self.current_line
+    }
+
+    /// Get the index of the pixel currently being drawn.
+    pub fn get_current_line_pixel(&self) -> u8 {
+        self.current_line_pixel
     }
 
     /// Get the LCD buffer which contains the actual data sent to the device's display.

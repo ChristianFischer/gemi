@@ -18,10 +18,12 @@
 use crate::apu::apu::Apu;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
-use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8};
+use crate::cpu::cpu::{Cpu, CPU_CLOCK_SPEED, CpuFlag, RegisterR8};
 use crate::cpu::interrupts::InterruptRegisters;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
 use crate::debug::{DebugEvent, DebugEvents};
+// re-export some types
+pub use crate::device_type::{DeviceType, EmulationType};
 use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
@@ -30,10 +32,6 @@ use crate::ppu::ppu::Ppu;
 use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};
-
-// re-export some types
-pub use crate::device_type::{DeviceType, EmulationType};
-
 
 /// Type to measure clock ticks of the device.
 /// Alias for unsigned 64bit integer.
@@ -406,6 +404,18 @@ impl GameBoy {
 
             self.get_peripherals_mut().timer.initialize_counter(timer_counter, tac);
         }
+    }
+
+
+    /// Get the number of cycles processed by the emulator since it started.
+    pub fn get_total_cycles_processed(&self) -> Clock {
+        self.total_cycles
+    }
+
+
+    /// Get the time in seconds the emulator did run.
+    pub fn get_total_seconds_processed(&self) -> f32 {
+        (self.total_cycles as f32) / (CPU_CLOCK_SPEED as f32)
     }
 
 

@@ -84,7 +84,7 @@ pub enum ViewClass {
 impl ViewClass {
     /// Creates a new [`EmulatorDisplayView`] object.
     pub fn new_display_view() -> ViewClass {
-        ViewClass::Display(EmulatorDisplayView { })
+        ViewClass::Display(EmulatorDisplayView::new())
     }
 
 

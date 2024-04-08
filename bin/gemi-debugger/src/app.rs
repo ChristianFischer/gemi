@@ -292,6 +292,7 @@ impl EmulatorApplication {
 
             let all_modes = [
                 UpdateStepMode::Frame,
+                UpdateStepMode::Line,
                 UpdateStepMode::Instruction
             ];
 

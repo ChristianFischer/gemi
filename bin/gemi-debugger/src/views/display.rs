@@ -15,28 +15,47 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use std::cmp::min;
 use std::ops::{Add, Div, Sub};
 
 use eframe::emath::Rect;
 use eframe::epaint::{ColorImage, Stroke};
 use eframe::epaint::textures::TextureOptions;
-use egui::{Color32, Image, Pos2, Sense, Ui, Vec2, vec2, Widget};
+use egui::{Color32, Context, Image, Pos2, Sense, TextureHandle, Ui, Vec2, vec2, Widget};
 
-use gemi_core::gameboy::GameBoy;
+use gemi_core::gameboy::{Clock, GameBoy};
 use gemi_core::ppu::flags::LcdControlFlag;
 use gemi_core::ppu::graphic_data::Sprite;
 use gemi_core::ppu::ppu::{SCREEN_H, SCREEN_W};
 
 use crate::highlight::test_selection;
 use crate::selection::Selected;
-use crate::state::{EmulatorState, UiStates};
+use crate::state::{EmulatorState, UiStates, UpdateMode};
 use crate::views::View;
 
 
 /// The main view to show the emulator's display.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct EmulatorDisplayView {
+    #[serde(skip)]
+    rt: RuntimeData,
+}
 
+
+#[derive(Default)]
+struct RuntimeData {
+    display_image: Option<TextureHandle>,
+    display_image_timestamp: Clock,
+
+    current_draw_pos: ScreenPos,
+    last_draw_pos: ScreenPos,
+}
+
+
+#[derive(Default, Copy, Clone, Eq, PartialEq)]
+struct ScreenPos {
+    pub x: usize,
+    pub y: usize,
 }
 
 
@@ -51,6 +70,7 @@ impl View for EmulatorDisplayView {
             None => {}
 
             Some(emu) => {
+                self.update_display_image(ui.ctx(), emu, &mut state.ui);
                 self.render_display_image(ui, emu, &mut state.ui);
             }
         }
@@ -59,41 +79,123 @@ impl View for EmulatorDisplayView {
 
 
 impl EmulatorDisplayView {
+    pub fn new() -> Self {
+        Self {
+            rt: Default::default(),
+        }
+    }
+
+
+    /// Checks whether the cached display image is outdated and updates the image, if necessary.
+    fn update_display_image(&mut self, ctx: &Context, emu: &GameBoy, ui_states: &mut UiStates) {
+        if self.rt.display_image.is_none() || self.rt.display_image_timestamp != emu.get_total_cycles_processed() {
+            let ppu    = &emu.get_peripherals().ppu;
+            let lcd    = ppu.get_lcd();
+            let size   = [lcd.get_width() as _, lcd.get_height() as _];
+            let pixels = lcd.get_pixels_as_slice();
+
+            // get the position on the screen which was drawn recently
+            let current_pos = ScreenPos {
+                x: min(lcd.get_width() as usize,  ppu.get_current_line_pixel() as usize),
+                y: min(lcd.get_height() as usize, ppu.get_current_line() as usize),
+            };
+
+            // check whether the draw cursor has moved
+            if self.rt.current_draw_pos != current_pos {
+                self.rt.last_draw_pos = self.rt.current_draw_pos;
+                self.rt.current_draw_pos = current_pos;
+            }
+
+            // create a texture from the pixel data
+            let mut image = ColorImage::from_rgba_unmultiplied(size, pixels);
+
+            // when the emulator is paused or in stepped-mode, highlight
+            // the pixels drawn since the last step
+            if
+                    Self::display_highlight_in_mode(&ui_states.get_update_mode())
+                &&  self.rt.last_draw_pos != self.rt.current_draw_pos
+            {
+                self.apply_highlight(&mut image);
+            }
+
+            let texture = ctx.load_texture("display", image, TextureOptions::NEAREST);
+
+            self.rt.display_image = Some(texture);
+        }
+    }
+
+
     /// Render the display image of the currently running emulator.
-    fn render_display_image(&self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
-        let lcd    = emu.get_peripherals().ppu.get_lcd();
-        let size   = [lcd.get_width() as _, lcd.get_height() as _];
-        let pixels = lcd.get_pixels_as_slice();
+    fn render_display_image(&mut self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
+        if let Some(texture) = &self.rt.display_image {
+            let texture_size = texture.size_vec2();
+            let available_size = ui.available_size();
 
-        // create a texture from the pixel data
-        let image   = ColorImage::from_rgba_unmultiplied(size, pixels);
-        let texture = ui.ctx().load_texture("display", image, TextureOptions::NEAREST);
+            // compute the scale factor to fit the image into the available space
+            // (but only whole numbers and not smaller than 1)
+            let scale = f32::max(
+                1.0,
+                f32::min(
+                    available_size.x / texture_size.x,
+                    available_size.y / texture_size.y
+                )
+            ).floor();
 
-        let texture_size   = texture.size_vec2();
-        let available_size = ui.available_size();
+            // store the origin of the draw area
+            let origin = ui.cursor().left_top();
 
-        // compute the scale factor to fit the image into the available space
-        // (but only whole numbers and not smaller than 1)
-        let scale = f32::max(
-            1.0,
-            f32::min(
-                available_size.x / texture_size.x,
-                available_size.y / texture_size.y
-            )
-        ).floor();
+            // render the texture
+            Image::new(texture)
+                    .fit_to_exact_size(texture_size * scale)
+                    .ui(ui)
+            ;
 
-        // store the origin of the draw area
-        let origin = ui.cursor().left_top();
+            self.handle_interactions(ui, ui_states, emu, origin, scale);
 
-        // render the texture
-        Image::new(&texture)
-                .fit_to_exact_size(texture_size * scale)
-                .ui(ui)
-        ;
-        
-        self.handle_interactions(ui, ui_states, emu, origin, scale);
+            self.render_selection_overlays(ui, ui_states, emu, origin, scale);
+        }
+    }
 
-        self.render_selection_overlays(ui, ui_states, emu, origin, scale);
+
+    /// Tells whether to highlight the recent drawn pixels in a certain [UpdateMode] or not.
+    fn display_highlight_in_mode(mode: &UpdateMode) -> bool {
+        match mode {
+            UpdateMode::Paused | UpdateMode::Step => true,
+            UpdateMode::Continuous => false,
+        }
+    }
+
+
+    /// Updates the image to highlight the recently drawn pixels, as defined
+    /// via `last_draw_pos` and `current_draw_pos`.
+    fn apply_highlight(&self, image: &mut ColorImage) {
+        let current_index = self.rt.current_draw_pos.index_on(image);
+        let last_index    = self.rt.last_draw_pos.index_on(image);
+        let end_index     = image.width() * image.height();
+
+        // helper function to fade the image on a given position
+        let mut fade_image_at = |index: usize| {
+            let color = image.pixels[index];
+
+            image.pixels[index] = Color32::from_rgba_unmultiplied(
+                color.r(), color.g(), color.b(), 64
+            );
+        };
+
+        if current_index >= last_index {
+            for index in current_index..end_index {
+                fade_image_at(index);
+            }
+
+            for index in 0..last_index {
+                fade_image_at(index);
+            }
+        }
+        else {
+            for index in last_index..current_index {
+                fade_image_at(index);
+            }
+        }
     }
 
 
@@ -203,5 +305,14 @@ impl EmulatorDisplayView {
             2.0,
             Stroke::new(2.0, color)
         );
+    }
+}
+
+
+impl ScreenPos {
+    fn index_on(&self, image: &ColorImage) -> usize {
+        let w = image.width();
+
+        self.y * w + self.x
     }
 }

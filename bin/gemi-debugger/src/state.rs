@@ -19,7 +19,8 @@ use std::fmt::{Display, Formatter};
 use std::path::Path;
 
 use gemi_core::cartridge::Cartridge;
-use gemi_core::gameboy::GameBoy;
+use gemi_core::debug::DebugEvent;
+use gemi_core::gameboy::{EmulatorUpdateResults, GameBoy};
 use gemi_core::input::InputButton;
 use gemi_utils::keybindings::KeyBindings;
 
@@ -28,6 +29,7 @@ use crate::selection::{Kind, Selection};
 /// An enum to store the different update modes of the emulator
 /// inside of this debugger application.
 #[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug)]
 pub enum UpdateMode {
     /// The execution of the emulator is currently paused.
     Paused,
@@ -50,6 +52,9 @@ pub enum UpdateMode {
 pub enum UpdateStepMode {
     /// Runs the emulator until the next frame was completed.
     Frame,
+
+    /// Runs the emulator until the next line was completed.
+    Line,
     
     /// Runs the emulator for a single instruction only.
     Instruction,
@@ -122,6 +127,7 @@ impl Display for UpdateStepMode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             UpdateStepMode::Frame       => write!(f, "Frame"),
+            UpdateStepMode::Line        => write!(f, "Line"),
             UpdateStepMode::Instruction => write!(f, "Instruction"),
         }
     }
@@ -182,6 +188,7 @@ impl EmulatorState {
             UpdateMode::Step => {
                 match self.ui.update_step_mode {
                     UpdateStepMode::Frame       => self.emu.run_frame(),
+                    UpdateStepMode::Line        => self.emu.run_line(),
                     UpdateStepMode::Instruction => self.emu.run_single_step(),
                 }
 
@@ -228,15 +235,36 @@ impl EmulatorInstance {
 
     /// Process a single frame of the emulator, if any.
     pub fn run_frame(&mut self) {
+        self.run_until(|_emu, result| result.events.contains(DebugEvent::PpuFrameCompleted));
+    }
+
+
+    /// Run the emulator until the next scanline was completed drawing.
+    pub fn run_line(&mut self) {
+        self.run_until(|_emu, result| result.events.contains(DebugEvent::PpuLineCompleted));
+    }
+
+
+    /// Run the emulator for a single instruction.
+    pub fn run_single_step(&mut self) {
         if let Some(emu) = self.get_emulator_mut() {
-            emu.run_frame();
+            emu.run_single_step();
         }
     }
 
 
-    pub fn run_single_step(&mut self) {
+    /// Run the emulator until a certain condition is met. 
+    pub fn run_until<F>(&mut self, condition: F)
+        where F: Fn(&GameBoy, EmulatorUpdateResults) -> bool
+    {
         if let Some(emu) = self.get_emulator_mut() {
-            emu.run_single_step();
+            loop {
+                let result = emu.run_single_step();
+
+                if condition(emu, result) {
+                    break;
+                }
+            }
         }
     }
 }
