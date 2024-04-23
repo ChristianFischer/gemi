@@ -17,6 +17,8 @@
 
 use egui::Ui;
 
+use gemi_core::ppu::graphic_data::TileMap;
+
 use crate::event::UiEvent;
 use crate::selection::Selected;
 use crate::state::EmulatorState;
@@ -28,7 +30,6 @@ use crate::views::memory::MemoryView;
 use crate::views::oam::OamView;
 use crate::views::sprites::SpritesView;
 use crate::views::tilemap::TileMapView;
-
 
 pub mod cartridge_info;
 pub mod cpu;
@@ -113,14 +114,14 @@ impl ViewClass {
 
 
     /// Placeholder for the tile map view.
-    pub fn new_tile_map() -> ViewClass {
-        ViewClass::TileMap(TileMapView::new())
+    pub fn new_tile_map(tilemap: TileMap) -> ViewClass {
+        ViewClass::TileMap(TileMapView::new(tilemap))
     }
 
 
     /// Placeholder for the sprites view.
-    pub fn new_sprites() -> ViewClass {
-        ViewClass::Sprites(SpritesView::new())
+    pub fn new_sprites(bank_index: u8) -> ViewClass {
+        ViewClass::Sprites(SpritesView::new(bank_index))
     }
 
 

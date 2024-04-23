@@ -20,6 +20,8 @@ use std::path::PathBuf;
 use eframe::{CreationContext, Frame};
 use egui::{ComboBox, Context};
 
+use gemi_core::ppu::graphic_data::TileMap;
+
 use crate::behaviour::TreeBehaviour;
 use crate::event::UiEvent;
 use crate::state::{EmulatorState, UpdateMode, UpdateStepMode};
@@ -106,14 +108,16 @@ impl Default for EmulatorApplication {
         // views for the main area in the window's center
         let tiles_main = add_views(vec![
             ViewClass::new_display_view(),
-            ViewClass::new_tile_map(),
+            ViewClass::new_tile_map(TileMap::H9800),
+            ViewClass::new_tile_map(TileMap::H9C00),
         ]);
 
         // views for the sidebar on the right
         let tiles_sidebar = add_views(vec![
             ViewClass::new_cartridge_info(),
             ViewClass::new_cpu(),
-            ViewClass::new_sprites(),
+            ViewClass::new_sprites(0),
+            ViewClass::new_sprites(1),
         ]);
 
         // views for the bottom area below the main area

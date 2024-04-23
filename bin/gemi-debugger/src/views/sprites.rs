@@ -29,20 +29,21 @@ use crate::ui::sprite_cache;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
-
 const TOTAL_SPRITES : usize     = 384;
 const SPRITE_DISPLAY_SIZE : f32 = 64.0;
 
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SpritesView {
+    bank_index: u8,
     sprite_selected: Option<usize>,
 }
 
 
 impl SpritesView {
-    pub fn new() -> Self {
+    pub fn new(bank_index: u8) -> Self {
         Self {
+            bank_index,
             sprite_selected: None,
         }
     }
@@ -51,13 +52,23 @@ impl SpritesView {
 
 impl View for SpritesView {
     fn title(&self, _state: &mut EmulatorState) -> &str {
-        "Sprites"
+        match self.bank_index {
+            0 => "Sprites Bank #0",
+            1 => "Sprites Bank #1",
+            _ => "Sprites"
+        }
     }
 
 
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         if let Some(emu) = state.emu.get_emulator() {
             let ui_states = &mut state.ui;
+
+            // additional VRAM banks only supported on GBC
+            if !emu.get_config().is_gbc_enabled() && self.bank_index > 0 {
+                ui.label(format!("VRAM Bank #{} only supported on GameBoy Color", self.bank_index));
+                return;
+            }
 
             let scroll_area = ScrollArea::vertical()
                     .id_source("sprites_scroll_area")
@@ -104,7 +115,8 @@ impl View for SpritesView {
                                                         ui,
                                                         ui_states,
                                                         emu,
-                                                        sprite_index
+                                                        sprite_index,
+                                                        self.bank_index
                                                 );
                                             }
                                         }
@@ -118,14 +130,16 @@ impl View for SpritesView {
 
 
     fn get_current_selection(&self) -> Option<Selected> {
-        self.sprite_selected.map(|index| Selected::Sprite(index))
+        self.sprite_selected.map(|index| Selected::Sprite(self.bank_index, index))
     }
 
 
     fn handle_ui_event(&mut self, event: &UiEvent) {
         match event {
-            UiEvent::SelectionChanged(Kind::Focus, Some(Selected::Sprite(sprite_index))) => {
-                self.sprite_selected = Some(*sprite_index);
+            UiEvent::SelectionChanged(Kind::Focus, Some(Selected::Sprite(bank_index, sprite_index))) => {
+                if self.bank_index == *bank_index {
+                    self.sprite_selected = Some(*sprite_index);
+                }
             },
 
             _ => { }
@@ -136,12 +150,12 @@ impl View for SpritesView {
 
 impl SpritesView {
     /// Display a single sprite within the grid.
-    fn display_sprite(&mut self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, sprite_index: usize) {
+    fn display_sprite(&mut self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, sprite_index: usize, bank_index: u8) {
         let ppu     = &emu.get_peripherals().ppu;
-        let sprite  = ppu.get_sprite_image(sprite_index, 0);
+        let sprite  = ppu.get_sprite_image(sprite_index, bank_index);
         let texture = sprite_cache::get_texture_for(ui, &sprite);
 
-        let highlight_state = test_selection(Selected::Sprite(sprite_index))
+        let highlight_state = test_selection(Selected::Sprite(self.bank_index, sprite_index))
                 .of_view(self)
                 .compare_with_ui_states(ui_states, emu)
         ;
@@ -159,11 +173,11 @@ impl SpritesView {
         ;
 
         // handle hover state
-        ui_states.hover.set(Selected::Sprite(sprite_index), response.hovered());
+        ui_states.hover.set(Selected::Sprite(self.bank_index, sprite_index), response.hovered());
 
         // handle click
         if response.clicked() {
-            ui_states.focus.toggle(Selected::Sprite(sprite_index));
+            ui_states.focus.toggle(Selected::Sprite(self.bank_index, sprite_index));
         }
     }
 

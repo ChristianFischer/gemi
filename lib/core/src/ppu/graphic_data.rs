@@ -305,6 +305,21 @@ impl TileSet {
         }
     }
 
+
+    /// Get the index of a tile within the VRAM bank.
+    /// When the VRAM is seen as an array of images, the
+    /// index returned by this function can be used to access
+    /// the requested tile.
+    pub fn get_tile_image_index(&self, tile: u8) -> usize {
+        let tile = tile as usize;
+        
+        match *self {
+            TileSet::H8000 => 0x0000 + tile,
+            TileSet::H8800 => 0x0100 + tile - ((tile & 0x80) << 1),
+        }
+    }
+
+
     /// Get the address of a tile when this tileset is used.
     /// ````
     /// use gemi_core::ppu::graphic_data::TileSet;

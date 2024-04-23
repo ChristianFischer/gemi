@@ -23,9 +23,9 @@ use crate::event::UiEvent;
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(PartialEq, Clone)]
 pub enum Selected {
-    /// The selection is on a sprite, which is defined by its index within
-    /// the video memory.
-    Sprite(usize),
+    /// The selection is on a sprite, which is defined by the index of a 
+    /// VRAM bank and the sprites index.
+    Sprite(u8, usize),
 
     /// The selection is on an entry within the OAM table, defined by its index.
     OamEntry(usize),

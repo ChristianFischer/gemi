@@ -19,7 +19,10 @@ use egui::{Color32, Rgba, Ui};
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
-use gemi_core::ppu::graphic_data::TileMap;
+use gemi_core::ppu::flags::LcdControlFlag;
+use gemi_core::ppu::graphic_data::{TileMap, TileSet};
+use gemi_core::ppu::ppu::TILE_ATTR_BIT_VRAM_BANK;
+use gemi_core::utils::get_bit;
 
 use crate::selection::{Kind, Selected};
 use crate::state::UiStates;
@@ -125,9 +128,16 @@ impl HighlightTesting {
     fn is_related(gb: &GameBoy, a: &Selected, b: &Selected) -> bool {
         match (a, b) {
             // sprites highlighted by a selected oam entry
-            (Selected::Sprite(sprite_index), Selected::OamEntry(oam_index)) => {
+            (Selected::Sprite(bank_index, sprite_index), Selected::OamEntry(oam_index)) => {
                 let oam   = gb.get_peripherals().ppu.get_oam();
                 let entry = &oam[*oam_index];
+
+                // when on GBC, also check the bank index
+                if gb.get_config().is_gbc_enabled() {
+                    if entry.get_gbc_vram_bank() != *bank_index {
+                        return false;
+                    }
+                }
 
                 if entry.tile as usize == *sprite_index {
                     return true;
@@ -135,15 +145,29 @@ impl HighlightTesting {
             }
 
             // sprites highlighted by a selected tile
-            (Selected::Sprite(sprite_index), Selected::Tile(tilemap_bit, tile_index)) => {
+            (Selected::Sprite(bank_index, sprite_index), Selected::Tile(tilemap_bit, tile_index)) => {
                 let ppu     = &gb.get_peripherals().ppu;
                 let vram0   = ppu.get_vram(0);
                 let tilemap = TileMap::by_select_bit(*tilemap_bit);
+                let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
 
-                let tile_address     = tilemap.base_address() as usize + tile_index;
-                let tile_image_index = vram0[tile_address - MEMORY_LOCATION_VRAM_BEGIN as usize] as usize;
+                let tilemap_field_address     = tilemap.base_address() as usize + tile_index;
+                let tilemap_field_vram_offset = tilemap_field_address - MEMORY_LOCATION_VRAM_BEGIN as usize;
+                let tile_number               = vram0[tilemap_field_vram_offset];
+                let tile_image_index          = tileset.get_tile_image_index(tile_number);
 
-                if *sprite_index == tile_image_index {
+                // when on GBC, also check the bank index
+                if gb.get_config().is_gbc_enabled() {
+                    let vram1           = ppu.get_vram(1);
+                    let tile_attributes = vram1[tilemap_field_vram_offset];
+                    let tile_bank_index = get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8;
+
+                    if tile_bank_index != *bank_index {
+                        return false;
+                    }
+                }
+
+                if tile_image_index == *sprite_index {
                     return true;
                 }
             }

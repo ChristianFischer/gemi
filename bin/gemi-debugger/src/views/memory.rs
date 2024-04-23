@@ -111,7 +111,7 @@ impl MemoryView {
         };
 
         match event {
-            SelectionChanged(kind, Some(Sprite(sprite_index))) => {
+            SelectionChanged(kind, Some(Sprite(_, sprite_index))) => {
                 self.memory_editor.set_highlighted_range(
                         get_highlight_index(kind),
                         get_sprite_address_range(*sprite_index)

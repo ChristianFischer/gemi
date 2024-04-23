@@ -18,11 +18,14 @@
 use eframe::epaint::{Color32, Stroke};
 use egui::{Grid, Image, pos2, Pos2, Rect, ScrollArea, Sense, Ui, vec2, Widget};
 use egui::scroll_area::ScrollBarVisibility;
+use serde::{Deserialize, Deserializer, Serializer};
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
 use gemi_core::ppu::flags::LcdControlFlag;
-use gemi_core::ppu::graphic_data::TileMap;
+use gemi_core::ppu::graphic_data::{TileMap, TileSet};
+use gemi_core::ppu::ppu::TILE_ATTR_BIT_VRAM_BANK;
+use gemi_core::utils::get_bit;
 
 use crate::event::UiEvent;
 use crate::highlight::test_selection;
@@ -30,7 +33,6 @@ use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::sprite_cache;
 use crate::views::View;
-
 
 const TILE_ROWS: usize      = 32;
 const TILE_COLS: usize      = 32;
@@ -42,13 +44,18 @@ const DEFAULT_SCALE: usize  =  5;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TileMapView {
+    // todo: temp solution until core library gets serde support
+    #[serde(serialize_with = "serialize_tilemap", deserialize_with = "deserialize_tilemap")]
+    tilemap: TileMap,
+
     tile_selected: Option<(bool, usize)>,
 }
 
 
 impl TileMapView {
-    pub fn new() -> Self {
+    pub fn new(tilemap: TileMap) -> Self {
         Self {
+            tilemap,
             tile_selected: None,
         }
     }
@@ -57,7 +64,10 @@ impl TileMapView {
 
 impl View for TileMapView {
     fn title(&self, _state: &mut EmulatorState) -> &str {
-        "TileMap"
+        match self.tilemap {
+            TileMap::H9800 => "TileMap #0",
+            TileMap::H9C00 => "TileMap #1",
+        }
     }
 
 
@@ -124,7 +134,7 @@ impl TileMapView {
     fn render_tilemap_grid(&self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
         let ppu     = &emu.get_peripherals().ppu;
         let vram0   = ppu.get_vram(0);
-        let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
+        let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
 
         let scale = DEFAULT_SCALE as f32;
 
@@ -136,12 +146,24 @@ impl TileMapView {
 
         for tile_row in 0..TILE_ROWS {
             for tile_column in 0..TILE_COLS {
-                let tile_index       = tile_row * TILE_COLS + tile_column;
-                let tile_address     = tilemap.base_address() as usize + tile_index;
-                let tile_image_index = vram0[tile_address - MEMORY_LOCATION_VRAM_BEGIN as usize] as usize;
+                let tilemap_field_index       = tile_row * TILE_COLS + tile_column;
+                let tilemap_field_address     = self.tilemap.base_address() as usize + tilemap_field_index;
+                let tilemap_field_vram_offset = tilemap_field_address - MEMORY_LOCATION_VRAM_BEGIN as usize;
+                let tile_number               = vram0[tilemap_field_vram_offset];
 
-                let tile_image = ppu.get_sprite_image(tile_image_index, 0);
-                let texture    = sprite_cache::get_texture_for(ui, &tile_image);
+                // if on GBC, also get from which bank the tile is needed to be loaded from
+                let tile_image_bank = if emu.get_config().is_gbc_enabled() {
+                    let vram1           = ppu.get_vram(1);
+                    let tile_attributes = vram1[tilemap_field_vram_offset];
+                    get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8
+                }
+                else {
+                    0
+                };
+
+                let tile_image_index = tileset.get_tile_image_index(tile_number);
+                let tile_image       = ppu.get_sprite_image(tile_image_index, tile_image_bank);
+                let texture          = sprite_cache::get_texture_for(ui, &tile_image);
 
                 let response = Image::new(&texture)
                         .fit_to_exact_size(tile_display_size)
@@ -150,11 +172,11 @@ impl TileMapView {
                 ;
 
                 // handle hover
-                ui_states.hover.set(Selected::Tile(tilemap.to_select_bit(), tile_index), response.hovered());
+                ui_states.hover.set(Selected::Tile(self.tilemap.to_select_bit(), tilemap_field_index), response.hovered());
 
                 // handle click
                 if response.clicked() {
-                    ui_states.focus.toggle(Selected::Tile(tilemap.to_select_bit(), tile_index));
+                    ui_states.focus.toggle(Selected::Tile(self.tilemap.to_select_bit(), tilemap_field_index));
                 }
             }
 
@@ -173,17 +195,12 @@ impl TileMapView {
             (TILE_HEIGHT as f32) * scale
         );
 
-        // check which tilemap is currently active
-        let current_tilemap = TileMap::by_select_bit(
-                emu.get_peripherals().ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect)
-        );
-
         for tile_row in 0..TILE_ROWS {
             for tile_column in 0..TILE_COLS {
                 let tile_index = tile_row * TILE_COLS + tile_column;
 
                 let highlight_state = test_selection(Selected::Tile(
-                        current_tilemap.to_select_bit(),
+                        self.tilemap.to_select_bit(),
                         tile_index
                 ))
                         .of_view(self)
@@ -216,4 +233,19 @@ impl TileMapView {
                 Stroke::new(2.0, color)
         );
     }
+}
+
+
+fn serialize_tilemap<S>(tilemap: &TileMap, serializer: S) -> Result<S::Ok, S::Error>
+    where S: Serializer
+{
+    let bit = tilemap.to_select_bit();
+    serializer.serialize_bool(bit)
+}
+
+fn deserialize_tilemap<'de, D>(deserializer: D) -> Result<TileMap, D::Error>
+    where D: Deserializer<'de>,
+{
+    bool::deserialize(deserializer)
+            .map(|bit| TileMap::by_select_bit(bit))
 }

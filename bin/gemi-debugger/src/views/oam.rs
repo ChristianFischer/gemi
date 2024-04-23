@@ -172,6 +172,24 @@ impl View for OamView {
 }
 
 
+/// Read the tile number and the bank where to read it from.
+/// The bank number is always zero for DMG, even if the according flag is set.
+fn read_oam_tile_ref(emu: &GameBoy, oam_index: usize) -> (usize, u8) {
+    let oam_entry = emu.get_peripherals().ppu.get_oam()[oam_index];
+    
+    let tile = oam_entry.tile as usize;
+    
+    let bank = if emu.get_config().is_gbc_enabled() {
+        oam_entry.get_gbc_vram_bank()
+    }
+    else {
+        0
+    };
+
+    (tile, bank)
+}
+
+
 impl OamView {
     fn display_entry(
             &mut self,
@@ -188,12 +206,12 @@ impl OamView {
         ;
 
         let oam_index  = table_row.index();
-        let ppu        = &mut emu.get_peripherals_mut().ppu;
-        let tile_index = ppu.get_oam_mut()[oam_index].tile as usize;
-        let bank       = ppu.get_oam()[oam_index].get_gbc_vram_bank();
-        let sprite     = ppu.get_sprite_image(tile_index, bank);
-        let entry      = &mut ppu.get_oam_mut()[oam_index];
-        let style      = GemiStyle::VALUE_WRITABLE;
+        let (tile_index, bank) = read_oam_tile_ref(emu, oam_index);
+        
+        let ppu    = &mut emu.get_peripherals_mut().ppu;
+        let sprite = ppu.get_sprite_image(tile_index, bank);
+        let entry  = &mut ppu.get_oam_mut()[oam_index];
+        let style  = GemiStyle::VALUE_WRITABLE;
 
         match highlight_state {
             Some(HighlightState::Selected) => table_row.set_selected(true),
