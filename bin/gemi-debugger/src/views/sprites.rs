@@ -17,7 +17,7 @@
 
 use std::cmp::max;
 
-use egui::{Color32, Grid, Image, Label, ScrollArea, Ui, Vec2, Widget};
+use egui::{Color32, Grid, Label, ScrollArea, Ui, Vec2, Widget};
 
 use gemi_core::gameboy::GameBoy;
 
@@ -25,7 +25,7 @@ use crate::event::UiEvent;
 use crate::highlight::test_selection;
 use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
-use crate::ui::sprite_cache;
+use crate::ui::draw_tile::DrawTile;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
@@ -153,7 +153,6 @@ impl SpritesView {
     fn display_sprite(&mut self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, sprite_index: usize, bank_index: u8) {
         let ppu     = &emu.get_peripherals().ppu;
         let sprite  = ppu.get_sprite_image(sprite_index, bank_index);
-        let texture = sprite_cache::get_texture_for(ui, &sprite);
 
         let highlight_state = test_selection(Selected::Sprite(self.bank_index, sprite_index))
                 .of_view(self)
@@ -166,7 +165,7 @@ impl SpritesView {
         }
 
         // render the image and receive input-response
-        let response = Image::new(&texture)
+        let response = DrawTile::from(sprite)
                 .fit_to_exact_size(Vec2::splat(SPRITE_DISPLAY_SIZE))
                 .sense(egui::Sense::click())
                 .ui(ui)

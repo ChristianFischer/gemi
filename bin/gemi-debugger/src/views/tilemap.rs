@@ -16,7 +16,7 @@
  */
 
 use eframe::epaint::{Color32, Stroke};
-use egui::{Grid, Image, pos2, Pos2, Rect, ScrollArea, Sense, Ui, vec2, Widget};
+use egui::{Grid, pos2, Pos2, Rect, ScrollArea, Sense, Ui, vec2, Widget};
 use egui::scroll_area::ScrollBarVisibility;
 use serde::{Deserialize, Deserializer, Serializer};
 
@@ -31,7 +31,7 @@ use crate::event::UiEvent;
 use crate::highlight::test_selection;
 use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
-use crate::ui::sprite_cache;
+use crate::ui::draw_tile::DrawTile;
 use crate::views::View;
 
 const TILE_ROWS: usize      = 32;
@@ -136,37 +136,36 @@ impl TileMapView {
         let vram0   = ppu.get_vram(0);
         let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
 
-        let scale = DEFAULT_SCALE as f32;
-
-        // compute the size of a tile how it will be displayed
-        let tile_display_size = vec2(
-            (TILE_WIDTH  as f32) * scale,
-            (TILE_HEIGHT as f32) * scale
-        );
-
         for tile_row in 0..TILE_ROWS {
             for tile_column in 0..TILE_COLS {
                 let tilemap_field_index       = tile_row * TILE_COLS + tile_column;
                 let tilemap_field_address     = self.tilemap.base_address() as usize + tilemap_field_index;
                 let tilemap_field_vram_offset = tilemap_field_address - MEMORY_LOCATION_VRAM_BEGIN as usize;
                 let tile_number               = vram0[tilemap_field_vram_offset];
+                let tile_image_index          = tileset.get_tile_image_index(tile_number);
 
-                // if on GBC, also get from which bank the tile is needed to be loaded from
-                let tile_image_bank = if emu.get_config().is_gbc_enabled() {
-                    let vram1           = ppu.get_vram(1);
-                    let tile_attributes = vram1[tilemap_field_vram_offset];
-                    get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8
+                let draw_tile = if emu.get_config().is_gbc_enabled() {
+                    let vram1            = ppu.get_vram(1);
+                    let tile_attributes  = vram1[tilemap_field_vram_offset];
+                    let tile_image_bank  = get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8;
+                    let tile_image       = ppu.get_sprite_image(tile_image_index, tile_image_bank);
+                    let palette_index    = (tile_attributes & 0b0000_0111) as usize;
+                    let palette          = ppu.get_palettes().gbc_background_palette.get()[palette_index];
+
+                    DrawTile::from(tile_image)
+                            .set_tilemap_field_attributes(tile_attributes)
+                            .set_palette_gbc(palette)
                 }
                 else {
-                    0
+                    let tile_image       = ppu.get_sprite_image(tile_image_index, 0);
+                    let palette          = &ppu.get_palettes().bgp;
+
+                    DrawTile::from(tile_image)
+                            .set_palette_dmg(*palette)
                 };
 
-                let tile_image_index = tileset.get_tile_image_index(tile_number);
-                let tile_image       = ppu.get_sprite_image(tile_image_index, tile_image_bank);
-                let texture          = sprite_cache::get_texture_for(ui, &tile_image);
-
-                let response = Image::new(&texture)
-                        .fit_to_exact_size(tile_display_size)
+                let response = draw_tile
+                        .scale(DEFAULT_SCALE as f32)
                         .sense(Sense::click())
                         .ui(ui)
                 ;

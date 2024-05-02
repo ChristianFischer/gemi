@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::ppu::graphic_data::{Color, SpritePixelValue};
+
 /// A struct representing the image data of a single sprite
-/// as it is stored inside of the video memory.
+/// as it is stored inside the video memory.
 /// Each sprite has a 8x8 pixel size with 2 bits per pixel,
 /// which results in a total of 16 bytes per sprite.
 #[derive(Clone, Hash, PartialEq, Eq)]
@@ -79,25 +81,43 @@ impl SpriteImage {
     /// Creates a new byte array containing RGBA values for each pixel of this sprite.
     /// The data is stored in a byte array, with 4 bytes for each pixel containing
     /// a red, green, blue and alpha value.
-    pub fn to_rgba(&self) -> [u8; 256] {
+    pub fn to_rgba(&self, to_color: impl Fn(&SpritePixelValue) -> Color) -> [u8; 256] {
         let mut image_data = [0x00; 256];
 
         self.read_pixels(&mut |x, y, pixel| {
-            let gray = match pixel {
+            let sprite_pixel = SpritePixelValue::new(pixel);
+            let color        = to_color(&sprite_pixel);
+
+            let index = (y*8 + x) * 4;
+            image_data[index + 0] = color.r;
+            image_data[index + 1] = color.g;
+            image_data[index + 2] = color.b;
+            image_data[index + 3] = color.a;
+        });
+
+        image_data
+    }
+
+
+    /// Creates a new byte array containing RGBA values for each pixel of this sprite.
+    /// The data is stored in a byte array, with 4 bytes for each pixel containing
+    /// a red, green, blue and alpha value.
+    pub fn to_rgba_default_gray(&self) -> [u8; 256] {
+        self.to_rgba(|pixel| {
+            let gray = match (*pixel).into() {
                 0x03 => 0xFF,
                 0x02 => 0xAA,
                 0x01 => 0x55,
                 _    => 0x00,
             };
 
-            let index = (y*8 + x) * 4;
-            image_data[index + 0] = gray;
-            image_data[index + 1] = gray;
-            image_data[index + 2] = gray;
-            image_data[index + 3] = 0xff;
-        });
-
-        image_data
+            Color {
+                r: gray,
+                g: gray,
+                b: gray,
+                a: 0xff,
+            }
+        })
     }
 
 

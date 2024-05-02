@@ -39,13 +39,14 @@ pub struct Color {
 
 /// The pixel value read from a sprite.
 /// This value needs to be transformed into a color value using a color palette.
+#[derive(Copy, Clone, Hash, PartialEq, Eq)]
 pub struct SpritePixelValue(u8);
 
 /// A color palette of the classic GameBoy.
 /// This contains 4 Colors packed into one byte. Each color in the palette
 /// is meant as the brightness of a pixel on the LCD (0-3). This value
 /// may be transformed into a RGB color by a DmgDisplayPalette.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct DmgPalette(u8);
 
 /// A pixel value to be displayed on the LCD of a DMG GameBoy.
@@ -62,7 +63,7 @@ pub struct DmgDisplayPalette {
 
 /// The palette data stored in a dedicated memory area of the GameBoy Color.
 /// This is meant to be used to translate sprite pixels into RGB colors.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Hash, PartialEq, Eq)]
 pub struct GbcPaletteData {
     palette: [u16; 4]
 }
@@ -190,6 +191,20 @@ impl SpritePixelValue {
     /// Checks whether a pixel can be considered being opaque (pixel value is not 0)
     pub fn is_opaque(&self) -> bool {
         self.0 != 0
+    }
+}
+
+
+impl From<u8> for SpritePixelValue {
+    fn from(value: u8) -> Self {
+        Self::new(value)
+    }
+}
+
+
+impl Into<u8> for SpritePixelValue {
+    fn into(self) -> u8 {
+        self.0
     }
 }
 

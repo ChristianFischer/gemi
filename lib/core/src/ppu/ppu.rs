@@ -28,7 +28,7 @@ use crate::mmu::memory_data::MemoryData;
 use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
 use crate::ppu::graphic_data::*;
 use crate::ppu::sprite_image::SpriteImage;
-use crate::ppu::video_memory::{OamRam, OamRamBank, VideoMemory};
+use crate::ppu::video_memory::{OamRam, OamRamBank, Palettes, VideoMemory};
 use crate::utils::get_bit;
 
 pub const SCREEN_W: u32 = 160;
@@ -344,10 +344,10 @@ impl Ppu {
 
         {
             let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
-            let palette_bg       = &self.memory.bgp;
-            let palette_obp      = &self.memory.obp;
-            let palettes_gbc_bg  = &self.memory.gbc_background_palette.get();
-            let palettes_gbc_obj = &self.memory.gbc_object_palette.get();
+            let palette_bg       = &self.memory.palettes.bgp;
+            let palette_obp      = &self.memory.palettes.obp;
+            let palettes_gbc_bg  = &self.memory.palettes.gbc_background_palette.get();
+            let palettes_gbc_obj = &self.memory.palettes.gbc_object_palette.get();
             let wx               = self.registers.window_x;
             let wy               = self.registers.window_y;
 
@@ -694,6 +694,18 @@ impl Ppu {
         self.memory.vram_banks[bank].as_slice_mut()
     }
 
+    /// Get all palettes stored inside the PPU.
+    /// This also contains the GBC palettes, even when not in GBC mode.
+    pub fn get_palettes(&self) -> &Palettes {
+        &self.memory.palettes
+    }
+
+    /// Get all palettes stored inside the PPU.
+    /// This also contains the GBC palettes, even when not in GBC mode.
+    pub fn get_palettes_mut(&mut self) -> &mut Palettes {
+        &mut self.memory.palettes
+    }
+
     /// Checks the LCD control register for a specific flag to be set.
     pub fn check_lcdc(&self, flag: LcdControlFlag) -> bool {
         self.registers.lcd_control.contains(flag)
@@ -970,9 +982,9 @@ impl MemoryBusConnection for Ppu {
                     MEMORY_LOCATION_WY              => self.registers.window_y,
                     MEMORY_LOCATION_WX              => self.registers.window_x,
 
-                    MEMORY_LOCATION_PALETTE_BG      => self.memory.bgp.into(),
-                    MEMORY_LOCATION_PALETTE_OBP0    => self.memory.obp[0].into(),
-                    MEMORY_LOCATION_PALETTE_OBP1    => self.memory.obp[1].into(),
+                    MEMORY_LOCATION_PALETTE_BG      => self.memory.palettes.bgp.into(),
+                    MEMORY_LOCATION_PALETTE_OBP0    => self.memory.palettes.obp[0].into(),
+                    MEMORY_LOCATION_PALETTE_OBP1    => self.memory.palettes.obp[1].into(),
 
                     MEMORY_LOCATION_VBK => {
                         // on GBC: get the active RAM bank
@@ -987,22 +999,22 @@ impl MemoryBusConnection for Ppu {
                     },
 
                     MEMORY_LOCATION_BCPS => {
-                        self.memory.gbc_background_palette_pointer.get()
+                        self.memory.palettes.gbc_background_palette_pointer.get()
                     }
 
                     MEMORY_LOCATION_BCPD => {
-                        self.memory.gbc_background_palette_pointer.read(
-                            &self.memory.gbc_background_palette
+                        self.memory.palettes.gbc_background_palette_pointer.read(
+                            &self.memory.palettes.gbc_background_palette
                         )
                     }
 
                     MEMORY_LOCATION_OCPS => {
-                        self.memory.gbc_object_palette_pointer.get()
+                        self.memory.palettes.gbc_object_palette_pointer.get()
                     }
 
                     MEMORY_LOCATION_OCPD => {
-                        self.memory.gbc_object_palette_pointer.read(
-                            &self.memory.gbc_object_palette
+                        self.memory.palettes.gbc_object_palette_pointer.read(
+                            &self.memory.palettes.gbc_object_palette
                         )
                     }
 
@@ -1041,9 +1053,9 @@ impl MemoryBusConnection for Ppu {
                     MEMORY_LOCATION_WY              => self.registers.window_y          = value,
                     MEMORY_LOCATION_WX              => self.registers.window_x          = value,
 
-                    MEMORY_LOCATION_PALETTE_BG      => self.memory.bgp                  = DmgPalette::from(value),
-                    MEMORY_LOCATION_PALETTE_OBP0    => self.memory.obp[0]               = DmgPalette::from(value),
-                    MEMORY_LOCATION_PALETTE_OBP1    => self.memory.obp[1]               = DmgPalette::from(value),
+                    MEMORY_LOCATION_PALETTE_BG      => self.memory.palettes.bgp         = DmgPalette::from(value),
+                    MEMORY_LOCATION_PALETTE_OBP0    => self.memory.palettes.obp[0]      = DmgPalette::from(value),
+                    MEMORY_LOCATION_PALETTE_OBP1    => self.memory.palettes.obp[1]      = DmgPalette::from(value),
 
                     MEMORY_LOCATION_VBK => {
                         // on GBC: switch VRAM bank
@@ -1054,23 +1066,23 @@ impl MemoryBusConnection for Ppu {
                     },
 
                     MEMORY_LOCATION_BCPS => {
-                        self.memory.gbc_background_palette_pointer.set(value)
+                        self.memory.palettes.gbc_background_palette_pointer.set(value)
                     }
 
                     MEMORY_LOCATION_BCPD => {
-                        self.memory.gbc_background_palette_pointer.write(
-                            &mut self.memory.gbc_background_palette,
+                        self.memory.palettes.gbc_background_palette_pointer.write(
+                            &mut self.memory.palettes.gbc_background_palette,
                             value
                         )
                     }
 
                     MEMORY_LOCATION_OCPS => {
-                        self.memory.gbc_object_palette_pointer.set(value)
+                        self.memory.palettes.gbc_object_palette_pointer.set(value)
                     }
 
                     MEMORY_LOCATION_OCPD => {
-                        self.memory.gbc_object_palette_pointer.write(
-                            &mut self.memory.gbc_object_palette,
+                        self.memory.palettes.gbc_object_palette_pointer.write(
+                            &mut self.memory.palettes.gbc_object_palette,
                             value
                         )
                     }

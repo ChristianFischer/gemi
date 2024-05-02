@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 
 
 use crate::gameboy::{DeviceConfig, EmulationType};
-use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
+use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::ppu::graphic_data::{DmgPalette, GbcPaletteData, Sprite};
 use crate::utils::get_bit;
 
@@ -53,6 +53,13 @@ pub struct VideoMemory {
     /// OAM memory: 40 sprites, 4 bytes each = 160B
     pub oam: OamRamBank,
 
+
+    pub palettes: Palettes,
+}
+
+
+/// Stores all palettes used in either GBC or DMG mode.
+pub struct Palettes {
     /// DMG background palette
     pub bgp: DmgPalette,
 
@@ -127,6 +134,15 @@ impl VideoMemory {
 
             oam: OamRamBank::new([Sprite::empty(); 40]),
 
+            palettes: Palettes::new(),
+        }
+    }
+}
+
+
+impl Palettes {
+    pub fn new() -> Self {
+        Self {
             bgp: DmgPalette::create_default(),
             obp: [DmgPalette::create_default(); 2],
 

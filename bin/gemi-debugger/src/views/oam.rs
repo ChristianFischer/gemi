@@ -16,7 +16,7 @@
  */
 
 use eframe::emath::{Align, Vec2};
-use egui::{ComboBox, Direction, Image, Label, Layout, TextStyle, Ui, Widget};
+use egui::{ComboBox, Direction, Label, Layout, TextStyle, Ui, Widget};
 use egui_extras::{Column, TableBuilder, TableRow};
 
 use gemi_core::gameboy::GameBoy;
@@ -25,7 +25,7 @@ use crate::event::UiEvent;
 use crate::highlight::{HighlightState, test_selection};
 use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
-use crate::ui::sprite_cache;
+use crate::ui::draw_tile::DrawTile;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
@@ -176,9 +176,9 @@ impl View for OamView {
 /// The bank number is always zero for DMG, even if the according flag is set.
 fn read_oam_tile_ref(emu: &GameBoy, oam_index: usize) -> (usize, u8) {
     let oam_entry = emu.get_peripherals().ppu.get_oam()[oam_index];
-    
+
     let tile = oam_entry.tile as usize;
-    
+
     let bank = if emu.get_config().is_gbc_enabled() {
         oam_entry.get_gbc_vram_bank()
     }
@@ -207,11 +207,12 @@ impl OamView {
 
         let oam_index  = table_row.index();
         let (tile_index, bank) = read_oam_tile_ref(emu, oam_index);
-        
-        let ppu    = &mut emu.get_peripherals_mut().ppu;
-        let sprite = ppu.get_sprite_image(tile_index, bank);
-        let entry  = &mut ppu.get_oam_mut()[oam_index];
-        let style  = GemiStyle::VALUE_WRITABLE;
+
+        let ppu      = &emu.get_peripherals().ppu;
+        let sprite   = ppu.get_sprite_image(tile_index, bank);
+        let entry    = &ppu.get_oam()[oam_index];
+        let palettes = ppu.get_palettes();
+        let style    = GemiStyle::VALUE_WRITABLE;
 
         match highlight_state {
             Some(HighlightState::Selected) => table_row.set_selected(true),
@@ -220,12 +221,26 @@ impl OamView {
 
         // Sprite image
         table_row.col(|ui| {
-            let texture    = sprite_cache::get_texture_for(ui, &sprite);
-
-            Image::new(&texture)
+            let mut draw_tile = DrawTile::from(sprite)
                     .fit_to_exact_size(Vec2::splat(row_height))
-                    .ui(ui)
+                    .apply_oam(entry)
             ;
+
+            // apply the palette
+            if emu.get_config().is_gbc_enabled() {
+                let palette_index = entry.get_color_palette() as usize;
+                let palette       = palettes.gbc_object_palette.get()[palette_index];
+
+                draw_tile = draw_tile.set_palette_gbc(palette);
+            }
+            else {
+                let palette_index = entry.get_dmg_palette() as usize;
+                let palette       = palettes.obp[palette_index];
+
+                draw_tile = draw_tile.set_palette_dmg(palette);
+            }
+
+            draw_tile.ui(ui);
         });
 
         // Tile index
