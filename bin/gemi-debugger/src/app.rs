@@ -16,10 +16,13 @@
  */
 
 use std::path::PathBuf;
+use std::sync::mpsc::{channel, Receiver, TryRecvError};
 
 use eframe::{CreationContext, Frame};
 use egui::{ComboBox, Context};
+use rfd::AsyncFileDialog;
 
+use gemi_core::cartridge::Cartridge;
 use gemi_core::ppu::graphic_data::TileMap;
 
 use crate::behaviour::TreeBehaviour;
@@ -43,6 +46,9 @@ pub struct EmulatorApplication {
     /// which controls the behaviour of the tiled UI.
     #[serde(skip)]
     behaviour: TreeBehaviour,
+
+    #[serde(skip)]
+    open_file: Option<Receiver<Option<Cartridge>>>,
 
     /// A user notification to be displayed in a message box.
     #[serde(skip)]
@@ -159,6 +165,7 @@ impl Default for EmulatorApplication {
         Self {
             tree,
             behaviour:          TreeBehaviour::default(),
+            open_file:          None,
             display_message:    None,
             close_message:      false,
         }
@@ -176,6 +183,7 @@ impl eframe::App for EmulatorApplication {
         self.update_center_panel(ctx, frame);
         self.update_message_box(ctx, frame);
         self.update_input(ctx);
+        self.handle_open_file();
         self.handle_frame_response();
 
         // when the emulator is still running, request an immediate repaint
@@ -198,6 +206,25 @@ impl EmulatorApplication {
 
         // open the ROM file
         state.open_rom(path)?;
+
+        // on success, notify the views
+        visit_tiles(
+            &mut self.tree,
+            |tile| {
+                tile.on_emulator_loaded(state);
+            }
+        );
+
+        Ok(())
+    }
+
+    
+    /// Loads an already created cartridge into the emulator.
+    pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
+        let state = self.behaviour.get_state_mut();
+
+        // open the ROM file
+        state.load_cartridge(cartridge)?;
 
         // on success, notify the views
         visit_tiles(
@@ -234,34 +261,83 @@ impl EmulatorApplication {
             ui.close_menu();
 
             // open a file dialog to select a ROM file
-            match nfd2::open_file_dialog(Some("gb,gbc;*;txt"), None) {
-                Ok(nfd2::Response::Okay(path)) => {
+            self.open_file_dialog();
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            // "Quit" button to close the application
+            if ui.button("Quit").clicked() {
+                ui.close_menu();
+                ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+            }
+        }
+    }
+
+
+    /// Displays a "File Open" dialog
+    fn open_file_dialog(&mut self) {
+        if self.open_file.is_none() {
+            let (sender, receiver) = channel();
+
+            let open_file_request = async move {
+                let result = async {
+                    // open an async file request using rfd
+                    let file_handle = AsyncFileDialog::new()
+                            .set_title("Open ROM")
+                            .add_filter("GameBoy ROM Files", &["gb", "gbc"])
+                            .pick_file()
+                            .await?
+                    ;
+                    
+                    let file_data = file_handle.read().await;
+
+                    let cartridge = Cartridge::load_from_bytes(file_data, None)
+                            .ok()?
+                    ;
+
+                    Some(cartridge)
+                }.await;
+
+                _ = sender.send(result);
+            };
+
+            self.open_file = Some(receiver);
+
+            #[cfg(not(target_arch = "wasm32"))]
+            std::thread::spawn(move || futures::executor::block_on(open_file_request));
+
+            #[cfg(target_arch = "wasm32")]
+            wasm_bindgen_futures::spawn_local(open_file_request);
+        }
+    }
+
+
+    /// Waiting for the response of a "File Open" dialog and handle the result.
+    fn handle_open_file(&mut self) {
+        if let Some(receiver) = &mut self.open_file {
+            let result = receiver.try_recv();
+
+            match result {
+                // load the cartridge into the emulator
+                Ok(Some(cartridge)) => {
                     // try to load the file
-                    if let Err(e) = self.open_rom(&path) {
+                    if let Err(e) = self.load_cartridge(cartridge) {
                         // display an error message on failure
                         self.display_message_box(&format!("Error: {}", e));
                     }
+
+                    self.open_file = None;
                 }
 
-                Ok(nfd2::Response::OkayMultiple(_)) => {
-                    // cannot handle multiple files
-                    self.display_message_box("Cannot handle multiple files");
+                // Operation was cancelled or no file was selected
+                Err(TryRecvError::Disconnected) | Ok(None) => {
+                    self.open_file = None;
                 }
 
-                Err(e) => {
-                    // display an error message on failure
-                    self.display_message_box(&format!("Error: {}", e));
-                }
-
-                // ignore any other result (e.g. user cancelled)
-                _ => { }
+                // ignore as long as the channel is empty
+                Err(TryRecvError::Empty) => { }
             }
-        }
-
-        // "Quit" button to close the application
-        if ui.button("Quit").clicked() {
-            ui.close_menu();
-            ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
         }
     }
 

@@ -23,7 +23,6 @@ use egui::ViewportBuilder;
 
 use crate::app::EmulatorApplication;
 
-
 mod views;
 mod app;
 mod behaviour;
@@ -59,6 +58,7 @@ fn load_application(cc: &CreationContext) -> EmulatorApplication {
 }
 
 
+#[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), eframe::Error> {
     let options = NativeOptions {
         viewport: ViewportBuilder::default()

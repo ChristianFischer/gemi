@@ -144,6 +144,16 @@ impl EmulatorState {
                 ?
         ;
 
+        self.load_cartridge(cartridge)?;
+
+        // success!
+        Ok(())
+    }
+
+
+    /// Takes an existing Cartridge object and load it into the emulator.
+    /// If there's already a running instance of the emulator, this will be closed.
+    pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
         // on success build the new emulator instance
         let mut builder = GameBoy::build();
         builder.set_cartridge(cartridge);
