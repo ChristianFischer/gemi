@@ -28,6 +28,7 @@ use crate::views::disassembly::DisassemblyView;
 use crate::views::display::EmulatorDisplayView;
 use crate::views::memory::MemoryView;
 use crate::views::oam::OamView;
+use crate::views::palettes::PaletteView;
 use crate::views::sprites::SpritesView;
 use crate::views::tilemap::TileMapView;
 
@@ -37,6 +38,7 @@ pub mod disassembly;
 pub mod display;
 pub mod memory;
 pub mod oam;
+pub mod palettes;
 pub mod sprites;
 pub mod tilemap;
 
@@ -77,6 +79,7 @@ pub enum ViewClass {
     Disassembly(DisassemblyView),
     TileMap(TileMapView),
     Sprites(SpritesView),
+    Palettes(PaletteView),
     Oam(OamView),
 }
 
@@ -94,37 +97,43 @@ impl ViewClass {
     }
 
 
-    /// Placeholder for the CPU view.
+    /// Creates a new [`CpuView`] object.
     pub fn new_cpu() -> ViewClass {
         ViewClass::Cpu(CpuView::new())
     }
 
 
-    /// Placeholder for the memory view.
+    /// Creates a new [`MemoryView`] object.
     pub fn new_memory() -> ViewClass {
         ViewClass::Memory(MemoryView::new())
     }
 
 
-    /// Placeholder for the disassembly view.
+    /// Creates a new [`DisassemblyView`] object.
     pub fn new_disassembly() -> ViewClass {
         ViewClass::Disassembly(DisassemblyView::new())
     }
 
 
-    /// Placeholder for the tile map view.
+    /// Creates a new [`TileMapView`] object.
     pub fn new_tile_map(tilemap: TileMap) -> ViewClass {
         ViewClass::TileMap(TileMapView::new(tilemap))
     }
 
 
-    /// Placeholder for the sprites view.
+    /// Creates a new [`SpritesView`] object.
     pub fn new_sprites(bank_index: u8) -> ViewClass {
         ViewClass::Sprites(SpritesView::new(bank_index))
     }
 
 
-    /// Placeholder for the OAM view.
+    /// Creates a new [`PaletteView`] object.
+    pub fn new_palettes() -> ViewClass {
+        ViewClass::Palettes(PaletteView::new())
+    }
+
+
+    /// Creates a new [`OamView`] object.
     pub fn new_oam() -> ViewClass {
         ViewClass::Oam(OamView::new())
     }
@@ -141,6 +150,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.title(state),
             ViewClass::TileMap(v)       => v.title(state),
             ViewClass::Sprites(v)       => v.title(state),
+            ViewClass::Palettes(v)      => v.title(state),
             ViewClass::Oam(v)           => v.title(state),
         }
     }
@@ -155,6 +165,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.ui(state, ui),
             ViewClass::TileMap(v)       => v.ui(state, ui),
             ViewClass::Sprites(v)       => v.ui(state, ui),
+            ViewClass::Palettes(v)      => v.ui(state, ui),
             ViewClass::Oam(v)           => v.ui(state, ui),
         }
     }
@@ -169,6 +180,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.get_current_selection(),
             ViewClass::TileMap(v)       => v.get_current_selection(),
             ViewClass::Sprites(v)       => v.get_current_selection(),
+            ViewClass::Palettes(v)      => v.get_current_selection(),
             ViewClass::Oam(v)           => v.get_current_selection(),
         }
     }
@@ -183,6 +195,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.handle_ui_event(event),
             ViewClass::TileMap(v)       => v.handle_ui_event(event),
             ViewClass::Sprites(v)       => v.handle_ui_event(event),
+            ViewClass::Palettes(v)      => v.handle_ui_event(event),
             ViewClass::Oam(v)           => v.handle_ui_event(event),
         }
     }
@@ -197,6 +210,7 @@ impl View for ViewClass {
             ViewClass::Disassembly(v)   => v.on_emulator_loaded(state),
             ViewClass::TileMap(v)       => v.on_emulator_loaded(state),
             ViewClass::Sprites(v)       => v.on_emulator_loaded(state),
+            ViewClass::Palettes(v)      => v.on_emulator_loaded(state),
             ViewClass::Oam(v)           => v.on_emulator_loaded(state),
         }
     }

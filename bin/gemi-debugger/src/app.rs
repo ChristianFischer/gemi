@@ -122,6 +122,7 @@ impl Default for EmulatorApplication {
         let tiles_sidebar = add_views(vec![
             ViewClass::new_cartridge_info(),
             ViewClass::new_cpu(),
+            ViewClass::new_palettes(),
             ViewClass::new_sprites(0),
             ViewClass::new_sprites(1),
         ]);
