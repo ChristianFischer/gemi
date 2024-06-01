@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +47,6 @@ pub enum Value {
 
     /// A boolean value to be displayed as a checkbox value.
     Bool(bool),
-
-    /// A numeric value to be displayed as a label.
-    Number(i32),
 }
 
 
@@ -90,12 +87,6 @@ impl DataList {
     }
 
 
-    /// Adds a new numeric data item to this list.
-    pub fn add_number(&mut self, name: &str, value: i32) {
-        self.add_value(name, Value::Number(value));
-    }
-
-
     /// Renders this data list UI.
     pub fn ui(&mut self, ui: &mut egui::Ui) {
         Grid::new(&self.id)
@@ -115,10 +106,6 @@ impl DataList {
                             // shadow the original value, which should not be modified
                             let mut value = *value;
                             ui.checkbox(&mut value, "");
-                        }
-
-                        Value::Number(value) => {
-                            ui.label(&format!("{}", value));
                         }
                     }
 

@@ -264,7 +264,7 @@ impl<Source> MemoryEditor<Source> {
     /// In case there are multiple categories for the same address,
     /// it will return the first one appearing in the list.
     /// If no category was found, it will return `None`.
-    fn find_category_for_address(&mut self, address: usize) -> Option<&MemoryArea> {
+    pub fn find_category_for_address(&mut self, address: usize) -> Option<&MemoryArea> {
         for memory_area in &self.memory_areas {
             if memory_area.memory_range.contains(&address) {
                 return Some(memory_area);

@@ -155,7 +155,7 @@ impl OpCodeContext {
 
     /// Increase the stage index to be executed when invoking the opcode implementation.
     pub fn enter_next_stage(&mut self) {
-        self.stage = self.stage + 1;
+        self.stage += 1;
     }
 
     /// Get the opcodes current stage.
@@ -271,7 +271,7 @@ impl Instruction {
 
         // get the opcode, either extended or normal one
         let opcode = if opcode_byte == 0xCB {
-            let (hi, lo) = to_u8(opcode_id);
+            let (hi, _) = to_u8(opcode_id);
             &OPCODE_TABLE_EXTENDED[hi as usize]
         }
         else {

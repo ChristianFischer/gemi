@@ -37,7 +37,6 @@ pub mod disassembly;
 pub mod display;
 pub mod memory;
 pub mod oam;
-pub mod placeholder;
 pub mod sprites;
 pub mod tilemap;
 

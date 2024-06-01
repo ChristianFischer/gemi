@@ -218,7 +218,7 @@ impl EmulatorApplication {
         Ok(())
     }
 
-    
+
     /// Loads an already created cartridge into the emulator.
     pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
         let state = self.behaviour.get_state_mut();
