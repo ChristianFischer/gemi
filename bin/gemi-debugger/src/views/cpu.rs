@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use egui::{Grid, Label, PointerButton, Sense, TextEdit, Ui, Vec2, Widget};
+use egui::{Grid, Label, PointerButton, Sense, Ui, Vec2, Widget};
 
 use gemi_core::cpu::cpu::{CpuFlag, RegisterR8};
 use gemi_core::gameboy::GameBoy;
@@ -262,7 +262,7 @@ impl CpuView {
                 };
 
                 // display the edit box
-                let response = TextEdit::singleline(&mut self.rt.edit_string)
+                let response = style.text_edit_singleline(&mut self.rt.edit_string)
                     .desired_width(self.rt.edit_label_width)
                     .char_limit(max_characters)
                     .clip_text(false)
@@ -270,7 +270,6 @@ impl CpuView {
                     .horizontal_align(egui::Align::Center)
                     .frame(false)
                     .font(style.style.clone())
-                    .text_color(style.color)
                     .ui(ui)
                 ;
 

@@ -21,7 +21,7 @@ use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
 
 use eframe::epaint::Color32;
-use egui::{Grid, Id, Key, Label, PointerButton, pos2, ScrollArea, Sense, Stroke, TextEdit, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
+use egui::{Grid, Id, Key, Label, PointerButton, pos2, ScrollArea, Sense, Stroke, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
 use egui::collapsing_header::{CollapsingState, paint_default_icon};
 use egui::text_edit::TextEditOutput;
 
@@ -849,18 +849,14 @@ impl<Source> MemoryEditor<Source> {
             &mut self,
             ui: &mut Ui
     ) -> TextEditOutput {
-        let style = GemiStyle::VALUE_HIGHLIGHTED;
-
         // display the edit box
-        TextEdit::singleline(&mut self.rt.edit_string)
+        GemiStyle::VALUE_HIGHLIGHTED.text_edit_singleline(&mut self.rt.edit_string)
                 .desired_width(self.rt.edit_label_width)
                 .char_limit(2)
                 .clip_text(false)
                 .margin(Vec2::new(0.0, 0.0))
                 .horizontal_align(egui::Align::Center)
                 .frame(false)
-                .font(style.style.clone())
-                .text_color(style.color)
                 .show(ui)
     }
 

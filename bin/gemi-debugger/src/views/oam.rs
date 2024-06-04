@@ -16,10 +16,13 @@
  */
 
 use eframe::emath::{Align, Vec2};
-use egui::{ComboBox, Direction, Label, Layout, TextStyle, Ui, Widget};
+use egui::{ComboBox, Direction, Label, Layout, Sense, TextStyle, Ui, Widget};
 use egui_extras::{Column, TableBuilder, TableRow};
 
 use gemi_core::gameboy::GameBoy;
+use gemi_core::ppu::flags::LcdControlFlag;
+use gemi_core::ppu::graphic_data::Sprite;
+use gemi_core::ppu::sprite_image::SpriteImage;
 
 use crate::event::UiEvent;
 use crate::highlight::{HighlightState, test_selection};
@@ -28,7 +31,6 @@ use crate::state::{EmulatorState, UiStates};
 use crate::ui::draw_tile::DrawTile;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
-
 
 const OAM_ENTRIES : usize       = 40;
 const SPRITE_DISPLAY_SIZE : f32 = 16.0;
@@ -211,8 +213,8 @@ impl OamView {
         let ppu      = &emu.get_peripherals().ppu;
         let sprite   = ppu.get_sprite_image(tile_index, bank);
         let entry    = &ppu.get_oam()[oam_index];
-        let palettes = ppu.get_palettes();
         let style    = GemiStyle::VALUE_WRITABLE;
+        let large    = ppu.check_lcdc(LcdControlFlag::SpritesSize);
 
         match highlight_state {
             Some(HighlightState::Selected) => table_row.set_selected(true),
@@ -221,26 +223,36 @@ impl OamView {
 
         // Sprite image
         table_row.col(|ui| {
-            let mut draw_tile = DrawTile::from(sprite)
+            let image_response = self
+                    .draw_tile(emu, entry, &sprite)
                     .fit_to_exact_size(Vec2::splat(row_height))
-                    .apply_oam(entry)
+                    .sense(Sense::hover())
+                    .ui(ui)
             ;
 
-            // apply the palette
-            if emu.get_config().is_gbc_enabled() {
-                let palette_index = entry.get_color_palette() as usize;
-                let palette       = palettes.gbc_object_palette.get()[palette_index];
+            // display tooltip
+            image_response.on_hover_ui(|ui| {
+                ui.vertical(|ui| {
+                    // display the sprite image
+                    self
+                            .draw_tile(emu, entry, &sprite)
+                            .scale(10.0)
+                            .ui(ui)
+                    ;
 
-                draw_tile = draw_tile.set_palette_gbc(palette);
-            }
-            else {
-                let palette_index = entry.get_dmg_palette() as usize;
-                let palette       = palettes.obp[palette_index];
+                    // display the next image as well when "large sprites" is enabled
+                    if large {
+                        let next_tile   = tile_index + 1;
+                        let next_sprite = ppu.get_sprite_image(next_tile, bank);
 
-                draw_tile = draw_tile.set_palette_dmg(palette);
-            }
-
-            draw_tile.ui(ui);
+                        self
+                                .draw_tile(emu, entry, &next_sprite)
+                                .scale(10.0)
+                                .ui(ui)
+                        ;
+                    }
+                });
+            });
         });
 
         // Tile index
@@ -348,12 +360,41 @@ impl OamView {
         // Remainder
         table_row.col(|_| { });
 
+        // get the response
+        let response = table_row.response();
+
         // handle hover state
-        ui_states.hover.set(Selected::OamEntry(oam_index), table_row.response().hovered());
+        ui_states.hover.set(Selected::OamEntry(oam_index), response.hovered());
 
         // handle click
-        if table_row.response().clicked() {
+        if response.clicked() {
             ui_states.focus.toggle(Selected::OamEntry(oam_index));
         }
+    }
+
+
+    fn draw_tile(&self, emu: &GameBoy, entry: &Sprite, image: &SpriteImage) -> DrawTile {
+        let ppu      = &emu.get_peripherals().ppu;
+        let palettes = ppu.get_palettes();
+
+        let mut draw_tile = DrawTile::from(image.clone())
+                .apply_oam(entry)
+        ;
+
+        // apply the palette
+        if emu.get_config().is_gbc_enabled() {
+            let palette_index = entry.get_color_palette() as usize;
+            let palette       = palettes.gbc_object_palette.get()[palette_index];
+
+            draw_tile = draw_tile.set_palette_gbc(palette);
+        }
+        else {
+            let palette_index = entry.get_dmg_palette() as usize;
+            let palette       = palettes.obp[palette_index];
+
+            draw_tile = draw_tile.set_palette_dmg(palette);
+        }
+
+        draw_tile
     }
 }

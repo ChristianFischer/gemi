@@ -20,6 +20,8 @@ use std::cmp::max;
 use egui::{Color32, Grid, Label, ScrollArea, Ui, Vec2, Widget};
 
 use gemi_core::gameboy::GameBoy;
+use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
+use gemi_core::ppu::graphic_data::TileSet;
 
 use crate::event::UiEvent;
 use crate::highlight::test_selection;
@@ -178,6 +180,40 @@ impl SpritesView {
         if response.clicked() {
             ui_states.focus.toggle(Selected::Sprite(self.bank_index, sprite_index));
         }
+
+        // tooltip
+        response.on_hover_ui(|ui| {
+            Grid::new("tooltip")
+                    .num_columns(2)
+                    .show(ui, |ui| {
+                        let image_address = MEMORY_LOCATION_VRAM_BEGIN + (sprite_index as u16 * 16);
+                        let tileset0_ref  = TileSet::H8000.get_tile_index_by_address(image_address);
+                        let tileset1_ref  = TileSet::H8800.get_tile_index_by_address(image_address);
+
+                        ui.label("image");
+                        ui.label(sprite_index.to_string());
+                        ui.end_row();
+
+                        ui.label("tileset #0 ref");
+                        ui.label(match tileset0_ref {
+                            None => "-".to_string(),
+                            Some(r) => format!("{r}"),
+                        });
+                        ui.end_row();
+
+                        ui.label("tileset #1 ref");
+                        ui.label(match tileset1_ref {
+                            None => "-".to_string(),
+                            Some(r) => format!("{r}"),
+                        });
+                        ui.end_row();
+
+                        ui.label("address");
+                        ui.label(GemiStyle::ADDRESS.rich_text(format!("0x{image_address:x}")));
+                        ui.end_row();
+                    })
+            ;
+        });
     }
 
 

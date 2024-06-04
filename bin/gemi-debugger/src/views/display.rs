@@ -16,12 +16,12 @@
  */
 
 use std::cmp::min;
-use std::ops::{Add, Div, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 
 use eframe::emath::Rect;
 use eframe::epaint::{ColorImage, Stroke};
 use eframe::epaint::textures::TextureOptions;
-use egui::{Color32, Context, Image, Pos2, Sense, TextureHandle, Ui, Vec2, vec2, Widget};
+use egui::{Color32, Context, Grid, Image, Pos2, Sense, TextureHandle, Ui, Vec2, vec2, Widget};
 
 use gemi_core::gameboy::{Clock, GameBoy};
 use gemi_core::ppu::flags::LcdControlFlag;
@@ -201,6 +201,8 @@ impl EmulatorDisplayView {
 
     /// Handles interactions of the user with the UI.
     fn handle_interactions(&self, ui: &mut Ui, ui_states: &mut UiStates, emu: &GameBoy, origin: Pos2, scale: f32) {
+        let mut oam_hit : Option<(usize, Sprite, Rect)> = None;
+
         let display_bounds = Rect::from_min_size(
                 origin,
                 Vec2::new(
@@ -233,7 +235,7 @@ impl EmulatorDisplayView {
 
                 // test for all OAM entries
                 for oam_index in 0..40 {
-                    let oam_entry  = oam[oam_index];
+                    let oam_entry  = &oam[oam_index];
                     let oam_bounds = Rect::from_min_size(
                             Pos2::new(oam_entry.pos_x as f32, oam_entry.pos_y as f32),
                             Vec2::new(8.0, sprite_size as f32)
@@ -242,10 +244,47 @@ impl EmulatorDisplayView {
                     let hit = oam_bounds.contains(oam_pos);
                     ui_states.hover.set(Selected::OamEntry(oam_index), hit);
 
-                    if hit && response.clicked() {
-                        ui_states.focus.toggle(Selected::OamEntry(oam_index));
+                    if hit {
+                        if response.clicked() {
+                            ui_states.focus.toggle(Selected::OamEntry(oam_index));
+                        }
+
+                        oam_hit = Some((oam_index, oam_entry.clone(), oam_bounds));
                     }
                 }
+            }
+
+            // tooltip
+            if let Some((oam_index, sprite, bounds)) = oam_hit {
+                // interact on the OAM bounds itself, to get the tooltip
+                // displayed close on the image itself
+                ui.interact(
+                    bounds
+                            .translate(vec2(-8.0, -16.0))
+                            .mul(scale)
+                            .translate(origin.to_vec2()),
+                    ui.id().with(2),
+                    Sense::hover()
+                )
+                    .on_hover_ui(|ui| {
+                        Grid::new("tooltip")
+                                .num_columns(2)
+                                .show(ui, |ui| {
+                                    ui.label("position");
+                                    ui.label(format!("{} : {}", sprite.pos_x, sprite.pos_y));
+                                    ui.end_row();
+
+                                    ui.label("oam");
+                                    ui.label(oam_index.to_string());
+                                    ui.end_row();
+
+                                    ui.label("tile");
+                                    ui.label(sprite.tile.to_string());
+                                    ui.end_row();
+                                })
+                        ;
+                    })
+                ;
             }
         }
     }

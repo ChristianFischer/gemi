@@ -24,7 +24,7 @@ use gemi_core::gameboy::GameBoy;
 use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
 use gemi_core::ppu::flags::LcdControlFlag;
 use gemi_core::ppu::graphic_data::{TileMap, TileSet};
-use gemi_core::ppu::ppu::TILE_ATTR_BIT_VRAM_BANK;
+use gemi_core::ppu::ppu::{TILE_ATTR_BIT_H_FLIP, TILE_ATTR_BIT_V_FLIP, TILE_ATTR_BIT_VRAM_BANK};
 use gemi_core::utils::get_bit;
 
 use crate::event::UiEvent;
@@ -32,6 +32,7 @@ use crate::highlight::test_selection;
 use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::draw_tile::DrawTile;
+use crate::ui::style::GemiStyle;
 use crate::views::View;
 
 const TILE_ROWS: usize      = 32;
@@ -177,6 +178,85 @@ impl TileMapView {
                 if response.clicked() {
                     ui_states.focus.toggle(Selected::Tile(self.tilemap.to_select_bit(), tilemap_field_index));
                 }
+
+                // tooltip
+                response.on_hover_ui(|ui| {
+                    Grid::new("tooltip")
+                            .num_columns(2)
+                            .show(ui, |ui| {
+                                let image_address = MEMORY_LOCATION_VRAM_BEGIN + (tile_image_index as u16 * 16);
+
+                                // TileMap field
+                                ui.label(GemiStyle::CAPTION.rich_text("TileMap field"));
+                                ui.end_row();
+
+                                ui.label("position");
+                                ui.label(GemiStyle::MONOSPACE.rich_text(format!("{tile_column} : {tile_row}")));
+                                ui.end_row();
+
+                                ui.label("index");
+                                ui.label(tilemap_field_index.to_string());
+                                ui.end_row();
+
+                                ui.label("address");
+                                ui.label(GemiStyle::ADDRESS.rich_text(format!("0x{tilemap_field_address:x}")));
+                                ui.end_row();
+
+                                ui.end_row();
+
+                                // Image
+                                ui.label(GemiStyle::CAPTION.rich_text("Image")); // bold
+                                ui.end_row();
+
+                                ui.label("number");
+                                ui.label(format!("{tile_number}"));
+                                ui.end_row();
+
+                                ui.label("tileset");
+                                ui.label(GemiStyle::ADDRESS.rich_text(match tileset {
+                                    TileSet::H8000 => "0x8000",
+                                    TileSet::H8800 => "0x8800",
+                                }));
+                                ui.end_row();
+
+                                ui.label("address");
+                                ui.label(GemiStyle::ADDRESS.rich_text(format!("0x{image_address:x}")));
+                                ui.end_row();
+
+                                // display tooltip
+                                if emu.get_config().is_gbc_enabled() {
+                                    let vram1            = ppu.get_vram(1);
+                                    let tile_attributes  = vram1[tilemap_field_vram_offset];
+                                    let tile_image_bank  = get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8;
+                                    let palette_index    = (tile_attributes & 0b0000_0111) as usize;
+                                    let mut flip_x       = get_bit(tile_attributes, TILE_ATTR_BIT_H_FLIP);
+                                    let mut flip_y       = get_bit(tile_attributes, TILE_ATTR_BIT_V_FLIP);
+
+                                    ui.label("bank");
+                                    ui.label(format!("#{tile_image_bank}"));
+                                    ui.end_row();
+
+                                    ui.end_row();
+
+                                    // GBC Attribtues
+                                    ui.label(GemiStyle::CAPTION.rich_text("Attributes")); // bold
+                                    ui.end_row();
+
+                                    ui.label("palette");
+                                    ui.label(palette_index.to_string());
+                                    ui.end_row();
+
+                                    ui.label("flip x");
+                                    ui.checkbox(&mut flip_x, "");
+                                    ui.end_row();
+
+                                    ui.label("flip y");
+                                    ui.checkbox(&mut flip_y, "");
+                                    ui.end_row();
+                                }
+                            })
+                    ;
+                });
             }
 
             ui.end_row();
