@@ -971,7 +971,7 @@ impl MemoryBusConnection for Ppu {
                         let coincidence_bit = if self.current_line == self.registers.line_compare { 0b_0100 } else { 0b_0000 };
                         let interrupt_flags = self.registers.lcd_interrupts.bits();
 
-                        mode_bits | coincidence_bit | interrupt_flags
+                        0b_1000_0000 | mode_bits | coincidence_bit | interrupt_flags
                     },
 
                     MEMORY_LOCATION_LCD_CONTROL     => self.registers.lcd_control.bits(),
@@ -988,34 +988,47 @@ impl MemoryBusConnection for Ppu {
 
                     MEMORY_LOCATION_VBK => {
                         // on GBC: get the active RAM bank
-                        if let EmulationType::GBC = self.device_config.emulation {
+                        match self.device_config.emulation {
+                            EmulationType::DMG => 0xff,
+
                             // register will contain the active bank in bit #0
                             // and all other bits set to 1
-                            0b_1111_1110 | self.memory.vram_active_bank
-                        }
-                        else {
-                            0xff
+                            EmulationType::GBC => 0b_1111_1110 | self.memory.vram_active_bank,
                         }
                     },
 
                     MEMORY_LOCATION_BCPS => {
-                        self.memory.palettes.gbc_background_palette_pointer.get()
+                        match self.device_config.emulation {
+                            EmulationType::DMG => 0xff,
+                            EmulationType::GBC => self.memory.palettes.gbc_background_palette_pointer.get()
+                        }
                     }
 
                     MEMORY_LOCATION_BCPD => {
-                        self.memory.palettes.gbc_background_palette_pointer.read(
-                            &self.memory.palettes.gbc_background_palette
-                        )
+                        match self.device_config.emulation {
+                            EmulationType::DMG => 0xff,
+                            EmulationType::GBC => 
+                                    self.memory.palettes.gbc_background_palette_pointer.read(
+                                        &self.memory.palettes.gbc_background_palette
+                                    ),
+                        }
                     }
 
                     MEMORY_LOCATION_OCPS => {
-                        self.memory.palettes.gbc_object_palette_pointer.get()
+                        match self.device_config.emulation {
+                            EmulationType::DMG => 0xff,
+                            EmulationType::GBC => self.memory.palettes.gbc_object_palette_pointer.get(),
+                        }
                     }
 
                     MEMORY_LOCATION_OCPD => {
-                        self.memory.palettes.gbc_object_palette_pointer.read(
-                            &self.memory.palettes.gbc_object_palette
-                        )
+                        match self.device_config.emulation {
+                            EmulationType::DMG => 0xff,
+                            EmulationType::GBC => 
+                                    self.memory.palettes.gbc_object_palette_pointer.read(
+                                        &self.memory.palettes.gbc_object_palette
+                                    ),
+                        }
                     }
 
                     MEMORY_LOCATION_OPRI => {

@@ -101,7 +101,7 @@
 | cgbpal_write_m3start_lcdoffset1_1_cgb04c_out01.gbc                       |      |  ⚠️   |      |      |      |
 | cgbpal_write_m3start_lcdoffset1_2_cgb04c_out00.gbc                       |      |  ⚠️   |      |      |      |
 | **gambatte/display_startstate**                                          |      |      |      |      |      |
-| irq_dmg08_cgb04c_outE1.gbc                                               |  ❌   |  ⚠️   |      |      |      |
+| irq_dmg08_cgb04c_outE1.gbc                                               |  ✔️   |  ⚠️   |      |      |      |
 | ly_dmg08_out00_cgb04c_out90.gbc                                          |  ✔️   |  ⚠️   |      |      |      |
 | stat_1_cgb04c_out87.gbc                                                  |      |  ⚠️   |      |      |      |
 | stat_1_dmg08_out85.gb                                                    |  ❌   |      |      |      |      |
@@ -468,11 +468,11 @@
 | ly0_late_vramw_1_dmg08_cgb04c_outAA.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | ly0_late_vramw_2_dmg08_out55_cgb04c_outAA.gbc                            |  ❌   |  ⚠️   |      |      |      |
 | ly0_late_vramw_3_dmg08_cgb04c_out55.gbc                                  |  ❌   |  ⚠️   |      |      |      |
-| ly0_m0irq_scx0_1_dmg08_cgb04c_outE0.gbc                                  |  ❌   |  ⚠️   |      |      |      |
+| ly0_m0irq_scx0_1_dmg08_cgb04c_outE0.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | ly0_m0irq_scx0_2_dmg08_cgb04c_outE2.gbc                                  |  ❌   |  ⚠️   |      |      |      |
 | ly0_m0irq_scx0_ds_1_cgb04c_outE0.gbc                                     |      |  ⚠️   |      |      |      |
 | ly0_m0irq_scx0_ds_2_cgb04c_outE2.gbc                                     |      |  ⚠️   |      |      |      |
-| ly0_m0irq_scx1_1_dmg08_cgb04c_outE0.gbc                                  |  ❌   |  ⚠️   |      |      |      |
+| ly0_m0irq_scx1_1_dmg08_cgb04c_outE0.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | ly0_m0irq_scx1_2_dmg08_cgb04c_outE2.gbc                                  |  ❌   |  ⚠️   |      |      |      |
 | ly0_m0irq_scx1_ds_1_cgb04c_outE0.gbc                                     |      |  ⚠️   |      |      |      |
 | ly0_m0irq_scx1_ds_2_cgb04c_outE2.gbc                                     |      |  ⚠️   |      |      |      |
@@ -568,19 +568,19 @@
 | noime_m2irq_m0stat_2_dmg08_cgb04c_out2.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | **gambatte/irq_precedence**                                              |      |      |      |      |      |
 | if_and_ie_0_if_1_dmg08_cgb04c_outE4.gbc                                  |  ⚠️   |  ⚠️   |      |      |      |
-| if_and_ie_0_if_2_dmg08_cgb04c_outE1.gbc                                  |  ❌   |  ⚠️   |      |      |      |
+| if_and_ie_0_if_2_dmg08_cgb04c_outE1.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | if_and_ie_0_vector_1_dmg08_cgb04c_out00.gbc                              |  ⚠️   |  ⚠️   |      |      |      |
 | if_and_ie_0_vector_2_dmg08_cgb04c_out50.gbc                              |  ⚠️   |  ⚠️   |      |      |      |
 | if_and_ie_0_vector_3_dmg08_cgb04c_out00.gbc                              |  ⚠️   |  ⚠️   |      |      |      |
 | if_and_ie_0_vector_4_dmg08_cgb04c_out50.gbc                              |  ⚠️   |  ⚠️   |      |      |      |
 | late_if_via_sp_if_1_dmg08_cgb04c_outFD.gbc                               |  ❌   |  ⚠️   |      |      |      |
-| late_if_via_sp_if_2_dmg08_cgb04c_outE0.gbc                               |  ❌   |  ⚠️   |      |      |      |
+| late_if_via_sp_if_2_dmg08_cgb04c_outE0.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | late_m0irq_retrigger_1_dmg08_cgb04c_outE2.gbc                            |  ❌   |  ⚠️   |      |      |      |
-| late_m0irq_retrigger_2_dmg08_cgb04c_outE0.gbc                            |  ❌   |  ⚠️   |      |      |      |
+| late_m0irq_retrigger_2_dmg08_cgb04c_outE0.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | late_m0irq_retrigger_ds_1_cgb04c_outE2.gbc                               |      |  ⚠️   |      |      |      |
 | late_m0irq_retrigger_ds_2_cgb04c_outE0.gbc                               |      |  ⚠️   |      |      |      |
 | late_m0irq_retrigger_scx1_1_dmg08_cgb04c_outE2.gbc                       |  ❌   |  ⚠️   |      |      |      |
-| late_m0irq_retrigger_scx1_2_dmg08_cgb04c_outE0.gbc                       |  ❌   |  ⚠️   |      |      |      |
+| late_m0irq_retrigger_scx1_2_dmg08_cgb04c_outE0.gbc                       |  ✔️   |  ⚠️   |      |      |      |
 | late_m0irq_retrigger_scx1_ds_1_cgb04c_outE2.gbc                          |      |  ⚠️   |      |      |      |
 | late_m0irq_retrigger_scx1_ds_2_cgb04c_outE0.gbc                          |      |  ⚠️   |      |      |      |
 | late_m0irq_vs_tima_scx2_1_dmg08_cgb04c_out4.gbc                          |  ❌   |  ⚠️   |      |      |      |
@@ -687,7 +687,7 @@
 | m2irq_ly8f_lcdstat28_dmg08_cgb04c_out0.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | m2irq_ly8f_lcdstat30_dmg08_cgb04c_out2.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | **gambatte/ly0**                                                         |      |      |      |      |      |
-| lycint152_ly0stat_1_dmg08_cgb04c_outC1.gbc                               |  ❌   |  ⚠️   |      |      |      |
+| lycint152_ly0stat_1_dmg08_cgb04c_outC1.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_ly0stat_2_dmg08_cgb04c_outC0.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | lycint152_ly0stat_3_dmg08_cgb04c_outC2.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | lycint152_ly0stat_ds_1_cgb04c_outC1.gbc                                  |      |  ⚠️   |      |      |      |
@@ -701,54 +701,54 @@
 | lycint152_ly153_ds_3_cgb04c_out99.gbc                                    |      |  ⚠️   |      |      |      |
 | lycint152_ly153_ds_4_cgb04c_out99.gbc                                    |      |  ⚠️   |      |      |      |
 | lycint152_ly153_ds_5_cgb04c_out00.gbc                                    |      |  ⚠️   |      |      |      |
-| lycint152_ly1_m2irq_1_dmg08_cgb04c_outE0.gbc                             |  ❌   |  ⚠️   |      |      |      |
+| lycint152_ly1_m2irq_1_dmg08_cgb04c_outE0.gbc                             |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_ly1_m2irq_2_dmg08_cgb04c_outE2.gbc                             |  ❌   |  ⚠️   |      |      |      |
-| lycint152_lyc0flag_1_dmg08_cgb04c_outC1.gbc                              |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc0flag_1_dmg08_cgb04c_outC1.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc0flag_2_dmg08_cgb04c_outC5.gbc                              |  ❌   |  ⚠️   |      |      |      |
-| lycint152_lyc0flag_3_dmg08_cgb04c_outC4.gbc                              |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc0flag_3_dmg08_cgb04c_outC4.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc0flag_4_dmg08_cgb04c_outC0.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | lycint152_lyc0flag_ds_1_cgb04c_outC1.gbc                                 |      |  ⚠️   |      |      |      |
 | lycint152_lyc0flag_ds_2_cgb04c_outC5.gbc                                 |      |  ⚠️   |      |      |      |
 | lycint152_lyc0flag_ds_3_cgb04c_outC4.gbc                                 |      |  ⚠️   |      |      |      |
 | lycint152_lyc0flag_ds_4_cgb04c_outC2.gbc                                 |      |  ⚠️   |      |      |      |
-| lycint152_lyc0irq_1_dmg08_cgb04c_outE0.gbc                               |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc0irq_1_dmg08_cgb04c_outE0.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_2_dmg08_cgb04c_outE2.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_ds_1_cgb04c_outE0.gbc                                  |      |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_ds_2_cgb04c_outE2.gbc                                  |      |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_ifw_1_dmg08_cgb04c_outE2.gbc                           |  ❌   |  ⚠️   |      |      |      |
-| lycint152_lyc0irq_ifw_2_dmg08_cgb04c_outE0.gbc                           |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc0irq_ifw_2_dmg08_cgb04c_outE0.gbc                           |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_ifw_ds_1_cgb04c_outE2.gbc                              |      |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_ifw_ds_2_cgb04c_outE0.gbc                              |      |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_late_retrigger_1_dmg08_cgb04c_outE2.gbc                |  ❌   |  ⚠️   |      |      |      |
-| lycint152_lyc0irq_late_retrigger_2_dmg08_cgb04c_outE0.gbc                |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc0irq_late_retrigger_2_dmg08_cgb04c_outE0.gbc                |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_late_retrigger_ds_1_cgb04c_outE2.gbc                   |      |  ⚠️   |      |      |      |
 | lycint152_lyc0irq_late_retrigger_ds_2_cgb04c_outE0.gbc                   |      |  ⚠️   |      |      |      |
-| lycint152_lyc153flag_1_dmg08_cgb04c_outC1.gbc                            |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc153flag_1_dmg08_cgb04c_outC1.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc153flag_2_dmg08_cgb04c_outC5.gbc                            |  ❌   |  ⚠️   |      |      |      |
 | lycint152_lyc153flag_3_dmg08_cgb04c_outC1.gbc                            |  ⚠️   |  ⚠️   |      |      |      |
 | lycint152_lyc153flag_ds_1_cgb04c_outC1.gbc                               |      |  ⚠️   |      |      |      |
 | lycint152_lyc153flag_ds_2_cgb04c_outC5.gbc                               |      |  ⚠️   |      |      |      |
 | lycint152_lyc153flag_ds_3_cgb04c_outC5.gbc                               |      |  ⚠️   |      |      |      |
 | lycint152_lyc153flag_ds_4_cgb04c_outC1.gbc                               |      |  ⚠️   |      |      |      |
-| lycint152_lyc153irq_1_dmg08_cgb04c_outE0.gbc                             |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc153irq_1_dmg08_cgb04c_outE0.gbc                             |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_2_dmg08_cgb04c_outE2.gbc                             |  ❌   |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_ds_1_cgb04c_outE0.gbc                                |      |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_ds_2_cgb04c_outE2.gbc                                |      |  ⚠️   |      |      |      |
-| lycint152_lyc153irq_ifw_1_dmg08_cgb04c_outE2.gbc                         |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc153irq_ifw_1_dmg08_cgb04c_outE2.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_ifw_2_dmg08_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_ifw_ds_1_cgb04c_outE2.gbc                            |      |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_ifw_ds_2_cgb04c_outE0.gbc                            |      |  ⚠️   |      |      |      |
-| lycint152_lyc153irq_late_retrigger_1_dmg08_cgb04c_outE2.gbc              |  ❌   |  ⚠️   |      |      |      |
+| lycint152_lyc153irq_late_retrigger_1_dmg08_cgb04c_outE2.gbc              |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_late_retrigger_2_dmg08_cgb04c_outE0.gbc              |  ❌   |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_late_retrigger_ds_1_cgb04c_outE2.gbc                 |      |  ⚠️   |      |      |      |
 | lycint152_lyc153irq_late_retrigger_ds_2_cgb04c_outE0.gbc                 |      |  ⚠️   |      |      |      |
-| lycint152_m0irq_1_dmg08_cgb04c_outE0.gbc                                 |  ❌   |  ⚠️   |      |      |      |
+| lycint152_m0irq_1_dmg08_cgb04c_outE0.gbc                                 |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_m0irq_2_dmg08_cgb04c_outE2.gbc                                 |  ❌   |  ⚠️   |      |      |      |
-| lycint152_m2irq_1_dmg08_cgb04c_outE0.gbc                                 |  ❌   |  ⚠️   |      |      |      |
+| lycint152_m2irq_1_dmg08_cgb04c_outE0.gbc                                 |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_m2irq_2_dmg08_cgb04c_outE2.gbc                                 |  ❌   |  ⚠️   |      |      |      |
 | lycint152_m2irq_ds_1_cgb04c_outE0.gbc                                    |      |  ⚠️   |      |      |      |
 | lycint152_m2irq_ds_2_cgb04c_outE2.gbc                                    |      |  ⚠️   |      |      |      |
-| lycint152_m2stat_1_dmg08_cgb04c_outC2.gbc                                |  ❌   |  ⚠️   |      |      |      |
+| lycint152_m2stat_1_dmg08_cgb04c_outC2.gbc                                |  ✔️   |  ⚠️   |      |      |      |
 | lycint152_m2stat_2_dmg08_cgb04c_outC3.gbc                                |  ❌   |  ⚠️   |      |      |      |
 | **gambatte/lyc0int_m0irq**                                               |      |      |      |      |      |
 | lyc0int_m0irq_1_dmg08_cgb04c_out0.gbc                                    |  ❌   |  ⚠️   |      |      |      |
@@ -826,15 +826,15 @@
 | late_ff45_enable_lcdoffset1_1_cgb04c_out2.gbc                            |      |  ⚠️   |      |      |      |
 | late_ff45_enable_lcdoffset1_2_cgb04c_out0.gbc                            |      |  ⚠️   |      |      |      |
 | lcdoff_lycirqen_1_dmg08_cgb04c_outE2.gbc                                 |  ❌   |  ⚠️   |      |      |      |
-| lcdoff_lycirqen_2_dmg08_cgb04c_outE0.gbc                                 |  ❌   |  ⚠️   |      |      |      |
-| lcdoff_lycirqen_3_dmg08_cgb04c_outE0.gbc                                 |  ❌   |  ⚠️   |      |      |      |
+| lcdoff_lycirqen_2_dmg08_cgb04c_outE0.gbc                                 |  ✔️   |  ⚠️   |      |      |      |
+| lcdoff_lycirqen_3_dmg08_cgb04c_outE0.gbc                                 |  ✔️   |  ⚠️   |      |      |      |
 | lcdoff_lycirqen_4_dmg08_outE2_cgb04c_outE0.gbc                           |  ❌   |  ⚠️   |      |      |      |
 | lyc0_ff41_disable_1_dmg08_outE2_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
 | lyc0_ff41_disable_2_dmg08_cgb04c_outE2.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | lyc0_ff41_disable_ds_1_cgb04c_outE0.gbc                                  |      |  ⚠️   |      |      |      |
 | lyc0_ff41_disable_ds_2_cgb04c_outE2.gbc                                  |      |  ⚠️   |      |      |      |
-| lyc0_ff45_disable_1_dmg08_cgb04c_outE0.gbc                               |  ❌   |  ⚠️   |      |      |      |
-| lyc0_ff45_disable_2_dmg08_outE0_cgb04c_outE2.gbc                         |  ❌   |  ⚠️   |      |      |      |
+| lyc0_ff45_disable_1_dmg08_cgb04c_outE0.gbc                               |  ✔️   |  ⚠️   |      |      |      |
+| lyc0_ff45_disable_2_dmg08_outE0_cgb04c_outE2.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | lyc0_ff45_disable_3_dmg08_cgb04c_outE2.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | lyc0_ff45_disable_ds_1_cgb04c_outE0.gbc                                  |      |  ⚠️   |      |      |      |
 | lyc0_ff45_disable_ds_2_cgb04c_outE2.gbc                                  |      |  ⚠️   |      |      |      |
@@ -844,16 +844,16 @@
 | lyc0_ff45_enable_weirdpoint_4_dmg08_cgb04c_outE2.gbc                     |  ❌   |  ⚠️   |      |      |      |
 | lyc0_late_ff45_enable_1_dmg08_cgb04c_outE2.gbc                           |  ❌   |  ⚠️   |      |      |      |
 | lyc0_late_ff45_enable_2_dmg08_outE2_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
-| lyc0_late_ff45_enable_3_dmg08_cgb04c_outE0.gbc                           |  ❌   |  ⚠️   |      |      |      |
+| lyc0_late_ff45_enable_3_dmg08_cgb04c_outE0.gbc                           |  ✔️   |  ⚠️   |      |      |      |
 | lyc0_m1disable_1_dmg08_cgb04c_outE2.gbc                                  |  ❌   |  ⚠️   |      |      |      |
 | lyc0_m1disable_2_dmg08_outE2_cgb04c_outE0.gbc                            |  ❌   |  ⚠️   |      |      |      |
-| lyc0_m1disable_3_dmg08_cgb04c_outE0.gbc                                  |  ❌   |  ⚠️   |      |      |      |
+| lyc0_m1disable_3_dmg08_cgb04c_outE0.gbc                                  |  ✔️   |  ⚠️   |      |      |      |
 | lyc0_m1disable_ds_1_cgb04c_outE2.gbc                                     |      |  ⚠️   |      |      |      |
 | lyc0_m1disable_ds_2_cgb04c_outE0.gbc                                     |      |  ⚠️   |      |      |      |
-| lyc153_late_enable_m1disable_1_dmg08_cgb04c_outE2.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lyc153_late_enable_m1disable_2_dmg08_outE2_cgb04c_outE0.gbc              |  ❌   |  ⚠️   |      |      |      |
+| lyc153_late_enable_m1disable_1_dmg08_cgb04c_outE2.gbc                    |  ✔️   |  ⚠️   |      |      |      |
+| lyc153_late_enable_m1disable_2_dmg08_outE2_cgb04c_outE0.gbc              |  ✔️   |  ⚠️   |      |      |      |
 | lyc153_late_enable_m1disable_3_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lyc153_late_ff41_enable_1_dmg08_cgb04c_outE2.gbc                         |  ❌   |  ⚠️   |      |      |      |
+| lyc153_late_ff41_enable_1_dmg08_cgb04c_outE2.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | lyc153_late_ff41_enable_2_dmg08_outE2_cgb04c_outE0.gbc                   |  ❌   |  ⚠️   |      |      |      |
 | lyc153_late_ff41_enable_ds_1_cgb04c_outE2.gbc                            |      |  ⚠️   |      |      |      |
 | lyc153_late_ff41_enable_ds_2_cgb04c_outE0.gbc                            |      |  ⚠️   |      |      |      |
@@ -861,11 +861,11 @@
 | lyc153_late_ff41_enable_ds_lcdoffset1_2_cgb04c_outE0.gbc                 |      |  ⚠️   |      |      |      |
 | lyc153_late_ff41_enable_lcdoffset1_1_cgb04c_outE2.gbc                    |      |  ⚠️   |      |      |      |
 | lyc153_late_ff41_enable_lcdoffset1_2_cgb04c_outE0.gbc                    |      |  ⚠️   |      |      |      |
-| lyc153_late_ff45_enable_1_dmg08_cgb04c_outE2.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| lyc153_late_ff45_enable_2_dmg08_outE2_cgb04c_outE0.gbc                   |  ❌   |  ⚠️   |      |      |      |
+| lyc153_late_ff45_enable_1_dmg08_cgb04c_outE2.gbc                         |  ✔️   |  ⚠️   |      |      |      |
+| lyc153_late_ff45_enable_2_dmg08_outE2_cgb04c_outE0.gbc                   |  ✔️   |  ⚠️   |      |      |      |
 | lyc153_late_ff45_enable_3_dmg08_outE0_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
-| lyc153_late_ff45_enable_4_dmg08_outE2_cgb04c_outE0.gbc                   |  ❌   |  ⚠️   |      |      |      |
-| lyc153_late_ff45_enable_5_dmg08_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
+| lyc153_late_ff45_enable_4_dmg08_outE2_cgb04c_outE0.gbc                   |  ✔️   |  ⚠️   |      |      |      |
+| lyc153_late_ff45_enable_5_dmg08_cgb04c_outE0.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | lyc153_late_ff45_enable_ds_1_cgb04c_outE2.gbc                            |      |  ⚠️   |      |      |      |
 | lyc153_late_ff45_enable_ds_2_cgb04c_outE0.gbc                            |      |  ⚠️   |      |      |      |
 | lyc153_late_ff45_enable_ds_3_cgb04c_outE0.gbc                            |      |  ⚠️   |      |      |      |
@@ -876,8 +876,8 @@
 | lyc153_late_ff45_enable_ds_lcdoffset1_2_cgb04c_outE0.gbc                 |      |  ⚠️   |      |      |      |
 | lyc153_late_ff45_enable_lcdoffset1_1_cgb04c_outE2.gbc                    |      |  ⚠️   |      |      |      |
 | lyc153_late_ff45_enable_lcdoffset1_2_cgb04c_outE0.gbc                    |      |  ⚠️   |      |      |      |
-| lyc153_late_m1disable_1_dmg08_cgb04c_outE2.gbc                           |  ❌   |  ⚠️   |      |      |      |
-| lyc153_late_m1disable_2_dmg08_outE2_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
+| lyc153_late_m1disable_1_dmg08_cgb04c_outE2.gbc                           |  ✔️   |  ⚠️   |      |      |      |
+| lyc153_late_m1disable_2_dmg08_outE2_cgb04c_outE0.gbc                     |  ✔️   |  ⚠️   |      |      |      |
 | lyc153_late_m1disable_3_dmg08_cgb04c_outE0.gbc                           |  ❌   |  ⚠️   |      |      |      |
 | lyc153_m1disable_ds_1_cgb04c_outE2.gbc                                   |      |  ⚠️   |      |      |      |
 | lyc153_m1disable_ds_2_cgb04c_outE0.gbc                                   |      |  ⚠️   |      |      |      |
@@ -906,14 +906,14 @@
 | lyc_ff45_trigger_delay_ds_2_cgb04c_out2.gbc                              |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_1_dmg08_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_2_dmg08_outE0_cgb04c_outE2.gbc               |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_ly00_stat50_3_dmg08_cgb04c_outE2.gbc                     |  ❌   |  ⚠️   |      |      |      |
+| lycwirq_trigger_ly00_stat50_3_dmg08_cgb04c_outE2.gbc                     |  ✔️   |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_ds_1_cgb04c_outE0.gbc                        |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_ds_2_cgb04c_outE2.gbc                        |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_ds_lcdoffset1_1_cgb04c_outE0.gbc             |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_ds_lcdoffset1_2_cgb04c_outE2.gbc             |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_lcdoffset1_1_cgb04c_outE0.gbc                |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_ly00_stat50_lcdoffset1_2_cgb04c_outE2.gbc                |      |  ⚠️   |      |      |      |
-| lycwirq_trigger_ly94_stat50_dmg08_cgb04c_outE0.gbc                       |  ❌   |  ⚠️   |      |      |      |
+| lycwirq_trigger_ly94_stat50_dmg08_cgb04c_outE0.gbc                       |  ✔️   |  ⚠️   |      |      |      |
 | **gambatte/lycint_ly**                                                   |      |      |      |      |      |
 | lycint_ly_1_dmg08_cgb04c_out5.gbc                                        |  ⚠️   |  ⚠️   |      |      |      |
 | lycint_ly_2_dmg08_cgb04c_out6.gbc                                        |  ⚠️   |  ⚠️   |      |      |      |
@@ -1360,7 +1360,7 @@
 | m2int_m3stat_ds_1_cgb04c_out3.gbc                                        |      |  ⚠️   |      |      |      |
 | m2int_m3stat_ds_2_cgb04c_out0.gbc                                        |      |  ⚠️   |      |      |      |
 | **gambatte/miscmstatirq**                                                |      |      |      |      |      |
-| lcdoff_statirqen_if_dmg08_cgb04c_outE0.gbc                               |  ❌   |  ⚠️   |      |      |      |
+| lcdoff_statirqen_if_dmg08_cgb04c_outE0.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | lycflag_statwirq_1_dmg08_out2.gb                                         |  ❌   |      |      |      |      |
 | lycflag_statwirq_2_dmg08_out2.gb                                         |  ❌   |      |      |      |      |
 | lycflag_statwirq_3_dmg08_out2.gb                                         |  ❌   |      |      |      |      |
@@ -1382,7 +1382,7 @@
 | lycstatwirq_trigger_ff_bf_dmg08_cgb04c_out0.gbc                          |  ✔️   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ff_ff_dmg08_cgb04c_out0.gbc                          |  ✔️   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ly00_10_50_1_dmg08_cgb04c_outE0.gbc                  |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_ly00_10_50_2_dmg08_cgb04c_outE2.gbc                  |  ❌   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_ly00_10_50_2_dmg08_cgb04c_outE2.gbc                  |  ✔️   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ly00_10_50_ds_1_cgb04c_outE0.gbc                     |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ly00_10_50_ds_2_cgb04c_outE2.gbc                     |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ly00_10_50_ds_lcdoffset1_1_cgb04c_outE0.gbc          |      |  ⚠️   |      |      |      |
@@ -1390,8 +1390,8 @@
 | lycstatwirq_trigger_ly00_10_50_lcdoffset3_1_cgb04c_outE0.gbc             |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ly00_10_50_lcdoffset3_2_cgb04c_outE2.gbc             |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_ly94_00_50_dmg08_cgb04c_outE2.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_ly94_10_40_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_ly94_10_50_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_ly94_10_40_dmg08_cgb04c_outE0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_ly94_10_50_dmg08_cgb04c_outE0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_1_dmg08_cgb04c_outE2.gbc   |  ❌   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_2_dmg08_cgb04c_outE2.gbc   |  ❌   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_3_dmg08_cgb04c_outE2.gbc   |  ❌   |  ⚠️   |      |      |      |
@@ -1400,24 +1400,24 @@
 | lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_6_dmg08_cgb04c_outE2.gbc   |  ❌   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_7_dmg08_cgb04c_outE2.gbc   |  ❌   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_8_dmg08_cgb04c_outE2.gbc   |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_9_dmg08_cgb04c_outE0.gbc   |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_1_dmg08_cgb04c_outE0.gbc    |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_2_dmg08_cgb04c_outE0.gbc    |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_3_dmg08_cgb04c_outE0.gbc    |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_4_dmg08_cgb04c_outE0.gbc    |  ❌   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_early_ly44_lyc44_08_40_9_dmg08_cgb04c_outE0.gbc   |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_1_dmg08_cgb04c_outE0.gbc    |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_2_dmg08_cgb04c_outE0.gbc    |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_3_dmg08_cgb04c_outE0.gbc    |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_4_dmg08_cgb04c_outE0.gbc    |  ✔️   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_ds_1_cgb04c_outE0.gbc       |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_ds_2_cgb04c_outE0.gbc       |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_ds_3_cgb04c_outE2.gbc       |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_late_ly44_lyc44_08_40_ds_4_cgb04c_outE0.gbc       |      |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_ly44_lyc44_00_40_dmg08_cgb04c_outE2.gbc           |  ❌   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_ly44_lyc44_00_48_dmg08_cgb04c_outE2.gbc           |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_ly44_lyc44_08_40_dmg08_cgb04c_outE0.gbc           |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_ly44_lyc44_08_48_dmg08_cgb04c_outE0.gbc           |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_ly44_lyc44_08_ff_dmg08_cgb04c_outE0.gbc           |  ❌   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_ly44_lyc44_08_40_dmg08_cgb04c_outE0.gbc           |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_ly44_lyc44_08_48_dmg08_cgb04c_outE0.gbc           |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_ly44_lyc44_08_ff_dmg08_cgb04c_outE0.gbc           |  ✔️   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_ly44_lyc44_b7_40_dmg08_cgb04c_outE2.gbc           |  ❌   |  ⚠️   |      |      |      |
 | lycstatwirq_trigger_m0_ly44_lyc44_b7_f7_dmg08_cgb04c_outE2.gbc           |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_ly44_lyc44_bf_40_dmg08_cgb04c_outE0.gbc           |  ❌   |  ⚠️   |      |      |      |
-| lycstatwirq_trigger_m0_ly44_lyc44_bf_ff_dmg08_cgb04c_outE0.gbc           |  ❌   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_ly44_lyc44_bf_40_dmg08_cgb04c_outE0.gbc           |  ✔️   |  ⚠️   |      |      |      |
+| lycstatwirq_trigger_m0_ly44_lyc44_bf_ff_dmg08_cgb04c_outE0.gbc           |  ✔️   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_early_ly44_1_dmg08_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_early_ly44_2_dmg08_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_early_ly44_3_dmg08_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
@@ -1426,20 +1426,20 @@
 | lycwirq_trigger_m0_early_ly44_6_dmg08_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_early_ly44_7_dmg08_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_early_ly44_8_dmg08_cgb04c_outE2.gbc                   |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_early_ly44_9_dmg08_cgb04c_outE0.gbc                   |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_1_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_2_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_3_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_4_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_early_ly44_9_dmg08_cgb04c_outE0.gbc                   |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_1_dmg08_cgb04c_outE0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_2_dmg08_cgb04c_outE0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_3_dmg08_cgb04c_outE0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_4_dmg08_cgb04c_outE0.gbc                    |  ✔️   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_ds_1_cgb04c_outE0.gbc                       |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_ds_2_cgb04c_outE0.gbc                       |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_ds_3_cgb04c_outE0.gbc                       |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_ds_4_cgb04c_outE0.gbc                       |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_lyc45_1_dmg08_cgb04c_outE2.gbc              |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_lyc45_2_dmg08_cgb04c_outE2.gbc              |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_lyc45_3_dmg08_cgb04c_outE2.gbc              |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_lyc45_4_dmg08_cgb04c_outE2.gbc              |  ❌   |  ⚠️   |      |      |      |
-| lycwirq_trigger_m0_late_ly44_lyc45_5_dmg08_cgb04c_outE2.gbc              |  ❌   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_lyc45_2_dmg08_cgb04c_outE2.gbc              |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_lyc45_3_dmg08_cgb04c_outE2.gbc              |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_lyc45_4_dmg08_cgb04c_outE2.gbc              |  ✔️   |  ⚠️   |      |      |      |
+| lycwirq_trigger_m0_late_ly44_lyc45_5_dmg08_cgb04c_outE2.gbc              |  ✔️   |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_lyc45_ds_1_cgb04c_outE2.gbc                 |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_lyc45_ds_2_cgb04c_outE2.gbc                 |      |  ⚠️   |      |      |      |
 | lycwirq_trigger_m0_late_ly44_lyc45_ds_3_cgb04c_outE2.gbc                 |      |  ⚠️   |      |      |      |
@@ -1471,8 +1471,8 @@
 | m0statwirq_trigger_ff_f7_dmg08_cgb04c_out0.gbc                           |  ✔️   |  ⚠️   |      |      |      |
 | m0statwirq_trigger_ff_ff_dmg08_cgb04c_out0.gbc                           |  ✔️   |  ⚠️   |      |      |      |
 | m0statwirq_trigger_ly44_lyc44_00_08_dmg08_cgb04c_outE2.gbc               |  ❌   |  ⚠️   |      |      |      |
-| m0statwirq_trigger_ly44_lyc44_40_08_dmg08_cgb04c_outE0.gbc               |  ❌   |  ⚠️   |      |      |      |
-| m0statwirq_trigger_ly44_lyc44_40_48_dmg08_cgb04c_outE0.gbc               |  ❌   |  ⚠️   |      |      |      |
+| m0statwirq_trigger_ly44_lyc44_40_08_dmg08_cgb04c_outE0.gbc               |  ✔️   |  ⚠️   |      |      |      |
+| m0statwirq_trigger_ly44_lyc44_40_48_dmg08_cgb04c_outE0.gbc               |  ✔️   |  ⚠️   |      |      |      |
 | m1statwirq_1_dmg08_out3.gb                                               |  ❌   |      |      |      |      |
 | m1statwirq_2_dmg08_out3.gb                                               |  ❌   |      |      |      |      |
 | m1statwirq_3_dmg08_out2.gb                                               |  ❌   |      |      |      |      |
@@ -1495,11 +1495,11 @@
 | m1statwirq_trigger_ff_ff_dmg08_cgb04c_out0.gbc                           |  ✔️   |  ⚠️   |      |      |      |
 | m1statwirq_trigger_ly94_lyc94_00_10_dmg08_cgb04c_outE2.gbc               |  ❌   |  ⚠️   |      |      |      |
 | m1statwirq_trigger_ly94_lyc94_00_50_dmg08_cgb04c_outE2.gbc               |  ❌   |  ⚠️   |      |      |      |
-| m1statwirq_trigger_ly94_lyc94_40_10_dmg08_cgb04c_outE0.gbc               |  ❌   |  ⚠️   |      |      |      |
-| m1statwirq_trigger_ly94_lyc94_40_50_1_dmg08_cgb04c_outE0.gbc             |  ❌   |  ⚠️   |      |      |      |
-| m1statwirq_trigger_ly94_lyc94_40_50_2_dmg08_outE0_cgb04c_outE2.gbc       |  ❌   |  ⚠️   |      |      |      |
+| m1statwirq_trigger_ly94_lyc94_40_10_dmg08_cgb04c_outE0.gbc               |  ✔️   |  ⚠️   |      |      |      |
+| m1statwirq_trigger_ly94_lyc94_40_50_1_dmg08_cgb04c_outE0.gbc             |  ✔️   |  ⚠️   |      |      |      |
+| m1statwirq_trigger_ly94_lyc94_40_50_2_dmg08_outE0_cgb04c_outE2.gbc       |  ✔️   |  ⚠️   |      |      |      |
 | m1statwirq_trigger_ly94_lyc94_40_50_3_dmg08_cgb04c_outE2.gbc             |  ❌   |  ⚠️   |      |      |      |
-| m1statwirq_trigger_ly94_lyc94_40_50_dmg08_cgb04c_outE0.gbc               |  ❌   |  ⚠️   |      |      |      |
+| m1statwirq_trigger_ly94_lyc94_40_50_dmg08_cgb04c_outE0.gbc               |  ✔️   |  ⚠️   |      |      |      |
 | m1statwirq_trigger_ly94_lyc94_40_50_ds_1_cgb04c_outE0.gbc                |      |  ⚠️   |      |      |      |
 | m1statwirq_trigger_ly94_lyc94_40_50_ds_2_cgb04c_outE2.gbc                |      |  ⚠️   |      |      |      |
 | m2statwirq_trigger_00_00_dmg08_cgb04c_out0.gbc                           |  ✔️   |  ⚠️   |      |      |      |
@@ -1664,7 +1664,7 @@
 | oamdma_srcFF00_busyreadA000_dmg08_out1_cgb04c_out0.gbc                   |  ❌   |  ⚠️   |      |      |      |
 | oamdma_srcFF00_busyreadC000_dmg08_out1_cgb_xoutblank.gbc                 |  ❌   |      |      |      |      |
 | oamdma_srcFF00_busyreadFF4B_dmg08_cgb04c_out3.gbc                        |  ✔️   |  ⚠️   |      |      |      |
-| oamdma_srcFF00_readFE00_dmg08_out1_cgb04c_out0.gbc                       |  ✔️   |  ⚠️   |      |      |      |
+| oamdma_srcFF00_readFE00_dmg08_out1_cgb04c_out0.gbc                       |  ⚠️   |  ⚠️   |      |      |      |
 | oamdma_srcFF00_readFE45_dmg08_out1_cgb04c_out0.gbc                       |  ⚠️   |  ⚠️   |      |      |      |
 | oamdmasrc80_halt_lycirq_read8000_dmg08_cgb04c_out81.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | oamdmasrc80_halt_m2irq_read8000_dmg08_cgb04c_out81.gbc                   |  ❌   |  ⚠️   |      |      |      |
@@ -1820,33 +1820,33 @@
 | scy_during_m3_spx0B_4.gbc                                                |      |  ❌   |      |      |      |
 | **gambatte/serial**                                                      |      |      |      |      |      |
 | div_write_start_wait_read_if_1_dmg08_cgb04c_outE0.gbc                    |  ❌   |  ⚠️   |      |      |      |
-| div_write_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc                    |  ❌   |  ⚠️   |      |      |      |
+| div_write_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc                    |  ✔️   |  ⚠️   |      |      |      |
 | nopx1_div_write_start_wait_read_if_1_dmg08_cgb04c_outE0.gbc              |  ❌   |  ⚠️   |      |      |      |
-| nopx1_div_write_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc              |  ❌   |  ⚠️   |      |      |      |
-| nopx1_start83_wait_read_if_1_dmg08_cgb04c_outE0.gbc                      |  ❌   |  ⚠️   |      |      |      |
-| nopx1_start83_wait_read_if_2_dmg08_outE0_cgb04c_outE8.gbc                |  ❌   |  ⚠️   |      |      |      |
-| nopx1_start_wait_read_if_1_dmg08_cgb04c_outE0.gbc                        |  ❌   |  ⚠️   |      |      |      |
+| nopx1_div_write_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc              |  ✔️   |  ⚠️   |      |      |      |
+| nopx1_start83_wait_read_if_1_dmg08_cgb04c_outE0.gbc                      |  ✔️   |  ⚠️   |      |      |      |
+| nopx1_start83_wait_read_if_2_dmg08_outE0_cgb04c_outE8.gbc                |  ✔️   |  ⚠️   |      |      |      |
+| nopx1_start_wait_read_if_1_dmg08_cgb04c_outE0.gbc                        |  ✔️   |  ⚠️   |      |      |      |
 | nopx1_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc                        |  ❌   |  ⚠️   |      |      |      |
-| nopx2_start83_wait_read_if_1_dmg08_cgb04c_outE0.gbc                      |  ❌   |  ⚠️   |      |      |      |
-| nopx2_start83_wait_read_if_2_dmg08_outE0_cgb04c_outE8.gbc                |  ❌   |  ⚠️   |      |      |      |
+| nopx2_start83_wait_read_if_1_dmg08_cgb04c_outE0.gbc                      |  ✔️   |  ⚠️   |      |      |      |
+| nopx2_start83_wait_read_if_2_dmg08_outE0_cgb04c_outE8.gbc                |  ✔️   |  ⚠️   |      |      |      |
 | nopx2_start_wait_read_if_1_dmg08_cgb04c_outE0.gbc                        |  ❌   |  ⚠️   |      |      |      |
-| nopx2_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc                        |  ❌   |  ⚠️   |      |      |      |
+| nopx2_start_wait_read_if_2_dmg08_cgb04c_outE8.gbc                        |  ✔️   |  ⚠️   |      |      |      |
 | start83_late_div_write_wait_read_if_1a_cgb04c_outE0.gbc                  |      |  ⚠️   |      |      |      |
 | start83_late_div_write_wait_read_if_1b_cgb04c_outE8.gbc                  |      |  ⚠️   |      |      |      |
 | start83_late_div_write_wait_read_if_2a_cgb04c_outE0.gbc                  |      |  ⚠️   |      |      |      |
 | start83_late_div_write_wait_read_if_2b_cgb04c_outE8.gbc                  |      |  ⚠️   |      |      |      |
 | start_late_div_write_wait_read_if_1a_dmg08_cgb04c_outE0.gbc              |  ❌   |  ⚠️   |      |      |      |
-| start_late_div_write_wait_read_if_1b_dmg08_cgb04c_outE8.gbc              |  ❌   |  ⚠️   |      |      |      |
-| start_late_div_write_wait_read_if_2a_dmg08_cgb04c_outE0.gbc              |  ❌   |  ⚠️   |      |      |      |
+| start_late_div_write_wait_read_if_1b_dmg08_cgb04c_outE8.gbc              |  ✔️   |  ⚠️   |      |      |      |
+| start_late_div_write_wait_read_if_2a_dmg08_cgb04c_outE0.gbc              |  ✔️   |  ⚠️   |      |      |      |
 | start_late_div_write_wait_read_if_2b_dmg08_cgb04c_outE8.gbc              |  ❌   |  ⚠️   |      |      |      |
 | start_late_div_write_wait_read_if_3a_dmg08_cgb04c_outE0.gbc              |  ❌   |  ⚠️   |      |      |      |
-| start_late_div_write_wait_read_if_3b_dmg08_cgb04c_outE8.gbc              |  ❌   |  ⚠️   |      |      |      |
+| start_late_div_write_wait_read_if_3b_dmg08_cgb04c_outE8.gbc              |  ✔️   |  ⚠️   |      |      |      |
 | start_late_div_write_wait_read_if_4_dmg08_cgb04c_outE8.gbc               |  ❌   |  ⚠️   |      |      |      |
-| start_wait_clear_if_read_if_1_dmg08_cgb04c_outE8.gbc                     |  ❌   |  ⚠️   |      |      |      |
+| start_wait_clear_if_read_if_1_dmg08_cgb04c_outE8.gbc                     |  ✔️   |  ⚠️   |      |      |      |
 | start_wait_clear_if_read_if_2_dmg08_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
 | start_wait_clear_if_read_if_ds_1_cgb04c_outE8.gbc                        |      |  ⚠️   |      |      |      |
 | start_wait_clear_if_read_if_ds_2_cgb04c_outE0.gbc                        |      |  ⚠️   |      |      |      |
-| start_wait_read_if_1_dmg08_cgb04c_outE0.gbc                              |  ❌   |  ⚠️   |      |      |      |
+| start_wait_read_if_1_dmg08_cgb04c_outE0.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | start_wait_read_if_2_dmg08_cgb04c_outE8.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | start_wait_read_if_ds_1_cgb04c_outE0.gbc                                 |      |  ⚠️   |      |      |      |
 | start_wait_read_if_ds_2_cgb04c_outE8.gbc                                 |      |  ⚠️   |      |      |      |
@@ -1854,14 +1854,14 @@
 | start_wait_read_sb_2_dmg08_cgb04c_outFF.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | start_wait_read_sc_1_dmg08_outFF_cgb04c_outFD.gbc                        |  ✔️   |  ⚠️   |      |      |      |
 | start_wait_read_sc_2_dmg08_out7F_cgb04c_out7D.gbc                        |  ❌   |  ⚠️   |      |      |      |
-| start_wait_restart_read_if_1_dmg08_cgb04c_outE0.gbc                      |  ❌   |  ⚠️   |      |      |      |
+| start_wait_restart_read_if_1_dmg08_cgb04c_outE0.gbc                      |  ✔️   |  ⚠️   |      |      |      |
 | start_wait_restart_read_if_2_dmg08_cgb04c_outE8.gbc                      |  ❌   |  ⚠️   |      |      |      |
 | start_wait_sc80_read_if_1_dmg08_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| start_wait_sc80_read_if_2_dmg08_cgb04c_outE8.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| start_wait_stop_read_if_1_dmg08_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
+| start_wait_sc80_read_if_2_dmg08_cgb04c_outE8.gbc                         |  ✔️   |  ⚠️   |      |      |      |
+| start_wait_stop_read_if_1_dmg08_cgb04c_outE0.gbc                         |  ✔️   |  ⚠️   |      |      |      |
 | start_wait_stop_read_if_2_dmg08_cgb04c_outE8.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| start_wait_trigger_int8_read_if_1_dmg08_cgb04c_outE8.gbc                 |  ❌   |  ⚠️   |      |      |      |
-| start_wait_trigger_int8_read_if_2_dmg08_outE8_cgb04c_outE0.gbc           |  ❌   |  ⚠️   |      |      |      |
+| start_wait_trigger_int8_read_if_1_dmg08_cgb04c_outE8.gbc                 |  ✔️   |  ⚠️   |      |      |      |
+| start_wait_trigger_int8_read_if_2_dmg08_outE8_cgb04c_outE0.gbc           |  ✔️   |  ⚠️   |      |      |      |
 | start_wait_trigger_int8_read_if_3_dmg08_cgb04c_outE0.gbc                 |  ❌   |  ⚠️   |      |      |      |
 | start_wait_trigger_int8_read_if_ds_1_cgb04c_outE8.gbc                    |      |  ⚠️   |      |      |      |
 | start_wait_trigger_int8_read_if_ds_2_cgb04c_outE0.gbc                    |      |  ⚠️   |      |      |      |
@@ -2564,16 +2564,16 @@
 | tc00_ff_tma_1_dmg08_cgb04c_outFF.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | tc00_ff_tma_2_dmg08_cgb04c_out00.gbc                                     |  ❌   |  ⚠️   |      |      |      |
 | tc00_ff_tma_3_dmg08_cgb04c_outFE.gbc                                     |  ❌   |  ⚠️   |      |      |      |
-| tc00_irq_1_dmg08_cgb04c_outE0.gbc                                        |  ❌   |  ⚠️   |      |      |      |
+| tc00_irq_1_dmg08_cgb04c_outE0.gbc                                        |  ✔️   |  ⚠️   |      |      |      |
 | tc00_irq_2_dmg08_cgb04c_outE4.gbc                                        |  ❌   |  ⚠️   |      |      |      |
 | tc00_irq_ds_1_cgb04c_outE0.gbc                                           |      |  ⚠️   |      |      |      |
 | tc00_irq_ds_2_cgb04c_outE4.gbc                                           |      |  ⚠️   |      |      |      |
-| tc00_irq_ifw_1_dmg08_cgb04c_outE4.gbc                                    |  ❌   |  ⚠️   |      |      |      |
+| tc00_irq_ifw_1_dmg08_cgb04c_outE4.gbc                                    |  ✔️   |  ⚠️   |      |      |      |
 | tc00_irq_ifw_2_dmg08_cgb04c_outE0.gbc                                    |  ❌   |  ⚠️   |      |      |      |
 | tc00_irq_ifw_ds_1_cgb04c_outE4.gbc                                       |      |  ⚠️   |      |      |      |
 | tc00_irq_ifw_ds_2_cgb04c_outE0.gbc                                       |      |  ⚠️   |      |      |      |
-| tc00_irq_late_retrigger_1_dmg08_cgb04c_outE4.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| tc00_irq_late_retrigger_2_dmg08_outE4_cgb04c_outE0.gbc                   |  ❌   |  ⚠️   |      |      |      |
+| tc00_irq_late_retrigger_1_dmg08_cgb04c_outE4.gbc                         |  ✔️   |  ⚠️   |      |      |      |
+| tc00_irq_late_retrigger_2_dmg08_outE4_cgb04c_outE0.gbc                   |  ✔️   |  ⚠️   |      |      |      |
 | tc00_irq_late_retrigger_3_dmg08_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
 | tc00_irq_late_retrigger_ds_1_cgb04c_outE4.gbc                            |      |  ⚠️   |      |      |      |
 | tc00_irq_late_retrigger_ds_2_cgb04c_outE0.gbc                            |      |  ⚠️   |      |      |      |
@@ -2585,12 +2585,12 @@
 | tc00_late_div_write_3b_dmg08_cgb04c_outFF.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | tc00_late_div_write_4a_dmg08_cgb04c_outFE.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | tc00_late_div_write_4b_dmg08_cgb04c_outFF.gbc                            |  ✔️   |  ⚠️   |      |      |      |
-| tc00_late_div_write_if_1a_dmg08_cgb04c_outE0.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| tc00_late_div_write_if_1b_dmg08_cgb04c_outE4.gbc                         |  ❌   |  ⚠️   |      |      |      |
-| tc00_late_div_write_if_2_dmg08_cgb04c_outE4.gbc                          |  ❌   |  ⚠️   |      |      |      |
+| tc00_late_div_write_if_1a_dmg08_cgb04c_outE0.gbc                         |  ✔️   |  ⚠️   |      |      |      |
+| tc00_late_div_write_if_1b_dmg08_cgb04c_outE4.gbc                         |  ✔️   |  ⚠️   |      |      |      |
+| tc00_late_div_write_if_2_dmg08_cgb04c_outE4.gbc                          |  ✔️   |  ⚠️   |      |      |      |
 | tc00_late_stop_inc_1_dmg08_cgb04c_outFE.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | tc00_late_stop_inc_2_dmg08_cgb04c_outFF.gbc                              |  ❌   |  ⚠️   |      |      |      |
-| tc00_late_stop_irq_1_dmg08_cgb04c_outE0.gbc                              |  ❌   |  ⚠️   |      |      |      |
+| tc00_late_stop_irq_1_dmg08_cgb04c_outE0.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | tc00_late_stop_irq_2_dmg08_cgb04c_outE4.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | tc00_late_stop_of_1_dmg08_cgb04c_outFF.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | tc00_late_stop_of_2_dmg08_cgb04c_outFE.gbc                               |  ❌   |  ⚠️   |      |      |      |
@@ -2616,22 +2616,22 @@
 | tc01_1stopstart_ff_tma_1_dmg08_cgb04c_outFF.gbc                          |  ✔️   |  ⚠️   |      |      |      |
 | tc01_1stopstart_ff_tma_2_dmg08_cgb04c_out00.gbc                          |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_ff_tma_3_dmg08_cgb04c_outF0.gbc                          |  ❌   |  ⚠️   |      |      |      |
-| tc01_1stopstart_irq_1_dmg08_cgb04c_outE0.gbc                             |  ❌   |  ⚠️   |      |      |      |
+| tc01_1stopstart_irq_1_dmg08_cgb04c_outE0.gbc                             |  ✔️   |  ⚠️   |      |      |      |
 | tc01_1stopstart_irq_2_dmg08_cgb04c_outE4.gbc                             |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset1_ff_tma_1_dmg08_cgb04c_outFF.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset1_ff_tma_2_dmg08_cgb04c_out00.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset1_ff_tma_3_dmg08_cgb04c_outF0.gbc                  |  ❌   |  ⚠️   |      |      |      |
-| tc01_1stopstart_offset1_irq_1_dmg08_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
+| tc01_1stopstart_offset1_irq_1_dmg08_cgb04c_outE0.gbc                     |  ✔️   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset1_irq_2_dmg08_cgb04c_outE4.gbc                     |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset2_ff_tma_1_dmg08_cgb04c_outFF.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset2_ff_tma_2_dmg08_cgb04c_out00.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset2_ff_tma_3_dmg08_cgb04c_outF0.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset2_irq_1_dmg08_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
-| tc01_1stopstart_offset2_irq_2_dmg08_cgb04c_outE4.gbc                     |  ❌   |  ⚠️   |      |      |      |
+| tc01_1stopstart_offset2_irq_2_dmg08_cgb04c_outE4.gbc                     |  ✔️   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset3_ff_tma_1_dmg08_cgb04c_outFF.gbc                  |  ✔️   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset3_ff_tma_2_dmg08_cgb04c_out00.gbc                  |  ❌   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset3_ff_tma_3_dmg08_cgb04c_outF0.gbc                  |  ❌   |  ⚠️   |      |      |      |
-| tc01_1stopstart_offset3_irq_1_dmg08_cgb04c_outE0.gbc                     |  ❌   |  ⚠️   |      |      |      |
+| tc01_1stopstart_offset3_irq_1_dmg08_cgb04c_outE0.gbc                     |  ✔️   |  ⚠️   |      |      |      |
 | tc01_1stopstart_offset3_irq_2_dmg08_cgb04c_outE4.gbc                     |  ❌   |  ⚠️   |      |      |      |
 | tc01_div_write_start_1_dmg08_cgb04c_outF1.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | tc01_div_write_start_2_dmg08_cgb04c_outF2.gbc                            |  ✔️   |  ⚠️   |      |      |      |
@@ -2640,7 +2640,7 @@
 | tc01_ff_tma_1_dmg08_cgb04c_outFF.gbc                                     |  ✔️   |  ⚠️   |      |      |      |
 | tc01_ff_tma_2_dmg08_cgb04c_out00.gbc                                     |  ❌   |  ⚠️   |      |      |      |
 | tc01_ff_tma_3_dmg08_cgb04c_outF0.gbc                                     |  ❌   |  ⚠️   |      |      |      |
-| tc01_irq_1_dmg08_cgb04c_outE0.gbc                                        |  ❌   |  ⚠️   |      |      |      |
+| tc01_irq_1_dmg08_cgb04c_outE0.gbc                                        |  ✔️   |  ⚠️   |      |      |      |
 | tc01_irq_2_dmg08_cgb04c_outE4.gbc                                        |  ❌   |  ⚠️   |      |      |      |
 | tc01_late_div_write_1a_dmg08_cgb04c_outFF.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_div_write_1b_dmg08_cgb04c_out00.gbc                            |  ✔️   |  ⚠️   |      |      |      |
@@ -2652,13 +2652,13 @@
 | tc01_late_div_write_4b_dmg08_cgb04c_outFF.gbc                            |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_stop_inc_1_dmg08_cgb04c_outFD.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_stop_inc_2_dmg08_cgb04c_outFE.gbc                              |  ❌   |  ⚠️   |      |      |      |
-| tc01_late_stop_irq_1_dmg08_cgb04c_outE0.gbc                              |  ❌   |  ⚠️   |      |      |      |
+| tc01_late_stop_irq_1_dmg08_cgb04c_outE0.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_stop_irq_2_dmg08_cgb04c_outE4.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | tc01_late_stop_of_1_dmg08_cgb04c_outFF.gbc                               |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_stop_of_2_dmg08_cgb04c_outF0.gbc                               |  ❌   |  ⚠️   |      |      |      |
 | tc01_late_tima_inc_1_dmg08_cgb04c_out11.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_tima_inc_2_dmg08_cgb04c_out10.gbc                              |  ❌   |  ⚠️   |      |      |      |
-| tc01_late_tima_irq_1_dmg08_cgb04c_outE0.gbc                              |  ❌   |  ⚠️   |      |      |      |
+| tc01_late_tima_irq_1_dmg08_cgb04c_outE0.gbc                              |  ✔️   |  ⚠️   |      |      |      |
 | tc01_late_tima_irq_2_dmg08_cgb04c_outE4.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | tc01_late_tima_tma_1_dmg08_cgb04c_out11.gbc                              |  ❌   |  ⚠️   |      |      |      |
 | tc01_late_tima_tma_2_dmg08_cgb04c_outF1.gbc                              |  ❌   |  ⚠️   |      |      |      |

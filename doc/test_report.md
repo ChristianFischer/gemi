@@ -14,8 +14,8 @@ To update this file, call `run --package update-test-report --release --bin upda
 |                                                    |   ✔️   |   ❌   |   ⚠️   |   ☠️   |
 |----------------------------------------------------|-------:|-------:|-------:|-------:|
 | [Blargg](test_report_blargg.md)                    |  82.1% |  17.9% |   0.0% |   0.0% |
-| [Gambatte](test_report_gambatte.md)                |  12.3% |  25.5% |  61.8% |   0.5% |
-| [Mooneye](test_report_mooneye.md)                  |  58.9% |  41.1% |   0.0% |   0.0% |
+| [Gambatte](test_report_gambatte.md)                |  14.5% |  23.2% |  61.8% |   0.5% |
+| [Mooneye](test_report_mooneye.md)                  |  60.6% |  39.4% |   0.0% |   0.0% |
 
 ## Symbols
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 
 use flagset::{flags, FlagSet};
+
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::MemoryBusConnection;
-
 
 flags! {
     /// An enumeration of all interrupts available.
@@ -43,6 +43,9 @@ pub struct InterruptRegisters {
 
     /// IE: interrupts enabled
     interrupts_enabled: Interrupts,
+
+    /// Stores the unused bits of the 'interrupts_enabled' register.
+    ie_unused_bits: u8,
 }
 
 
@@ -75,6 +78,7 @@ impl InterruptRegisters {
         Self {
             interrupts_flagged: Interrupts::default(),
             interrupts_enabled: Interrupts::default(),
+            ie_unused_bits:     0b_1110_0000,
         }
     }
 
@@ -135,8 +139,8 @@ impl InterruptRegisters {
 impl MemoryBusConnection for InterruptRegisters {
     fn on_read(&self, address: u16) -> u8 {
         match address {
-            MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged.bits(),
-            MEMORY_LOCATION_INTERRUPTS_ENABLED => self.interrupts_enabled.bits(),
+            MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged.bits() | 0b_1110_0000,
+            MEMORY_LOCATION_INTERRUPTS_ENABLED => self.interrupts_enabled.bits() | self.ie_unused_bits,
 
             _ => 0xff,
         }
@@ -146,7 +150,11 @@ impl MemoryBusConnection for InterruptRegisters {
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged = Interrupts::new_truncated(value),
-            MEMORY_LOCATION_INTERRUPTS_ENABLED => self.interrupts_enabled = Interrupts::new_truncated(value),
+
+            MEMORY_LOCATION_INTERRUPTS_ENABLED => {
+                self.interrupts_enabled = Interrupts::new_truncated(value);
+                self.ie_unused_bits     = value & 0b_1110_0000;
+            }
 
             _ => { }
         }

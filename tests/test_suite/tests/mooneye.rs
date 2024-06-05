@@ -33,7 +33,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn mem_oam_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
@@ -55,7 +54,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn mem_oam_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -77,7 +75,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn mem_oam_gba() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyAdvance,
@@ -99,7 +96,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn mem_oam_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -121,7 +117,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn mem_oam_sgb2() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy2,
@@ -143,7 +138,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn reg_f_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
@@ -165,7 +159,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn reg_f_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -187,7 +180,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn reg_f_gba() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyAdvance,
@@ -209,7 +201,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn reg_f_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -231,7 +222,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn reg_f_sgb2() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy2,
@@ -253,7 +243,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn unused_hwio_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
@@ -275,7 +264,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn unused_hwio_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -297,7 +285,6 @@ mod acceptance {
 
 
         #[test]
-        #[ignore]
         fn unused_hwio_sgb2() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy2,

@@ -126,7 +126,7 @@ impl MemoryBusConnection for Input {
                     _    => 0x0f,
                 };
 
-                states | self.button_selection
+                0b_1100_0000 | states | self.button_selection
             },
 
             _ => 0xff

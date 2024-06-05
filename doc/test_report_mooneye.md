@@ -5,7 +5,7 @@
 | **mooneye_test_suite/acceptance/bits**                                   |      |      |      |      |      |
 | mem_oam.gb                                                               |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | reg_f.gb                                                                 |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
-| unused_hwio-GS.gb                                                        |  ❌   |      |      |  ❌   |  ❌   |
+| unused_hwio-GS.gb                                                        |  ✔️   |      |      |  ✔️   |  ✔️   |
 | **mooneye_test_suite/acceptance/instr**                                  |      |      |      |      |      |
 | daa.gb                                                                   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | **mooneye_test_suite/acceptance/interrupts**                             |      |      |      |      |      |
@@ -69,7 +69,7 @@
 | halt_ime0_nointr_timing.gb                                               |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | halt_ime1_timing.gb                                                      |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | halt_ime1_timing2-GS.gb                                                  |  ❌   |      |      |  ❌   |  ❌   |
-| if_ie_registers.gb                                                       |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| if_ie_registers.gb                                                       |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | intr_timing.gb                                                           |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | jp_cc_timing.gb                                                          |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
 | jp_timing.gb                                                             |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |

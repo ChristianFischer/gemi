@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +76,6 @@ pub const TESTS_KNOWN_TO_FAIL : &'static [&str] = &[
     "gambatte/vramw_m3end/",
     "gambatte/window/",
 
-    "mooneye_test_suite/acceptance/bits",
     "mooneye_test_suite/acceptance/interrupts/",
     "mooneye_test_suite/acceptance/oam_dma/",
     "mooneye_test_suite/acceptance/ppu/",
