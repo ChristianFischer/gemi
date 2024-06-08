@@ -36,8 +36,10 @@ pub const SCREEN_H: u32 = 144;
 
 pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
 
-pub const CPU_CYCLES_PER_LINE:  Clock =    456;
-pub const CPU_CYCLES_PER_FRAME: Clock = 70_224;
+pub const CPU_CYCLES_PER_LINE:                  Clock =    456;
+pub const CPU_CYCLES_PER_FRAME:                 Clock = 70_224;
+pub const CPU_CYCPES_MODE_2:                    Clock =     80;
+pub const CPU_CYCLES_MODE_2_3_MIN:              Clock =    252;
 
 pub const TILE_ATTR_BIT_VRAM_BANK:                  u8 = 3;
 pub const TILE_ATTR_BIT_H_FLIP:                     u8 = 5;
@@ -316,8 +318,8 @@ impl Ppu {
     /// to collect the objects to be drawn in this line.
     /// Enters Mode::DrawLine after the OAM scan was completed.
     fn process_oam_scan(&mut self) {
-        if self.clock > 80 {
-            self.clock -= 80;
+        if self.clock >= CPU_CYCPES_MODE_2 {
+            self.clock -= CPU_CYCPES_MODE_2;
 
             self.current_scanline    = self.do_oam_scan_for_line(self.current_line);
             self.current_line_pixel  = 0;
@@ -332,84 +334,94 @@ impl Ppu {
     /// Enters Mode::HBlank after the drawing was completed.
     fn process_draw_line(&mut self) {
         let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
-        let pixels_to_update = min(self.clock / 2, pixels_remaining as u64);
-        if pixels_to_update == 0 {
-            return;
+
+        if pixels_remaining > 0 {
+            // how many pixels could be drawn
+            let pixels_to_update = min(self.clock, pixels_remaining as u64);
+
+            // update clock
+            let cycles = pixels_to_update;
+            self.current_line_cycles += cycles;
+            self.clock -= cycles;
+
+            // process the pixels
+            self.process_draw_line_pixels(pixels_to_update);
         }
+        else {
+            self.current_line_cycles += self.clock;
+            self.clock = 0;
 
-        // update clock
-        let cycles = pixels_to_update * 2;
-        self.current_line_cycles += cycles;
-        self.clock               -= cycles;
-
-        {
-            let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
-            let palette_bg       = &self.memory.palettes.bgp;
-            let palette_obp      = &self.memory.palettes.obp;
-            let palettes_gbc_bg  = &self.memory.palettes.gbc_background_palette.get();
-            let palettes_gbc_obj = &self.memory.palettes.gbc_object_palette.get();
-            let wx               = self.registers.window_x;
-            let wy               = self.registers.window_y;
-
-            for _ in 0..pixels_to_update {
-                // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
-                if !self.current_scanline.window_enabled && window_enabled {
-                    if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.current_line) {
-                        self.current_scanline.window_enabled = true;
-                    }
-                }
-
-                // fetch background and foreground pixels, if any
-                let fetched_pixel_background = self.fetch_background_pixel();
-                let fetched_pixel_foreground = self.fetch_foreground_pixel();
-
-                // select palettes for background pixel
-                let pixel_background = PixelFetchResultWithPalette {
-                    data: &fetched_pixel_background,
-                    palette_dmg: &palette_bg,
-                    palette_gbc: &palettes_gbc_bg[fetched_pixel_background.palette_gbc as usize]
-                };
-
-                // select palettes for foreground pixel
-                let pixel_foreground = PixelFetchResultWithPalette {
-                    data: &fetched_pixel_foreground,
-                    palette_dmg: &palette_obp[fetched_pixel_foreground.palette_dmg as usize],
-                    palette_gbc: &palettes_gbc_obj[fetched_pixel_foreground.palette_gbc as usize]
-                };
-
-                // select pixel to be displayed
-                let pixel = self.mix_pixels(
-                        &pixel_background,
-                        &pixel_foreground
-                );
-
-                // resolve pixel color using the according palette
-                let pixel_color = match self.device_config.emulation {
-                    EmulationType::DMG => {
-                        let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
-                        *self.translate_dmg_color_index(&lcd_pixel)
-                    }
-
-                    EmulationType::GBC => {
-                        pixel.palette_gbc.get_color(&pixel.data.value)
-                    }
-                };
-
-                // write pixel into LCD buffer
-                self.lcd_buffer.set_pixel(
-                    self.current_line_pixel as u32,
-                    self.current_line as u32,
-                    pixel_color
-                );
-
-                // set next pixel to compute
-                self.current_line_pixel += 1;
+            // wait for the minimum time mode 2+3 could take
+            if self.current_line_cycles >= CPU_CYCLES_MODE_2_3_MIN {
+                self.enter_mode(Mode::HBlank);
             }
         }
+    }
 
-        // when reached the end of the current scanline, enter HBlank mode
-        if self.current_line_pixel as u32 >= SCREEN_W {
-            self.enter_mode(Mode::HBlank);
+
+    /// Process a number of pixels within the current scanline.
+    fn process_draw_line_pixels(&mut self, pixels_to_update: Clock) {
+        let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
+        let palette_bg       = &self.memory.palettes.bgp;
+        let palette_obp      = &self.memory.palettes.obp;
+        let palettes_gbc_bg  = &self.memory.palettes.gbc_background_palette.get();
+        let palettes_gbc_obj = &self.memory.palettes.gbc_object_palette.get();
+        let wx               = self.registers.window_x;
+        let wy               = self.registers.window_y;
+
+        for _ in 0..pixels_to_update {
+            // check if the window is enabled and the current screen pixel is inside the area covered by wx/wy
+            if !self.current_scanline.window_enabled && window_enabled {
+                if (self.current_line_pixel+7 >= wx) && ((wy as u32) < SCREEN_H) && (wy <= self.current_line) {
+                    self.current_scanline.window_enabled = true;
+                }
+            }
+
+            // fetch background and foreground pixels, if any
+            let fetched_pixel_background = self.fetch_background_pixel();
+            let fetched_pixel_foreground = self.fetch_foreground_pixel();
+
+            // select palettes for background pixel
+            let pixel_background = PixelFetchResultWithPalette {
+                data: &fetched_pixel_background,
+                palette_dmg: &palette_bg,
+                palette_gbc: &palettes_gbc_bg[fetched_pixel_background.palette_gbc as usize]
+            };
+
+            // select palettes for foreground pixel
+            let pixel_foreground = PixelFetchResultWithPalette {
+                data: &fetched_pixel_foreground,
+                palette_dmg: &palette_obp[fetched_pixel_foreground.palette_dmg as usize],
+                palette_gbc: &palettes_gbc_obj[fetched_pixel_foreground.palette_gbc as usize]
+            };
+
+            // select pixel to be displayed
+            let pixel = self.mix_pixels(
+                    &pixel_background,
+                    &pixel_foreground
+            );
+
+            // resolve pixel color using the according palette
+            let pixel_color = match self.device_config.emulation {
+                EmulationType::DMG => {
+                    let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
+                    *self.translate_dmg_color_index(&lcd_pixel)
+                }
+
+                EmulationType::GBC => {
+                    pixel.palette_gbc.get_color(&pixel.data.value)
+                }
+            };
+
+            // write pixel into LCD buffer
+            self.lcd_buffer.set_pixel(
+                self.current_line_pixel as u32,
+                self.current_line as u32,
+                pixel_color
+            );
+
+            // set next pixel to compute
+            self.current_line_pixel += 1;
         }
     }
 
@@ -526,7 +538,7 @@ impl Ppu {
         if self.clock >= remaining_cycles {
             self.clock -= remaining_cycles;
 
-            return self.enter_next_line();
+            self.enter_next_line();
         }
     }
 
@@ -538,7 +550,7 @@ impl Ppu {
         if self.clock >= CPU_CYCLES_PER_LINE {
             self.clock -= CPU_CYCLES_PER_LINE;
 
-            return self.enter_next_line();
+            self.enter_next_line();
         }
     }
 
@@ -561,7 +573,17 @@ impl Ppu {
                     self.request_interrupt(Interrupt::LcdStat);
                 }
 
+                // entering line 144, where VBlank begins will also trigger
+                // the interrupt for entering mode 2/oam
+                if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByOam) {
+                    self.request_interrupt(Interrupt::LcdStat);
+                }
+
                 self.request_interrupt(Interrupt::VBlank);
+
+                // frame completed rendering; this notifies frontends to
+                // display the new frame image data
+                self.signals.events |= DebugEvent::PpuFrameCompleted;
             },
 
             Mode::OamScan => {
@@ -585,7 +607,7 @@ impl Ppu {
             self.current_line = 0;
         }
         else {
-            self.current_line = self.current_line + 1;
+            self.current_line += 1;
         }
 
         // also progress window line counter,
@@ -621,9 +643,8 @@ impl Ppu {
         // notify LineCompleted after switching a line
         self.signals.events |= DebugEvent::PpuLineCompleted;
 
-        // notify FrameCompleted after switching back to line #0
+        // begin a new frame after switching back to line #0
         if self.current_line == 0 {
-            self.signals.events |= DebugEvent::PpuFrameCompleted;
             self.on_new_frame();
         }
     }

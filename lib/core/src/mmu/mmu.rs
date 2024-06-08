@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
  */
 
 use std::cmp::min;
+
 use crate::gameboy::{Clock, Peripherals};
 use crate::mmu::locations::*;
 use crate::mmu::memory::{DmaTransferInfo, DmaTransferState};
 use crate::mmu::memory_bus::{impl_memory_mapper, MemoryBus, MemoryBusConnection, MemoryMapper};
 use crate::mmu::memory_data::MemoryData;
 use crate::utils::{to_u16, to_u8};
-
 
 /// The memory management unit, which provides an interface to read and write the device memory.
 /// IO operations are performed via memory bus, which maps memory addresses to their according
@@ -38,6 +38,9 @@ pub struct MmuInternal {
     peripherals: Peripherals,
 
     dma: DmaTransferState,
+
+    /// Stores the value written into the DMA register.
+    dma_register_value: u8,
 }
 
 
@@ -48,6 +51,7 @@ impl Mmu {
                 peripherals,
 
                 dma: DmaTransferState::Disabled,
+                dma_register_value: 0xff,
             }
         }
     }
@@ -152,16 +156,7 @@ impl MemoryBus<MmuInternal, MmuInternal> for MmuInternal {
 impl MemoryBusConnection for MmuInternal {
     fn on_read(&self, address: u16) -> u8 {
         match address {
-            MEMORY_LOCATION_DMA_ADDRESS => {
-                match &self.dma {
-                    DmaTransferState::Disabled => 0xff,
-
-                    DmaTransferState::Transferring(dma_info) => {
-                        (dma_info.start_address >> 8) as u8
-                    }
-                }
-            },
-
+            MEMORY_LOCATION_DMA_ADDRESS => self.dma_register_value,
             _ => 0xff,
         }
     }
@@ -169,6 +164,7 @@ impl MemoryBusConnection for MmuInternal {
     fn on_write(&mut self, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_DMA_ADDRESS => {
+                self.dma_register_value = value;
                 let start_address = (value as u16) << 8;
 
                 self.dma = DmaTransferState::Transferring(DmaTransferInfo {

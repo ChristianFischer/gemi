@@ -12,21 +12,21 @@
 | ie_push.gb                                                               |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
 | **mooneye_test_suite/acceptance/oam_dma**                                |      |      |      |      |      |
 | basic.gb                                                                 |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
-| reg_read.gb                                                              |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| reg_read.gb                                                              |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | sources-GS.gb                                                            |  ❌   |      |      |  ❌   |  ❌   |
 | **mooneye_test_suite/acceptance/ppu**                                    |      |      |      |      |      |
 | hblank_ly_scx_timing-GS.gb                                               |  ❌   |      |      |  ❌   |  ❌   |
 | intr_1_2_timing-GS.gb                                                    |  ❌   |      |      |  ❌   |  ❌   |
 | intr_2_0_timing.gb                                                       |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
-| intr_2_mode0_timing.gb                                                   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| intr_2_mode0_timing.gb                                                   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | intr_2_mode0_timing_sprites.gb                                           |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
-| intr_2_mode3_timing.gb                                                   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| intr_2_mode3_timing.gb                                                   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | intr_2_oam_ok_timing.gb                                                  |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
 | lcdon_timing-GS.gb                                                       |  ❌   |      |      |  ❌   |  ❌   |
 | lcdon_write_timing-GS.gb                                                 |  ❌   |      |      |  ❌   |  ❌   |
 | stat_irq_blocking.gb                                                     |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
 | stat_lyc_onoff.gb                                                        |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
-| vblank_stat_intr-GS.gb                                                   |  ❌   |      |      |  ❌   |  ❌   |
+| vblank_stat_intr-GS.gb                                                   |  ✔️   |      |      |  ✔️   |  ✔️   |
 | **mooneye_test_suite/acceptance/serial**                                 |      |      |      |      |      |
 | boot_sclk_align-dmgABCmgb.gb                                             |  ❌   |      |      |      |      |
 | **mooneye_test_suite/acceptance/timer**                                  |      |      |      |      |      |
