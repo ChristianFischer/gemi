@@ -63,7 +63,7 @@
 | **blargg/mem_timing_2/mem_timing_2_other**                               |      |      |      |      |      |
 | mem_timing.gb                                                            |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | **blargg/oam_bug/rom_singles**                                           |      |      |      |      |      |
-| 1-lcd_sync.gb                                                            |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 1-lcd_sync.gb                                                            |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | 2-causes.gb                                                              |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
 | 3-non_causes.gb                                                          |  ✔️   |  ✔️   |  ✔️   |  ✔️   |  ✔️   |
 | 4-scanline_timing.gb                                                     |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |

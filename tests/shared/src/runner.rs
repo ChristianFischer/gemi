@@ -148,9 +148,10 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
 
 /// Run the emulator until any stop condition is met, which is defined in the RunConfig.
 pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> Result<u32, TestCaseError> {
-    let mut stop_next_frame   = false;
-    let mut frames_to_process = config.run_frames;
-    let mut frames = 0;
+    let mut stop_next_frame           = false;
+    let mut stop_next_frame_countdown = 2u32;
+    let mut frames_to_process         = config.run_frames;
+    let mut frames                    = 0;
 
     loop {
         gb.run_frame();
@@ -160,7 +161,13 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> Result<u3
         // this will be used to ensure the following frame will be completed,
         // after the actual program has been finished.
         if stop_next_frame {
-            break;
+            // well, 'stop_next_frame' does not necessarily mean the VERY next frame...
+            // some tests take a bit more time.
+            stop_next_frame_countdown = stop_next_frame_countdown.saturating_sub(1);
+
+            if stop_next_frame_countdown == 0 {
+                break;
+            }
         }
 
         // stop running after 'n' frames were processed

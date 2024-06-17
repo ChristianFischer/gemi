@@ -120,7 +120,8 @@ impl EmulatorDisplayView {
 
             let texture = ctx.load_texture("display", image, TextureOptions::NEAREST);
 
-            self.rt.display_image = Some(texture);
+            self.rt.display_image           = Some(texture);
+            self.rt.display_image_timestamp = emu.get_total_cycles_processed();
         }
     }
 

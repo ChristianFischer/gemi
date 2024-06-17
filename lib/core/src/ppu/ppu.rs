@@ -38,8 +38,11 @@ pub const SCREEN_PIXELS: usize = (SCREEN_W * SCREEN_H) as usize;
 
 pub const CPU_CYCLES_PER_LINE:                  Clock =    456;
 pub const CPU_CYCLES_PER_FRAME:                 Clock = 70_224;
-pub const CPU_CYCPES_MODE_2:                    Clock =     80;
-pub const CPU_CYCLES_MODE_2_3_MIN:              Clock =    252;
+pub const CPU_CYCLES_OAMSCAN:                   Clock =     80;
+pub const CPU_CYCLES_DRAW_MIN:                  Clock =    172;
+pub const CPU_CYCLES_DRAW_MAX:                  Clock =    289;
+pub const CPU_CYCLES_HBLANK_MIN:                Clock =     87;
+pub const CPU_CYCLES_HBLANK_MAX:                Clock =    204;
 
 pub const TILE_ATTR_BIT_VRAM_BANK:                  u8 = 3;
 pub const TILE_ATTR_BIT_H_FLIP:                     u8 = 5;
@@ -59,6 +62,19 @@ pub enum Mode {
     VBlank      = 1,
     OamScan     = 2,
     DrawLine    = 3,
+}
+
+
+/// Defines the state whether the PPU is enabled or not.
+pub enum LcdState {
+    /// The PPU is disabled and does not process anything.
+    Off,
+
+    /// The PPU is enabled and processing graphic data.
+    On,
+
+    /// After the PPU was enabled, the first frame behaves differently.
+    EnableFirstFrame,
 }
 
 
@@ -174,6 +190,12 @@ pub struct Ppu {
     /// Pending output to be sent back through the memory bus.
     signals: MemoryBusSignals,
 
+    /// Whether PPU is enabled or not.
+    lcd_state: LcdState,
+
+    /// `true` for the first frame after the PPU was enabled.
+    is_first_frame: bool,
+
     /// The PPU's current mode.
     mode: Mode,
 
@@ -226,10 +248,15 @@ impl PixelFetchResult {
 
 impl LcdBuffer {
     pub fn alloc() -> LcdBuffer {
+        LcdBuffer::allow_with_color(Color::white())
+    }
+
+    pub fn allow_with_color(color: Color) -> LcdBuffer {
         LcdBuffer {
-            pixels: PixelBuffer160x144::new([Color::white(); SCREEN_PIXELS])
+            pixels: PixelBuffer160x144::new([color; SCREEN_PIXELS])
         }
     }
+
 
     /// Get the width of the buffer image content.
     pub fn get_width(&self) -> u32 {
@@ -251,6 +278,13 @@ impl LcdBuffer {
     pub fn set_pixel(&mut self, x: u32, y: u32, color: Color) {
         let index = x + (y * SCREEN_W);
         self.pixels.get_mut()[index as usize] = color;
+    }
+
+    /// Fill the whole screen with a single solid color.
+    pub fn fill(&mut self, color: Color) {
+        for pixel in self.pixels.get_mut() {
+            *pixel = color;
+        }
     }
 
     /// Get the pixel data to be displayed.
@@ -280,10 +314,15 @@ impl ScanlineData {
 impl Ppu {
     /// Creates a new PPU object.
     pub fn new(device_config: DeviceConfig) -> Ppu {
+        let dmg_display_palette = DmgDisplayPalette::new_green();
+        let blank_color         = Self::get_blank_color(&device_config, &dmg_display_palette);
+        
         Ppu {
             clock: 0,
             device_config,
             signals: MemoryBusSignals::default(),
+            lcd_state: LcdState::On,
+            is_first_frame: true,
             mode: Mode::OamScan,
             memory: VideoMemory::new(device_config),
             registers: PpuRegisters::default(),
@@ -292,8 +331,17 @@ impl Ppu {
             current_line_cycles: 0,
             current_scanline: ScanlineData::new(),
             window_line: 0,
-            dmg_display_palette: DmgDisplayPalette::new_green(),
-            lcd_buffer: LcdBuffer::alloc(),
+            dmg_display_palette,
+            lcd_buffer: LcdBuffer::allow_with_color(blank_color),
+        }
+    }
+    
+    
+    /// Get the blank color for a disabled screen.
+    fn get_blank_color(device_config: &DeviceConfig, dmg_display_palette: &DmgDisplayPalette) -> Color {
+        match device_config.emulation {
+            EmulationType::DMG => dmg_display_palette.get_colors()[0],
+            EmulationType::GBC => Color::white(),
         }
     }
 
@@ -303,13 +351,49 @@ impl Ppu {
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
     pub fn update(&mut self, cycles: Clock) {
-        self.clock += cycles;
+        match self.lcd_state {
+            LcdState::On => {
+                self.clock += cycles;
 
-        match self.mode {
-            Mode::OamScan  => self.process_oam_scan(),
-            Mode::DrawLine => self.process_draw_line(),
-            Mode::HBlank   => self.process_hblank(),
-            Mode::VBlank   => self.process_vblank(),
+                match self.mode {
+                    Mode::OamScan  => self.process_oam_scan(),
+                    Mode::DrawLine => self.process_draw_line(),
+                    Mode::HBlank   => self.process_hblank(),
+                    Mode::VBlank   => self.process_vblank(),
+                }
+            }
+
+            LcdState::EnableFirstFrame => {
+                self.clock += cycles;
+
+                match self.mode {
+                    // 1st frame starts with HBlank for 80 cycles
+                    Mode::HBlank => {
+                        if self.clock >= CPU_CYCLES_OAMSCAN {
+                            self.clock -= CPU_CYCLES_OAMSCAN;
+                            self.current_line_cycles += CPU_CYCLES_OAMSCAN;
+                            self.enter_mode(Mode::DrawLine);
+                        }
+                    }
+
+                    // after hblank we switch into drawing, but since first frame
+                    // will be white, we just wait until the frame time elapsed
+                    Mode::DrawLine => {
+                        if self.clock >= CPU_CYCLES_DRAW_MIN {
+                            self.clock -= CPU_CYCLES_DRAW_MIN;
+                            self.current_line_cycles += CPU_CYCLES_DRAW_MIN;
+                            self.current_line_cycles += 4;
+                            self.enter_mode(Mode::HBlank);
+
+                            self.lcd_state = LcdState::On;
+                        }
+                    }
+
+                    _ => { unreachable!(); }
+                }
+            }
+
+            LcdState::Off => { }
         }
     }
 
@@ -318,8 +402,8 @@ impl Ppu {
     /// to collect the objects to be drawn in this line.
     /// Enters Mode::DrawLine after the OAM scan was completed.
     fn process_oam_scan(&mut self) {
-        if self.clock >= CPU_CYCPES_MODE_2 {
-            self.clock -= CPU_CYCPES_MODE_2;
+        if self.clock >= CPU_CYCLES_OAMSCAN {
+            self.clock -= CPU_CYCLES_OAMSCAN;
 
             self.current_scanline    = self.do_oam_scan_for_line(self.current_line);
             self.current_line_pixel  = 0;
@@ -352,7 +436,7 @@ impl Ppu {
             self.clock = 0;
 
             // wait for the minimum time mode 2+3 could take
-            if self.current_line_cycles >= CPU_CYCLES_MODE_2_3_MIN {
+            if self.current_line_cycles >= CPU_CYCLES_OAMSCAN + CPU_CYCLES_DRAW_MIN {
                 self.enter_mode(Mode::HBlank);
             }
         }
@@ -401,24 +485,27 @@ impl Ppu {
                     &pixel_foreground
             );
 
-            // resolve pixel color using the according palette
-            let pixel_color = match self.device_config.emulation {
-                EmulationType::DMG => {
-                    let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
-                    *self.translate_dmg_color_index(&lcd_pixel)
-                }
+            // the first frame does not draw pixels
+            if !self.is_first_frame {
+                // resolve pixel color using the according palette
+                let pixel_color = match self.device_config.emulation {
+                    EmulationType::DMG => {
+                        let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
+                        *self.translate_dmg_color_index(&lcd_pixel)
+                    }
 
-                EmulationType::GBC => {
-                    pixel.palette_gbc.get_color(&pixel.data.value)
-                }
-            };
+                    EmulationType::GBC => {
+                        pixel.palette_gbc.get_color(&pixel.data.value)
+                    }
+                };
 
-            // write pixel into LCD buffer
-            self.lcd_buffer.set_pixel(
-                self.current_line_pixel as u32,
-                self.current_line as u32,
-                pixel_color
-            );
+                // write pixel into LCD buffer
+                self.lcd_buffer.set_pixel(
+                    self.current_line_pixel as u32,
+                    self.current_line as u32,
+                    pixel_color
+                );
+            }
 
             // set next pixel to compute
             self.current_line_pixel += 1;
@@ -620,16 +707,7 @@ impl Ppu {
         self.current_line_pixel = 0;
 
         // check for ly == lyc coincidence
-        {
-            let coincidence = self.current_line == self.registers.line_compare;
-
-            // fire interrupt, if enabled
-            if coincidence {
-                if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByCoincidence) {
-                    self.request_interrupt(Interrupt::LcdStat);
-                }
-            }
-        }
+        self.test_coincidence();
 
         // enter vblank when beyond the last scanline
         // enter OAM scan for next scanline otherwise
@@ -650,10 +728,56 @@ impl Ppu {
     }
 
 
+    /// Tests whether LY matches LYC and raises the according interrupt, if so.
+    fn test_coincidence(&mut self) {
+        if self.is_interrupt_enabled(LcdInterruptFlag::InterruptByCoincidence) {
+            let coincidence = self.current_line == self.registers.line_compare;
+
+            // fire interrupt on match
+            if coincidence {
+                self.request_interrupt(Interrupt::LcdStat);
+            }
+        }
+    }
+
+
     /// Callback to reset data when starting a new frame
     fn on_new_frame(&mut self) {
-        self.window_line = 0;
+        self.window_line    = 0;
+        self.is_first_frame = false;
     }
+
+
+    /// Clears the screen with a 'blank' color.
+    fn clear_screen(&mut self) {
+        self.lcd_buffer.fill(Self::get_blank_color(
+            &self.device_config,
+            &self.dmg_display_palette
+        ));
+    }
+
+
+    /// Reset the PPU once it get disabled.
+    fn on_ppu_reset(&mut self) {
+        self.clock                  = 0;
+        self.lcd_state              = LcdState::Off;
+        self.mode                   = Mode::HBlank;
+        self.current_line           = 0;
+        self.current_line_cycles    = 0;
+        self.current_line_pixel     = 0;
+        self.registers.line_compare = 0;
+        self.clear_screen();
+    }
+
+
+    /// The PPU just got enabled from the disabled state.
+    fn on_ppu_enabled(&mut self) {
+        self.lcd_state      = LcdState::EnableFirstFrame;
+        self.is_first_frame = true;
+
+        self.enter_mode(Mode::HBlank);
+    }
+
 
     /// Requests an interrupt to be fired.
     fn request_interrupt(&mut self, interrupt: Interrupt) {
@@ -663,6 +787,11 @@ impl Ppu {
     /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
     pub fn set_dmg_display_palette(&mut self, palette: DmgDisplayPalette) {
         self.dmg_display_palette = palette;
+        
+        // clear the screen when the palette was changed.
+        if self.is_first_frame {
+            self.clear_screen();
+        }
     }
 
     /// Get the current palette to be used to translate DMG LCD color intensities into RGBA colors
@@ -991,8 +1120,9 @@ impl MemoryBusConnection for Ppu {
                         let mode_bits       = self.mode as u8;
                         let coincidence_bit = if self.current_line == self.registers.line_compare { 0b_0100 } else { 0b_0000 };
                         let interrupt_flags = self.registers.lcd_interrupts.bits();
+                        let lcd_enabled_bit = match self.lcd_state { LcdState::Off => 0, _ => 1, } << 7;
 
-                        0b_1000_0000 | mode_bits | coincidence_bit | interrupt_flags
+                        lcd_enabled_bit | interrupt_flags | coincidence_bit | mode_bits
                     },
 
                     MEMORY_LOCATION_LCD_CONTROL     => self.registers.lcd_control.bits(),
@@ -1078,7 +1208,19 @@ impl MemoryBusConnection for Ppu {
             // IO registers
             0xff00 ..= 0xffff => [] {
                 match address {
-                    MEMORY_LOCATION_LCD_CONTROL     => self.registers.lcd_control       = LcdControl::new_truncated(value),
+                    MEMORY_LOCATION_LCD_CONTROL => {
+                        let was_enabled            = self.registers.lcd_control.contains(LcdControlFlag::LcdEnabled);
+                        self.registers.lcd_control = LcdControl::new_truncated(value);
+                        let is_enabled             = self.registers.lcd_control.contains(LcdControlFlag::LcdEnabled);
+
+                        if was_enabled && !is_enabled {
+                            self.on_ppu_reset();
+                        }
+                        else if is_enabled && !was_enabled {
+                            self.on_ppu_enabled();
+                        }
+                    }
+
                     MEMORY_LOCATION_LCD_STATUS      => self.registers.lcd_interrupts    = LcdInterruptFlags::new_truncated(value),
                     MEMORY_LOCATION_SCY             => self.registers.scroll_y          = value,
                     MEMORY_LOCATION_SCX             => self.registers.scroll_x          = value,

@@ -28,7 +28,7 @@ use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::mmu::mmu::Mmu;
-use crate::ppu::ppu::Ppu;
+use crate::ppu::ppu::{CPU_CYCLES_PER_FRAME, Ppu};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};
@@ -456,8 +456,18 @@ impl GameBoy {
         let mut results = EmulatorUpdateResults::default();
 
         // update until receiving the 'frame completed' event.
-        while !results.events.contains(DebugEvent::PpuFrameCompleted) {
+        loop {
             results += self.process_next();
+
+            // stop after completing one frame
+            if results.events.contains(DebugEvent::PpuFrameCompleted) {
+                break;
+            }
+
+            // inc ase the screen was disabled, stop after the time of one frame has passed
+            if results.cycles >= CPU_CYCLES_PER_FRAME {
+                break;
+            }
         }
 
         results

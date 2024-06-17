@@ -20,8 +20,9 @@ use std::path::Path;
 
 use gemi_core::cartridge::Cartridge;
 use gemi_core::debug::DebugEvent;
-use gemi_core::gameboy::{EmulatorUpdateResults, GameBoy};
+use gemi_core::gameboy::{Clock, EmulatorUpdateResults, GameBoy};
 use gemi_core::input::InputButton;
+use gemi_core::ppu::ppu::CPU_CYCLES_PER_FRAME;
 use gemi_utils::keybindings::KeyBindings;
 
 use crate::selection::{Kind, Selection};
@@ -245,13 +246,19 @@ impl EmulatorInstance {
 
     /// Process a single frame of the emulator, if any.
     pub fn run_frame(&mut self) {
-        self.run_until(|_emu, result| result.events.contains(DebugEvent::PpuFrameCompleted));
+        self.run_until(|_emu, cycles, result|
+                result.events.contains(DebugEvent::PpuFrameCompleted)
+            ||  cycles >= CPU_CYCLES_PER_FRAME
+        );
     }
 
 
     /// Run the emulator until the next scanline was completed drawing.
     pub fn run_line(&mut self) {
-        self.run_until(|_emu, result| result.events.contains(DebugEvent::PpuLineCompleted));
+        self.run_until(|_emu, cycles, result|
+                result.events.contains(DebugEvent::PpuLineCompleted)
+            ||  cycles >= CPU_CYCLES_PER_FRAME
+        );
     }
 
 
@@ -265,13 +272,16 @@ impl EmulatorInstance {
 
     /// Run the emulator until a certain condition is met. 
     pub fn run_until<F>(&mut self, condition: F)
-        where F: Fn(&GameBoy, EmulatorUpdateResults) -> bool
+        where F: Fn(&GameBoy, Clock, EmulatorUpdateResults) -> bool
     {
         if let Some(emu) = self.get_emulator_mut() {
+            let mut cycles = 0;
+
             loop {
                 let result = emu.run_single_step();
+                cycles += result.cycles;
 
-                if condition(emu, result) {
+                if condition(emu, cycles, result) {
                     break;
                 }
             }
