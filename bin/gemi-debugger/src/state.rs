@@ -359,6 +359,8 @@ impl EmulatorInstance {
     pub fn run_until<F>(&mut self, condition: F)
         where F: Fn(&GameBoy, Clock, EmulatorUpdateResults) -> bool
     {
+        let mut cycles : Clock = 0;
+
         if let Some(emu) = self.get_emulator_mut() {
             let mut cycles = 0;
 

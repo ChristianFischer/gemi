@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
  */
 
 use std::fmt::{Display, Formatter};
-use crate::gameboy::Clock;
-use crate::mmu::mmu::Mmu;
+
 use crate::cpu::opcode::{Instruction, OpCode};
 use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
+use crate::gameboy::Clock;
+use crate::mmu::mmu::Mmu;
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
 
@@ -423,7 +424,7 @@ impl Cpu {
 
     /// Pushes a 8bit value on the stack, moving the stack pointer.
     pub fn push_u8(&mut self, value: u8) {
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         self.mmu.write_u8(self.stack_pointer, value);
     }
 
@@ -437,7 +438,7 @@ impl Cpu {
     /// Pops a 8bit value from the stack, moving the stack pointer.
     pub fn pop_u8(&mut self) -> u8 {
         let value = self.mmu.read_u8(self.stack_pointer);
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
         value
     }
 

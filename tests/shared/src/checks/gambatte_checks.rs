@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::ppu::ppu::LcdBuffer;
+
 use crate::runner::TestCaseError;
 
 type BitmapDigit      = [u8; 8];
 type BitmapDigitEntry = (char, BitmapDigit);
-type BitmapDigitTable = [BitmapDigitEntry; 16];
 
 /// A lookup table containing the hex digits 0-9 and a-f
 /// as used by gambatte test roms to display result codes.
-const GAMBATTE_DIGIT_BITMAPS : BitmapDigitTable = [
+const GAMBATTE_DIGIT_BITMAPS : &[BitmapDigitEntry] = &[
     ('0', [
         0b_0000_0000,
         0b_0111_1111,
@@ -86,6 +86,17 @@ const GAMBATTE_DIGIT_BITMAPS : BitmapDigitTable = [
         0b_0111_1111,
         0b_1000_0000,
         0b_1000_0000,
+        0b_0111_1110,
+        0b_0000_0001,
+        0b_0000_0001,
+        0b_0111_1110,
+    ]),
+
+    ('5', [
+        0b_0000_0000,
+        0b_0111_1111,
+        0b_0100_0000,
+        0b_0100_0000,
         0b_0111_1110,
         0b_0000_0001,
         0b_0000_0001,
@@ -255,7 +266,7 @@ fn read_character_from_display(lcd: &LcdBuffer, x: u32, y: u32) -> Option<char> 
     let x_begin = x * 8;
     let y_begin = y * 8;
 
-    'iterate_character: for entry in &GAMBATTE_DIGIT_BITMAPS {
+    'iterate_character: for entry in GAMBATTE_DIGIT_BITMAPS {
         let bitmap = &entry.1;
 
         for py in 0..8 {

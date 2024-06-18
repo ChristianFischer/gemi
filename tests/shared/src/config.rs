@@ -57,7 +57,6 @@ pub const TESTS_KNOWN_TO_FAIL : &'static [&str] = &[
     "gambatte/m1/",
     "gambatte/m2enable/",
     "gambatte/m2int_m0irq/",
-    "gambatte/m2int_m0stat/",
     "gambatte/m2int_m2irq/",
     "gambatte/m2int_m2stat/",
     "gambatte/m2int_m3stat/",

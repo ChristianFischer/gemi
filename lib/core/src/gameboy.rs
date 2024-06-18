@@ -362,6 +362,12 @@ impl GameBoy {
                 DeviceType::GameBoyColor | DeviceType::GameBoyAdvance => 0x00,
                 _ => 0xff,
             };
+            
+            // set the initial vram bank index to 0 on GBC
+            let vbk = match self.device_config.emulation {
+                EmulationType::DMG => 0xff,
+                EmulationType::GBC => 0xfe,
+            };
 
             // GBC prefers object priority by OAM index, DMG by sprite x position
             let opri = match self.device_config.emulation {
@@ -383,7 +389,7 @@ impl GameBoy {
                 /* 10 */ 0x80, 0xbf, 0xf3, 0xff, 0xbf,    X, 0x3f, 0x00, 0xff, 0xbf, 0x7f, 0xff, 0x9f, 0xff, 0xbf,    X,
                 /* 20 */ 0xff, 0x00, 0x00, 0xbf, 0x77, 0xf3, 0xf1,    X,    X,    X,    X,    X,    X,    X,    X,    X,
                 /* 30 */    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,
-                /* 40 */ 0x91, lcds, 0x00, 0x00,   ly, 0x00,  dma, 0xfc, 0x00, 0x00, 0x00, 0x00,    X, 0xff,    X, 0xff,
+                /* 40 */ 0x91, lcds, 0x00, 0x00,   ly, 0x00,  dma, 0xfc, 0x00, 0x00, 0x00, 0x00,    X, 0xff,    X,  vbk,
                 /* 50 */    X, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,    X,    X,    X,    X,    X,    X,    X,    X,    X,
                 /* 60 */    X,    X,    X,    X,    X,    X,    X,    X, 0xff, 0xff, 0xff, 0xff, opri,    X,    X,    X,
                 /* 70 */ 0xff,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,    X,

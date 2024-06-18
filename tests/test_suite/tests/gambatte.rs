@@ -41135,7 +41135,6 @@ mod m2int_m0stat {
 
 
     #[test]
-    #[ignore]
     fn m2int_m0stat_1_out0_dmg() {
         let test_case = EmulatorTestCase {
             device: DeviceType::GameBoyDmg,
@@ -41157,7 +41156,6 @@ mod m2int_m0stat {
 
 
     #[test]
-    #[ignore]
     fn m2int_m0stat_1_out0_gbc() {
         let test_case = EmulatorTestCase {
             device: DeviceType::GameBoyColor,
@@ -41179,7 +41177,6 @@ mod m2int_m0stat {
 
 
     #[test]
-    #[ignore]
     fn m2int_m0stat_2_out2_dmg() {
         let test_case = EmulatorTestCase {
             device: DeviceType::GameBoyDmg,
@@ -41201,7 +41198,6 @@ mod m2int_m0stat {
 
 
     #[test]
-    #[ignore]
     fn m2int_m0stat_2_out2_gbc() {
         let test_case = EmulatorTestCase {
             device: DeviceType::GameBoyColor,
@@ -41223,7 +41219,6 @@ mod m2int_m0stat {
 
 
     #[test]
-    #[ignore]
     fn m2int_m0stat_ds_1_out0_gbc() {
         let test_case = EmulatorTestCase {
             device: DeviceType::GameBoyColor,
@@ -41245,7 +41240,6 @@ mod m2int_m0stat {
 
 
     #[test]
-    #[ignore]
     fn m2int_m0stat_ds_2_out2_gbc() {
         let test_case = EmulatorTestCase {
             device: DeviceType::GameBoyColor,
