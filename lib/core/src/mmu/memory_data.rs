@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::io;
 use std::fs::File;
+use std::io;
 use std::io::{Read, Write};
 use std::path::Path;
 
@@ -40,6 +40,11 @@ pub trait MemoryData {
 
     /// Get the mutable memory slice of the data below.
     fn as_slice_mut(&mut self) -> &mut [u8];
+
+    /// Copies this objects data into a `Vec<u8>`.
+    fn to_vec(&self) -> Vec<u8> {
+        self.as_slice().into()
+    }
 
     /// Save the RAM image into a file.
     fn save_to_file(&self, filepath: &Path) -> io::Result<()> {
@@ -168,6 +173,7 @@ pub mod mapped {
     use std::borrow::{Borrow, BorrowMut};
     use std::mem::size_of;
     use std::ptr::{slice_from_raw_parts, slice_from_raw_parts_mut};
+
     use crate::mmu::memory_data::MemoryData;
 
 

@@ -26,21 +26,23 @@ use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::cpu::CpuView;
 use crate::views::disassembly::DisassemblyView;
 use crate::views::display::EmulatorDisplayView;
+use crate::views::file_browser::FileBrowserView;
 use crate::views::memory::MemoryView;
 use crate::views::oam::OamView;
 use crate::views::palettes::PaletteView;
 use crate::views::sprites::SpritesView;
 use crate::views::tilemap::TileMapView;
 
-pub mod cartridge_info;
-pub mod cpu;
-pub mod disassembly;
-pub mod display;
-pub mod memory;
-pub mod oam;
-pub mod palettes;
-pub mod sprites;
-pub mod tilemap;
+mod cartridge_info;
+mod cpu;
+mod disassembly;
+mod display;
+mod file_browser;
+mod memory;
+mod oam;
+mod palettes;
+mod sprites;
+mod tilemap;
 
 
 /// A trait to be implemented by view objects of which each of them display
@@ -72,6 +74,7 @@ pub trait View: serde::Serialize + serde::de::DeserializeOwned {
 /// An enum to store the different view classes.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ViewClass {
+    FileBrowser(FileBrowserView),
     Display(EmulatorDisplayView),
     CartridgeInfo(CartridgeInfoView),
     Cpu(CpuView),
@@ -85,6 +88,11 @@ pub enum ViewClass {
 
 
 impl ViewClass {
+    /// Creates a new [`FileBrowserView`] object.
+    pub fn new_file_browser() -> ViewClass {
+        ViewClass::FileBrowser(FileBrowserView::new())
+    }
+
     /// Creates a new [`EmulatorDisplayView`] object.
     pub fn new_display_view() -> ViewClass {
         ViewClass::Display(EmulatorDisplayView::new())
@@ -143,6 +151,7 @@ impl ViewClass {
 impl View for ViewClass {
     fn title(&self, state: &mut EmulatorState) -> &str {
         match self {
+            ViewClass::FileBrowser(v)   => v.title(state),
             ViewClass::Display(v)       => v.title(state),
             ViewClass::CartridgeInfo(v) => v.title(state),
             ViewClass::Cpu(v)           => v.title(state),
@@ -158,6 +167,7 @@ impl View for ViewClass {
 
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         match self {
+            ViewClass::FileBrowser(v)   => v.ui(state, ui),
             ViewClass::Display(v)       => v.ui(state, ui),
             ViewClass::CartridgeInfo(v) => v.ui(state, ui),
             ViewClass::Cpu(v)           => v.ui(state, ui),
@@ -173,6 +183,7 @@ impl View for ViewClass {
 
     fn get_current_selection(&self) -> Option<Selected> {
         match self {
+            ViewClass::FileBrowser(v)   => v.get_current_selection(),
             ViewClass::Display(v)       => v.get_current_selection(),
             ViewClass::CartridgeInfo(v) => v.get_current_selection(),
             ViewClass::Cpu(v)           => v.get_current_selection(),
@@ -188,6 +199,7 @@ impl View for ViewClass {
 
     fn handle_ui_event(&mut self, event: &UiEvent) {
         match self {
+            ViewClass::FileBrowser(v)   => v.handle_ui_event(event),
             ViewClass::Display(v)       => v.handle_ui_event(event),
             ViewClass::CartridgeInfo(v) => v.handle_ui_event(event),
             ViewClass::Cpu(v)           => v.handle_ui_event(event),
@@ -203,6 +215,7 @@ impl View for ViewClass {
 
     fn on_emulator_loaded(&mut self, state: &mut EmulatorState) {
         match self {
+            ViewClass::FileBrowser(v)   => v.on_emulator_loaded(state),
             ViewClass::Display(v)       => v.on_emulator_loaded(state),
             ViewClass::CartridgeInfo(v) => v.on_emulator_loaded(state),
             ViewClass::Cpu(v)           => v.on_emulator_loaded(state),

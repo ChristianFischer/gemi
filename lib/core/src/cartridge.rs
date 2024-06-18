@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ use std::io;
 use std::io::Read;
 use std::ops::Range;
 use std::path::{Path, PathBuf};
+
 use crate::mmu::mbc::MemoryBankController;
 use crate::mmu::memory_data::{MemoryData, MemoryDataDynamic};
 use crate::utils::as_hex_digit;
@@ -109,6 +110,11 @@ pub const ROM_OFFSET_OLD_LICENSEE_CODE:     usize = 0x014B;
 
 
 impl RomData {
+    /// Get the ROM data.
+    pub fn get_data(&self) -> &Vec<u8> {
+        &self.data
+    }
+
     /// Get the ROM data on a particular address.
     pub fn get_at(&self, address: usize) -> u8 {
         self.data[address]

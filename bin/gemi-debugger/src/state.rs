@@ -16,16 +16,29 @@
  */
 
 use std::fmt::{Display, Formatter};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use gemi_core::cartridge::Cartridge;
 use gemi_core::debug::DebugEvent;
-use gemi_core::gameboy::{Clock, EmulatorUpdateResults, GameBoy};
+use gemi_core::gameboy::{Clock, DeviceType, EmulatorUpdateResults, GameBoy};
 use gemi_core::input::InputButton;
+use gemi_core::mmu::memory_data::MemoryData;
 use gemi_core::ppu::ppu::CPU_CYCLES_PER_FRAME;
 use gemi_utils::keybindings::KeyBindings;
 
 use crate::selection::{Kind, Selection};
+
+/// An enum to store the device type to be emulated
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Copy, Clone)]
+pub enum EmulatorDevice {
+    GameBoyDmg,
+    GameBoyColor,
+    GameBoyAdvance,
+    SuperGameBoy,
+    SuperGameBoy2,
+}
+
 
 /// An enum to store the different update modes of the emulator
 /// inside of this debugger application.
@@ -67,6 +80,9 @@ pub enum UpdateStepMode {
 /// This provides functionality to load ROMs and serialize the emulator state.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct EmulatorState {
+    /// Stores the last file path opened.
+    pub last_rom_file: Option<PathBuf>,
+
     /// The actual state of the emulator, which also
     /// contains the emulator instance itself.
     pub emu: EmulatorInstance,
@@ -94,6 +110,9 @@ pub struct UiStates {
     #[serde(skip)]
     key_bindings: KeyBindings<egui::Key>,
 
+    /// The device being emulated.
+    device_type: EmulatorDevice,
+
     /// The current update mode of the emulator.
     update_mode: UpdateMode,
 
@@ -107,6 +126,13 @@ pub struct UiStates {
     /// While moving the mouse cursor over the UI, this will contain the
     /// currently hovered item.
     pub hover: Selection,
+}
+
+
+impl Default for EmulatorDevice {
+    fn default() -> Self {
+        Self::GameBoyColor
+    }
 }
 
 
@@ -124,6 +150,19 @@ impl Default for UpdateStepMode {
 }
 
 
+impl Display for EmulatorDevice {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EmulatorDevice::GameBoyDmg      => write!(f, "GameBoy DMG"),
+            EmulatorDevice::GameBoyColor    => write!(f, "GameBoy Color"),
+            EmulatorDevice::GameBoyAdvance  => write!(f, "GameBoy Advance"),
+            EmulatorDevice::SuperGameBoy    => write!(f, "Super GameBoy"),
+            EmulatorDevice::SuperGameBoy2   => write!(f, "Super GameBoy 2"),
+        }
+    }
+}
+
+
 impl Display for UpdateStepMode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -135,10 +174,26 @@ impl Display for UpdateStepMode {
 }
 
 
+impl Into<DeviceType> for EmulatorDevice {
+    fn into(self) -> DeviceType {
+        match self {
+            EmulatorDevice::GameBoyDmg      => DeviceType::GameBoyDmg,
+            EmulatorDevice::GameBoyColor    => DeviceType::GameBoyColor,
+            EmulatorDevice::GameBoyAdvance  => DeviceType::GameBoyAdvance,
+            EmulatorDevice::SuperGameBoy    => DeviceType::SuperGameBoy,
+            EmulatorDevice::SuperGameBoy2   => DeviceType::SuperGameBoy2,
+        }
+    }
+}
+
+
 impl EmulatorState {
     /// Open a ROM file and load it into the emulator.
     /// If there's already a running instance of the emulator, this will be closed.
     pub fn open_rom(&mut self, path: &Path) -> Result<(), String> {
+        // clear last rom path
+        self.last_rom_file = None;
+
         // load the cartridge from the given path
         let cartridge = Cartridge::load_files_with_default_ram(path)
                 .map_err(|e| format!("Failed to load ROM: {}", e))
@@ -146,6 +201,9 @@ impl EmulatorState {
         ;
 
         self.load_cartridge(cartridge)?;
+
+        // store the path to the rom file opened
+        self.last_rom_file = Some(path.to_path_buf());
 
         // success!
         Ok(())
@@ -155,8 +213,35 @@ impl EmulatorState {
     /// Takes an existing Cartridge object and load it into the emulator.
     /// If there's already a running instance of the emulator, this will be closed.
     pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
+        // no path known
+        self.last_rom_file = None;
+
+        self.instantiate_emulator_with_cartridge(cartridge)
+    }
+
+
+    pub fn reload(&mut self) -> Result<(), String> {
+        let cartridge = self.emu.get_cartridge().ok_or("No Cartridge loaded")?;
+
+        // copy the ROM and RAM data from the existing cartridge
+        let rom = cartridge.get_rom().get_data().clone();
+        let ram = cartridge.get_ram().to_vec();
+
+        // create a new cartridge with the existing data
+        let new_cartridge = Cartridge::load_from_bytes(rom, Some(ram))
+                .map_err(|e| e.to_string())?
+        ;
+
+        self.instantiate_emulator_with_cartridge(new_cartridge)
+    }
+
+
+    /// Internal function to create a new emulator instance with an existing cartridge
+    /// without changing any other configuration.
+    fn instantiate_emulator_with_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
         // on success build the new emulator instance
         let mut builder = GameBoy::build();
+        builder.set_device_type(self.ui.get_device_type().clone().into());
         builder.set_cartridge(cartridge);
 
         // finish & initialize
@@ -291,6 +376,20 @@ impl EmulatorInstance {
 
 
 impl UiStates {
+    /// Get the device type to be emulated.
+    /// This is not necessarily the device type of the current emulator instance,
+    /// but will be used next type starting an emulator
+    pub fn get_device_type(&self) -> &EmulatorDevice {
+        &self.device_type
+    }
+
+    /// Set the device type of the emulator.
+    /// This will not affect the currently running emulator,
+    /// but takes effect next time when loading a new emulator instance.
+    pub fn set_device_type(&mut self, device_type: EmulatorDevice) {
+        self.device_type = device_type;
+    }
+
     /// Get the current update mode of the emulator.
     pub fn get_update_mode(&self) -> &UpdateMode {
         &self.update_mode
@@ -345,12 +444,15 @@ fn make_default_key_bindings() -> KeyBindings<egui::Key> {
 impl Default for EmulatorState {
     fn default() -> Self {
         Self {
+            last_rom_file: None,
+
             emu: EmulatorInstance {
                 gb: None,
             },
 
             ui: UiStates {
                 key_bindings:       make_default_key_bindings(),
+                device_type:        EmulatorDevice::GameBoyColor,
                 update_mode:        UpdateMode::Paused,
                 update_step_mode:   UpdateStepMode::Frame,
                 focus:              Selection::new(Kind::Focus),

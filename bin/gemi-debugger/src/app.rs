@@ -27,7 +27,7 @@ use gemi_core::ppu::graphic_data::TileMap;
 
 use crate::behaviour::TreeBehaviour;
 use crate::event::UiEvent;
-use crate::state::{EmulatorState, UpdateMode, UpdateStepMode};
+use crate::state::{EmulatorDevice, EmulatorState, UpdateMode, UpdateStepMode};
 use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
@@ -134,6 +134,11 @@ impl Default for EmulatorApplication {
             ViewClass::new_oam(),
         ]);
 
+        // another sidebar containing the file browser
+        let file_browser = add_views(vec![
+            ViewClass::new_file_browser(),
+        ]);
+
         // create a split between the main area and a bottom area below
         let v_split = {
             let linear = egui_tiles::Linear::new_binary(
@@ -160,8 +165,31 @@ impl Default for EmulatorApplication {
             tiles.insert_container(container)
         };
 
+        // main view panel
+        let main_view = {
+            // on desktop, add a separate pane with the file browser
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                let linear = egui_tiles::Linear::new_binary(
+                    egui_tiles::LinearDir::Horizontal,
+                    [file_browser, h_split],
+                    0.25
+                );
+
+                let container = egui_tiles::Container::Linear(linear);
+
+                tiles.insert_container(container)
+            }
+
+            // on web, there is no file browser
+            #[cfg(target_arch = "wasm32")]
+            {
+                h_split
+            }
+        };
+
         // create the tree object
-        let tree = egui_tiles::Tree::new("gemi", h_split, tiles);
+        let tree = egui_tiles::Tree::new("gemi", main_view, tiles);
 
         Self {
             tree,
@@ -348,6 +376,20 @@ impl EmulatorApplication {
         let mut is_running = state.is_running();
         let mut is_paused  = state.ui.is_paused();
 
+        // "Reload" button
+        {
+            let was_enabled = ui.is_enabled();
+            ui.set_enabled(state.emu.is_emulator_loaded());
+
+            if ui.button(BUTTON_LABEL_RELOAD).clicked() {
+                _ = state.reload();
+            }
+
+            ui.set_enabled(was_enabled);
+
+            ui.separator();
+        }
+
         // "Play" button
         if ui.toggle_value(&mut is_running, BUTTON_LABEL_PLAY).clicked() {
             if is_running {
@@ -388,6 +430,34 @@ impl EmulatorApplication {
             
             if response.changed() {
                 state.ui.set_update_step_mode(all_modes[selected_index]);
+            }
+        }
+
+        ui.separator();
+
+        // emulator device type
+        {
+            let mut selected_index = *state.ui.get_device_type() as usize;
+
+            let all_types = [
+                EmulatorDevice::GameBoyDmg,
+                EmulatorDevice::GameBoyColor,
+                EmulatorDevice::GameBoyAdvance,
+                EmulatorDevice::SuperGameBoy,
+                EmulatorDevice::SuperGameBoy2,
+            ];
+
+            let response = ComboBox::from_id_source("device_type")
+                    .show_index(
+                        ui,
+                        &mut selected_index,
+                        all_types.len(),
+                        |i| all_types[i].to_string()
+                    )
+            ;
+
+            if response.changed() {
+                state.ui.set_device_type(all_types[selected_index]);
             }
         }
     }
