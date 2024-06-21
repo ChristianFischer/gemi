@@ -289,6 +289,12 @@ impl GameBoy {
                 (0x01, true, false, ch, ch, 0x00, 0x13, 0x00, 0xd8, 0x01, 0x4d)
             }
 
+            // classic GameBoy
+            (DeviceType::GameBoyPocket, _) => {
+                let ch = header_checksum != 0;
+                (0x01, true, false, ch, ch, 0x00, 0x13, 0x00, 0xd8, 0x01, 0x4d)
+            }
+
             // GameBoy Color with classic GameBoy cartridge
             (DeviceType::GameBoyColor, EmulationType::DMG) => {
                 let b = title_checksum;
@@ -306,7 +312,8 @@ impl GameBoy {
             }
 
             // GameBoy Advance with classic GameBoy cartridge
-            (DeviceType::GameBoyAdvance, EmulationType::DMG) => {
+            (DeviceType::GameBoyAdvance, EmulationType::DMG) |
+            (DeviceType::GameBoyAdvanceSP, EmulationType::DMG) => {
                 let (b, flag_h, _) = carrying_add_u8(title_checksum, 1, false);
                 let flag_z = b == 0;
 
@@ -318,7 +325,8 @@ impl GameBoy {
             }
 
             // GameBoy Advance with a cartridge using GBC extensions
-            (DeviceType::GameBoyAdvance, EmulationType::GBC) => {
+            (DeviceType::GameBoyAdvance, EmulationType::GBC) |
+            (DeviceType::GameBoyAdvanceSP, EmulationType::GBC) => {
                 (0x11, false, false, false, false, 0x01, 0x00, 0xff, 0x56, 0x00, 0x0d)
             }
 

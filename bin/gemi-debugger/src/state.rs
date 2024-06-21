@@ -33,8 +33,10 @@ use crate::selection::{Kind, Selection};
 #[derive(Copy, Clone)]
 pub enum EmulatorDevice {
     GameBoyDmg,
+    GameBoyPocket,
     GameBoyColor,
     GameBoyAdvance,
+    GameBoyAdvanceSP,
     SuperGameBoy,
     SuperGameBoy2,
 }
@@ -153,11 +155,13 @@ impl Default for UpdateStepMode {
 impl Display for EmulatorDevice {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            EmulatorDevice::GameBoyDmg      => write!(f, "GameBoy DMG"),
-            EmulatorDevice::GameBoyColor    => write!(f, "GameBoy Color"),
-            EmulatorDevice::GameBoyAdvance  => write!(f, "GameBoy Advance"),
-            EmulatorDevice::SuperGameBoy    => write!(f, "Super GameBoy"),
-            EmulatorDevice::SuperGameBoy2   => write!(f, "Super GameBoy 2"),
+            EmulatorDevice::GameBoyDmg       => write!(f, "GameBoy DMG"),
+            EmulatorDevice::GameBoyPocket    => write!(f, "GameBoy Pocket"),
+            EmulatorDevice::GameBoyColor     => write!(f, "GameBoy Color"),
+            EmulatorDevice::GameBoyAdvance   => write!(f, "GameBoy Advance"),
+            EmulatorDevice::GameBoyAdvanceSP => write!(f, "GameBoy Advance SP"),
+            EmulatorDevice::SuperGameBoy     => write!(f, "Super GameBoy"),
+            EmulatorDevice::SuperGameBoy2    => write!(f, "Super GameBoy 2"),
         }
     }
 }
@@ -177,11 +181,13 @@ impl Display for UpdateStepMode {
 impl Into<DeviceType> for EmulatorDevice {
     fn into(self) -> DeviceType {
         match self {
-            EmulatorDevice::GameBoyDmg      => DeviceType::GameBoyDmg,
-            EmulatorDevice::GameBoyColor    => DeviceType::GameBoyColor,
-            EmulatorDevice::GameBoyAdvance  => DeviceType::GameBoyAdvance,
-            EmulatorDevice::SuperGameBoy    => DeviceType::SuperGameBoy,
-            EmulatorDevice::SuperGameBoy2   => DeviceType::SuperGameBoy2,
+            EmulatorDevice::GameBoyDmg       => DeviceType::GameBoyDmg,
+            EmulatorDevice::GameBoyPocket    => DeviceType::GameBoyPocket,
+            EmulatorDevice::GameBoyColor     => DeviceType::GameBoyColor,
+            EmulatorDevice::GameBoyAdvance   => DeviceType::GameBoyAdvance,
+            EmulatorDevice::GameBoyAdvanceSP => DeviceType::GameBoyAdvanceSP,
+            EmulatorDevice::SuperGameBoy     => DeviceType::SuperGameBoy,
+            EmulatorDevice::SuperGameBoy2    => DeviceType::SuperGameBoy2,
         }
     }
 }
@@ -359,8 +365,6 @@ impl EmulatorInstance {
     pub fn run_until<F>(&mut self, condition: F)
         where F: Fn(&GameBoy, Clock, EmulatorUpdateResults) -> bool
     {
-        let mut cycles : Clock = 0;
-
         if let Some(emu) = self.get_emulator_mut() {
             let mut cycles = 0;
 

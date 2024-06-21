@@ -136,12 +136,20 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
                 builder.set_device_type(DeviceType::GameBoyDmg);
             }
 
+            "--mgb" => {
+                builder.set_device_type(DeviceType::GameBoyPocket);
+            }
+
             "--gbc" => {
                 builder.set_device_type(DeviceType::GameBoyColor);
             }
 
             "--gba" => {
                 builder.set_device_type(DeviceType::GameBoyAdvance);
+            }
+
+            "--ags" => {
+                builder.set_device_type(DeviceType::GameBoyAdvanceSP);
             }
 
             "--sgb" => {

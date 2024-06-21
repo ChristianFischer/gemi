@@ -69,11 +69,13 @@ pub fn print_run_command(workspace: &Workspace, device_type: &DeviceType, setup:
     // add argument for specific device type
     {
         let device_type_arg = match device_type {
-            DeviceType::GameBoyDmg     => "--dmg",
-            DeviceType::GameBoyColor   => "--gbc",
-            DeviceType::GameBoyAdvance => "--gba",
-            DeviceType::SuperGameBoy   => "--sgb",
-            DeviceType::SuperGameBoy2  => "--sgb2",
+            DeviceType::GameBoyDmg       => "--dmg",
+            DeviceType::GameBoyPocket    => "--mgb",
+            DeviceType::GameBoyColor     => "--gbc",
+            DeviceType::GameBoyAdvance   => "--gba",
+            DeviceType::GameBoyAdvanceSP => "--ags",
+            DeviceType::SuperGameBoy     => "--sgb",
+            DeviceType::SuperGameBoy2    => "--sgb2",
         };
 
         cmd.push_str(&format!(" {}", device_type_arg));

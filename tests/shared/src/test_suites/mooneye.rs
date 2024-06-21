@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,9 @@
 
 use std::collections::HashSet;
 use std::path::PathBuf;
+
 use gemi_core::gameboy::DeviceType;
+
 use crate::io_utils::{filename_to_symbol, FindRomCallbacks, HandleDirectory, recursive_visit_directory, TestConfigVisitorRef, Workspace};
 use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUpConfig};
 
@@ -26,10 +28,10 @@ use crate::test_config::{CheckResultConfig, EmulatorTestConfig, RunConfig, SetUp
 /// Each entry contains a mask for the set of device revision covered by this entry
 const DEVICE_TYPE_LOOKUP_TABLE : &[(&str, u32, DeviceType)] = &[
     ("dmg",  0b_001110, DeviceType::GameBoyDmg),        // covers revisions ABC
-    //("mgb",  0b_000000, DeviceType::GameBoyPocket),
+    ("mgb",  0b_000000, DeviceType::GameBoyPocket),
     ("cgb",  0b_111111, DeviceType::GameBoyColor),      // covers revisions 0ABCDE
     ("agb",  0b_100111, DeviceType::GameBoyAdvance),    // covers revisions 0ABE
-    //("ags",  DeviceType::GameBoyAdvanceSP),
+    ("ags",  0b_000000, DeviceType::GameBoyAdvanceSP),
     ("sgb2", 0b_000000, DeviceType::SuperGameBoy2),
     ("sgb",  0b_000000, DeviceType::SuperGameBoy),
 ];
@@ -37,10 +39,10 @@ const DEVICE_TYPE_LOOKUP_TABLE : &[(&str, u32, DeviceType)] = &[
 
 /// Lookup table to extract device groups from file names.
 const DEVICE_TYPE_GROUP_LOOKUP_TABLE : &[(&str, &[DeviceType])] = &[
-    ("G", &[DeviceType::GameBoyDmg]),
+    ("G", &[DeviceType::GameBoyDmg, DeviceType::GameBoyPocket]),
     ("S", &[DeviceType::SuperGameBoy, DeviceType::SuperGameBoy2]),
-    ("C", &[DeviceType::GameBoyColor, DeviceType::GameBoyAdvance, /* GameBoyAdvance SP */]),
-    ("A", &[DeviceType::GameBoyAdvance, /* GameBoyAdvance SP */]),
+    ("C", &[DeviceType::GameBoyColor, DeviceType::GameBoyAdvance, DeviceType::GameBoyAdvanceSP]),
+    ("A", &[DeviceType::GameBoyAdvance, DeviceType::GameBoyAdvanceSP]),
 ];
 
 

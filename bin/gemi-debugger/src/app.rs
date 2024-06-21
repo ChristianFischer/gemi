@@ -441,8 +441,10 @@ impl EmulatorApplication {
 
             let all_types = [
                 EmulatorDevice::GameBoyDmg,
+                EmulatorDevice::GameBoyPocket,
                 EmulatorDevice::GameBoyColor,
                 EmulatorDevice::GameBoyAdvance,
+                EmulatorDevice::GameBoyAdvanceSP,
                 EmulatorDevice::SuperGameBoy,
                 EmulatorDevice::SuperGameBoy2,
             ];

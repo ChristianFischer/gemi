@@ -20,6 +20,7 @@ use std::mem::take;
 
 use crate::cpu::interrupts::Interrupt;
 use crate::debug::DebugEvent;
+use crate::device_type::DeviceType;
 use crate::gameboy::{Clock, DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals};
@@ -314,8 +315,12 @@ impl ScanlineData {
 impl Ppu {
     /// Creates a new PPU object.
     pub fn new(device_config: DeviceConfig) -> Ppu {
-        let dmg_display_palette = DmgDisplayPalette::new_green();
-        let blank_color         = Self::get_blank_color(&device_config, &dmg_display_palette);
+        let dmg_display_palette = match device_config.device {
+            DeviceType::GameBoyDmg => DmgDisplayPalette::new_green(),
+            _ => DmgDisplayPalette::new_gray(),
+        };
+
+        let blank_color = Self::get_blank_color(&device_config, &dmg_display_palette);
         
         Ppu {
             clock: 0,

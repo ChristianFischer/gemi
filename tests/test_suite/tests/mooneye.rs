@@ -54,6 +54,27 @@ mod acceptance {
 
 
         #[test]
+        fn mem_oam_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/bits/mem_oam.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn mem_oam_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -141,6 +162,27 @@ mod acceptance {
         fn reg_f_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/bits/reg_f.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn reg_f_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/bits/reg_f.gb")
                 },
@@ -264,6 +306,27 @@ mod acceptance {
 
 
         #[test]
+        fn unused_hwio_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/bits/unused_hwio-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn unused_hwio_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -314,6 +377,27 @@ mod acceptance {
         fn daa_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/instr/daa.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn daa_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/instr/daa.gb")
                 },
@@ -425,6 +509,28 @@ mod acceptance {
         fn ie_push_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/interrupts/ie_push.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn ie_push_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/interrupts/ie_push.gb")
                 },
@@ -559,6 +665,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn basic_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma/basic.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn basic_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -650,6 +778,28 @@ mod acceptance {
         fn reg_read_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma/reg_read.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn reg_read_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma/reg_read.gb")
                 },
@@ -779,6 +929,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn sources_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma/sources-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn sources_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -831,6 +1003,28 @@ mod acceptance {
         fn hblank_ly_scx_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/hblank_ly_scx_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn hblank_ly_scx_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/hblank_ly_scx_timing-GS.gb")
                 },
@@ -916,6 +1110,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn intr_1_2_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_1_2_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn intr_1_2_timing_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -963,6 +1179,28 @@ mod acceptance {
         fn intr_2_0_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_0_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn intr_2_0_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_0_timing.gb")
                 },
@@ -1092,6 +1330,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn intr_2_mode0_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_mode0_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn intr_2_mode0_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -1183,6 +1443,28 @@ mod acceptance {
         fn intr_2_mode0_timing_sprites_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_mode0_timing_sprites.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn intr_2_mode0_timing_sprites_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_mode0_timing_sprites.gb")
                 },
@@ -1312,6 +1594,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn intr_2_mode3_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_mode3_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn intr_2_mode3_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -1403,6 +1707,28 @@ mod acceptance {
         fn intr_2_oam_ok_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_oam_ok_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn intr_2_oam_ok_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/intr_2_oam_ok_timing.gb")
                 },
@@ -1532,6 +1858,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn lcdon_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/lcdon_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn lcdon_timing_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -1598,6 +1946,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn lcdon_write_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/lcdon_write_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn lcdon_write_timing_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -1645,6 +2015,28 @@ mod acceptance {
         fn stat_irq_blocking_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/stat_irq_blocking.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn stat_irq_blocking_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/stat_irq_blocking.gb")
                 },
@@ -1774,6 +2166,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn stat_lyc_onoff_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/stat_lyc_onoff.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn stat_lyc_onoff_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -1884,6 +2298,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn vblank_stat_intr_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ppu/vblank_stat_intr-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn vblank_stat_intr_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -1951,6 +2387,28 @@ mod acceptance {
 
             run_test_case(test_case);
         }
+
+
+        #[test]
+        #[ignore]
+        fn boot_sclk_align_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/serial/boot_sclk_align-dmgABCmgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
     }
 
 
@@ -1962,6 +2420,27 @@ mod acceptance {
         fn div_write_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/div_write.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn div_write_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/div_write.gb")
                 },
@@ -2085,6 +2564,27 @@ mod acceptance {
 
 
         #[test]
+        fn rapid_toggle_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/rapid_toggle.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rapid_toggle_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -2172,6 +2672,27 @@ mod acceptance {
         fn tim00_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim00.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn tim00_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim00.gb")
                 },
@@ -2295,6 +2816,27 @@ mod acceptance {
 
 
         #[test]
+        fn tim00_div_trigger_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim00_div_trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn tim00_div_trigger_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -2382,6 +2924,27 @@ mod acceptance {
         fn tim01_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim01.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn tim01_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim01.gb")
                 },
@@ -2505,6 +3068,27 @@ mod acceptance {
 
 
         #[test]
+        fn tim01_div_trigger_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim01_div_trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn tim01_div_trigger_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -2592,6 +3176,27 @@ mod acceptance {
         fn tim10_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim10.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn tim10_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim10.gb")
                 },
@@ -2715,6 +3320,27 @@ mod acceptance {
 
 
         #[test]
+        fn tim10_div_trigger_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim10_div_trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn tim10_div_trigger_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -2802,6 +3428,27 @@ mod acceptance {
         fn tim11_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim11.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn tim11_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim11.gb")
                 },
@@ -2925,6 +3572,27 @@ mod acceptance {
 
 
         #[test]
+        fn tim11_div_trigger_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tim11_div_trigger.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn tim11_div_trigger_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -3012,6 +3680,27 @@ mod acceptance {
         fn tima_reload_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tima_reload.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn tima_reload_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tima_reload.gb")
                 },
@@ -3135,6 +3824,27 @@ mod acceptance {
 
 
         #[test]
+        fn tima_write_reloading_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tima_write_reloading.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn tima_write_reloading_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -3222,6 +3932,27 @@ mod acceptance {
         fn tma_write_reloading_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tma_write_reloading.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn tma_write_reloading_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/timer/tma_write_reloading.gb")
                 },
@@ -3333,6 +4064,28 @@ mod acceptance {
         fn add_sp_e_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/add_sp_e_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn add_sp_e_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/add_sp_e_timing.gb")
                 },
@@ -3506,6 +4259,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn boot_div_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_div-dmgABCmgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn boot_div2_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -3616,6 +4391,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn boot_hwio_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_hwio-dmgABCmgb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn boot_regs_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
@@ -3638,97 +4435,9 @@ mod acceptance {
 
         #[test]
         #[ignore]
-        fn boot_regs_mgb_dmg() {
+        fn boot_regs_mgb() {
             let test_case = EmulatorTestCase {
-                device: DeviceType::GameBoyDmg,
-                setup: SetUpConfig {
-                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
-                },
-                run_config: RunConfig {
-                    stop_on_infinite_loop: true,
-                    .. RunConfig::default()
-                },
-                result: CheckResultConfig {
-                    mooneye_check_result_code: true,
-                    .. CheckResultConfig::default()
-                },
-            };
-
-            run_test_case(test_case);
-        }
-
-
-        #[test]
-        #[ignore]
-        fn boot_regs_mgb_gbc() {
-            let test_case = EmulatorTestCase {
-                device: DeviceType::GameBoyColor,
-                setup: SetUpConfig {
-                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
-                },
-                run_config: RunConfig {
-                    stop_on_infinite_loop: true,
-                    .. RunConfig::default()
-                },
-                result: CheckResultConfig {
-                    mooneye_check_result_code: true,
-                    .. CheckResultConfig::default()
-                },
-            };
-
-            run_test_case(test_case);
-        }
-
-
-        #[test]
-        #[ignore]
-        fn boot_regs_mgb_gba() {
-            let test_case = EmulatorTestCase {
-                device: DeviceType::GameBoyAdvance,
-                setup: SetUpConfig {
-                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
-                },
-                run_config: RunConfig {
-                    stop_on_infinite_loop: true,
-                    .. RunConfig::default()
-                },
-                result: CheckResultConfig {
-                    mooneye_check_result_code: true,
-                    .. CheckResultConfig::default()
-                },
-            };
-
-            run_test_case(test_case);
-        }
-
-
-        #[test]
-        #[ignore]
-        fn boot_regs_mgb_sgb() {
-            let test_case = EmulatorTestCase {
-                device: DeviceType::SuperGameBoy,
-                setup: SetUpConfig {
-                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
-                },
-                run_config: RunConfig {
-                    stop_on_infinite_loop: true,
-                    .. RunConfig::default()
-                },
-                result: CheckResultConfig {
-                    mooneye_check_result_code: true,
-                    .. CheckResultConfig::default()
-                },
-            };
-
-            run_test_case(test_case);
-        }
-
-
-        #[test]
-        #[ignore]
-        fn boot_regs_mgb_sgb2() {
-            let test_case = EmulatorTestCase {
-                device: DeviceType::SuperGameBoy2,
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/boot_regs-mgb.gb")
                 },
@@ -3795,6 +4504,28 @@ mod acceptance {
         fn call_cc_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn call_cc_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing.gb")
                 },
@@ -3924,6 +4655,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn call_cc_timing2_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_cc_timing2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn call_cc_timing2_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -4015,6 +4768,28 @@ mod acceptance {
         fn call_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn call_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing.gb")
                 },
@@ -4144,6 +4919,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn call_timing2_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/call_timing2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn call_timing2_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -4254,6 +5051,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn di_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/di_timing-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn di_timing_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -4301,6 +5120,28 @@ mod acceptance {
         fn div_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/div_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn div_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/div_timing.gb")
                 },
@@ -4430,6 +5271,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn ei_sequence_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_sequence.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn ei_sequence_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -4521,6 +5384,28 @@ mod acceptance {
         fn ei_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn ei_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ei_timing.gb")
                 },
@@ -4650,6 +5535,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn halt_ime0_ei_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_ei.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn halt_ime0_ei_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -4741,6 +5648,28 @@ mod acceptance {
         fn halt_ime0_nointr_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_nointr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn halt_ime0_nointr_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime0_nointr_timing.gb")
                 },
@@ -4870,6 +5799,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn halt_ime1_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn halt_ime1_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -4980,6 +5931,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn halt_ime1_timing2_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/halt_ime1_timing2-GS.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn halt_ime1_timing2_sgb() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::SuperGameBoy,
@@ -5027,6 +6000,28 @@ mod acceptance {
         fn if_ie_registers_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/if_ie_registers.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn if_ie_registers_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/if_ie_registers.gb")
                 },
@@ -5156,6 +6151,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn intr_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/intr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn intr_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -5247,6 +6264,28 @@ mod acceptance {
         fn jp_cc_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn jp_cc_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_cc_timing.gb")
                 },
@@ -5376,6 +6415,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn jp_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/jp_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn jp_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -5467,6 +6528,28 @@ mod acceptance {
         fn ld_hl_sp_e_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ld_hl_sp_e_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn ld_hl_sp_e_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ld_hl_sp_e_timing.gb")
                 },
@@ -5596,6 +6679,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn oam_dma_restart_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_restart.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn oam_dma_restart_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -5687,6 +6792,28 @@ mod acceptance {
         fn oam_dma_start_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_start.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn oam_dma_start_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_start.gb")
                 },
@@ -5816,6 +6943,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn oam_dma_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/oam_dma_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn oam_dma_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -5907,6 +7056,28 @@ mod acceptance {
         fn pop_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/pop_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn pop_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/pop_timing.gb")
                 },
@@ -6036,6 +7207,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn push_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/push_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn push_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -6127,6 +7320,28 @@ mod acceptance {
         fn rapid_di_ei_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rapid_di_ei.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn rapid_di_ei_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rapid_di_ei.gb")
                 },
@@ -6256,6 +7471,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn ret_cc_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_cc_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn ret_cc_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -6347,6 +7584,28 @@ mod acceptance {
         fn ret_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn ret_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/ret_timing.gb")
                 },
@@ -6476,6 +7735,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn reti_intr_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_intr_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn reti_intr_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -6586,6 +7867,28 @@ mod acceptance {
 
         #[test]
         #[ignore]
+        fn reti_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/reti_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
         fn reti_timing_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -6677,6 +7980,28 @@ mod acceptance {
         fn rst_timing_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rst_timing.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        #[ignore]
+        fn rst_timing_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/acceptance/rst_timing.gb")
                 },
@@ -6814,6 +8139,27 @@ mod emulator_only {
 
 
         #[test]
+        fn bits_bank1_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/bits_bank1.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn bits_bank1_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -6901,6 +8247,27 @@ mod emulator_only {
         fn bits_bank2_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/bits_bank2.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn bits_bank2_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/bits_bank2.gb")
                 },
@@ -7024,6 +8391,27 @@ mod emulator_only {
 
 
         #[test]
+        fn bits_mode_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/bits_mode.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn bits_mode_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -7111,6 +8499,27 @@ mod emulator_only {
         fn bits_ramg_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/bits_ramg.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn bits_ramg_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/bits_ramg.gb")
                 },
@@ -7234,6 +8643,27 @@ mod emulator_only {
 
 
         #[test]
+        fn multicart_rom_8mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/multicart_rom_8Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn multicart_rom_8mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -7321,6 +8751,27 @@ mod emulator_only {
         fn ram_256kb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/ram_256kb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn ram_256kb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/ram_256kb.gb")
                 },
@@ -7444,6 +8895,27 @@ mod emulator_only {
 
 
         #[test]
+        fn ram_64kb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/ram_64kb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn ram_64kb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -7531,6 +9003,27 @@ mod emulator_only {
         fn rom_16mb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_16Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_16mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_16Mb.gb")
                 },
@@ -7654,6 +9147,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_1mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_1Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_1mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -7741,6 +9255,27 @@ mod emulator_only {
         fn rom_2mb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_2Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_2mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_2Mb.gb")
                 },
@@ -7864,6 +9399,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_4mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_4Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_4mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -7969,6 +9525,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_512kb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_512kb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_512kb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -8056,6 +9633,27 @@ mod emulator_only {
         fn rom_8mb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_8Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_8mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc1/rom_8Mb.gb")
                 },
@@ -8184,6 +9782,27 @@ mod emulator_only {
 
 
         #[test]
+        fn bits_ramg_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/bits_ramg.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn bits_ramg_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -8271,6 +9890,27 @@ mod emulator_only {
         fn bits_romb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/bits_romb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn bits_romb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/bits_romb.gb")
                 },
@@ -8394,6 +10034,27 @@ mod emulator_only {
 
 
         #[test]
+        fn bits_unused_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/bits_unused.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn bits_unused_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -8481,6 +10142,27 @@ mod emulator_only {
         fn ram_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/ram.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn ram_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/ram.gb")
                 },
@@ -8604,6 +10286,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_1mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/rom_1Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_1mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -8709,6 +10412,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_2mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/rom_2Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_2mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -8796,6 +10520,27 @@ mod emulator_only {
         fn rom_512kb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/rom_512kb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_512kb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc2/rom_512kb.gb")
                 },
@@ -8924,6 +10669,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_16mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_16Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_16mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -9011,6 +10777,27 @@ mod emulator_only {
         fn rom_1mb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_1Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_1mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_1Mb.gb")
                 },
@@ -9134,6 +10921,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_2mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_2Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_2mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -9221,6 +11029,27 @@ mod emulator_only {
         fn rom_32mb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_32Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_32mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_32Mb.gb")
                 },
@@ -9344,6 +11173,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_4mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_4Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_4mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -9431,6 +11281,27 @@ mod emulator_only {
         fn rom_512kb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_512kb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_512kb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_512kb.gb")
                 },
@@ -9554,6 +11425,27 @@ mod emulator_only {
 
 
         #[test]
+        fn rom_64mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_64Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
         fn rom_64mb_gbc() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyColor,
@@ -9641,6 +11533,27 @@ mod emulator_only {
         fn rom_8mb_dmg() {
             let test_case = EmulatorTestCase {
                 device: DeviceType::GameBoyDmg,
+                setup: SetUpConfig {
+                    .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_8Mb.gb")
+                },
+                run_config: RunConfig {
+                    stop_on_infinite_loop: true,
+                    .. RunConfig::default()
+                },
+                result: CheckResultConfig {
+                    mooneye_check_result_code: true,
+                    .. CheckResultConfig::default()
+                },
+            };
+
+            run_test_case(test_case);
+        }
+
+
+        #[test]
+        fn rom_8mb_mgb() {
+            let test_case = EmulatorTestCase {
+                device: DeviceType::GameBoyPocket,
                 setup: SetUpConfig {
                     .. SetUpConfig::with_rom_file("mooneye-test-suite/emulator-only/mbc5/rom_8Mb.gb")
                 },

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@
 
 pub mod abbreviations {
     pub const DMG:  &str = "dmg";
+    pub const MGB:  &str = "mgb";
     pub const GBC:  &str = "gbc";
     pub const GBA:  &str = "gba";
+    pub const AGS:  &str = "ags";
     pub const SGB:  &str = "sgb";
     pub const SGB2: &str = "sgb2";
 }
@@ -32,11 +34,17 @@ pub enum DeviceType {
     /// DMG = Dot Matrix Game
     GameBoyDmg,
 
+    /// GameBoy Pocket / MGB; also includes GameBoy Light
+    GameBoyPocket,
+
     /// GameBoy Color with slightly more RAM and color support.
     GameBoyColor,
 
     /// GameBoy Advance
     GameBoyAdvance,
+
+    /// GameBoy Advance SP
+    GameBoyAdvanceSP,
 
     /// Super GameBoy
     SuperGameBoy,
@@ -63,8 +71,9 @@ pub enum EmulationType {
 impl DeviceType {
 
     /// List of all valid devices.
-    pub const ALL_DEVICES: [DeviceType; 5] = [
+    pub const ALL_DEVICES: [DeviceType; 6] = [
         DeviceType::GameBoyDmg,
+        DeviceType::GameBoyPocket,
         DeviceType::GameBoyColor,
         DeviceType::GameBoyAdvance,
         DeviceType::SuperGameBoy,
@@ -72,9 +81,10 @@ impl DeviceType {
     ];
 
     /// A list of all devices with GameBoy Color compatibility.
-    pub const GBC_DEVICES: [DeviceType; 2] = [
+    pub const GBC_DEVICES: [DeviceType; 3] = [
         DeviceType::GameBoyColor,
         DeviceType::GameBoyAdvance,
+        DeviceType::GameBoyAdvanceSP,
     ];
 
 
@@ -83,8 +93,10 @@ impl DeviceType {
     pub fn from_abbreviation(abbreviation: &str) -> Option<DeviceType> {
         match abbreviation {
             abbreviations::DMG  => Some(DeviceType::GameBoyDmg),
+            abbreviations::MGB  => Some(DeviceType::GameBoyPocket),
             abbreviations::GBC  => Some(DeviceType::GameBoyColor),
             abbreviations::GBA  => Some(DeviceType::GameBoyAdvance),
+            abbreviations::AGS  => Some(DeviceType::GameBoyAdvanceSP),
             abbreviations::SGB  => Some(DeviceType::SuperGameBoy),
             abbreviations::SGB2 => Some(DeviceType::SuperGameBoy2),
             _                   => None,
@@ -95,11 +107,13 @@ impl DeviceType {
     /// Get an abbreviation for the device type.
     pub fn get_abbreviation(&self) -> &'static str {
         match self {
-            DeviceType::GameBoyDmg     => abbreviations::DMG,
-            DeviceType::GameBoyColor   => abbreviations::GBC,
-            DeviceType::GameBoyAdvance => abbreviations::GBA,
-            DeviceType::SuperGameBoy   => abbreviations::SGB,
-            DeviceType::SuperGameBoy2  => abbreviations::SGB2,
+            DeviceType::GameBoyDmg       => abbreviations::DMG,
+            DeviceType::GameBoyPocket    => abbreviations::MGB,
+            DeviceType::GameBoyColor     => abbreviations::GBC,
+            DeviceType::GameBoyAdvance   => abbreviations::GBA,
+            DeviceType::GameBoyAdvanceSP => abbreviations::AGS,
+            DeviceType::SuperGameBoy     => abbreviations::SGB,
+            DeviceType::SuperGameBoy2    => abbreviations::SGB2,
         }
     }
 
@@ -107,11 +121,13 @@ impl DeviceType {
     /// Checks whether this device type has GameBoy Color support.
     pub fn has_gbc_support(&self) -> bool {
         match self {
-            DeviceType::GameBoyDmg     => false,
-            DeviceType::GameBoyColor   => true,
-            DeviceType::GameBoyAdvance => true,
-            DeviceType::SuperGameBoy   => false,
-            DeviceType::SuperGameBoy2  => false,
+            DeviceType::GameBoyDmg       => false,
+            DeviceType::GameBoyPocket    => false,
+            DeviceType::GameBoyColor     => true,
+            DeviceType::GameBoyAdvance   => true,
+            DeviceType::GameBoyAdvanceSP => true,
+            DeviceType::SuperGameBoy     => false,
+            DeviceType::SuperGameBoy2    => false,
         }
     }
 
@@ -119,11 +135,13 @@ impl DeviceType {
     /// Get a string representation of the device type.
     pub fn to_string(&self) -> &'static str {
         match self {
-            DeviceType::GameBoyDmg     => "GameBoyDmg",
-            DeviceType::GameBoyColor   => "GameBoyColor",
-            DeviceType::GameBoyAdvance => "GameBoyAdvance",
-            DeviceType::SuperGameBoy   => "SuperGameBoy",
-            DeviceType::SuperGameBoy2  => "SuperGameBoy2",
+            DeviceType::GameBoyDmg       => "GameBoyDmg",
+            DeviceType::GameBoyPocket    => "GameBoyPocket",
+            DeviceType::GameBoyColor     => "GameBoyColor",
+            DeviceType::GameBoyAdvance   => "GameBoyAdvance",
+            DeviceType::GameBoyAdvanceSP => "GameBoyAdvance",
+            DeviceType::SuperGameBoy     => "SuperGameBoy",
+            DeviceType::SuperGameBoy2    => "SuperGameBoy2",
         }
     }
 }
