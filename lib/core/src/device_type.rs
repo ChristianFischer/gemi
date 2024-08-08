@@ -29,6 +29,7 @@ pub mod abbreviations {
 
 /// The type of GameBoy device to be emulated.
 #[derive(Copy, Clone, Hash, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DeviceType {
     /// The original GameBoy with monochrome 4 color display.
     /// DMG = Dot Matrix Game
@@ -59,6 +60,7 @@ pub enum DeviceType {
 /// run in DMG compatibility mode when a ROM without GBC support
 /// is played.
 #[derive(Copy, Clone, Hash, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EmulationType {
     /// Classic GameBoy or compatibility mode.
     DMG,

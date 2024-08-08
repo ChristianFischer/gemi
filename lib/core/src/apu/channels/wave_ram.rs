@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ use std::ops::{Index, IndexMut};
 /// Since each byte of the Wave RAM contains two values, the range of the cursor would be
 /// from 0 to 31.
 #[derive(Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WaveRamPositionCursor {
     position: u8,
 }
@@ -30,6 +31,7 @@ pub struct WaveRamPositionCursor {
 
 /// The Wave RAM storing a 16 byte array containing the wave data to be played by channel 3.
 #[derive(Default, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WaveRam {
     /// The wave RAM's actual data.
     data: [u8; 16],

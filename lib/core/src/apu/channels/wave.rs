@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 
 use std::cmp::min;
+
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
@@ -45,6 +46,7 @@ const FREQUENCY_CYCLES : Clock = 2;
 /// A sound generator reading wave data from a dedicated memory location called Wave RAM.
 /// Each time the frequency timer expires, a sample is read from the Wave RAM and the reading
 /// cursor get incremented.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WaveGenerator {
     /// Stores whether the DAC of this channel is enabled or not.
     dac_enabled: bool,

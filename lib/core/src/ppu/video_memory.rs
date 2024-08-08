@@ -17,13 +17,13 @@
 
 
 use crate::gameboy::{DeviceConfig, EmulationType};
-use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
+use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::ppu::graphic_data::{DmgPalette, GbcPaletteData, Sprite};
-use crate::utils::get_bit;
+use crate::utils::{get_bit, SerializableArray};
 
-pub type OamRam         = [Sprite; 40];
-pub type GbcPaletteRam  = [GbcPaletteData; 8];
+pub type OamRam         = SerializableArray<Sprite, 40>;
+pub type GbcPaletteRam  = SerializableArray<GbcPaletteData, 8>;
 
 pub type VRamBank       = MemoryDataFixedSize<8192>;
 pub type WRamBank       = MemoryDataFixedSize<4096>;
@@ -33,6 +33,7 @@ pub type GbcPaletteBank = MemoryDataMapped<GbcPaletteRam>;
 
 /// Utility to read and write data into GameBoy Color palettes
 /// via BCPS/BCPD and OCPS/OCPD registers.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GbcPalettePointer {
     /// The pointer where to access the palette buffer on the next read/write operation.
     pointer: u8,
@@ -43,6 +44,7 @@ pub struct GbcPalettePointer {
 
 
 /// An helper object to hold all video memory structures used by the PPU.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VideoMemory {
     /// Video RAM (DMG = 1 * 8kiB, GBC = 2 * 8kiB)
     pub vram_banks: Vec<VRamBank>,
@@ -59,6 +61,7 @@ pub struct VideoMemory {
 
 
 /// Stores all palettes used in either GBC or DMG mode.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Palettes {
     /// DMG background palette
     pub bgp: DmgPalette,

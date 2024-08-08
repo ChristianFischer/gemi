@@ -22,6 +22,7 @@ use crate::debug::DebugEvents;
 
 /// Represents the signals sent from a component back to the memory bus.
 #[derive(Copy, Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MemoryBusSignals {
     /// Interrupts risen by a component.
     pub interrupts: Interrupts,
@@ -120,7 +121,7 @@ pub trait MemoryBus<TRootType, TMemoryMapper>
 macro_rules! impl_memory_mapper {
     (MemoryMapper($root:ident : $root_type:ident) for $name:ident { $($pattern:pat => $data:expr),+ }) => {
         impl MemoryMapper<$root_type> for $name {
-            fn map<'a>(address: u16, $root: &'a $root_type) -> &'a dyn MemoryBusConnection {
+            fn map(address: u16, $root: &$root_type) -> &dyn MemoryBusConnection {
                 match address {
                     $(
                         $pattern => &$data,
@@ -128,7 +129,7 @@ macro_rules! impl_memory_mapper {
                 }
             }
 
-            fn map_mut<'a>(address: u16, $root: &'a mut $root_type) -> &'a mut dyn MemoryBusConnection {
+            fn map_mut(address: u16, $root: &mut $root_type) -> &mut dyn MemoryBusConnection {
                 match address {
                     $(
                         $pattern => &mut $data,

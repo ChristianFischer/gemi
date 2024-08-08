@@ -83,8 +83,8 @@ pub trait MemoryData {
 mod dynamic_size {
     use crate::mmu::memory_data::MemoryData;
 
-
     /// A data object storing data of variable size.
+    #[derive(Clone)]
     pub struct MemoryDataDynamic {
         data: Vec<u8>,
     }
@@ -126,12 +126,13 @@ mod dynamic_size {
 
 pub mod fixed_size {
     use crate::mmu::memory_data::MemoryData;
-
+    use crate::utils::SerializableArray;
 
     /// A data object storing data of fixed size.
     #[derive(Clone)]
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct MemoryDataFixedSize<const SIZE: usize> {
-        arr: Box<[u8; SIZE]>,
+        arr: Box<SerializableArray<u8, SIZE>>,
     }
 
 
@@ -139,7 +140,7 @@ pub mod fixed_size {
         /// Allocates a new memory block.
         pub fn new() -> Self {
             Self {
-                arr: Box::new([0x00; SIZE])
+                arr: Box::new([0x00; SIZE].into())
             }
         }
     }
@@ -178,6 +179,7 @@ pub mod mapped {
 
 
     /// A memory data object storing data being represented by another data type like a struct.
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct MemoryDataMapped<T> {
         data: Box<T>,
     }
@@ -185,9 +187,9 @@ pub mod mapped {
 
     impl<T> MemoryDataMapped<T> {
         /// Creates a new data type with a given content object.
-        pub fn new(data: T) -> Self {
+        pub fn new(data: impl Into<T>) -> Self {
             Self {
-                data: Box::new(data)
+                data: Box::new(data.into())
             }
         }
 

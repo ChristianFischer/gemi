@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,14 @@
  */
 
 
-use egui::{Rect, Ui, WidgetText};
-use egui_tiles::{SimplificationOptions, TileId, UiResponse};
 use crate::state::EmulatorState;
 use crate::views::{View, ViewClass};
+use egui::{Rect, Ui, WidgetText};
+use egui_tiles::{SimplificationOptions, TileId, UiResponse};
 
 
 /// The implementation of the behaviour trait for the UI tile tree.
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TreeBehaviour {
     /// The current state of the emulator.
     /// Note: This is a bit misplaced here since it logically
@@ -33,6 +34,7 @@ pub struct TreeBehaviour {
     state: EmulatorState,
     
     /// Some options to control the behaviour of the tiled UI.
+    #[serde(skip)]
     simplification_options: SimplificationOptions,
 }
 

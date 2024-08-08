@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 
 use flagset::{flags, FlagSet};
+
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::features::{FEATURE_FREQUENCY_SWEEP_DISABLED, FEATURE_LENGTH_TIMER_DISABLED, FEATURE_VOLUME_ENVELOPE_DISABLED};
 use crate::apu::channels::envelope::Envelope;
@@ -42,6 +43,7 @@ pub mod features {
 
 
 /// The type of a channel.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ChannelType {
     Ch1Pulse1,
     Ch2Pulse2,
@@ -137,6 +139,7 @@ pub fn default_on_trigger_event(apu_state: &ApuState) -> TriggerAction {
 /// Each channel contains a distinct sound generator which generates
 /// an audio signal and a DAC to convert the digital value into an
 /// analogue sound wave.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Channel<
     G : SoundGenerator,
     const FEATURE_LENGTH_TIMER : u8,

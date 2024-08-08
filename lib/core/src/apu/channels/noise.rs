@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
  */
 
 use std::cmp::min;
+
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
+use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::gameboy::Clock;
@@ -32,6 +33,7 @@ const NR44_WRITE_ONLY_TRIGGER_BIT : u8  = 0b_1000_0000;
 /// A sound generator to generate random noise using a Linear Feedback Shift Register (LFSR)
 /// This will generate a random sequence of 0 and 1, modified with the volume from
 /// the volume envelope function.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NoiseGenerator {
     /// A Linear Feedback Shift Register used to generate a random sequence of 0 an 1.
     lfsr: u16,

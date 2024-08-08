@@ -38,6 +38,7 @@ use crate::utils::{as_bit_flag, get_bit, get_high};
 ///
 /// The upper 8 bits of the counter stores the value which will be accessible via DIV register
 /// and therefor automatically be incremented each 256 ticks.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct InternalCounter {
     /// The value of the counter
     value: u16,
@@ -67,6 +68,7 @@ struct InternalCounter {
 /// Writing to TIMA during the overflow state will cancel the overflow and let TIMA
 /// continue counting with the new value. Writing to TIMA when it's value is reloaded
 /// from TMA will ignore the written TIMA value and keep the value from TMA.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 enum TimaState {
     /// TIMA is counting normally.
     Normal,
@@ -84,11 +86,13 @@ enum TimaState {
 
 /// An object handling the gameboys internal timers,
 /// which are controlled by TIMA, TMA, TAC and DIV registers.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Timer {
     /// Pending output to be sent back through the memory bus.
     signals: MemoryBusSignals,
 
     /// The internal counter used to trigger TIMA increments
+    #[cfg_attr(feature = "serde", serde(rename = "internal"))]
     internal_counter: InternalCounter,
 
     /// Internal state of the TIMA counter.

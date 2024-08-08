@@ -15,9 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::fmt::{Display, Formatter};
-use std::path::{Path, PathBuf};
-
 use gemi_core::cartridge::Cartridge;
 use gemi_core::debug::DebugEvent;
 use gemi_core::gameboy::{Clock, DeviceType, EmulatorUpdateResults, GameBoy};
@@ -25,6 +22,9 @@ use gemi_core::input::InputButton;
 use gemi_core::mmu::memory_data::MemoryData;
 use gemi_core::ppu::ppu::CPU_CYCLES_PER_FRAME;
 use gemi_utils::keybindings::KeyBindings;
+use serde::{Deserialize, Deserializer};
+use std::fmt::{Display, Formatter};
+use std::path::{Path, PathBuf};
 
 use crate::selection::{Kind, Selection};
 
@@ -101,7 +101,7 @@ pub struct EmulatorState {
 pub struct EmulatorInstance {
     /// The actual instance of the emulator.
     /// Will be [None] if no ROM is loaded.
-    #[serde(skip)]
+    #[serde(deserialize_with = "deserialize_emulator_instance")]
     gb: Option<GameBoy>,
 }
 
@@ -128,6 +128,54 @@ pub struct UiStates {
     /// While moving the mouse cursor over the UI, this will contain the
     /// currently hovered item.
     pub hover: Selection,
+}
+
+
+/// Helper function to deserialize the actual emulator instance.
+/// Failing to deserialize the emulator does not lead into fail the whole deserialization.
+fn deserialize_emulator_instance<'de, D>(deserializer: D) -> Result<Option<GameBoy>, D::Error>
+where
+        D: Deserializer<'de>,
+{
+    /*
+    let panic_handler_result = panic::catch_unwind(||
+            Option::<GameBoy>::deserialize(deserializer)
+                    .map_err(|e| "")
+    );
+
+    match panic_handler_result {
+        // successfully deserialized
+        Ok(Ok(result)) => {
+            Ok(result)
+        }
+
+        // No panic, but deserialization failed for some reason
+        Ok(Err(err)) => {
+            eprintln!("Error deserializing emulator instance: {:?}", err);
+            Ok(None)
+        }
+
+        // Program panicked on deserialization
+        Err(err) => {
+            eprintln!("Panic at deserializing emulator instance: {:?}", err);
+            Ok(None)
+        }
+    }
+    */
+
+    let maybe_emu = Option::<GameBoy>::deserialize(deserializer);
+
+    match maybe_emu {
+        Ok(emu) => {
+            Ok(emu)
+        }
+
+        Err(e) => {
+            eprintln!("failed to deserialize emulator instance: {e:?}");
+
+            Ok(None)
+        }
+    }
 }
 
 

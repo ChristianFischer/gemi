@@ -36,6 +36,7 @@ pub enum InputButton {
 }
 
 
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Input {
     /// Pending output to be sent back through the memory bus.
     signals: MemoryBusSignals,

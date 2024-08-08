@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
  */
 
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
+use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
 use crate::utils::get_bit;
 
 
 /// Whether to increment or decrement the volume
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
     Decrement,
     Increment,
@@ -34,6 +35,7 @@ pub enum Direction {
 /// on the setting in NRx2 and the timer restarted.
 /// Additionally, setting the volume and the direction bit to 0 will disable the channel's DAC
 /// as well, which is also covered by this object.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Envelope {
     /// Flag to store whether the period timer is enabled or not.
     /// This is used to stop the timer once the volume reached it's minimum or maximum value

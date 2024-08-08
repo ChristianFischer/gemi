@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 
 use std::cmp::min;
+
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_write_register, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
@@ -36,6 +37,7 @@ const FREQUENCY_CYCLES : Clock = 4;
 
 /// A sound generator to generate a pulse wave. The wave is based is based on a wave duty value
 /// and a volume computed by an envelope function.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PulseGenerator {
     /// The base of the sound wave to be played, represented by a square wave.
     wave_duty: WaveDuty,

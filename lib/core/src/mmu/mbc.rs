@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,16 @@
  */
 
 use std::fmt::{Display, Formatter};
+
 use crate::cartridge::Cartridge;
 use crate::mmu::mbc::mbc1::Mbc1;
 use crate::mmu::mbc::mbc2::Mbc2;
 use crate::mmu::mbc::mbc5::Mbc5;
 use crate::mmu::mbc::mbc_none::MbcNone;
 
+
 /// Type of memory bank controller to be used
+#[derive(Copy, Clone)]
 pub enum MemoryBankController {
     None,
     MBC1,
@@ -35,8 +38,22 @@ pub enum MemoryBankController {
 }
 
 
+/// The actual implementation of [MemoryBankImplementation]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum Mbc {
+    None(MbcNone),
+    MBC1(Mbc1),
+    MBC1M(Mbc1),
+    MBC2(Mbc2),
+    MBC3(MbcNone),
+    MBC5(Mbc5),
+    MBC6(MbcNone),
+    MBC7(MbcNone),
+}
+
+
 /// Trait for objects acting as memory bank controller.
-pub trait Mbc {
+pub trait MbcImpl {
     /// Read a single byte from the device memory.
     fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8;
 
@@ -46,13 +63,13 @@ pub trait Mbc {
 
 
 /// Creates a memory bank controller object based on the type given.
-pub fn create_mbc(kind: &MemoryBankController) -> Box<dyn Mbc> {
+pub fn create_mbc(kind: &MemoryBankController) -> Mbc {
     match kind {
-        MemoryBankController::None  => Box::new(MbcNone::new()),
-        MemoryBankController::MBC1  => Box::new(Mbc1::new()),
-        MemoryBankController::MBC1M => Box::new(Mbc1::new_multicart()),
-        MemoryBankController::MBC2  => Box::new(Mbc2::new()),
-        MemoryBankController::MBC5  => Box::new(Mbc5::new()),
+        MemoryBankController::None  => Mbc::None(MbcNone::new()),
+        MemoryBankController::MBC1  => Mbc::MBC1(Mbc1::new()),
+        MemoryBankController::MBC1M => Mbc::MBC1(Mbc1::new_multicart()),
+        MemoryBankController::MBC2  => Mbc::MBC2(Mbc2::new()),
+        MemoryBankController::MBC5  => Mbc::MBC5(Mbc5::new()),
         _                           => panic!("Not implemented {}", kind)
     }
 }
@@ -76,13 +93,45 @@ impl Display for MemoryBankController {
 }
 
 
+impl MbcImpl for Mbc {
+    fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+        match self {
+            Mbc::None(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC1(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC1M(mbc_impl) => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC2(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC3(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC5(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC6(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::MBC7(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+        }
+    }
+
+
+    fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+        match self {
+            Mbc::None(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC1(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC1M(mbc_impl) => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC2(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC3(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC5(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC6(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::MBC7(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+        }
+    }
+}
+
+
 pub mod mbc_none {
     use super::*;
 
 
     /// A default MBC handling ROMs which do not need bank switching.
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct MbcNone {
     }
+
 
     impl MbcNone {
         /// Creates a default MBC object.
@@ -92,7 +141,8 @@ pub mod mbc_none {
         }
     }
 
-    impl Mbc for MbcNone {
+
+    impl MbcImpl for MbcNone {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from ROM address space
@@ -109,6 +159,7 @@ pub mod mbc_none {
             }
         }
 
+
         fn write_byte(&mut self, _cartridge: &mut Cartridge, _address: u16, _value: u8) {
             // not writing any data
         }
@@ -117,11 +168,13 @@ pub mod mbc_none {
 
 
 mod mbc1 {
-    use crate::mmu::memory_data::MemoryData;
     use super::*;
+    use crate::mmu::memory_data::MemoryData;
+
 
     /// Type 1 Memory Bank Controller:
     /// Supports up to 2MiB ROMs or up to 32kiB RAM.
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct Mbc1 {
         /// Flag whether to handle a multi cart ROM.
         is_multicart: bool,
@@ -162,6 +215,7 @@ mod mbc1 {
         /// Sets if the RAM bank is enabled or not.
         ram_enabled: bool,
     }
+
 
     impl Mbc1 {
         pub fn new() -> Mbc1 {
@@ -262,7 +316,8 @@ mod mbc1 {
         }
     }
 
-    impl Mbc for Mbc1 {
+
+    impl MbcImpl for Mbc1 {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
@@ -291,6 +346,7 @@ mod mbc1 {
                 _ => unreachable!("Unexpected read from address {}", address),
             }
         }
+
 
         fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
             match (address >> 13) & 0x000f {
@@ -333,12 +389,14 @@ mod mbc1 {
 
 
 mod mbc2 {
+    use super::*;
     use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
     use crate::utils::{get_bit, get_high};
-    use super::*;
+
 
     /// Type 2 Memory Bank Controller:
     /// Supports up to 256kiB ROMs and up to 128kB RAM.
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct Mbc2 {
         /// The value written into the bank selection register.
         /// Bits 0-3 are used to select the ROM bank number.
@@ -357,6 +415,7 @@ mod mbc2 {
         /// Sets if the RAM bank is enabled or not.
         ram_enabled: bool,
     }
+
 
     impl Mbc2 {
         pub fn new() -> Self {
@@ -393,7 +452,8 @@ mod mbc2 {
         }
     }
 
-    impl Mbc for Mbc2 {
+
+    impl MbcImpl for Mbc2 {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
@@ -425,6 +485,7 @@ mod mbc2 {
                 _ => unreachable!("Unexpected read from address {}", address),
             }
         }
+
 
         fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
             match address {
@@ -469,11 +530,13 @@ mod mbc2 {
 
 
 mod mbc5 {
-    use crate::mmu::memory_data::MemoryData;
     use super::*;
+    use crate::mmu::memory_data::MemoryData;
+
 
     /// Type 5 Memory Bank Controller:
     /// Supports up to 8MiB ROMs and up to 128kiB RAM.
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct Mbc5 {
         /// The value written into the first bank selection register.
         /// Contains the lower 8 bits of the selected ROM bank.
@@ -503,6 +566,7 @@ mod mbc5 {
         /// Sets if the RAM bank is enabled or not.
         ram_enabled: bool,
     }
+
 
     impl Mbc5 {
         pub fn new() -> Self {
@@ -550,7 +614,8 @@ mod mbc5 {
         }
     }
 
-    impl Mbc for Mbc5 {
+
+    impl MbcImpl for Mbc5 {
         fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
@@ -579,6 +644,7 @@ mod mbc5 {
                 _ => unreachable!("Unexpected read from address {}", address),
             }
         }
+
 
         fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
             match address {

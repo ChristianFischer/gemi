@@ -16,15 +16,14 @@
  */
 
 use eframe::epaint::{Color32, Stroke};
-use egui::{Grid, pos2, Pos2, Rect, ScrollArea, Sense, Ui, vec2, Widget};
 use egui::scroll_area::ScrollBarVisibility;
-use serde::{Deserialize, Deserializer, Serializer};
+use egui::{pos2, vec2, Grid, Pos2, Rect, ScrollArea, Sense, Ui, Widget};
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
 use gemi_core::ppu::flags::LcdControlFlag;
 use gemi_core::ppu::graphic_data::{TileMap, TileSet};
-use gemi_core::ppu::ppu::{TILE_ATTR_BIT_H_FLIP, TILE_ATTR_BIT_V_FLIP, TILE_ATTR_BIT_VRAM_BANK};
+use gemi_core::ppu::ppu::{TILE_ATTR_BIT_H_FLIP, TILE_ATTR_BIT_VRAM_BANK, TILE_ATTR_BIT_V_FLIP};
 use gemi_core::utils::get_bit;
 
 use crate::event::UiEvent;
@@ -45,8 +44,6 @@ const DEFAULT_SCALE: usize  =  5;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TileMapView {
-    // todo: temp solution until core library gets serde support
-    #[serde(serialize_with = "serialize_tilemap", deserialize_with = "deserialize_tilemap")]
     tilemap: TileMap,
 
     tile_selected: Option<(bool, usize)>,
@@ -312,19 +309,4 @@ impl TileMapView {
                 Stroke::new(2.0, color)
         );
     }
-}
-
-
-fn serialize_tilemap<S>(tilemap: &TileMap, serializer: S) -> Result<S::Ok, S::Error>
-    where S: Serializer
-{
-    let bit = tilemap.to_select_bit();
-    serializer.serialize_bool(bit)
-}
-
-fn deserialize_tilemap<'de, D>(deserializer: D) -> Result<TileMap, D::Error>
-    where D: Deserializer<'de>,
-{
-    bool::deserialize(deserializer)
-            .map(|bit| TileMap::by_select_bit(bit))
 }

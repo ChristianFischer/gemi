@@ -61,6 +61,7 @@ pub enum CpuFlag {
 
 /// State of the interrupts enabled flag.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ImeState {
     /// Interrupts are globally disabled.
     Disabled,
@@ -74,6 +75,7 @@ pub enum ImeState {
 
 /// Determines the CPU's state, when suspended by the HALT instruction.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum HaltState {
     /// The CPU is running normally.
     Running,
@@ -83,6 +85,7 @@ pub enum HaltState {
 }
 
 /// An object representing the gameboy's CPU
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Cpu {
     /// Interface to the device memory.
     mmu: Mmu,

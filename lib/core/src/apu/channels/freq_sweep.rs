@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, TriggerAction, default_on_trigger_event, default_on_write_register, default_on_read_register};
+use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::utils::{as_bit_flag, get_bit};
 
@@ -37,6 +37,8 @@ pub enum FrequencySweepResult {
 }
 
 
+// todo: doc
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FrequencySweep {
     /// Flag to store whether the frequency sweep is enabled or not.
     enabled: bool,

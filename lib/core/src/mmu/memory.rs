@@ -22,8 +22,7 @@ use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::gameboy::{DeviceConfig, EmulationType};
 use crate::mmu::locations::*;
-use crate::mmu::mbc::{create_mbc, Mbc};
-use crate::mmu::mbc::mbc_none::MbcNone;
+use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl, MemoryBankController};
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 
@@ -33,6 +32,7 @@ use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 /// into OAM memory.
 /// In total, 160 bytes will be transferred, so it takes
 /// 160 cycles to transfer for the transfer to be completed.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DmaTransferInfo {
     /// The address where to start copying the memory from.
     pub start_address: u16,
@@ -44,6 +44,7 @@ pub struct DmaTransferInfo {
 
 /// State of the OAM DMA transfer, whether it be disabled or
 /// in progress, including the time remaining.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DmaTransferState {
     /// No transfer is active.
     Disabled,
@@ -61,6 +62,7 @@ pub type HRamBank = MemoryDataFixedSize<127>;
 
 
 /// The memory object is the owner of the emulator's memory.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Memory {
     /// The configuration of the running device
     device_config: DeviceConfig,
@@ -76,7 +78,9 @@ pub struct Memory {
     /// High RAM
     hram: HRamBank,
 
-    mbc:        Box<dyn Mbc>,
+    /// MemoryBankController implementation.
+    mbc: Mbc,
+
     boot_rom:   Option<BootRom>,
     cartridge:  Option<Cartridge>,
 }
@@ -99,7 +103,8 @@ impl Memory {
 
             hram: HRamBank::new(),
 
-            mbc:        Box::new(MbcNone::new()),
+            mbc: create_mbc(&MemoryBankController::None),
+
             boot_rom:   None,
             cartridge:  None,
         }

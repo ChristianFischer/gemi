@@ -21,9 +21,9 @@ use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
 
 use eframe::epaint::Color32;
-use egui::{Grid, Id, Key, Label, PointerButton, pos2, ScrollArea, Sense, Stroke, TextStyle, Ui, Vec2, vec2, Widget, WidgetText};
-use egui::collapsing_header::{CollapsingState, paint_default_icon};
+use egui::collapsing_header::{paint_default_icon, CollapsingState};
 use egui::text_edit::TextEditOutput;
+use egui::{pos2, vec2, Grid, Id, Key, Label, PointerButton, ScrollArea, Sense, Stroke, TextStyle, Ui, Vec2, Widget, WidgetText};
 
 use crate::ui::style::GemiStyle;
 
@@ -172,6 +172,7 @@ struct MemoryEditorRuntimeData {
 }
 
 
+#[allow(dead_code)]
 impl<Source> MemoryEditor<Source> {
     /// Creates a new [MemoryEditor] object.
     pub fn new() -> Self {

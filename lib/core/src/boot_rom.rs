@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::utils::SerializableArray;
 use std::fs::File;
 use std::io;
 use std::io::Read;
 
 /// A data object containing a 256 byte boot ROM.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BootRom {
-    rom: Box<[u8; 256]>,
+    rom: Box<SerializableArray<u8, 256>>,
 }
 
 
@@ -47,7 +49,7 @@ impl BootRom {
         file.read(&mut buffer)?;
 
         Ok(BootRom {
-            rom: Box::new(buffer)
+            rom: Box::new(buffer.into())
         })
     }
 

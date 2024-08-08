@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ pub const WAVE_DUTY_PATTERN: [u8; 4] = [
 /// A wave duty describes the ratio between peaks and valleys of a sound wave.
 /// This creates a wave pattern of alternating valleys and peaks with their
 /// duration depending on the ratio between valleys and peaks.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WaveDuty {
     /// Get the index of this wave duty pattern.
     index: u8,

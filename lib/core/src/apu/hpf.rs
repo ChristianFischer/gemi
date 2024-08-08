@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ const CAPACITOR_CHARGE_FACTOR_BASE_GBC : f32 = 0.998943;
 
 /// The Highpass Filter tries to pull an input value towards zero
 /// to neutralize the offset of inactive but still enabled channels.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HighPassFilter {
     capacitor: f32,
     charge_factor: f32,
@@ -35,6 +36,7 @@ pub struct HighPassFilter {
 
 
 /// A set of two [HighPassFilter], one for the left, one for the right channel.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StereoHighPassFilters {
     filter_left:  HighPassFilter,
     filter_right: HighPassFilter,

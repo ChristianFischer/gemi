@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 
 use crate::mmu::mbc::MemoryBankController;
 use crate::mmu::memory_data::{MemoryData, MemoryDataDynamic};
-use crate::utils::as_hex_digit;
+use crate::utils::{as_hex_digit, SerializableBuffer};
 
 
 pub const FILE_EXT_GB:  &str = "gb";
@@ -34,6 +34,7 @@ pub const FILE_EXT_RAM: &str = "sav";
 
 
 /// Type of game boy color support
+#[derive(Copy, Clone)]
 pub enum GameBoyColorSupport {
     /// CGB is not supported
     None,
@@ -47,6 +48,7 @@ pub enum GameBoyColorSupport {
 
 
 /// Hold the licensee code (either it's old or new version)
+#[derive(Copy, Clone)]
 pub enum LicenseeCode {
     /// old licensee code
     Old(u8),
@@ -60,12 +62,19 @@ pub enum LicenseeCode {
 
 
 /// This object holds the plain data of a ROM.
+#[derive(Clone)]
 pub struct RomData {
     data: Vec<u8>,
 }
 
 
 /// This object represents a cartridge of a single game.
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Serialize, serde::Deserialize),
+    serde(try_from = "CartridgeSerdeHelper", into = "CartridgeSerdeHelper")
+)]
 pub struct Cartridge {
     source_file: Option<PathBuf>,
 
@@ -91,6 +100,14 @@ pub struct Cartridge {
     has_timer: bool,
     has_battery: bool,
     has_rumble: bool,
+}
+
+
+/// Helper struct to implement serialization via serde by only serializing RAM and ROM.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+struct CartridgeSerdeHelper {
+    rom: SerializableBuffer<u8>,
+    ram: Option<SerializableBuffer<u8>>,
 }
 
 
@@ -241,7 +258,7 @@ impl Cartridge {
     }
 
 
-    /// Loads a cartridge and optionally it's RAM from a byte buffer.
+    /// Loads a cartridge and optionally its RAM from a byte buffer.
     pub fn load_from_bytes(rom_data: Vec<u8>, ram_data: Option<Vec<u8>>) -> io::Result<Cartridge> {
         let rom = RomData {
             data: rom_data,
@@ -515,6 +532,33 @@ impl Cartridge {
     /// checks whether this cartridge has a rumble module
     pub fn has_rumble(&self) -> bool {
         self.has_rumble
+    }
+}
+
+
+impl TryFrom<CartridgeSerdeHelper> for Cartridge {
+    type Error = io::Error;
+
+    fn try_from(helper: CartridgeSerdeHelper) -> Result<Self, Self::Error> {
+        Cartridge::load_from_bytes(
+            helper.rom.into(), 
+            helper.ram.map(|ram| ram.into())
+        )
+    }
+}
+
+
+impl From<Cartridge> for CartridgeSerdeHelper {
+    fn from(cart: Cartridge) -> Self {
+        Self {
+            rom: cart.rom.data.clone().into(),
+            ram: if cart.has_ram {
+                Some(cart.ram.to_vec().into())
+            }
+            else {
+                None
+            }
+        }
     }
 }
 

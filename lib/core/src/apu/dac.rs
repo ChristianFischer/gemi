@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ use crate::apu::sample::{Sample, SampleResult, SampleType};
 /// by the sound processor. The output will be an audio sample in the range
 /// between `i16::MIN / 4` and `i16::MAX / 4`, so combining all four channels
 /// wont exceed the value range of i16.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DigitalAudioConverter {
     enabled: bool,
 }

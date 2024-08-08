@@ -30,7 +30,7 @@ use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterru
 use crate::ppu::graphic_data::*;
 use crate::ppu::sprite_image::SpriteImage;
 use crate::ppu::video_memory::{OamRam, OamRamBank, Palettes, VideoMemory};
-use crate::utils::get_bit;
+use crate::utils::{get_bit, SerializableArray};
 
 pub const SCREEN_W: u32 = 160;
 pub const SCREEN_H: u32 = 144;
@@ -51,13 +51,18 @@ pub const TILE_ATTR_BIT_V_FLIP:                     u8 = 6;
 pub const TILE_ATTR_BIT_BG_TO_OAM_PRIO:             u8 = 7;
 
 
-type PixelBuffer160x144 = MemoryDataMapped<[Color; SCREEN_PIXELS]>;
+type PixelArray160x144  = SerializableArray<Color, SCREEN_PIXELS>;
+type PixelBuffer160x144 = MemoryDataMapped<PixelArray160x144>;
 
+
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LcdBuffer {
     pixels: PixelBuffer160x144,
 }
 
+
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Mode {
     HBlank      = 0,
     VBlank      = 1,
@@ -67,6 +72,7 @@ pub enum Mode {
 
 
 /// Defines the state whether the PPU is enabled or not.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum LcdState {
     /// The PPU is disabled and does not process anything.
     Off,
@@ -80,6 +86,7 @@ pub enum LcdState {
 
 
 /// An object storing data of any scanline to be processed by the PPU.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ScanlineData {
     /// The line number stored in this object.
     line: u8,
@@ -151,6 +158,7 @@ pub struct TileFetchProperties {
 
 
 #[derive(Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct PpuRegisters {
     /// LCD control flags.
     lcd_control: LcdControl,
@@ -182,6 +190,7 @@ struct PpuRegisters {
 
 
 /// An object representing the gameboy's picture processing unit.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Ppu {
     clock: Clock,
 

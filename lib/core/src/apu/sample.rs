@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ pub type SampleType = f32;
 
 /// A sample of a single channel as to be transmitted to the emulator frontend.
 #[derive(Default, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Sample {
     value: SampleType
 }
@@ -30,6 +31,7 @@ pub struct Sample {
 
 /// A sample of left and right channel as to be transmitted to the emulator frontend.
 #[derive(Default, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StereoSample {
     pub left: Sample,
     pub right: Sample,
@@ -39,6 +41,7 @@ pub struct StereoSample {
 /// The result of taking a sample from the APU channels.
 /// This may be sound data or silence, if no DAC was enabled.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SampleResult<T>
     where T : Copy + Clone
 {

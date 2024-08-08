@@ -18,7 +18,7 @@
 use crate::apu::apu::Apu;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
-use crate::cpu::cpu::{Cpu, CPU_CLOCK_SPEED, CpuFlag, RegisterR8};
+use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8, CPU_CLOCK_SPEED};
 use crate::cpu::interrupts::InterruptRegisters;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
 use crate::debug::{DebugEvent, DebugEvents};
@@ -28,7 +28,7 @@ use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::mmu::mmu::Mmu;
-use crate::ppu::ppu::{CPU_CYCLES_PER_FRAME, Ppu};
+use crate::ppu::ppu::{Ppu, CPU_CYCLES_PER_FRAME};
 use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};
@@ -40,6 +40,7 @@ pub type Clock = u64;
 
 /// A struct containing the setup information of the running device.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeviceConfig {
     /// The current device type being running.
     pub device: DeviceType,
@@ -63,6 +64,7 @@ pub struct Builder {
 
 
 /// The GameBoy object providing access to all it's emulated components.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GameBoy {
     device_config: DeviceConfig,
 
@@ -73,14 +75,15 @@ pub struct GameBoy {
 
 
 /// A set of components connected together via memory bus.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Peripherals {
-    pub apu: Apu,
-    pub ppu: Ppu,
-    pub mem: Memory,
-    pub timer: Timer,
-    pub input: Input,
-    pub serial: SerialPort,
-    pub interrupts: InterruptRegisters,
+    pub apu:        Box<Apu>,
+    pub ppu:        Box<Ppu>,
+    pub mem:        Box<Memory>,
+    pub timer:      Box<Timer>,
+    pub input:      Box<Input>,
+    pub serial:     Box<SerialPort>,
+    pub interrupts: Box<InterruptRegisters>,
 }
 
 
@@ -224,13 +227,13 @@ impl GameBoy {
                 cpu: Cpu::new(
                     Mmu::new(
                         Peripherals {
-                            apu: Apu::new(device_config),
-                            ppu: Ppu::new(device_config),
-                            mem: Memory::new(device_config),
-                            timer: Timer::new(),
-                            input: Input::new(),
-                            serial: SerialPort::new(),
-                            interrupts: InterruptRegisters::new(),
+                            apu:        Box::new(Apu::new(device_config)),
+                            ppu:        Box::new(Ppu::new(device_config)),
+                            mem:        Box::new(Memory::new(device_config)),
+                            timer:      Box::new(Timer::new()),
+                            input:      Box::new(Input::new()),
+                            serial:     Box::new(SerialPort::new()),
+                            interrupts: Box::new(InterruptRegisters::new()),
                         }
                     )
                 ),

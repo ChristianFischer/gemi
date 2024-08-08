@@ -37,6 +37,7 @@ pub type Interrupts = FlagSet<Interrupt>;
 
 /// A data struct holding the interrupt registers used by the CPU
 /// and connected via memory bus to other components.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InterruptRegisters {
     /// IF: pending interrupts
     interrupts_flagged: Interrupts,

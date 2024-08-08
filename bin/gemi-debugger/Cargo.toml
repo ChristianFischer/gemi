@@ -11,7 +11,7 @@ egui_tiles = "0.8.0"
 egui-modal = "0.3.5"
 lazy_static = "1.4.0"
 rfd = "0.14.1"
-serde = "1.0.197"
+serde = "1.0.205"
 
 # desktop:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -24,6 +24,7 @@ wasm-bindgen-futures = "0.4"
 
 [dependencies.gemi-core]
 path = "../../lib/core"
+features = ["snapshots"]
 
 [dependencies.gemi-utils]
 path = "../../lib/utils"

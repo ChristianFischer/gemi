@@ -34,6 +34,7 @@ const UPDATE_TIME_SERIAL_TRANSFER:      Clock = 4096;
 ///
 /// The output queue is disabled by default and needs to be
 /// enabled in order to store data sent.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SerialPort {
     /// The SerialPort's clock to measure time between the transfer of each byte.
     clock: Clock,

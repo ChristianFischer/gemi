@@ -22,6 +22,7 @@ use crate::ppu::graphic_data::{Color, SpritePixelValue};
 /// Each sprite has a 8x8 pixel size with 2 bits per pixel,
 /// which results in a total of 16 bytes per sprite.
 #[derive(Clone, Hash, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SpriteImage {
     /// The actual, packed data of the sprite.
     image_data: [u8; 16],

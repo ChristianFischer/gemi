@@ -23,6 +23,7 @@ use crate::utils::get_bit;
 /// An RGBA color value containing a RGB value with additional alpha channel
 /// ready to be displayed on modern screens.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Color {
     /// 8 bit red channel.
     pub r: u8,
@@ -40,6 +41,7 @@ pub struct Color {
 /// The pixel value read from a sprite.
 /// This value needs to be transformed into a color value using a color palette.
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SpritePixelValue(u8);
 
 /// A color palette of the classic GameBoy.
@@ -47,16 +49,19 @@ pub struct SpritePixelValue(u8);
 /// is meant as the brightness of a pixel on the LCD (0-3). This value
 /// may be transformed into a RGB color by a DmgDisplayPalette.
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DmgPalette(u8);
 
 /// A pixel value to be displayed on the LCD of a DMG GameBoy.
 /// The value represents the brightness of a LCD pixel and may be
 /// transformed into a RGB value using a palette to be displayed on modern screens.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DmgLcdPixel(u8);
 
 /// A palette to convert DmgLcdPixel values into RGB colors
 /// which can be represented on modern screens.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DmgDisplayPalette {
     palette: [Color; 4],
 }
@@ -64,6 +69,7 @@ pub struct DmgDisplayPalette {
 /// The palette data stored in a dedicated memory area of the GameBoy Color.
 /// This is meant to be used to translate sprite pixels into RGB colors.
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GbcPaletteData {
     palette: [u16; 4]
 }
@@ -71,6 +77,7 @@ pub struct GbcPaletteData {
 
 /// A list of possible tilesets the gameboy can handle.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TileSet {
     /// The tileset is based on the 0x8000 address plus tile index as unsigned integer.
     H8000,
@@ -81,6 +88,7 @@ pub enum TileSet {
 
 /// A list of possible TileMaps the gameboy can handle.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TileMap {
     /// This tilemap is stored in the video memory at 0x9800 - 0x9bff
     H9800,
@@ -93,6 +101,7 @@ pub enum TileMap {
 /// Stores the data of a single sprite entry, how
 /// it's stored in the OAM memory.
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Sprite {
     /// The sprites position on Y axis.
     pub pos_y: u8,

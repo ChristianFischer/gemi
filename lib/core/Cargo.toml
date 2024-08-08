@@ -4,4 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-flagset = "0.4.5"
+flagset = "0.4.6"
+serde = { version = "1.0.205", optional = true }
+zstd = { version = "0.13.2", optional = true }
+base64 = { version = "0.22.1", optional = true }
+
+[features]
+default = []
+snapshots = [
+    "serde",
+    "serde/serde_derive",
+    "flagset/serde",
+    "zstd",
+    "base64",
+]

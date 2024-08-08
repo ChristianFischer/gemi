@@ -44,7 +44,6 @@ pub struct EmulatorApplication {
 
     /// The implementation of the tiles behaviour trait
     /// which controls the behaviour of the tiled UI.
-    #[serde(skip)]
     behaviour: TreeBehaviour,
 
     #[serde(skip)]
