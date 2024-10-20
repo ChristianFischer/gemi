@@ -137,32 +137,6 @@ fn deserialize_emulator_instance<'de, D>(deserializer: D) -> Result<Option<GameB
 where
         D: Deserializer<'de>,
 {
-    /*
-    let panic_handler_result = panic::catch_unwind(||
-            Option::<GameBoy>::deserialize(deserializer)
-                    .map_err(|e| "")
-    );
-
-    match panic_handler_result {
-        // successfully deserialized
-        Ok(Ok(result)) => {
-            Ok(result)
-        }
-
-        // No panic, but deserialization failed for some reason
-        Ok(Err(err)) => {
-            eprintln!("Error deserializing emulator instance: {:?}", err);
-            Ok(None)
-        }
-
-        // Program panicked on deserialization
-        Err(err) => {
-            eprintln!("Panic at deserializing emulator instance: {:?}", err);
-            Ok(None)
-        }
-    }
-    */
-
     let maybe_emu = Option::<GameBoy>::deserialize(deserializer);
 
     match maybe_emu {

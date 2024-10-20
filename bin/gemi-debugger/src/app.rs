@@ -118,7 +118,7 @@ impl Default for EmulatorApplication {
         ]);
 
         // views for the sidebar on the right
-        let tiles_sidebar = add_views(vec![
+        let tiles_sidebar_right = add_views(vec![
             ViewClass::new_cartridge_info(),
             ViewClass::new_cpu(),
             ViewClass::new_palettes(),
@@ -133,10 +133,21 @@ impl Default for EmulatorApplication {
             ViewClass::new_oam(),
         ]);
 
-        // another sidebar containing the file browser
-        let file_browser = add_views(vec![
-            ViewClass::new_file_browser(),
-        ]);
+        // another sidebar containing the file browser and snapshots
+        let tiles_sidebar_left = add_views(
+            // FileBrowser is only available for non-wasm targets
+            if cfg!(not(target_arch = "wasm32")) {
+                vec![
+                    ViewClass::new_file_browser(),
+                    ViewClass::new_snapshots(),
+                ]
+            } 
+            else {
+                vec![
+                    ViewClass::new_snapshots(),
+                ]
+            }
+        );
 
         // create a split between the main area and a bottom area below
         let v_split = {
@@ -155,7 +166,7 @@ impl Default for EmulatorApplication {
         let h_split = {
             let linear = egui_tiles::Linear::new_binary(
                 egui_tiles::LinearDir::Horizontal,
-                [ v_split, tiles_sidebar ],
+                [ v_split, tiles_sidebar_right ],
                 0.8
             );
 
@@ -166,25 +177,15 @@ impl Default for EmulatorApplication {
 
         // main view panel
         let main_view = {
-            // on desktop, add a separate pane with the file browser
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                let linear = egui_tiles::Linear::new_binary(
-                    egui_tiles::LinearDir::Horizontal,
-                    [file_browser, h_split],
-                    0.25
-                );
+            let linear = egui_tiles::Linear::new_binary(
+                egui_tiles::LinearDir::Horizontal,
+                [tiles_sidebar_left, h_split],
+                0.20
+            );
 
-                let container = egui_tiles::Container::Linear(linear);
+            let container = egui_tiles::Container::Linear(linear);
 
-                tiles.insert_container(container)
-            }
-
-            // on web, there is no file browser
-            #[cfg(target_arch = "wasm32")]
-            {
-                h_split
-            }
+            tiles.insert_container(container)
         };
 
         // create the tree object

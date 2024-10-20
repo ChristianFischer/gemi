@@ -30,6 +30,7 @@ use crate::views::file_browser::FileBrowserView;
 use crate::views::memory::MemoryView;
 use crate::views::oam::OamView;
 use crate::views::palettes::PaletteView;
+use crate::views::snapshots::SnapshotsView;
 use crate::views::sprites::SpritesView;
 use crate::views::tilemap::TileMapView;
 
@@ -41,6 +42,7 @@ mod file_browser;
 mod memory;
 mod oam;
 mod palettes;
+mod snapshots;
 mod sprites;
 mod tilemap;
 
@@ -84,6 +86,7 @@ pub enum ViewClass {
     Sprites(SpritesView),
     Palettes(PaletteView),
     Oam(OamView),
+    Snapshots(SnapshotsView),
 }
 
 
@@ -93,6 +96,7 @@ impl ViewClass {
         ViewClass::FileBrowser(FileBrowserView::new())
     }
 
+    
     /// Creates a new [`EmulatorDisplayView`] object.
     pub fn new_display_view() -> ViewClass {
         ViewClass::Display(EmulatorDisplayView::new())
@@ -145,6 +149,12 @@ impl ViewClass {
     pub fn new_oam() -> ViewClass {
         ViewClass::Oam(OamView::new())
     }
+    
+    
+    /// Creates a new [`SnapshotsView`] object.
+    pub fn new_snapshots() -> ViewClass {
+        ViewClass::Snapshots(SnapshotsView::new())
+    }
 }
 
 
@@ -161,6 +171,7 @@ impl View for ViewClass {
             ViewClass::Sprites(v)       => v.title(state),
             ViewClass::Palettes(v)      => v.title(state),
             ViewClass::Oam(v)           => v.title(state),
+            ViewClass::Snapshots(v)     => v.title(state),
         }
     }
 
@@ -177,6 +188,7 @@ impl View for ViewClass {
             ViewClass::Sprites(v)       => v.ui(state, ui),
             ViewClass::Palettes(v)      => v.ui(state, ui),
             ViewClass::Oam(v)           => v.ui(state, ui),
+            ViewClass::Snapshots(v)     => v.ui(state, ui),
         }
     }
 
@@ -193,6 +205,7 @@ impl View for ViewClass {
             ViewClass::Sprites(v)       => v.get_current_selection(),
             ViewClass::Palettes(v)      => v.get_current_selection(),
             ViewClass::Oam(v)           => v.get_current_selection(),
+            ViewClass::Snapshots(v)     => v.get_current_selection(),
         }
     }
 
@@ -209,6 +222,7 @@ impl View for ViewClass {
             ViewClass::Sprites(v)       => v.handle_ui_event(event),
             ViewClass::Palettes(v)      => v.handle_ui_event(event),
             ViewClass::Oam(v)           => v.handle_ui_event(event),
+            ViewClass::Snapshots(v)     => v.handle_ui_event(event),
         }
     }
 
@@ -225,6 +239,7 @@ impl View for ViewClass {
             ViewClass::Sprites(v)       => v.on_emulator_loaded(state),
             ViewClass::Palettes(v)      => v.on_emulator_loaded(state),
             ViewClass::Oam(v)           => v.on_emulator_loaded(state),
+            ViewClass::Snapshots(v)     => v.on_emulator_loaded(state),
         }
     }
 }

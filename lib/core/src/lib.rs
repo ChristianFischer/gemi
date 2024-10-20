@@ -26,5 +26,6 @@ pub mod input;
 pub mod mmu;
 pub mod ppu;
 pub mod serial;
+pub mod snapshots;
 pub mod timer;
 pub mod utils;

@@ -18,7 +18,7 @@
 use std::env;
 use std::path::PathBuf;
 
-use eframe::{CreationContext, NativeOptions, run_native};
+use eframe::{run_native, CreationContext, NativeOptions};
 use egui::ViewportBuilder;
 
 use crate::app::EmulatorApplication;
