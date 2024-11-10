@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2024 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::min;
+use crate::runner::TestCaseError;
+use crate::test_config::LcdColorMod;
 use gemi_core::gameboy::GameBoy;
 use gemi_core::ppu::graphic_data::Color;
 use gemi_core::ppu::ppu::LcdBuffer;
-use image::io::Reader as ImageReader;
+use image::ImageReader;
 use image::{Rgba, RgbaImage};
-use crate::runner::TestCaseError;
-use crate::test_config::LcdColorMod;
+use std::cmp::min;
 
 
 /// Loads an image from any given file.

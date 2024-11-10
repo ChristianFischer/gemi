@@ -62,7 +62,7 @@ mod with_snapshots {
 
 
         /// Reads a snapshot from a file path.
-        fn read_from_file(filepath: &Path) -> io::Result<Self> {
+        pub fn read_from_file(filepath: &Path) -> io::Result<Self> {
             let mut file = File::open(filepath)?;
             let mut data = Vec::new();
             file.read_to_end(&mut data)?;
@@ -72,7 +72,7 @@ mod with_snapshots {
 
 
         /// Saves a snapshot into a file path.
-        fn save_to_file(&self, filepath: &Path) -> io::Result<()> {
+        pub fn save_to_file(&self, filepath: &Path) -> io::Result<()> {
             let mut file = File::create(filepath)?;
             file.write_all(&self.data)?;
 

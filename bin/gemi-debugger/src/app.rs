@@ -272,12 +272,13 @@ impl EmulatorApplication {
         egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 let enabled = !self.is_message_box_open();
-                ui.set_enabled(enabled);
 
-                ui.menu_button("File", |ui| self.update_submenu_file(ui, frame));
-                ui.separator();
+                ui.add_enabled_ui(enabled, |ui| {
+                    ui.menu_button("File", |ui| self.update_submenu_file(ui, frame));
+                    ui.separator();
 
-                self.update_player_toolbar(ui);
+                    self.update_player_toolbar(ui);
+                });
             });
         });
     }
@@ -377,18 +378,13 @@ impl EmulatorApplication {
         let mut is_paused  = state.ui.is_paused();
 
         // "Reload" button
-        {
-            let was_enabled = ui.is_enabled();
-            ui.set_enabled(state.emu.is_emulator_loaded());
-
+        ui.add_enabled_ui(state.emu.is_emulator_loaded(), |ui| {
             if ui.button(BUTTON_LABEL_RELOAD).clicked() {
                 _ = state.reload();
             }
 
-            ui.set_enabled(was_enabled);
-
             ui.separator();
-        }
+        });
 
         // "Play" button
         if ui.toggle_value(&mut is_running, BUTTON_LABEL_PLAY).clicked() {
@@ -419,7 +415,7 @@ impl EmulatorApplication {
                 UpdateStepMode::Instruction
             ];
 
-            let response = ComboBox::from_id_source("update_step")
+            let response = ComboBox::from_id_salt("update_step")
                     .show_index(
                         ui,
                         &mut selected_index,
@@ -449,7 +445,7 @@ impl EmulatorApplication {
                 EmulatorDevice::SuperGameBoy2,
             ];
 
-            let response = ComboBox::from_id_source("device_type")
+            let response = ComboBox::from_id_salt("device_type")
                     .show_index(
                         ui,
                         &mut selected_index,
@@ -471,9 +467,10 @@ impl EmulatorApplication {
             ctx,
             |ui| {
                 let enabled = !self.is_message_box_open();
-                ui.set_enabled(enabled);
 
-                self.tree.ui(&mut self.behaviour, ui);
+                ui.add_enabled_ui(enabled, |ui| {
+                    self.tree.ui(&mut self.behaviour, ui);
+                });
             }
         );
     }

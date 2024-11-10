@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-flagset = "0.4.6"
-serde = { version = "1.0.205", optional = true }
-zstd = { version = "0.13.2", optional = true }
-base64 = { version = "0.22.1", optional = true }
+flagset = { version = "0.4.6", default-features = false, features = [] }
+serde = { version = "1.0.214", default-features = false, features = ["std"], optional = true }
+zstd = { version = "0.13.2", default-features = false, features = [], optional = true }
+base64 = { version = "0.22.1", default-features = false, features = ["std"], optional = true }
 bincode = { version = "2.0.0-rc.3", default-features = false, features = ["std", "serde"], optional = true }
 
 [features]

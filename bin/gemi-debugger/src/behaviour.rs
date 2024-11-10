@@ -16,10 +16,11 @@
  */
 
 
+use egui::{Rect, Ui, UiBuilder, WidgetText};
+use egui_tiles::{SimplificationOptions, TileId, UiResponse};
+
 use crate::state::EmulatorState;
 use crate::views::{View, ViewClass};
-use egui::{Rect, Ui, WidgetText};
-use egui_tiles::{SimplificationOptions, TileId, UiResponse};
 
 
 /// The implementation of the behaviour trait for the UI tile tree.
@@ -82,8 +83,8 @@ impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
                 ui.ctx().clone(),
                 ui.layer_id(),
                 ui.id().with(_tile_id),
-                child_rect,
-                child_rect
+                UiBuilder::new()
+                    .max_rect(child_rect)
         );
 
         pane.ui(self.get_state_mut(), &mut child_ui);

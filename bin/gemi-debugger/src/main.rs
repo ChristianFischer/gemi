@@ -71,7 +71,7 @@ fn main() -> Result<(), eframe::Error> {
         options,
         Box::new(|cc| {
             let app = load_application(cc);
-            Box::new(app)
+            Ok(Box::new(app))
         })
     )
 }

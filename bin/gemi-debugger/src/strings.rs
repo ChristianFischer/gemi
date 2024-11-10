@@ -20,5 +20,5 @@ pub const BUTTON_LABEL_PAUSE: &str  = "\u{23f8}";
 pub const BUTTON_LABEL_STEP: &str   = "\u{23ed}";
 pub const BUTTON_LABEL_RELOAD: &str = "\u{27f3}";
 
-pub const BUTTON_LABEL_ADD: &str    = "\u{27f4}";
+pub const BUTTON_LABEL_ADD: &str    = "\u{2795}";
 pub const BUTTON_LABEL_DELETE: &str = "\u{1f5d1}";

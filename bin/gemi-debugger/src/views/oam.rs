@@ -25,7 +25,7 @@ use gemi_core::ppu::graphic_data::Sprite;
 use gemi_core::ppu::sprite_image::SpriteImage;
 
 use crate::event::UiEvent;
-use crate::highlight::{HighlightState, test_selection};
+use crate::highlight::{test_selection, HighlightState};
 use crate::selection::{Kind, Selected};
 use crate::state::{EmulatorState, UiStates};
 use crate::ui::draw_tile::DrawTile;
@@ -311,7 +311,7 @@ impl OamView {
                 ui.label(BANK_NAMES[bank as usize]);
             }
             else {
-                ComboBox::from_id_source(format!("oam{oam_index}_bank"))
+                ComboBox::from_id_salt(format!("oam{oam_index}_bank"))
                         .width(ui.available_width())
                         .show_index(
                                 ui,
@@ -330,7 +330,7 @@ impl OamView {
                 let current_palette = entry.get_color_palette();
                 let mut new_palette = current_palette as usize;
 
-                ComboBox::from_id_source(format!("oam{oam_index}_gbc_palette"))
+                ComboBox::from_id_salt(format!("oam{oam_index}_gbc_palette"))
                         .width(ui.available_width())
                         .show_index(
                                 ui,
@@ -345,7 +345,7 @@ impl OamView {
                 let current_palette = entry.get_dmg_palette();
                 let mut new_palette = current_palette as usize;
 
-                ComboBox::from_id_source(format!("oam{oam_index}_dmg_palette"))
+                ComboBox::from_id_salt(format!("oam{oam_index}_dmg_palette"))
                         .width(ui.available_width())
                         .show_index(
                                 ui,

@@ -17,7 +17,7 @@
 
 use std::ops::Range;
 
-use egui::{Grid, RichText, ScrollArea, Sense, TextStyle, Ui, vec2};
+use egui::{vec2, Grid, RichText, ScrollArea, Sense, TextStyle, Ui};
 
 use gemi_core::cpu::opcode::{Instruction, Token};
 use gemi_core::gameboy::GameBoy;
@@ -187,7 +187,7 @@ impl DisassemblyView {
 
         // create the widget for the scroll area
         let mut scroll_area = ScrollArea::vertical()
-                .id_source("scroll_area")
+                .id_salt("scroll_area")
                 .auto_shrink([false, false])
         ;
 

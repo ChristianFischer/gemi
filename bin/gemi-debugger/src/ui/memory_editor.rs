@@ -20,12 +20,12 @@ use std::marker::PhantomData;
 use std::ops::{Range, RangeInclusive};
 use std::string::ToString;
 
+use crate::ui::style::GemiStyle;
+use eframe::epaint::text::TextWrapMode;
 use eframe::epaint::Color32;
 use egui::collapsing_header::{paint_default_icon, CollapsingState};
 use egui::text_edit::TextEditOutput;
 use egui::{pos2, vec2, Grid, Id, Key, Label, PointerButton, ScrollArea, Sense, Stroke, TextStyle, Ui, Vec2, Widget, WidgetText};
-
-use crate::ui::style::GemiStyle;
 
 
 /// A placeholder value in case when a memory address was not readable.
@@ -416,7 +416,7 @@ impl<Source> MemoryEditor<Source> {
 
         // create the widget for the scroll area
         let scroll_area = ScrollArea::vertical()
-            .id_source("memory_view_scroll_area")
+            .id_salt("memory_view_scroll_area")
             .auto_shrink([false, false])
         ;
 
@@ -598,7 +598,7 @@ impl<Source> MemoryEditor<Source> {
         let desired_width  = self.rt.column_width_category;
         let id             = ui.make_persistent_id(&title);
         let widget_text    = WidgetText::from(title);
-        let title_galley   = widget_text.into_galley(ui, Some(false), desired_width, TextStyle::Body);
+        let title_galley   = widget_text.into_galley(ui, Some(TextWrapMode::Truncate), desired_width, TextStyle::Body);
 
         // take space for the category header
         let desired_size = vec2(desired_width, title_galley.size().y + 2.0 * button_padding.y);
@@ -1092,7 +1092,7 @@ impl<Source> MemoryEditor<Source> {
     /// Measures the width of a text using the given style.
     fn measure_text_width(&self, ui: &mut Ui, text: &str, style: TextStyle) -> f32 {
         WidgetText::from(text)
-            .into_galley(ui, Some(false), 0.0, style)
+            .into_galley(ui, Some(TextWrapMode::Extend), 0.0, style)
             .rect.width()
     }
 

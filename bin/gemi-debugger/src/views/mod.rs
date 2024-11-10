@@ -16,7 +16,6 @@
  */
 
 use egui::Ui;
-
 use gemi_core::ppu::graphic_data::TileMap;
 
 use crate::event::UiEvent;

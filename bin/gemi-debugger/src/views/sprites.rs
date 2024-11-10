@@ -73,7 +73,7 @@ impl View for SpritesView {
             }
 
             let scroll_area = ScrollArea::vertical()
-                    .id_source("sprites_scroll_area")
+                    .id_salt("sprites_scroll_area")
                     .auto_shrink([false, false])
             ;
 

@@ -46,7 +46,7 @@ impl BootRom {
         }
 
         let mut buffer = [0u8; 256];
-        file.read(&mut buffer)?;
+        file.read_exact(&mut buffer)?;
 
         Ok(BootRom {
             rom: Box::new(buffer.into())

@@ -33,6 +33,7 @@ pub mod serialize {
     use base64::Engine;
     use serde::de::Error;
     use serde::Deserialize;
+    use std::mem::size_of;
     use std::ptr::slice_from_raw_parts;
 
 
