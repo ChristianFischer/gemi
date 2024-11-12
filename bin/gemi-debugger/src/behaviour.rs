@@ -17,10 +17,22 @@
 
 
 use egui::{Rect, Ui, UiBuilder, WidgetText};
-use egui_tiles::{SimplificationOptions, TileId, UiResponse};
+use egui_tiles::{SimplificationOptions, Tabs, TileId, Tiles, UiResponse};
 
 use crate::state::EmulatorState;
+use crate::strings;
 use crate::views::{View, ViewClass};
+
+
+/// Container for a [ViewClass] to be inserted into the UI.
+pub struct ViewToInsert {
+    /// The actual [ViewClass] to be added.
+    pub view: ViewClass,
+    
+    /// The ID of the tile, where it should be added,
+    /// usually a Tab container.
+    pub insert_at: TileId,
+}
 
 
 /// The implementation of the behaviour trait for the UI tile tree.
@@ -33,6 +45,10 @@ pub struct TreeBehaviour {
     /// If there's a way to pass the state reference into the behaviour
     /// this should be moved into the application object.
     state: EmulatorState,
+
+    /// Stores a [ViewClass] which was created and shall be added into the UI.
+    #[serde(skip)]
+    view_to_insert: Option<ViewToInsert>,
     
     /// Some options to control the behaviour of the tiled UI.
     #[serde(skip)]
@@ -51,6 +67,14 @@ impl TreeBehaviour {
     pub fn get_state_mut(&mut self) -> &mut EmulatorState {
         &mut self.state
     }
+    
+    
+    /// If a [ViewClass] was prepared to be added, take the 
+    /// view from the behaviour object.
+    /// The view will be cleared from the behaviour after this.
+    pub fn take_view_insert(&mut self) -> Option<ViewToInsert> {
+        self.view_to_insert.take()
+    }
 }
 
 
@@ -58,6 +82,8 @@ impl Default for TreeBehaviour {
     fn default() -> Self {
         Self {
             state: EmulatorState::default(),
+            
+            view_to_insert: None,
 
             simplification_options: SimplificationOptions {
                 all_panes_must_have_tabs: true,
@@ -96,6 +122,28 @@ impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
 
     fn tab_title_for_pane(&mut self, pane: &ViewClass) -> WidgetText {
         pane.title(self.get_state_mut()).into()
+    }
+
+
+    fn is_tab_closable(&self, _tiles: &Tiles<ViewClass>, _tile_id: TileId) -> bool {
+        true
+    }
+
+
+    fn top_bar_right_ui(&mut self, _tiles: &Tiles<ViewClass>, ui: &mut Ui, tile_id: TileId, _tabs: &Tabs, _scroll_offset: &mut f32) {
+        // border to the right side to ensure the button and it's border are fully visible
+        ui.add_space(2.0);
+
+        ui.menu_button(strings::BUTTON_LABEL_ADD, |ui| {
+            for (name, instantiate) in &ViewClass::ALL {
+                if ui.button(*name).clicked() {
+                    self.view_to_insert = Some(ViewToInsert { 
+                        view: instantiate(),
+                        insert_at: tile_id
+                    });
+                }
+            }
+        });
     }
 
 

@@ -89,7 +89,27 @@ pub enum ViewClass {
 }
 
 
+pub type Instantiate = fn() -> ViewClass;
+
+
 impl ViewClass {
+    pub const ALL : [(&'static str, Instantiate); 13] = [
+        ("Display",         ViewClass::new_display_view),
+        ("CartridgeInfo",   ViewClass::new_cartridge_info),
+        ("Cpu",             ViewClass::new_cpu),
+        ("Disassembly",     ViewClass::new_disassembly),
+        ("Memory",          ViewClass::new_memory),
+        ("Oam",             ViewClass::new_oam),
+        ("Palettes",        ViewClass::new_palettes),
+        ("Sprites Bank #0", || ViewClass::new_sprites(0)),
+        ("Sprites Bank #1", || ViewClass::new_sprites(1)),
+        ("TileMap #9800",   || ViewClass::new_tile_map(TileMap::H9800)),
+        ("TileMap #9C00",   || ViewClass::new_tile_map(TileMap::H9C00)),
+        ("FileBrowser",     ViewClass::new_file_browser),
+        ("Snapshots",       ViewClass::new_snapshots),
+    ];
+    
+    
     /// Creates a new [`FileBrowserView`] object.
     pub fn new_file_browser() -> ViewClass {
         ViewClass::FileBrowser(FileBrowserView::new())

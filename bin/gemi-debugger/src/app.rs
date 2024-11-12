@@ -20,6 +20,7 @@ use std::sync::mpsc::{channel, Receiver, TryRecvError};
 
 use eframe::{CreationContext, Frame};
 use egui::{ComboBox, Context};
+use egui_tiles::{Container, Tile};
 use rfd::AsyncFileDialog;
 
 use gemi_core::cartridge::Cartridge;
@@ -214,6 +215,7 @@ impl eframe::App for EmulatorApplication {
         self.update_input(ctx);
         self.handle_open_file();
         self.handle_frame_response();
+        self.handle_view_insert();
 
         // when the emulator is still running, request an immediate repaint
         // to update the display instead of waiting for the next event
@@ -550,6 +552,28 @@ impl EmulatorApplication {
 
         for event in events {
             self.send_event(event);
+        }
+    }
+
+
+    /// Attaches a previously created view into the UI.
+    fn handle_view_insert(&mut self) {
+        if let Some(insert) = self.behaviour.take_view_insert() {
+            let tile = self.tree.tiles.insert_pane(insert.view);
+            
+            match self.tree.tiles.get_mut(insert.insert_at) {
+                Some(Tile::Container(container)) => {
+                    match container {
+                        Container::Tabs(tabs)     => { tabs.add_child(tile); tabs.set_active(tile); },
+                        Container::Linear(linear) => { linear.add_child(tile); },
+                        Container::Grid(grid)     => { grid.add_child(tile); },
+                    }                   
+                },
+                
+                _ => { 
+                    self.tree.tiles.remove(tile);
+                }
+            }
         }
     }
     
