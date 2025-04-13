@@ -24,8 +24,8 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use crate::apu::hpf::StereoHighPassFilters;
 use crate::apu::sample::{SampleResult, StereoSample};
 use crate::cpu::cpu::CPU_CLOCK_SPEED;
-use crate::device_type::DeviceConfig;
-use crate::emulator_core::Clock;
+use crate::emulator_context::EmulatorContext;
+use crate::emulator_device::Clock;
 use crate::utils::SerializableArray;
 
 
@@ -87,7 +87,7 @@ impl AudioOutput {
     pub const DEFAULT_SAMPLE_RATE: u32 = 48_000;
 
 
-    pub fn new(device_config: DeviceConfig) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         Self {
             sample_rate:        Self::DEFAULT_SAMPLE_RATE,
             time_passed:        0,
@@ -96,7 +96,7 @@ impl AudioOutput {
             current_sample:     StereoSample::default(),
             buffer:             Box::new([StereoSample::default(); SAMPLE_BUFFER_SIZE].into()),
             buffer_insert_pos:  0,
-            high_pass_filter:   StereoHighPassFilters::new(device_config),
+            high_pass_filter:   StereoHighPassFilters::new(ec),
             sender:             None,
         }
     }

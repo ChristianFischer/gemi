@@ -20,7 +20,7 @@ use gemi_utils::keybindings::KeyBindings;
 use libgemi::core::cartridge::Cartridge;
 use libgemi::core::debug::DebugEvent;
 use libgemi::core::device_type::DeviceType;
-use libgemi::core::emulator_core::{Clock, EmulatorCore, EmulatorUpdateResults};
+use libgemi::core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
 use libgemi::core::input::InputButton;
 use libgemi::core::mmu::memory_data::MemoryData;
 use libgemi::core::ppu::ppu::CPU_CYCLES_PER_FRAME;
@@ -348,13 +348,13 @@ impl EmulatorInstance {
 
 
     /// Get the currently running emulator instance.
-    pub fn get_emulator(&self) -> Option<&EmulatorCore> {
+    pub fn get_emulator(&self) -> Option<&EmulatorDevice> {
         self.gb.as_ref().map(|gb| gb.get_emulator())
     }
 
 
     /// Get the currently running emulator instance.
-    pub fn get_emulator_mut(&mut self) -> Option<&mut EmulatorCore> {
+    pub fn get_emulator_mut(&mut self) -> Option<&mut EmulatorDevice> {
         self.gb.as_mut().map(|gb| gb.get_emulator_mut())
     }
 
@@ -400,7 +400,7 @@ impl EmulatorInstance {
 
     /// Run the emulator until a certain condition is met. 
     pub fn run_until<F>(&mut self, condition: F)
-        where F: Fn(&EmulatorCore, Clock, EmulatorUpdateResults) -> bool
+        where F: Fn(&EmulatorDevice, Clock, EmulatorUpdateResults) -> bool
     {
         if let Some(emu) = self.get_emulator_mut() {
             let mut cycles = 0;

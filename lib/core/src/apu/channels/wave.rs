@@ -22,7 +22,7 @@ use crate::apu::channels::channel::{default_on_read_register, default_on_trigger
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_ram::{WaveRam, WaveRamPositionCursor};
-use crate::emulator_core::Clock;
+use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::utils::{as_bit_flag, get_bit};
 
@@ -118,7 +118,7 @@ impl WaveGenerator {
             let index = (requested_address - MEMORY_LOCATION_APU_WAVE_RAM_BEGIN) & 0x0f;
             Some(index as u8)
         }
-        else if apu_state.device_config.is_gbc_enabled() || (self.wave_ram_access_timeout > 0) {
+        else if apu_state.gbc_enabled || (self.wave_ram_access_timeout > 0) {
             // with the channel enabled, the access is restricted to the last
             // address being read by the sound generator.
             // On DMG this is only possible within 2 cycles after the data was read,
@@ -225,7 +225,7 @@ impl ChannelComponent for WaveGenerator {
         if
                 self.channel_enabled // was already enabled
             &&  self.wave_timer == 2 // wave ram is about to be read when the timer expires
-            &&  !apu_state.device_config.is_gbc_enabled()
+            &&  !apu_state.gbc_enabled
         {
             self.wave_ram.do_wave_ram_corruption(&self.wave_ram_position);
         }

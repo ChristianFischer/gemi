@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 use core::mem::take;
 
 use crate::cpu::interrupts::Interrupt;
+use crate::emulator_context::EmulatorContext;
 use crate::mmu::locations::MEMORY_LOCATION_JOYP;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::utils::{change_bit, get_bit};
@@ -117,7 +118,7 @@ impl Input {
 
 
 impl MemoryBusConnection for Input {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_JOYP => {
                 let states = match self.button_selection {
@@ -135,7 +136,7 @@ impl MemoryBusConnection for Input {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_JOYP => {
                 self.button_selection = value & 0x30;

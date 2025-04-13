@@ -16,12 +16,14 @@
  */
 
 use crate::apu::Apu;
+use crate::cartridge;
 use crate::cartridge::LicenseeCode;
 use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8, CPU_CLOCK_SPEED};
 use crate::cpu::interrupts::InterruptRegisters;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
 use crate::debug::{DebugEvent, DebugEvents};
-use crate::device_type::{DeviceConfig, DeviceType, EmulationType};
+use crate::device_type::{DeviceType, EmulationType};
+use crate::emulator_context::EmulatorContext;
 use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
@@ -37,11 +39,9 @@ use crate::utils::{carrying_add_u8, get_high};
 pub type Clock = u64;
 
 
-/// The GameBoy object providing access to all it's emulated components.
+/// The device object providing access to all it's emulated components.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct EmulatorCore {
-    device_config: DeviceConfig,
-
+pub struct EmulatorDevice {
     pub cpu: Cpu,
 
     total_cycles: Clock,
@@ -72,19 +72,17 @@ pub struct EmulatorUpdateResults {
 }
 
 
-impl EmulatorCore {
+impl EmulatorDevice {
 
     /// Create a new GameBoy device.
-    pub fn new(device_config: DeviceConfig) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         Self {
-            device_config,
-            
             cpu: Cpu::new(
                 Mmu::new(
                     Peripherals {
-                        apu:        Apu::new(device_config),
-                        ppu:        Ppu::new(device_config),
-                        mem:        Memory::new(device_config),
+                        apu:        Apu::new(ec),
+                        ppu:        Ppu::new(ec),
+                        mem:        Memory::new(ec),
                         timer:      Timer::new(),
                         input:      Input::new(),
                         serial:     SerialPort::new(),
@@ -99,17 +97,19 @@ impl EmulatorCore {
 
 
     /// Boot the device, initializing the Boot ROM program.
-    pub fn initialize(&mut self) {
+    // todo: non-mut ec?
+    pub fn initialize(&mut self, ec: &mut impl EmulatorContext) {
         if self.get_peripherals().mem.has_boot_rom() {
             self.cpu.set_instruction_pointer(0x0000);
         }
         else {
-            self.setup_initial_values();
+            self.setup_initial_values(ec);
         }
     }
 
     /// setup values like expected after the boot rom was executed on the original GameBoy.
-    fn setup_initial_values(&mut self) {
+    fn setup_initial_values(&mut self, ec: &mut impl EmulatorContext) {
+        let device_config = ec.get_device_config().clone();
         let pc = 0x0100;
         let sp = 0xfffe;
 
@@ -118,7 +118,7 @@ impl EmulatorCore {
         let title_checksum = if let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() {
             match cartridge.get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
-                    cartridge.compute_title_checksum()
+                    cartridge::rom_data::compute_title_checksum(ec.get_cartridge_rom())
                 }
 
                 _ => 0x00
@@ -130,11 +130,11 @@ impl EmulatorCore {
         };
 
         // read cartridge header checksum
-        let header_checksum = self.get_mmu().read_u8(0x14d);
+        let header_checksum = self.get_mmu().read_u8(ec, 0x14d);
 
         // select initial values based on device type and emulation mode
         let (a, flag_z, flag_n, flag_h, flag_c, b, c, d, e, h, l) =
-            match (self.device_config.device, self.device_config.emulation)
+            match (device_config.device, device_config.emulation)
         {
             // classic GameBoy
             (DeviceType::GameBoyDmg, _) => {
@@ -219,25 +219,25 @@ impl EmulatorCore {
             // placeholder for unknown/unused entries
             const X : u8 = 0xff;
 
-            let dma = match self.device_config.device {
+            let dma = match device_config.device {
                 DeviceType::GameBoyColor | DeviceType::GameBoyAdvance => 0x00,
                 _ => 0xff,
             };
             
             // set the initial vram bank index to 0 on GBC
-            let vbk = match self.device_config.emulation {
+            let vbk = match device_config.emulation {
                 EmulationType::DMG => 0xff,
                 EmulationType::GBC => 0xfe,
             };
 
             // GBC prefers object priority by OAM index, DMG by sprite x position
-            let opri = match self.device_config.emulation {
+            let opri = match device_config.emulation {
                 EmulationType::DMG => 0xff,
                 EmulationType::GBC => 0xfe,
             };
 
             // Timer, LCD-STAT and LY depends on how long the boot rom took for execution
-            let (timer_counter, tac, lcds, ly) = match self.device_config.device {
+            let (timer_counter, tac, lcds, ly) = match device_config.device {
                 _ => (0xabf0, 0xf8, 0x85, 0x00)
             };
 
@@ -266,7 +266,7 @@ impl EmulatorCore {
 
             // apply selected values
             for i in 0..=255 {
-                self.get_mmu_mut().write_u8(0xff00 + i, io_reg_data[i as usize]);
+                self.get_mmu_mut().write_u8(ec, 0xff00 + i, io_reg_data[i as usize]);
             }
 
             self.get_peripherals_mut().timer.initialize_counter(timer_counter, tac);
@@ -312,19 +312,19 @@ impl EmulatorCore {
 
     /// Runs the emulator for a single step, either an instruction
     /// or to process a single HALT cycle.
-    pub fn run_single_step(&mut self) -> EmulatorUpdateResults {
-        self.process_next()
+    pub fn run_single_step(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
+        self.process_next(ec)
     }
 
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
-    pub fn run_frame(&mut self) -> EmulatorUpdateResults {
+    pub fn run_frame(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
         let mut results = EmulatorUpdateResults::default();
 
         // update until receiving the 'frame completed' event.
         loop {
-            results += self.process_next();
+            results += self.process_next(ec);
 
             // stop after completing one frame
             if results.events.contains(DebugEvent::PpuFrameCompleted) {
@@ -342,10 +342,10 @@ impl EmulatorCore {
 
 
     /// Continues processing the next pending operation.
-    fn process_next(&mut self) -> EmulatorUpdateResults {
+    fn process_next(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
         if self.cpu.is_running() {
-            if let Some(cycles) = self.cpu.handle_interrupts() {
-                let signals = self.update_components(cycles);
+            if let Some(cycles) = self.cpu.handle_interrupts(ec) {
+                let signals = self.update_components(ec, cycles);
 
                 EmulatorUpdateResults {
                     cycles,
@@ -353,14 +353,14 @@ impl EmulatorCore {
                 }
             }
             else {
-                self.process_next_opcode()
+                self.process_next_opcode(ec)
             }
         }
         else {
             // when in HALT state just pass 4 cycles
             // where the CPU idles
             let halt_cycle = 4;
-            let signals    = self.update_components(halt_cycle);
+            let signals    = self.update_components(ec, halt_cycle);
 
             EmulatorUpdateResults {
                 cycles: halt_cycle,
@@ -371,8 +371,8 @@ impl EmulatorCore {
 
 
     /// Process the next opcode.
-    fn process_next_opcode(&mut self) -> EmulatorUpdateResults {
-        let instruction = self.cpu.fetch_next_instruction();
+    fn process_next_opcode(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
+        let instruction = self.cpu.fetch_next_instruction(ec);
         let mut context = OpCodeContext::for_instruction(&instruction);
         let mut signals = MemoryBusSignals::default();
         let mut total_step_cycles : Clock = 0;
@@ -382,7 +382,7 @@ impl EmulatorCore {
         if instruction.opcode.cycles_ahead != 0 {
             let cycles_ahead = instruction.opcode.cycles_ahead;
             total_step_cycles += cycles_ahead;
-            signals |= self.update_components(cycles_ahead);
+            signals |= self.update_components(ec, cycles_ahead);
         }
 
         loop {
@@ -394,7 +394,7 @@ impl EmulatorCore {
                 // to update timer or memory operations.
                 OpCodeResult::StageDone(step_cycles) => {
                     total_step_cycles += step_cycles;
-                    signals |= self.update_components(step_cycles);
+                    signals |= self.update_components(ec, step_cycles);
                     context.enter_next_stage();
                 }
 
@@ -403,24 +403,11 @@ impl EmulatorCore {
                     // get the total number of cycles consumed by this opcode and subtract the
                     // number of cycles already applied to components
                     let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
-                    signals |= self.update_components(remaining_cycles);
+                    signals |= self.update_components(ec, remaining_cycles);
 
                     break;
                 }
             }
-        }
-
-        // print opcode and CPU state if enabled
-        #[cfg(feature = "std")]
-        if self.device_config.print_opcodes {
-            println!(
-                "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
-                instruction.opcode_address,
-                instruction.opcode_id,
-                if instruction.opcode_id <= 0xff { "  " } else { "" },
-                instruction.to_string(),
-                self.cpu
-            );
         }
 
         EmulatorUpdateResults {
@@ -432,9 +419,9 @@ impl EmulatorCore {
 
     /// Applies the time passed during CPU execution to other components as well.
     #[must_use]
-    fn update_components(&mut self, cycles: Clock) -> MemoryBusSignals {
+    fn update_components(&mut self, ec: &mut impl EmulatorContext, cycles: Clock) -> MemoryBusSignals {
         self.cpu.update(cycles);
-        self.get_mmu_mut().update(cycles);
+        self.get_mmu_mut().update(ec, cycles);
         #[cfg(feature = "apu")]
         self.get_peripherals_mut().apu.update(cycles);
         self.get_peripherals_mut().ppu.update(cycles);

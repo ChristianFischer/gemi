@@ -17,12 +17,10 @@
 
 use core::cmp::max;
 
-#[cfg(feature = "file_io")]
-use std::io;
-
 use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::device_type::{DeviceConfig, EmulationType};
+use crate::emulator_context::EmulatorContext;
 use crate::mmu::locations::*;
 use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl, MemoryBankController};
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
@@ -67,6 +65,7 @@ pub type HRamBank = MemoryDataFixedSize<127>;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Memory {
     /// The configuration of the running device
+    #[deprecated(since = "0.1.0", note = "Use the EmulatorContext instead")]
     device_config: DeviceConfig,
 
     /// Work RAM banks (DMG = 2 * 4kiB, GBC = 8 * 4kiB)
@@ -95,8 +94,8 @@ pub struct Memory {
 
 impl Memory {
     /// Create a new Memory object.
-    pub fn new(device_config: DeviceConfig) -> Self {
-        let num_wram_banks = match device_config.emulation {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
+        let num_wram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 2,
             EmulationType::GBC => 8,
         };
@@ -107,7 +106,7 @@ impl Memory {
         }
 
         Self {
-            device_config,
+            device_config: ec.get_device_config().clone(),
 
             #[cfg(feature = "cgb")]
             wram_banks: core::iter::repeat_with(|| WRamBank::new()).take(num_wram_banks).collect(),
@@ -154,34 +153,24 @@ impl Memory {
     pub fn get_cartridge(&self) -> Option<&Cartridge> {
         self.cartridge.as_ref()
     }
-
-    /// Save the cartridge RAM, if any.
-    #[cfg(feature = "file_io")]
-    pub fn save_cartridge_ram_to_file_if_any(&self) -> io::Result<()> {
-        if let Some(cartridge) = &self.cartridge {
-            cartridge.save_ram_to_file_if_any()?;
-        }
-
-        Ok(())
-    }
 }
 
 
 impl Memory {
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
-    fn read_boot_rom_or_cartridge(&self, address: u16) -> u8 {
+    fn read_boot_rom_or_cartridge(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
         if let Some(boot_rom) = &self.boot_rom {
             return boot_rom.read(address);
         }
 
-        self.read_from_cartridge(address)
+        self.read_from_cartridge(ec, address)
     }
 
 
     /// Reads data from the cartridge.
-    fn read_from_cartridge(&self, address: u16) -> u8 {
+    fn read_from_cartridge(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
         if let Some(cartridge) = &self.cartridge {
-            return self.mbc.read_byte(cartridge, address);
+            return self.mbc.read_byte(ec, cartridge, address);
         }
 
         0xff
@@ -189,21 +178,21 @@ impl Memory {
 
 
     /// Writes data to the cartridge.
-    fn write_to_cartridge(&mut self, address: u16, value: u8) {
+    fn write_to_cartridge(&mut self, ec: &mut impl EmulatorContext, address: u16, value: u8) {
         if let Some(cartridge) = &mut self.cartridge {
-            self.mbc.write_byte(cartridge, address, value);
+            self.mbc.write_byte(ec, cartridge, address, value);
         }
     }
 }
 
 
 impl MemoryBusConnection for Memory {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
         memory_map!(
             address => {
-                0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(address),
-                0x0100 ..= 0x7fff => [] self.read_from_cartridge(address),
-                0xa000 ..= 0xbfff => [] self.read_from_cartridge(address),
+                0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(ec, address),
+                0x0100 ..= 0x7fff => [] self.read_from_cartridge(ec, address),
+                0xa000 ..= 0xbfff => [] self.read_from_cartridge(ec, address),
 
                 0xc000 ..= 0xcfff => [mapped_address] {
                     let bank = &self.wram_banks[self.wram_active_bank_0 as usize];
@@ -217,7 +206,7 @@ impl MemoryBusConnection for Memory {
 
                 0xe000 ..= 0xfdff => [mapped_address] {
                     // echo RAM; mapped into WRAM (0xc000 - 0xddff)
-                    self.on_read((mapped_address + 0xc000) as u16)
+                    self.on_read(ec, (mapped_address + 0xc000) as u16)
                 },
 
                 0xfea0 ..= 0xfeff => [] {
@@ -257,11 +246,11 @@ impl MemoryBusConnection for Memory {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, ec: &mut impl EmulatorContext, address: u16, value: u8) {
         memory_map!(
             address => {
-                0x0000 ..= 0x7fff => [] self.write_to_cartridge(address, value),
-                0xa000 ..= 0xbfff => [] self.write_to_cartridge(address, value),
+                0x0000 ..= 0x7fff => [] self.write_to_cartridge(ec, address, value),
+                0xa000 ..= 0xbfff => [] self.write_to_cartridge(ec, address, value),
 
                 0xc000 ..= 0xcfff => [mapped_address] {
                     let bank = &mut self.wram_banks[self.wram_active_bank_0 as usize];
@@ -275,7 +264,7 @@ impl MemoryBusConnection for Memory {
 
                 0xe000 ..= 0xfdff => [mapped_address] {
                     // echo RAM; mapped into WRAM (0xc000 - 0xddff)
-                    self.on_write((mapped_address + 0xc000) as u16, value)
+                    self.on_write(ec, (mapped_address + 0xc000) as u16, value)
                 },
 
                 0xfea0 ..= 0xfeff => [] { /* unusable ram area */ },

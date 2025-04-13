@@ -79,9 +79,6 @@ pub struct DeviceConfig {
 
     /// The current emulation mode (DMG compatibility or Color support)
     pub emulation: EmulationType,
-
-    /// Flag if opcodes should be printed
-    pub print_opcodes: bool,
 }
 
 
@@ -169,7 +166,6 @@ impl DeviceConfig {
     pub const DEFAULT_DMG: DeviceConfig = DeviceConfig {
         device: DeviceType::GameBoyDmg,
         emulation: EmulationType::DMG,
-        print_opcodes: false,
     };
 
 
@@ -177,7 +173,6 @@ impl DeviceConfig {
     pub const DEFAULT_GBC: DeviceConfig = DeviceConfig {
         device: DeviceType::GameBoyColor,
         emulation: EmulationType::GBC,
-        print_opcodes: false,
     };
 
 

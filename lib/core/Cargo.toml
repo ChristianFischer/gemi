@@ -14,8 +14,10 @@ default = []
 
 std = []
 
+# todo: remove?
 dyn_alloc = []
 
+# todo: remove
 file_io = [
     "std",
     "dyn_alloc",

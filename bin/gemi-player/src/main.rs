@@ -160,10 +160,6 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
             "--sgb2" => {
                 builder.set_device_type(DeviceType::SuperGameBoy2);
             }
-            
-            "--print-opcodes" => {
-                builder.set_print_opcodes(true);
-            }
 
             _ => {
                 let file = PathBuf::from(arg);

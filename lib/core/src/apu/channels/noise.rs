@@ -21,7 +21,7 @@ use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
-use crate::emulator_core::Clock;
+use crate::emulator_device::Clock;
 use crate::utils::{as_bit_flag, get_bit};
 
 

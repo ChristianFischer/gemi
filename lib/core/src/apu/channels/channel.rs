@@ -25,7 +25,7 @@ use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::length_timer::LengthTimer;
 use crate::apu::dac::DigitalAudioConverter;
 use crate::apu::sample::{Sample, SampleResult};
-use crate::emulator_core::Clock;
+use crate::emulator_device::Clock;
 use crate::utils::get_bit;
 
 

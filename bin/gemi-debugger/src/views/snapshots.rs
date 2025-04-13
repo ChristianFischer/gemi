@@ -24,7 +24,7 @@ use eframe::epaint::{ColorImage, Vec2};
 use egui::{Image, Sense, TextStyle, TextureHandle, Ui, Widget};
 use egui_extras::{Column, TableBuilder, TableRow};
 use libgemi::core::device_type::DeviceType;
-use libgemi::core::emulator_core::Clock;
+use libgemi::core::emulator_device::Clock;
 use libgemi::core::mmu::memory_data::MemoryData;
 use libgemi::core::ppu::ppu::{SCREEN_H, SCREEN_W};
 use libgemi::snapshots::Snapshot;

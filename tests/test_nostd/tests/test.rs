@@ -18,7 +18,8 @@
 #![no_std]
 
 use gemi_core::device_type::{DeviceConfig, DeviceType, EmulationType};
-use gemi_core::emulator_core::EmulatorCore;
+use gemi_core::emulator_context::ZeroEmulatorContext;
+use gemi_core::emulator_device::EmulatorDevice;
 
 
 #[test]
@@ -27,11 +28,13 @@ fn test_nostd() {
     let device_config = DeviceConfig {
         device: DeviceType::GameBoyDmg,
         emulation: EmulationType::DMG,
-        print_opcodes: false,
     };
+    
+    // create an EmulatorContext for the selected DeviceConfig
+    let ec = ZeroEmulatorContext::new(device_config);
 
     // create the emulator instance
-    let mut emulator = EmulatorCore::new(device_config);
+    let mut emulator = EmulatorDevice::new(&ec);
 
     // run one single frame
     emulator.run_frame();

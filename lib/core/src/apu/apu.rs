@@ -22,8 +22,8 @@ use crate::apu::channels::noise::NoiseGenerator;
 use crate::apu::channels::pulse::PulseGenerator;
 use crate::apu::channels::wave::WaveGenerator;
 use crate::apu::mixer::Mixer;
-use crate::device_type::DeviceConfig;
-use crate::emulator_core::Clock;
+use crate::emulator_context::EmulatorContext;
+use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::MemoryBusConnection;
 use crate::utils::{as_bit_flag, get_bit};
@@ -70,8 +70,10 @@ type Channel4 = Channel<
 pub struct ApuState {
     pub apu_on: bool,
 
-    /// Current device config
-    pub device_config: DeviceConfig,
+    /// Flag to store whether GBC mode is enabled.
+    // todo: use EmulatorContext instead
+    #[deprecated(note = "use EmulatorContext instead")]
+    pub gbc_enabled: bool,
 
     /// Frame Sequencer clock
     pub fs_clock: Clock,
@@ -165,13 +167,13 @@ impl FrameSequencer {
 
 impl Apu {
     /// Creates a new APU object.
-    pub fn new(device_config: DeviceConfig) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         Self {
             state: ApuState {
-                apu_on:     true,
-                fs_clock:   0,
-                fs:         FrameSequencer::new(),
-                device_config,
+                apu_on:      true,
+                gbc_enabled: ec.get_device_config().is_gbc_enabled(),
+                fs_clock:    0,
+                fs:          FrameSequencer::new(),
             },
 
             ch1: Channel::new(ChannelType::Ch1Pulse1),
@@ -181,7 +183,7 @@ impl Apu {
 
             mixer: Mixer::new(),
 
-            audio_output: AudioOutput::new(device_config),
+            audio_output: AudioOutput::new(ec),
         }
     }
 
@@ -302,7 +304,7 @@ impl Apu {
 
 
 impl MemoryBusConnection for Apu {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
@@ -364,7 +366,7 @@ impl MemoryBusConnection for Apu {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {

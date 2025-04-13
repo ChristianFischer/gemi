@@ -22,7 +22,7 @@ use crate::apu::channels::channel::{default_on_read_register, default_on_write_r
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_duty::WaveDuty;
-use crate::emulator_core::Clock;
+use crate::emulator_device::Clock;
 
 
 const NRX3_WRITE_ONLY_FREQUENCY : u8    = 0b_1111_1111;

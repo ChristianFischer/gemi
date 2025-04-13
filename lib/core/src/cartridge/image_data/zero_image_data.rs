@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+use crate::cartridge::image_data::{ImageData, ImageDataMut};
 
-mod cartridge;
-pub use cartridge::*;
 
-pub mod image_data;
+// todo: doc
+pub struct ZeroImageData {
+    data: [u8; 0],
+}
+
+
+impl ZeroImageData {
+    pub fn new() -> Self {
+        Self {
+            data: [0xff; 0],
+        }
+    }
+}
+
+
+impl Default for ZeroImageData {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
+impl ImageData for ZeroImageData {
+    fn get_size(&self) -> usize {
+        0
+    }
+
+
+    fn get_data(&self) -> &[u8] {
+        &self.data
+    }
+}
+
+
+impl ImageDataMut for ZeroImageData {
+    fn get_data_mut(&mut self) -> &mut [u8] {
+        &mut self.data
+    }
+}

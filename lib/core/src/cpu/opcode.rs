@@ -19,22 +19,22 @@
 use std::fmt::{Display, Formatter};
 
 use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
-use crate::emulator_core::{Clock, EmulatorCore};
+use crate::emulator_device::{Clock, EmulatorDevice};
 use crate::utils::{to_u16, to_u8};
 
-type ProcessOpCode = fn(gb: &mut EmulatorCore, ctx: &mut OpCodeContext) -> OpCodeResult;
+type ProcessOpCode = fn(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext) -> OpCodeResult;
 
 
 /// A macro to generate an opcode implementation function.
 macro_rules! opcode {
-    ($(#[$meta:meta])? $name:ident, [$($bind_gb:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
+    ($(#[$meta:meta])? $name:ident, [$($bind_dev:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
         $(#[$meta])?
-        pub fn $name(gb: &mut EmulatorCore, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
-            // silence 'unused' warning for gb and ctx
-            { let _ = (&gb, &ctx); }
+        pub fn $name(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
+            // silence 'unused' warning for dev and ctx
+            { let _ = (&dev, &ctx); }
 
-            // make gb and ctx visible to 'body', if requested
-            $(let $bind_gb  = gb;)?
+            // make dev and ctx visible to 'body', if requested
+            $(let $bind_dev = dev;)?
             $(let $bind_ctx = ctx;)?
 
             // paste 'body' statements
@@ -340,6 +340,21 @@ impl Instruction {
 
             _ => arg.to_string()
         }
+    }
+    
+    
+    /// Format a line as it could be displayed in a disassembly.
+    /// The line will contain the instructions address, opcode Id and 
+    /// the actual instruction with the opcode name and parameters
+    #[cfg(feature = "std")]
+    pub fn format_disassembly_line(&self) -> String {
+        format!(
+            "/* {:04x} [{:02x}]{} */ {:<16}",
+            self.opcode_address,
+            self.opcode_id,
+            if self.opcode_id <= 0xff { "  " } else { "" },
+            self.to_string()
+        )
     }
 }
 

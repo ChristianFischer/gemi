@@ -18,7 +18,7 @@
 use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::ChannelComponent;
 use crate::apu::channels::frequency::Frequency;
-use crate::emulator_core::Clock;
+use crate::emulator_device::Clock;
 
 
 /// Trait for any sound generator object.

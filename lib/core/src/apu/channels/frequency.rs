@@ -18,7 +18,7 @@
 #[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
 
-use crate::emulator_core::Clock;
+use crate::emulator_device::Clock;
 use crate::utils::{to_u16, to_u8};
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +58,9 @@ pub enum ErrorCode {
 
     /// Not supported to use a specific feature here.
     NotSupported,
+
+    /// No header present for the current ROM.
+    MissingHeader,
 }
 
 
@@ -109,6 +112,10 @@ impl Display for ErrorCode {
 
             ErrorCode::NotSupported => {
                 write!(f, "Not supported")
+            }
+
+            ErrorCode::MissingHeader => {
+                write!(f, "The selected ROM does not contain a valid header")
             }
         }
     }

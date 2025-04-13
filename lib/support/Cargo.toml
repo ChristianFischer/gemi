@@ -18,6 +18,11 @@ features = [
 
 [features]
 
+# Enables support for loading and storing ROM data from and to files.
+file_io = [
+    "gemi-core/file_io",
+]
+
 # Enables support for serialisation/deserialisation using the "serde" crate
 serde = [
     "dep:serde",

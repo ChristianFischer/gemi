@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,37 +14,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use crate::device_type::DeviceConfig;
-use crate::emulator_context::EmulatorContext;
-use crate::mmu::memory_bus::MemoryBusConnection;
+
+use crate::cartridge::image_data::{ImageData, ImageDataMut};
+use crate::utils::SerializableArray;
 
 
-/// This is a placeholder implementation of the APU, which has no effect at all.
-/// The [DummyApu] will be used as a replacement, when the APU feature is turned off.
-/// This allows the rest of the code being agnostic of the actual APU implementation. 
+// todo: doc
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DummyApu {
+pub struct ArrayImageData<const N: usize> {
+    data: SerializableArray<u8, N>,
 }
 
 
-impl DummyApu {
-    /// Creates a new APU object.
-    pub fn new(_ec: &mut impl EmulatorContext) -> Self {
+impl<const N: usize> ArrayImageData<N> {
+    pub fn new(data: [u8; N]) -> Self {
         Self {
+            data: data.into(),
+        }
+    }
+
+
+    pub fn alloc() -> Self {
+        Self {
+            data: [0x00; N].into(),
         }
     }
 }
 
 
-
-impl MemoryBusConnection for DummyApu {
-    fn on_read(&self, address: u16) -> u8 {
-        _ = address;
-        0xff
+impl<const N: usize> ImageData for ArrayImageData<N> {
+    fn get_size(&self) -> usize {
+        self.data.len()
     }
 
+    fn get_data(&self) -> &[u8] {
+        self.data.as_slice()
+    }
+}
 
-    fn on_write(&mut self, address: u16, value: u8) {
-        _ = (address, value);
+
+impl<const N: usize> ImageDataMut for ArrayImageData<N> {
+    fn get_data_mut(&mut self) -> &mut [u8] {
+        self.data.as_mut_slice()
     }
 }

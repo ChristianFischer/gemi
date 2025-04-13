@@ -18,7 +18,8 @@
 #[cfg(feature = "cgb")]
 use alloc::vec::Vec;
 
-use crate::device_type::{DeviceConfig, EmulationType};
+use crate::device_type::EmulationType;
+use crate::emulator_context::EmulatorContext;
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::ppu::graphic_data::{DmgPalette, GbcPaletteData, Sprite};
@@ -132,8 +133,8 @@ impl GbcPalettePointer {
 
 
 impl VideoMemory {
-    pub fn new(device_config: DeviceConfig) -> Self {
-        let num_vram_banks = match device_config.emulation {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
+        let num_vram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 1,
             EmulationType::GBC => 2,
         };

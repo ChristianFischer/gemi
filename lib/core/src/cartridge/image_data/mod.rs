@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-mod cartridge;
-pub use cartridge::*;
+mod array_image_data;
+mod file_image_data;
+mod image_data;
+mod memory_image_data;
+mod zero_image_data;
 
-pub mod image_data;
+
+pub use array_image_data::ArrayImageData;
+pub use file_image_data::FileImageData;
+pub use image_data::ImageData;
+pub use image_data::ImageDataMut;
+pub use memory_image_data::MemoryImageData;
+pub use zero_image_data::ZeroImageData;

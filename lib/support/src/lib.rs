@@ -16,6 +16,9 @@
  */
 
 mod gameboy;
+mod gameboy_builder;
 pub use gameboy::*;
+pub use gameboy_builder::*;
 
+pub mod context;
 pub mod snapshots;

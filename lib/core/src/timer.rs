@@ -23,7 +23,8 @@ use core::mem::take;
 use core::ops::Sub;
 
 use crate::cpu::interrupts::Interrupt;
-use crate::emulator_core::Clock;
+use crate::emulator_context::EmulatorContext;
+use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::utils::{as_bit_flag, get_bit, get_high};
@@ -385,7 +386,7 @@ impl Timer {
 
 
 impl MemoryBusConnection for Timer {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_REGISTER_DIV  => self.internal_counter.get_div(),
             MEMORY_LOCATION_REGISTER_TIMA => self.tima,
@@ -396,7 +397,7 @@ impl MemoryBusConnection for Timer {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_REGISTER_DIV => {
                 // writing to DIV will reset the counter

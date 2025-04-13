@@ -21,7 +21,8 @@ use core::mem::take;
 use crate::cpu::interrupts::Interrupt;
 use crate::debug::DebugEvent;
 use crate::device_type::{DeviceConfig, DeviceType, EmulationType};
-use crate::emulator_core::Clock;
+use crate::emulator_context::EmulatorContext;
+use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals};
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
@@ -196,6 +197,7 @@ pub struct Ppu {
     clock: Clock,
 
     /// Current device config
+    #[deprecated(note = "Use device_config instead")]
     device_config: DeviceConfig,
 
     /// Pending output to be sent back through the memory bus.
@@ -324,7 +326,8 @@ impl ScanlineData {
 
 impl Ppu {
     /// Creates a new PPU object.
-    pub fn new(device_config: DeviceConfig) -> Ppu {
+    pub fn new(ec: &impl EmulatorContext) -> Ppu {
+        let device_config = ec.get_device_config();
         let dmg_display_palette = match device_config.device {
             DeviceType::GameBoyDmg => DmgDisplayPalette::new_green(),
             _ => DmgDisplayPalette::new_gray(),
@@ -334,12 +337,12 @@ impl Ppu {
         
         Ppu {
             clock: 0,
-            device_config,
+            device_config: device_config.clone(),
             signals: MemoryBusSignals::default(),
             lcd_state: LcdState::On,
             is_first_frame: true,
             mode: Mode::OamScan,
-            memory: VideoMemory::new(device_config),
+            memory: VideoMemory::new(ec),
             registers: PpuRegisters::default(),
             current_line: 0,
             current_line_pixel: 0,
@@ -1117,7 +1120,7 @@ impl Ppu {
 
 
 impl MemoryBusConnection for Ppu {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {
@@ -1209,7 +1212,7 @@ impl MemoryBusConnection for Ppu {
         })
     }
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {

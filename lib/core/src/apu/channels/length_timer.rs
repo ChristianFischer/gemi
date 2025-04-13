@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
+use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::utils::{as_bit_flag, get_bit};
 
 
@@ -65,7 +65,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
                 // on DMG, length timer can always be written to.
                 // When GameBoy Color mode is enabled, the behaviour is the same as for
                 // other registers and can only be written, when the APU is enabled.
-                if apu_state.device_config.is_gbc_enabled() {
+                if apu_state.gbc_enabled {
                     apu_state.apu_on
                 }
                 else {
@@ -148,7 +148,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
         self.length_timer_enabled = false;
 
         // on GameBoy Color, the length value will be reset to the maximum.
-        if apu_state.device_config.is_gbc_enabled() {
+        if apu_state.gbc_enabled {
             self.length_timer = Self::LENGTH_MAX;
         }
     }

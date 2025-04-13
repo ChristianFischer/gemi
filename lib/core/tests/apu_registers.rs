@@ -15,7 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 use gemi_core::device_type::DeviceConfig;
-use gemi_core::emulator_core::EmulatorCore;
+use gemi_core::emulator_context::ZeroEmulatorContext;
+use gemi_core::emulator_device::EmulatorDevice;
 use gemi_core::mmu::locations::*;
 
 
@@ -45,7 +46,8 @@ fn test_apu_register(name: &str, address: u16) {
     let readable_bits     = get_readable_bits_for(address);
     let non_readable_bits = !readable_bits;
 
-    let mut emulator = Box::new(EmulatorCore::new(DeviceConfig::DEFAULT_DMG));
+    let ec = ZeroEmulatorContext::new(DeviceConfig::DEFAULT_DMG);
+    let mut emulator = Box::new(EmulatorDevice::new(&ec));
 
     emulator.cpu.get_mmu_mut().write_u8(address, 0xff);
     let result1 = emulator.cpu.get_mmu().read_u8(address);
@@ -125,7 +127,8 @@ mod apu_control {
 
 #[test]
 fn test_registers_after_reset() {
-    let mut emulator = Box::new(EmulatorCore::new(DeviceConfig::DEFAULT_DMG));
+    let ec = ZeroEmulatorContext::new(DeviceConfig::DEFAULT_DMG);
+    let mut emulator = Box::new(EmulatorDevice::new(&ec));
 
     // turn apu on
     emulator.get_mmu_mut().write_u8(MEMORY_LOCATION_APU_NR52, 0x80);

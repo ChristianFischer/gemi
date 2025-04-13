@@ -18,7 +18,7 @@
 use egui::{Grid, Label, PointerButton, Sense, Ui, Vec2, Widget};
 
 use libgemi::core::cpu::cpu::{CpuFlag, RegisterR8};
-use libgemi::core::emulator_core::EmulatorCore;
+use libgemi::core::emulator_device::EmulatorDevice;
 use libgemi::core::utils::to_u8;
 
 use crate::state::EmulatorState;
@@ -238,8 +238,8 @@ impl CpuView {
         &mut self,
         ui: &mut Ui, state: &mut EmulatorState,
         expected_edit_mode: EditMode,
-        on_read_value: impl FnOnce(&EmulatorCore) -> String,
-        on_write_value: impl FnOnce(&mut EmulatorCore, &String)
+        on_read_value: impl FnOnce(&EmulatorDevice) -> String,
+        on_write_value: impl FnOnce(&mut EmulatorDevice, &String)
     ) {
         let is_paused = state.ui.is_paused();
 

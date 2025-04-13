@@ -23,7 +23,7 @@ use eframe::epaint::textures::TextureOptions;
 use eframe::epaint::{ColorImage, Stroke};
 use egui::{vec2, Color32, Context, Grid, Image, Pos2, Sense, TextureHandle, Ui, Vec2, Widget};
 
-use libgemi::core::emulator_core::Clock;
+use libgemi::core::emulator_device::Clock;
 use libgemi::core::ppu::flags::LcdControlFlag;
 use libgemi::core::ppu::graphic_data::Sprite;
 use libgemi::core::ppu::ppu::{SCREEN_H, SCREEN_W};
