@@ -151,12 +151,13 @@ impl MemoryView {
 
     /// Refreshes the memory map of the editor.
     fn refresh_memory_map(&mut self, state: &mut EmulatorState) {
-        let has_cartridge_ram = if let Some(cart) = state.emu.get_cartridge() {
-            cart.has_ram()
-        }
-        else {
-            false
-        };
+        let has_cartridge_ram = 
+                state.emu
+                .get_cartridge()
+                .and_then(|cart| cart.read_cartridge_info().ok())
+                .map(|info| info.has_ram())
+                .unwrap_or(false)
+        ;
 
         self.memory_editor.clear_memory_areas();
         self.memory_editor.add_memory_area("ROM Bank #0",      0x0000..=0x3fff, false);
@@ -190,7 +191,7 @@ impl MemoryView {
                     match address {
                         // we can only read an address, if the address is in a valid 16 bit range
                         0x0000 ..= 0xffff => {
-                            let value = emu.get_mmu().read_u8(address as u16);
+                            let value = emu.read_u8(address as u16);
                             Some(value)
                         }
 
@@ -208,7 +209,7 @@ impl MemoryView {
                         /* WRAM Bank #1",     */  | 0xD000..=0xDFFF
                         /* OAM",              */  | 0xFE00..=0xFE9F
                         /* HRAM",             */  | 0xFF80..=0xFFFE => {
-                            emu.get_mmu_mut().write_u8(address as u16, value);
+                            emu.write_u8(address as u16, value);
                         }
 
                         _ => { }

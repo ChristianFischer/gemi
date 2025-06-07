@@ -60,6 +60,7 @@ pub enum LicenseeCode {
 /// This object represents a cartridge of a single game.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+// todo: rename CartridgeInfo?
 pub struct Cartridge {
     #[cfg(feature = "std")]
     title: String,
@@ -118,7 +119,8 @@ pub mod rom_data {
 
 
     /// Read the ROM title from a ROM image.
-    pub fn read_title(rom: &impl ImageData) -> String {
+    // todo: avoid dyn
+    pub fn read_title(rom: &dyn ImageData) -> String {
         let data = rom.get_data();
         let mut title_length: usize = 0;
 
@@ -150,7 +152,7 @@ pub mod rom_data {
 
 
     /// Read the manufacturer code from a ROM image.
-    pub fn read_manufacturer_code(rom: &impl ImageData) -> String {
+    pub fn read_manufacturer_code(rom: &dyn ImageData) -> String {
         let data = rom.get_data();
 
         if data[ROM_OFFSET_MANUFACTURER_CODE - 1] == 0
@@ -185,16 +187,18 @@ impl Cartridge {
     /// Default value to be used in [load_from_bytes] to tell the function
     /// not to load a RAM image.
     // todo: remove?
-    pub const NO_RAM: Option<[u8; 0]> = None;
+    //pub const NO_RAM: Option<[u8; 0]> = None;
 
 
     /// Loads a cartridge and optionally its RAM from a byte buffer.
-    pub fn create_from(rom: &impl ImageData) -> ioerr::Result<Cartridge> {
+    // todo: try to avoid 'dyn'
+    pub fn create_from(rom: &dyn ImageData) -> ioerr::Result<Cartridge> {
         if rom.get_size() < 0x0100 {
             return Err(ioerr::Error {
-                error_code: ErrorCode::MissingHeader,
-                source: Source::RomImage,
-                source_file: None,
+                error_code:     ErrorCode::MissingHeader,
+                source:         Some(Source::RomImage),
+                #[cfg(feature = "file_io")]
+                source_file:    None,
             });
         }
 
@@ -312,7 +316,7 @@ impl Cartridge {
 
 
     /// Checks if a ROM is a MBC1 multi cart ROM
-    fn check_is_mbc1m_multi_cart(rom: &impl ImageData) -> bool {
+    fn check_is_mbc1m_multi_cart(rom: &dyn ImageData) -> bool {
         // A ROM will be considered as 'multi cartridge' if it contains a cartridge header with
         // a nintendo logo, which is required for startup at address 0x40000, which is the
         // expected location of the 2nd ROM.

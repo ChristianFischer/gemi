@@ -138,7 +138,7 @@ impl InterruptRegisters {
 
 
 impl MemoryBusConnection for InterruptRegisters {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged.bits() | 0b_1110_0000,
             MEMORY_LOCATION_INTERRUPTS_ENABLED => self.interrupts_enabled.bits() | self.ie_unused_bits,
@@ -148,7 +148,7 @@ impl MemoryBusConnection for InterruptRegisters {
     }
 
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged = Interrupts::new_truncated(value),
 

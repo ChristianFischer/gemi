@@ -15,6 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::utils::ioerr;
+use crate::utils::ioerr::ErrorCode;
 use std::ops::Range;
 
 
@@ -48,12 +50,23 @@ pub trait ImageData {
 
 pub trait ImageDataMut : ImageData {
     fn get_data_mut(&mut self) -> &mut [u8];
-    
-    
+
+
     /// Writes a single byte to the image data.
     /// If the requested offset is not within the range of the data,
     /// this function will panic.
     fn write(&mut self, offset: usize, value: u8) {
         self.get_data_mut()[offset] = value;
+    }
+
+
+    // todo: doc
+    fn flush(&self) -> ioerr::Result<bool> {
+        Err(ioerr::Error {
+            error_code:     ErrorCode::NotSupported,
+            source:         None,
+            #[cfg(feature = "file_io")]
+            source_file:    None,
+        })
     }
 }

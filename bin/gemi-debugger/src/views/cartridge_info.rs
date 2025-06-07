@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use egui::Ui;
-use libgemi::core::cartridge::GameBoyColorSupport;
 use crate::state::EmulatorState;
 use crate::ui::data_list::DataList;
 use crate::views::View;
+use egui::Ui;
+use libgemi::core::cartridge::GameBoyColorSupport;
 
 
 /// A view to display information about the currently loaded cartridge.
@@ -62,26 +62,27 @@ impl View for CartridgeInfoView {
 
 
     fn on_emulator_loaded(&mut self, state: &mut EmulatorState) {
-        // expect a cartridge to be present after emulator loading
-        let cart = state.emu.get_cartridge().unwrap();
-
-        let rom_size_str = format!("{} kiB", cart.get_rom_size() / 1024);
-        let ram_size_str = format!("{} kiB", cart.get_ram_size() / 1024);
-        let requires_cgb = matches!(cart.get_cgb_support(), GameBoyColorSupport::Required);
-
         self.data_list.clear();
-        self.data_list.add_text("Title",                    cart.get_title());
-        self.data_list.add_text("Manufacturer",             cart.get_manufacturer_code());
-        self.data_list.add_text("Licensee",                 cart.get_licensee_code().to_string());
-        self.data_list.add_text("MBC",                      cart.get_mbc().to_string());
-        self.data_list.add_text("ROM size",                 rom_size_str);
-        self.data_list.add_text("RAM size",                 ram_size_str);
-        self.data_list.add_bool("Battery",                  cart.has_battery());
-        self.data_list.add_bool("Timer",                    cart.has_timer());
-        self.data_list.add_bool("Rumble",                   cart.has_rumble());
-        self.data_list.add_bool("Super GameBoy Support",    cart.supports_sgb());
-        self.data_list.add_bool("GameBoy Color Support",    cart.supports_cgb());
-        self.data_list.add_bool("GameBoy Color Required",   requires_cgb);
+
+        // expect a cartridge to be present after emulator loading
+        if let Some(cart) = state.emu.get_cartridge().and_then(|cart| cart.read_cartridge_info().ok()) {
+            let rom_size_str = format!("{} kiB", cart.get_rom_size() / 1024);
+            let ram_size_str = format!("{} kiB", cart.get_ram_size() / 1024);
+            let requires_cgb = matches!(cart.get_cgb_support(), GameBoyColorSupport::Required);
+
+            self.data_list.add_text("Title",                    cart.get_title());
+            self.data_list.add_text("Manufacturer",             cart.get_manufacturer_code());
+            self.data_list.add_text("Licensee",                 cart.get_licensee_code().to_string());
+            self.data_list.add_text("MBC",                      cart.get_mbc().to_string());
+            self.data_list.add_text("ROM size",                 rom_size_str);
+            self.data_list.add_text("RAM size",                 ram_size_str);
+            self.data_list.add_bool("Battery",                  cart.has_battery());
+            self.data_list.add_bool("Timer",                    cart.has_timer());
+            self.data_list.add_bool("Rumble",                   cart.has_rumble());
+            self.data_list.add_bool("Super GameBoy Support",    cart.supports_sgb());
+            self.data_list.add_bool("GameBoy Color Support",    cart.supports_cgb());
+            self.data_list.add_bool("GameBoy Color Required",   requires_cgb);
+        }
     }
 }
 

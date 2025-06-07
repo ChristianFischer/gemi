@@ -363,7 +363,7 @@ impl DisassemblyCache {
         let mut added_lines = 0;
 
         // accessor to read from emulator memory
-        let read_emu = |address| emu.get_mmu().read_u8(address);
+        let read_emu = |address| emu.read_u8(address);
 
         // keep adding entries until reaching the maximum number
         // or the instruction pointer reaches the end of address range
@@ -475,7 +475,7 @@ impl DisassemblyCache {
             // read the instruction again from memory
             let new_instruction = Instruction::read_instruction(
                 original_instruction_address,
-                |address| emu.get_mmu().read_u8(address)
+                |address| emu.read_u8(address)
             );
 
             // only if the length is matching, we can replace the old one with the new one
@@ -522,7 +522,7 @@ impl InstructionDisplayEntry {
             (0..num_instruction_bytes)
                     .into_iter()
                     .map(|offset| instruction.opcode_address.wrapping_add(offset))
-                    .map(|address| emu.get_mmu().read_u8(address))
+                    .map(|address| emu.read_u8(address))
                     .collect::<Vec<_>>()
         };
 
@@ -595,7 +595,7 @@ impl InstructionDisplayEntry {
     fn verify(&self, emu: &GameBoy) -> bool {
         for offset in 0..self.get_length() {
             let address           = self.instruction.opcode_address + (offset as u16);
-            let value_at_address  = emu.get_mmu().read_u8(address);
+            let value_at_address  = emu.read_u8(address);
             let instruction_value = self.instruction_bytes[offset];
 
             if value_at_address != instruction_value {

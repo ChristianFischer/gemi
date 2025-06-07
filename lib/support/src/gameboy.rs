@@ -15,9 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::context::GameBoyContext;
 use crate::Builder;
 use gemi_core::apu::Apu;
+use gemi_core::cartridge::image_data::{ImageData, ImageDataMut};
+use gemi_core::cartridge::CartridgeObject;
 use gemi_core::cpu::cpu::Cpu;
 use gemi_core::device_type::DeviceConfig;
 use gemi_core::emulator_context::EmulatorContext;
@@ -27,14 +28,23 @@ use gemi_core::mmu::memory::Memory;
 use gemi_core::mmu::mmu::Mmu;
 use gemi_core::ppu::ppu::Ppu;
 use gemi_core::serial::SerialPort;
-use std::fmt::Display;
 
 
 /// The GameBoy object providing access to all it's emulated components.
+// todo: #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GameBoy {
-    pub(crate) context: GameBoyContext,
+    pub(crate) context_data: GameBoyContextData,
     pub(crate) emulator: Box<EmulatorDevice>,
+}
+
+
+/// A struct holding the internal data used by the emulator.
+// todo: move to separate file?
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub(crate) struct GameBoyContextData {
+    pub(crate) device_config: DeviceConfig,
+    pub(crate) cartridge: Box<CartridgeObject>,
 }
 
 
@@ -47,7 +57,8 @@ impl GameBoy {
 
     /// Boot the device, initializing the Boot ROM program.
     pub fn initialize(&mut self) {
-        self.emulator.initialize(&mut self.context);
+        let mut context = self.context_data.make_context();
+        self.emulator.initialize(&mut context);
     }
 
 
@@ -66,26 +77,47 @@ impl GameBoy {
     /// Runs the emulator for a single step, either an instruction
     /// or to process a single HALT cycle.
     pub fn run_single_step(&mut self) -> EmulatorUpdateResults {
-        self.emulator.run_single_step()
+        let mut context = self.context_data.make_context();
+        self.emulator.run_single_step(&mut context)
     }
 
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
     pub fn run_frame(&mut self) -> EmulatorUpdateResults {
-        self.emulator.run_frame()
+        let mut context = self.context_data.make_context();
+        self.emulator.run_frame(&mut context)
     }
 
 
-    /// Get the emulator context.
-    pub fn get_emulator_context(&self) -> &GameBoyContext {
-        &self.context
+    /// Reads a single byte from the emulator's memory bus.
+    // todo: should not require mut
+    pub fn read_u8(&self, address: u16) -> u8 {
+        //let mut context = self.context_data.make_context();
+        //self.emulator.get_mmu().read_u8(&mut context, address)
+
+        _ = address;
+        unimplemented!();
+    }
+
+
+    /// Writes a single byte into the emulator's memory bus.
+    pub fn write_u8(&mut self, address: u16, value: u8) {
+        let mut context = self.context_data.make_context();
+        self.emulator.get_mmu_mut().write_u8(&mut context, address, value)
     }
 
 
     /// Get the emulator device configuration.
     pub fn get_config(&self) -> &DeviceConfig {
-        self.context.get_device_config()
+        &self.context_data.device_config
+    }
+
+
+    /// Get a reference to the emulator's cartridge, if any.
+    // todo: should cartridge stay optional?
+    pub fn get_cartridge(&self) -> Option<&CartridgeObject> {
+        Some(&self.context_data.cartridge)
     }
 
 
@@ -182,5 +214,16 @@ impl GameBoy {
     /// Get the device serial port component.
     pub fn get_serial_port_mut(&mut self) -> &mut SerialPort {
         &mut self.emulator.get_peripherals_mut().serial
+    }
+}
+
+
+impl GameBoyContextData {
+    pub(crate) fn make_context(&mut self) -> EmulatorContext {
+        EmulatorContext::new(
+            self.device_config,
+            self.cartridge.rom.get_data(),
+            self.cartridge.ram.get_data_mut()
+        )
     }
 }

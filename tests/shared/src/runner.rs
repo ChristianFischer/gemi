@@ -20,7 +20,7 @@ use std::panic;
 use std::path::PathBuf;
 
 use libgemi::core::boot_rom::BootRom;
-use libgemi::core::cartridge::Cartridge;
+use libgemi::core::cartridge::CartridgeObject;
 use libgemi::core::device_type::DeviceType;
 use libgemi::core::utils::to_u8;
 use libgemi::GameBoy;
@@ -31,6 +31,7 @@ use crate::checks::gambatte_checks::check_gambatte_display_code;
 use crate::checks::mooneye_checks::check_mooneye_test_passed;
 use crate::io_utils::Workspace;
 use crate::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
+
 
 /// The maximum number of frames allowed per emulator run,
 /// before it's considered as an error.
@@ -117,7 +118,7 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
 
     // load the cartridge file
     let cartridge_path = PathBuf::from(workspace.get_path_to_str(&setup.cartridge_path));
-    let cartridge = Cartridge::load_file(&cartridge_path)
+    let cartridge = CartridgeObject::load_file(&cartridge_path)
         .map_err(|e| TestCaseError::SetUpError(e.to_string()))
         ?;
 
@@ -234,7 +235,7 @@ fn check_for_opcode_sequence(gb: &GameBoy, address: u16, sequence: &[u8]) -> boo
         let i_addr = address + (i as u16);
 
         let byte_expected = sequence[i];
-        let byte_read     = gb.get_mmu().read_u8(i_addr);
+        let byte_read     = gb.read_u8(i_addr);
 
         if byte_read != byte_expected {
             return false;

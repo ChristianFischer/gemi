@@ -133,7 +133,7 @@ impl GbcPalettePointer {
 
 
 impl VideoMemory {
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         let num_vram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 1,
             EmulationType::GBC => 2,

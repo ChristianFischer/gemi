@@ -22,9 +22,10 @@ pub use file_image_data_impl::*;
 #[cfg(feature = "file_io")]
 pub mod file_image_data_impl {
     use crate::cartridge::image_data::{ImageData, ImageDataMut};
+    use crate::utils::ioerr;
     use std::fs::File;
     use std::io;
-    use std::io::Read;
+    use std::io::{Read, Write};
     use std::path::{Path, PathBuf};
 
 
@@ -71,6 +72,23 @@ pub mod file_image_data_impl {
     impl ImageDataMut for FileImageData {
         fn get_data_mut(&mut self) -> &mut [u8] {
             self.data.as_mut_slice()
+        }
+
+
+        fn flush(&self) -> crate::utils::ioerr::Result<bool> {
+            || -> io::Result<()> {
+                let mut file = File::create(&self.file_path)?;
+                file.write_all(self.get_data())?;
+
+                Ok(())
+            }()
+            .map_err(|_| ioerr::Error {
+                error_code: ioerr::ErrorCode::FailedToWriteFile,
+                source: None,
+                source_file: Some(self.file_path.clone()),
+            })?;
+            
+            Ok(true)
         }
     }
 }

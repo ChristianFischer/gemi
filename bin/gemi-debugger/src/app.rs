@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@ use egui::{ComboBox, Context};
 use egui_tiles::{Container, Tile};
 use rfd::AsyncFileDialog;
 
-use libgemi::core::cartridge::Cartridge;
+use libgemi::core::cartridge::CartridgeObject;
 use libgemi::core::ppu::graphic_data::TileMap;
 
 use crate::behaviour::TreeBehaviour;
 use crate::event::UiEvent;
-use crate::state::{EmulatorDevice, EmulatorState, UpdateMode, UpdateStepMode};
+use crate::state::{EmulatorDeviceType, EmulatorState, UpdateMode, UpdateStepMode};
 use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
@@ -48,7 +48,8 @@ pub struct EmulatorApplication {
     behaviour: TreeBehaviour,
 
     #[serde(skip)]
-    open_file: Option<Receiver<Option<Cartridge>>>,
+    // todo: try to send Cartridge
+    open_file: Option<Receiver<Option<Vec<u8>>>>,
 
     /// A user notification to be displayed in a message box.
     #[serde(skip)]
@@ -251,7 +252,7 @@ impl EmulatorApplication {
 
 
     /// Loads an already created cartridge into the emulator.
-    pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
+    pub fn load_cartridge(&mut self, cartridge: CartridgeObject) -> Result<(), String> {
         let state = self.behaviour.get_state_mut();
 
         // open the ROM file
@@ -317,18 +318,21 @@ impl EmulatorApplication {
                     // open an async file request using rfd
                     let file_handle = AsyncFileDialog::new()
                             .set_title("Open ROM")
-                            .add_filter("GameBoy ROM Files", &["gb", "gbc"])
+                            .add_filter("GameBoy ROM Files", &[
+                                CartridgeObject::FILE_EXT_GB,
+                                CartridgeObject::FILE_EXT_GBC,
+                            ])
                             .pick_file()
                             .await?
                     ;
                     
                     let file_data = file_handle.read().await;
 
-                    let cartridge = Cartridge::load_from_bytes(file_data, Cartridge::NO_RAM)
-                            .ok()?
-                    ;
+                    // todo: revert?
+                    //let cartridge = CartridgeObject::load_from_bytes(file_data, None);
 
-                    Some(cartridge)
+                    //Some(cartridge)
+                    Some(file_data)
                 }.await;
 
                 _ = sender.send(result);
@@ -353,6 +357,8 @@ impl EmulatorApplication {
             match result {
                 // load the cartridge into the emulator
                 Ok(Some(cartridge)) => {
+                    let cartridge = CartridgeObject::load_from_bytes(cartridge, None);
+
                     // try to load the file
                     if let Err(e) = self.load_cartridge(cartridge) {
                         // display an error message on failure
@@ -438,13 +444,13 @@ impl EmulatorApplication {
             let mut selected_index = *state.ui.get_device_type() as usize;
 
             let all_types = [
-                EmulatorDevice::GameBoyDmg,
-                EmulatorDevice::GameBoyPocket,
-                EmulatorDevice::GameBoyColor,
-                EmulatorDevice::GameBoyAdvance,
-                EmulatorDevice::GameBoyAdvanceSP,
-                EmulatorDevice::SuperGameBoy,
-                EmulatorDevice::SuperGameBoy2,
+                EmulatorDeviceType::GameBoyDmg,
+                EmulatorDeviceType::GameBoyPocket,
+                EmulatorDeviceType::GameBoyColor,
+                EmulatorDeviceType::GameBoyAdvance,
+                EmulatorDeviceType::GameBoyAdvanceSP,
+                EmulatorDeviceType::SuperGameBoy,
+                EmulatorDeviceType::SuperGameBoy2,
             ];
 
             let response = ComboBox::from_id_salt("device_type")

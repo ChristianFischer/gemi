@@ -29,7 +29,7 @@ pub struct DummyApu {
 
 impl DummyApu {
     /// Creates a new APU object.
-    pub fn new(_ec: &mut impl EmulatorContext) -> Self {
+    pub fn new(_ec: &mut EmulatorContext) -> Self {
         Self {
         }
     }

@@ -167,7 +167,7 @@ impl FrameSequencer {
 
 impl Apu {
     /// Creates a new APU object.
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         Self {
             state: ApuState {
                 apu_on:      true,
@@ -304,7 +304,7 @@ impl Apu {
 
 
 impl MemoryBusConnection for Apu {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
@@ -366,7 +366,7 @@ impl MemoryBusConnection for Apu {
     }
 
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {

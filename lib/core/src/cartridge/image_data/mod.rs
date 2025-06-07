@@ -15,7 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// todo: remove them all?
+
 mod array_image_data;
+mod data_buffer;
 mod file_image_data;
 mod image_data;
 mod memory_image_data;
@@ -23,8 +26,11 @@ mod zero_image_data;
 
 
 pub use array_image_data::ArrayImageData;
+pub use data_buffer::DataBuffer;
 pub use file_image_data::FileImageData;
 pub use image_data::ImageData;
 pub use image_data::ImageDataMut;
 pub use memory_image_data::MemoryImageData;
+pub use memory_image_data::MutableRefImageData;
+pub use memory_image_data::RefImageData;
 pub use zero_image_data::ZeroImageData;

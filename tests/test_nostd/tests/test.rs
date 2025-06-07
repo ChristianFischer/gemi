@@ -18,7 +18,7 @@
 #![no_std]
 
 use gemi_core::device_type::{DeviceConfig, DeviceType, EmulationType};
-use gemi_core::emulator_context::ZeroEmulatorContext;
+use gemi_core::emulator_context::EmulatorContextDataHolder;
 use gemi_core::emulator_device::EmulatorDevice;
 
 
@@ -31,11 +31,12 @@ fn test_nostd() {
     };
     
     // create an EmulatorContext for the selected DeviceConfig
-    let ec = ZeroEmulatorContext::new(device_config);
+    let mut ec_data = EmulatorContextDataHolder::new_empty(device_config);
+    let mut ec      = ec_data.make_context();
 
     // create the emulator instance
-    let mut emulator = EmulatorDevice::new(&ec);
+    let mut emulator = EmulatorDevice::new(&mut ec);
 
     // run one single frame
-    emulator.run_frame();
+    emulator.run_frame(&mut ec);
 }

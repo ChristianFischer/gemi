@@ -51,7 +51,7 @@ pub fn check_blargg_test_passed(gb: &GameBoy) -> Result<(), TestCaseError> {
         for tile_x in 0..TILE_SEQUENCE_PASSED.len() {
             let tile_index   = (line * 32 + tile_x) as u16;
             let tile_address = TileMap::H9800.base_address() + tile_index;
-            let tile         = gb.get_mmu().read_u8(tile_address);
+            let tile         = gb.read_u8(tile_address);
 
             if tile != TILE_SEQUENCE_PASSED[tile_x] {
                 line_match = false;

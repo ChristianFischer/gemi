@@ -386,7 +386,7 @@ impl Timer {
 
 
 impl MemoryBusConnection for Timer {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_REGISTER_DIV  => self.internal_counter.get_div(),
             MEMORY_LOCATION_REGISTER_TIMA => self.tima,
@@ -397,7 +397,7 @@ impl MemoryBusConnection for Timer {
     }
 
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_REGISTER_DIV => {
                 // writing to DIV will reset the counter

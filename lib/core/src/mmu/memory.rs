@@ -87,6 +87,7 @@ pub struct Memory {
     /// MemoryBankController implementation.
     mbc: Mbc,
 
+    // todo: move to context
     boot_rom:   Option<BootRom>,
     cartridge:  Option<Cartridge>,
 }
@@ -94,7 +95,7 @@ pub struct Memory {
 
 impl Memory {
     /// Create a new Memory object.
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         let num_wram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 2,
             EmulationType::GBC => 8,
@@ -158,7 +159,7 @@ impl Memory {
 
 impl Memory {
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
-    fn read_boot_rom_or_cartridge(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn read_boot_rom_or_cartridge(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
         if let Some(boot_rom) = &self.boot_rom {
             return boot_rom.read(address);
         }
@@ -168,7 +169,7 @@ impl Memory {
 
 
     /// Reads data from the cartridge.
-    fn read_from_cartridge(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn read_from_cartridge(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
         if let Some(cartridge) = &self.cartridge {
             return self.mbc.read_byte(ec, cartridge, address);
         }
@@ -178,7 +179,7 @@ impl Memory {
 
 
     /// Writes data to the cartridge.
-    fn write_to_cartridge(&mut self, ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn write_to_cartridge(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
         if let Some(cartridge) = &mut self.cartridge {
             self.mbc.write_byte(ec, cartridge, address, value);
         }
@@ -187,7 +188,7 @@ impl Memory {
 
 
 impl MemoryBusConnection for Memory {
-    fn on_read(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
         memory_map!(
             address => {
                 0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(ec, address),
@@ -246,7 +247,7 @@ impl MemoryBusConnection for Memory {
     }
 
 
-    fn on_write(&mut self, ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
         memory_map!(
             address => {
                 0x0000 ..= 0x7fff => [] self.write_to_cartridge(ec, address, value),

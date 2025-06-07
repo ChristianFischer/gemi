@@ -16,6 +16,8 @@
  */
 
 mod cartridge;
+mod cartridge_object;
 pub use cartridge::*;
+pub use cartridge_object::*;
 
 pub mod image_data;

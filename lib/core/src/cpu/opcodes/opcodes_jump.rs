@@ -17,7 +17,7 @@
 
 use crate::cpu::cpu::{CpuFlag, RegisterR16};
 use crate::cpu::opcode::{opcode, OpCodeContext};
-use crate::emulator_device::{Clock, EmulatorDevice};
+use crate::emulator_device::Clock;
 
 const BRANCH_CYCLES_JMP:    Clock =  4;
 const BRANCH_CYCLES_CALL:   Clock = 12;
@@ -25,118 +25,118 @@ const BRANCH_CYCLES_RET:    Clock = 12;
 
 
 /// Performs a jump to an address if a condition is met.
-fn jp_if_u16(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
-    let address = dev.cpu.fetch_u16();
-    if dev.cpu.is_flag_set(flag) == value {
+fn jp_if_u16(ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
+    let address = ctx.dev.cpu.fetch_u16(ctx.ec);
+    if ctx.dev.cpu.is_flag_set(flag) == value {
         ctx.add_cycles(BRANCH_CYCLES_JMP);
-        dev.cpu.jump_to(address);
+        ctx.dev.cpu.jump_to(address);
     }
 }
 
 /// Performs a relative jump if a condition is met.
-fn jr_if_i8(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
-    let offset = dev.cpu.fetch_i8();
-    if dev.cpu.is_flag_set(flag) == value {
+fn jr_if_i8(ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
+    let offset = ctx.dev.cpu.fetch_i8(ctx.ec);
+    if ctx.dev.cpu.is_flag_set(flag) == value {
         ctx.add_cycles(BRANCH_CYCLES_JMP);
-        dev.cpu.jump_relative(offset as i16);
+        ctx.dev.cpu.jump_relative(offset as i16);
     }
 }
 
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address.
-fn call_addr(dev: &mut EmulatorDevice, address: u16) {
-    dev.cpu.call_addr(address);
+fn call_addr(ctx: &mut OpCodeContext, address: u16) {
+    ctx.dev.cpu.call_addr(ctx.ec, address);
 }
 
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address.
-fn call_addr_u16(dev: &mut EmulatorDevice) {
-    let address = dev.cpu.fetch_u16();
-    call_addr(dev, address);
+fn call_addr_u16(ctx: &mut OpCodeContext) {
+    let address = ctx.dev.cpu.fetch_u16(ctx.ec);
+    call_addr(ctx, address);
 }
 
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address, if a condition is met.
-fn call_addr_if(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool, address: u16) {
-    if dev.cpu.is_flag_set(flag) == value {
+fn call_addr_if(ctx: &mut OpCodeContext, flag: CpuFlag, value: bool, address: u16) {
+    if ctx.dev.cpu.is_flag_set(flag) == value {
         ctx.add_cycles(BRANCH_CYCLES_CALL);
-        call_addr(dev, address);
+        call_addr(ctx, address);
     }
 }
 
 /// Calls a subroutine by storing the current instruction pointer on the stack
 /// and set the instruction pointer to a new address, taken from the current instruction pointer,
 /// if a condition is met.
-fn call_u16_if(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
-    let address = dev.cpu.fetch_u16();
-    call_addr_if(dev, ctx, flag, value, address);
+fn call_u16_if(ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
+    let address = ctx.dev.cpu.fetch_u16(ctx.ec);
+    call_addr_if(ctx, flag, value, address);
 }
 
 /// Returns from a subroutine by taking the previous instruction pointer address from the stack.
-fn ret_from_call(dev: &mut EmulatorDevice) {
-    dev.cpu.ret_from_call();
+fn ret_from_call(ctx: &mut OpCodeContext) {
+    ctx.dev.cpu.ret_from_call(ctx.ec);
 }
 
 /// Returns from a subroutine by taking the previous instruction pointer address from the stack,
 /// if a condition is met.
-fn ret_if(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
-    if dev.cpu.is_flag_set(flag) == value {
+fn ret_if(ctx: &mut OpCodeContext, flag: CpuFlag, value: bool) {
+    if ctx.dev.cpu.is_flag_set(flag) == value {
         ctx.add_cycles(BRANCH_CYCLES_RET);
-        ret_from_call(dev);
+        ret_from_call(ctx);
     }
 }
 
 
 
-opcode!(jr_i8, [dev] {
-    let offset = dev.cpu.fetch_i8();
-    dev.cpu.jump_relative(offset as i16);
+opcode!(jr_i8, [ctx] {
+    let offset = ctx.dev.cpu.fetch_i8(ctx.ec);
+    ctx.dev.cpu.jump_relative(offset as i16);
 });
 
-opcode!(jp_u16, [dev] {
-    let address = dev.cpu.fetch_u16();
-    dev.cpu.jump_to(address);
+opcode!(jp_u16, [ctx] {
+    let address = ctx.dev.cpu.fetch_u16(ctx.ec);
+    ctx.dev.cpu.jump_to(address);
 });
 
-opcode!(jp_hl, [dev] {
-    let address = dev.cpu.get_r16(RegisterR16::HL);
-    dev.cpu.jump_to(address);
+opcode!(jp_hl, [ctx] {
+    let address = ctx.dev.cpu.get_r16(RegisterR16::HL);
+    ctx.dev.cpu.jump_to(address);
 });
 
-opcode!(jr_z_i8,  [dev, ctx] jr_if_i8(dev, ctx, CpuFlag::Zero,  true));
-opcode!(jr_c_i8,  [dev, ctx] jr_if_i8(dev, ctx, CpuFlag::Carry, true));
-opcode!(jr_nz_i8, [dev, ctx] jr_if_i8(dev, ctx, CpuFlag::Zero,  false));
-opcode!(jr_nc_i8, [dev, ctx] jr_if_i8(dev, ctx, CpuFlag::Carry, false));
+opcode!(jr_z_i8,  [ctx] jr_if_i8(ctx, CpuFlag::Zero,  true));
+opcode!(jr_c_i8,  [ctx] jr_if_i8(ctx, CpuFlag::Carry, true));
+opcode!(jr_nz_i8, [ctx] jr_if_i8(ctx, CpuFlag::Zero,  false));
+opcode!(jr_nc_i8, [ctx] jr_if_i8(ctx, CpuFlag::Carry, false));
 
-opcode!(jp_z_u16,  [dev, ctx] jp_if_u16(dev, ctx, CpuFlag::Zero,  true));
-opcode!(jp_c_u16,  [dev, ctx] jp_if_u16(dev, ctx, CpuFlag::Carry, true));
-opcode!(jp_nz_u16, [dev, ctx] jp_if_u16(dev, ctx, CpuFlag::Zero,  false));
-opcode!(jp_nc_u16, [dev, ctx] jp_if_u16(dev, ctx, CpuFlag::Carry, false));
+opcode!(jp_z_u16,  [ctx] jp_if_u16(ctx, CpuFlag::Zero,  true));
+opcode!(jp_c_u16,  [ctx] jp_if_u16(ctx, CpuFlag::Carry, true));
+opcode!(jp_nz_u16, [ctx] jp_if_u16(ctx, CpuFlag::Zero,  false));
+opcode!(jp_nc_u16, [ctx] jp_if_u16(ctx, CpuFlag::Carry, false));
 
-opcode!(call_u16, [dev] call_addr_u16(dev));
+opcode!(call_u16, [ctx] call_addr_u16(ctx));
 
-opcode!(call_z_u16,  [dev, ctx] call_u16_if(dev, ctx, CpuFlag::Zero, true));
-opcode!(call_c_u16,  [dev, ctx] call_u16_if(dev, ctx, CpuFlag::Carry, true));
-opcode!(call_nz_u16, [dev, ctx] call_u16_if(dev, ctx, CpuFlag::Zero, false));
-opcode!(call_nc_u16, [dev, ctx] call_u16_if(dev, ctx, CpuFlag::Carry, false));
+opcode!(call_z_u16,  [ctx] call_u16_if(ctx, CpuFlag::Zero, true));
+opcode!(call_c_u16,  [ctx] call_u16_if(ctx, CpuFlag::Carry, true));
+opcode!(call_nz_u16, [ctx] call_u16_if(ctx, CpuFlag::Zero, false));
+opcode!(call_nc_u16, [ctx] call_u16_if(ctx, CpuFlag::Carry, false));
 
-opcode!(rst_00h, [dev] call_addr(dev, 0x0000));
-opcode!(rst_08h, [dev] call_addr(dev, 0x0008));
-opcode!(rst_10h, [dev] call_addr(dev, 0x0010));
-opcode!(rst_18h, [dev] call_addr(dev, 0x0018));
-opcode!(rst_20h, [dev] call_addr(dev, 0x0020));
-opcode!(rst_28h, [dev] call_addr(dev, 0x0028));
-opcode!(rst_30h, [dev] call_addr(dev, 0x0030));
-opcode!(rst_38h, [dev] call_addr(dev, 0x0038));
+opcode!(rst_00h, [ctx] call_addr(ctx, 0x0000));
+opcode!(rst_08h, [ctx] call_addr(ctx, 0x0008));
+opcode!(rst_10h, [ctx] call_addr(ctx, 0x0010));
+opcode!(rst_18h, [ctx] call_addr(ctx, 0x0018));
+opcode!(rst_20h, [ctx] call_addr(ctx, 0x0020));
+opcode!(rst_28h, [ctx] call_addr(ctx, 0x0028));
+opcode!(rst_30h, [ctx] call_addr(ctx, 0x0030));
+opcode!(rst_38h, [ctx] call_addr(ctx, 0x0038));
 
-opcode!(ret, [dev] ret_from_call(dev));
+opcode!(ret, [ctx] ret_from_call(ctx));
 
-opcode!(ret_z,  [dev, ctx] ret_if(dev, ctx, CpuFlag::Zero,  true));
-opcode!(ret_c,  [dev, ctx] ret_if(dev, ctx, CpuFlag::Carry, true));
-opcode!(ret_nz, [dev, ctx] ret_if(dev, ctx, CpuFlag::Zero,  false));
-opcode!(ret_nc, [dev, ctx] ret_if(dev, ctx, CpuFlag::Carry, false));
+opcode!(ret_z,  [ctx] ret_if(ctx, CpuFlag::Zero,  true));
+opcode!(ret_c,  [ctx] ret_if(ctx, CpuFlag::Carry, true));
+opcode!(ret_nz, [ctx] ret_if(ctx, CpuFlag::Zero,  false));
+opcode!(ret_nc, [ctx] ret_if(ctx, CpuFlag::Carry, false));
 
-opcode!(reti, [dev] {
-    ret_from_call(dev);
-    dev.cpu.enable_interrupts();
+opcode!(reti, [ctx] {
+    ret_from_call(ctx);
+    ctx.dev.cpu.enable_interrupts();
 });

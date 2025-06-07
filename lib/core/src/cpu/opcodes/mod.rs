@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ pub static OPCODE_INVALID: OpCode = OpCode {
     bytes: 1,
     cycles_ahead: 0,
     cycles: 0,
-    proc: |_ctx, _gb| {
+    proc: |_ctx| {
         panic!();
     }
 };
@@ -60,7 +60,7 @@ pub static OPCODE_UNASSIGNED: OpCode = OpCode {
     bytes: 1,
     cycles_ahead: 0,
     cycles: 0,
-    proc: |_ctx, _gb| {
+    proc: |_ctx| {
         panic!();
     }
 };

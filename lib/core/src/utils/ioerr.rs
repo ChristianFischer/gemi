@@ -30,7 +30,7 @@ pub struct Error {
     pub error_code: ErrorCode,
 
     /// The source type of where the error is related to.
-    pub source: Source,
+    pub source: Option<Source>,
 
     /// Optionally: a file which caused the error.
     #[cfg(feature = "file_io")]
@@ -50,6 +50,9 @@ pub enum Source {
 pub enum ErrorCode {
     /// An unknown error occurred on loading data.
     UnknownError,
+
+    /// A file could not be written.
+    FailedToWriteFile,
 
     /// A file to be loaded had an unexpected size.
     /// This may be the case, for example, when loading a RAM image,
@@ -93,7 +96,17 @@ impl Display for Source {
 #[cfg(feature = "std")]
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.source, self.error_code)
+        write!(
+            f,
+            "{}: {}",
+            if let Some(source) = &self.source { 
+                source.to_string() 
+            }
+            else { 
+                String::from("Unknown") 
+            }, 
+            self.error_code
+        )
     }
 }
 
@@ -104,6 +117,10 @@ impl Display for ErrorCode {
         match self {
             ErrorCode::UnknownError => {
                 write!(f, "Unknown error")
+            }
+
+            ErrorCode::FailedToWriteFile => {
+                write!(f, "Failed to write a file")
             }
 
             ErrorCode::InvalidFileSize(err) => {

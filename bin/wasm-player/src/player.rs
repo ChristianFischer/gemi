@@ -198,18 +198,20 @@ impl WasmPlayer {
     #[wasm_bindgen]
     pub fn save_cartridge_ram(&self) -> Option<Vec<u8>> {
         self.gb
-            .get_memory()
             .get_cartridge()
-            .as_ref()
-            .map(|cartridge| {
-                if cartridge.has_ram() && cartridge.has_battery() {
-                    Some(cartridge.get_ram().as_slice().to_vec())
+            .and_then(|cartridge| {
+                if let Ok(cartridge_info) = cartridge.read_cartridge_info() {
+                    if cartridge_info.has_ram() && cartridge_info.has_battery() {
+                        Some(cartridge.get_ram().get_data().to_vec())
+                    }
+                    else {
+                        None
+                    }
                 }
                 else {
                     None
                 }
             })
-            .flatten()
    }
 
 

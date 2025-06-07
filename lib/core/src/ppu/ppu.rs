@@ -326,7 +326,7 @@ impl ScanlineData {
 
 impl Ppu {
     /// Creates a new PPU object.
-    pub fn new(ec: &impl EmulatorContext) -> Ppu {
+    pub fn new(ec: &EmulatorContext) -> Ppu {
         let device_config = ec.get_device_config();
         let dmg_display_palette = match device_config.device {
             DeviceType::GameBoyDmg => DmgDisplayPalette::new_green(),
@@ -1120,7 +1120,7 @@ impl Ppu {
 
 
 impl MemoryBusConnection for Ppu {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {
@@ -1212,7 +1212,7 @@ impl MemoryBusConnection for Ppu {
         })
     }
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {

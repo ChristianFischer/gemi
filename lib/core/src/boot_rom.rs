@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ impl BootRom {
         // fail when the boot rom image has an unexpected size
         if file_size != 256 {
             let error = ioerr::Error {
-                source: ioerr::Source::BootRomImage,
+                source: Some(ioerr::Source::BootRomImage),
                 source_file: Some(filepath.to_path_buf()),
                 error_code: ioerr::ErrorCode::InvalidFileSize(ioerr::InvalidFileSizeError {
                     expected: 256,

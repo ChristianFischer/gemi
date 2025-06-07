@@ -47,6 +47,7 @@ dyn_alloc = [
 # support file access.
 file_io = [
     "gemi-core/file_io",
+    "gemi-support/file_io",
 ]
 
 # Enables GameBoyColor support

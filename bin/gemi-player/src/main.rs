@@ -22,8 +22,8 @@ use std::time::Duration;
 use std::{env, time};
 
 use libgemi::core::boot_rom::BootRom;
-use libgemi::core::cartridge::Cartridge;
 use libgemi::core::cartridge::GameBoyColorSupport;
+use libgemi::core::cartridge::{Cartridge, CartridgeObject};
 use libgemi::core::cpu::cpu::CPU_CLOCK_SPEED;
 use libgemi::core::device_type::DeviceType;
 use libgemi::GameBoy;
@@ -163,11 +163,15 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
 
             _ => {
                 let file = PathBuf::from(arg);
-                let cart = Cartridge::load_files_with_default_ram(&file)
+                let cart = CartridgeObject::load_files_with_default_ram(&file)
                     .map_err(|e| format!("Failed to load cartridge: {}", e))
                     ?;
 
-                print_rom_info(&file, &cart);
+                let info = cart.read_cartridge_info()
+                    .map_err(|e| format!("Cartridge is invalid: {}", e))
+                    ?;
+
+                print_rom_info(&file, &info);
 
                 builder.set_cartridge(cart);
             }
@@ -196,10 +200,12 @@ fn main() -> Result<(), String> {
     run(&mut window, &mut gb);
 
     // after running the cartridge, save it's on-chip-RAM, if any
-    gb.get_memory().save_cartridge_ram_to_file_if_any()
-        .map_err(|e| format!("Failed to save cartridge RAM: {}", e))
-        ?
-    ;
+    if let Some(cartridge) = gb.get_cartridge() {
+        cartridge.flush_ram_if_any()
+                .map_err(|e| format!("Failed to save cartridge RAM: {}", e))
+                ?
+        ;
+    }
 
     // everything went ok
     Ok(())

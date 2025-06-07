@@ -118,7 +118,7 @@ impl Input {
 
 
 impl MemoryBusConnection for Input {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_JOYP => {
                 let states = match self.button_selection {
@@ -136,7 +136,7 @@ impl MemoryBusConnection for Input {
     }
 
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_JOYP => {
                 self.button_selection = value & 0x30;

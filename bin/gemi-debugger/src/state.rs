@@ -17,7 +17,7 @@
 
 use crate::selection::{Kind, Selection};
 use gemi_utils::keybindings::KeyBindings;
-use libgemi::core::cartridge::Cartridge;
+use libgemi::core::cartridge::{Cartridge, CartridgeObject};
 use libgemi::core::debug::DebugEvent;
 use libgemi::core::device_type::DeviceType;
 use libgemi::core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
@@ -33,7 +33,7 @@ use std::path::{Path, PathBuf};
 /// An enum to store the device type to be emulated
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Copy, Clone)]
-pub enum EmulatorDevice {
+pub enum EmulatorDeviceType {
     GameBoyDmg,
     GameBoyPocket,
     GameBoyColor,
@@ -115,7 +115,7 @@ pub struct UiStates {
     key_bindings: KeyBindings<egui::Key>,
 
     /// The device being emulated.
-    device_type: EmulatorDevice,
+    device_type: EmulatorDeviceType,
 
     /// The current update mode of the emulator.
     update_mode: UpdateMode,
@@ -155,7 +155,7 @@ where
 }
 
 
-impl Default for EmulatorDevice {
+impl Default for EmulatorDeviceType {
     fn default() -> Self {
         Self::GameBoyColor
     }
@@ -176,16 +176,16 @@ impl Default for UpdateStepMode {
 }
 
 
-impl Display for EmulatorDevice {
+impl Display for EmulatorDeviceType {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            EmulatorDevice::GameBoyDmg       => write!(f, "GameBoy DMG"),
-            EmulatorDevice::GameBoyPocket    => write!(f, "GameBoy Pocket"),
-            EmulatorDevice::GameBoyColor     => write!(f, "GameBoy Color"),
-            EmulatorDevice::GameBoyAdvance   => write!(f, "GameBoy Advance"),
-            EmulatorDevice::GameBoyAdvanceSP => write!(f, "GameBoy Advance SP"),
-            EmulatorDevice::SuperGameBoy     => write!(f, "Super GameBoy"),
-            EmulatorDevice::SuperGameBoy2    => write!(f, "Super GameBoy 2"),
+            EmulatorDeviceType::GameBoyDmg       => write!(f, "GameBoy DMG"),
+            EmulatorDeviceType::GameBoyPocket    => write!(f, "GameBoy Pocket"),
+            EmulatorDeviceType::GameBoyColor     => write!(f, "GameBoy Color"),
+            EmulatorDeviceType::GameBoyAdvance   => write!(f, "GameBoy Advance"),
+            EmulatorDeviceType::GameBoyAdvanceSP => write!(f, "GameBoy Advance SP"),
+            EmulatorDeviceType::SuperGameBoy     => write!(f, "Super GameBoy"),
+            EmulatorDeviceType::SuperGameBoy2    => write!(f, "Super GameBoy 2"),
         }
     }
 }
@@ -202,16 +202,16 @@ impl Display for UpdateStepMode {
 }
 
 
-impl Into<DeviceType> for EmulatorDevice {
+impl Into<DeviceType> for EmulatorDeviceType {
     fn into(self) -> DeviceType {
         match self {
-            EmulatorDevice::GameBoyDmg       => DeviceType::GameBoyDmg,
-            EmulatorDevice::GameBoyPocket    => DeviceType::GameBoyPocket,
-            EmulatorDevice::GameBoyColor     => DeviceType::GameBoyColor,
-            EmulatorDevice::GameBoyAdvance   => DeviceType::GameBoyAdvance,
-            EmulatorDevice::GameBoyAdvanceSP => DeviceType::GameBoyAdvanceSP,
-            EmulatorDevice::SuperGameBoy     => DeviceType::SuperGameBoy,
-            EmulatorDevice::SuperGameBoy2    => DeviceType::SuperGameBoy2,
+            EmulatorDeviceType::GameBoyDmg       => DeviceType::GameBoyDmg,
+            EmulatorDeviceType::GameBoyPocket    => DeviceType::GameBoyPocket,
+            EmulatorDeviceType::GameBoyColor     => DeviceType::GameBoyColor,
+            EmulatorDeviceType::GameBoyAdvance   => DeviceType::GameBoyAdvance,
+            EmulatorDeviceType::GameBoyAdvanceSP => DeviceType::GameBoyAdvanceSP,
+            EmulatorDeviceType::SuperGameBoy     => DeviceType::SuperGameBoy,
+            EmulatorDeviceType::SuperGameBoy2    => DeviceType::SuperGameBoy2,
         }
     }
 }
@@ -225,7 +225,7 @@ impl EmulatorState {
         self.last_rom_file = None;
 
         // load the cartridge from the given path
-        let cartridge = Cartridge::load_files_with_default_ram(path)
+        let cartridge = CartridgeObject::load_files_with_default_ram(path)
                 .map_err(|e| format!("Failed to load ROM: {}", e))
                 ?
         ;
@@ -242,7 +242,7 @@ impl EmulatorState {
 
     /// Takes an existing Cartridge object and load it into the emulator.
     /// If there's already a running instance of the emulator, this will be closed.
-    pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
+    pub fn load_cartridge(&mut self, cartridge: CartridgeObject) -> Result<(), String> {
         // no path known
         self.last_rom_file = None;
 
@@ -253,14 +253,8 @@ impl EmulatorState {
     pub fn reload(&mut self) -> Result<(), String> {
         let cartridge = self.emu.get_cartridge().ok_or("No Cartridge loaded")?;
 
-        // copy the ROM and RAM data from the existing cartridge
-        let rom = cartridge.get_rom().as_slice().to_vec();
-        let ram = cartridge.get_ram().as_slice().to_vec();
-
         // create a new cartridge with the existing data
-        let new_cartridge = Cartridge::load_from_bytes(rom, Some(ram))
-                .map_err(|e| e.to_string())?
-        ;
+        let new_cartridge = cartridge.clone();
 
         self.instantiate_emulator_with_cartridge(new_cartridge)
     }
@@ -268,7 +262,7 @@ impl EmulatorState {
 
     /// Internal function to create a new emulator instance with an existing cartridge
     /// without changing any other configuration.
-    fn instantiate_emulator_with_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
+    fn instantiate_emulator_with_cartridge(&mut self, cartridge: CartridgeObject) -> Result<(), String> {
         // on success build the new emulator instance
         let mut builder = GameBoy::build();
         builder.set_device_type(self.ui.get_device_type().clone().into());
@@ -366,15 +360,14 @@ impl EmulatorInstance {
 
 
     /// Get the cartridge of the currently running emulator instance, if any.
-    pub fn get_cartridge(&self) -> Option<&Cartridge> {
-        self.get_emulator()
-            .and_then(|emu| emu.get_peripherals().mem.get_cartridge())
+    pub fn get_cartridge(&self) -> Option<&CartridgeObject> {
+        self.gb.as_ref().and_then(|gb| gb.get_cartridge())
     }
 
 
     /// Process a single frame of the emulator, if any.
     pub fn run_frame(&mut self) {
-        self.run_until(|_emu, cycles, result|
+        self.run_until(|_gb, cycles, result|
                 result.events.contains(DebugEvent::PpuFrameCompleted)
             ||  cycles >= CPU_CYCLES_PER_FRAME
         );
@@ -383,7 +376,7 @@ impl EmulatorInstance {
 
     /// Run the emulator until the next scanline was completed drawing.
     pub fn run_line(&mut self) {
-        self.run_until(|_emu, cycles, result|
+        self.run_until(|_gb, cycles, result|
                 result.events.contains(DebugEvent::PpuLineCompleted)
             ||  cycles >= CPU_CYCLES_PER_FRAME
         );
@@ -392,24 +385,24 @@ impl EmulatorInstance {
 
     /// Run the emulator for a single instruction.
     pub fn run_single_step(&mut self) {
-        if let Some(emu) = self.get_emulator_mut() {
-            emu.run_single_step();
+        if let Some(gb) = self.get_gameboy_mut() {
+            gb.run_single_step();
         }
     }
 
 
     /// Run the emulator until a certain condition is met. 
     pub fn run_until<F>(&mut self, condition: F)
-        where F: Fn(&EmulatorDevice, Clock, EmulatorUpdateResults) -> bool
+        where F: Fn(&GameBoy, Clock, EmulatorUpdateResults) -> bool
     {
-        if let Some(emu) = self.get_emulator_mut() {
+        if let Some(gb) = self.get_gameboy_mut() {
             let mut cycles = 0;
 
             loop {
-                let result = emu.run_single_step();
+                let result = gb.run_single_step();
                 cycles += result.cycles;
 
-                if condition(emu, cycles, result) {
+                if condition(gb, cycles, result) {
                     break;
                 }
             }
@@ -422,14 +415,14 @@ impl UiStates {
     /// Get the device type to be emulated.
     /// This is not necessarily the device type of the current emulator instance,
     /// but will be used next type starting an emulator
-    pub fn get_device_type(&self) -> &EmulatorDevice {
+    pub fn get_device_type(&self) -> &EmulatorDeviceType {
         &self.device_type
     }
 
     /// Set the device type of the emulator.
     /// This will not affect the currently running emulator,
     /// but takes effect next time when loading a new emulator instance.
-    pub fn set_device_type(&mut self, device_type: EmulatorDevice) {
+    pub fn set_device_type(&mut self, device_type: EmulatorDeviceType) {
         self.device_type = device_type;
     }
 
@@ -495,7 +488,7 @@ impl Default for EmulatorState {
 
             ui: UiStates {
                 key_bindings:       make_default_key_bindings(),
-                device_type:        EmulatorDevice::GameBoyColor,
+                device_type:        EmulatorDeviceType::GameBoyColor,
                 update_mode:        UpdateMode::Paused,
                 update_step_mode:   UpdateStepMode::Frame,
                 focus:              Selection::new(Kind::Focus),

@@ -164,7 +164,7 @@ impl SerialPort {
 
 
 impl MemoryBusConnection for SerialPort {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_SB => self.transfer_byte,
             MEMORY_LOCATION_SC => 0b_0111_1111 | as_bit_flag(self.transfer_enabled, 7),
@@ -173,7 +173,7 @@ impl MemoryBusConnection for SerialPort {
     }
 
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_SB => self.transfer_byte    = value,
             MEMORY_LOCATION_SC => self.transfer_enabled = get_bit(value, 7),

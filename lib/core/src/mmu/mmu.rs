@@ -72,13 +72,13 @@ impl Mmu {
 
 
     /// Reads a single byte value from the memory bus on a given address.
-    pub fn read_u8(&self, ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    pub fn read_u8(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
         self.internal.read(ec, address)
     }
 
 
     /// Reads two bytes into a 16 bit integer from the memory bus on a given address.
-    pub fn read_u16(&self, ec: &mut impl EmulatorContext, address: u16) -> u16 {
+    pub fn read_u16(&self, ec: &mut EmulatorContext, address: u16) -> u16 {
         let l = self.read_u8(ec, address.wrapping_add(0));
         let h = self.read_u8(ec, address.wrapping_add(1));
         to_u16(h, l)
@@ -86,13 +86,13 @@ impl Mmu {
 
 
     /// Writes a single byte value to the memory bus on a given address.
-    pub fn write_u8(&mut self, ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    pub fn write_u8(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
         self.internal.write(ec, address, value);
     }
 
 
     /// Writes two bytes from a 16 bit integer to the memory bus on a given address.
-    pub fn write_u16(&mut self, ec: &mut impl EmulatorContext, address: u16, value: u16) {
+    pub fn write_u16(&mut self, ec: &mut EmulatorContext, address: u16, value: u16) {
         let (h, l) = to_u8(value);
         self.write_u8(ec, address.wrapping_add(0), l);
         self.write_u8(ec, address.wrapping_add(1), h);
@@ -102,7 +102,7 @@ impl Mmu {
     /// Let the memory controller handle it's tasks.
     /// 'cycles' gives the number of ticks passed since
     /// the last call.
-    pub fn update(&mut self, ec: &mut impl EmulatorContext, cycles: Clock) {
+    pub fn update(&mut self, ec: &mut EmulatorContext, cycles: Clock) {
         self.internal.handle_dma_transfer(ec, cycles);
     }
 }
@@ -110,7 +110,7 @@ impl Mmu {
 
 impl MmuInternal {
     /// Handles an OAM DMA transfer, if any active.
-    fn handle_dma_transfer(&mut self, ec: &mut impl EmulatorContext, cycles: Clock) {
+    fn handle_dma_transfer(&mut self, ec: &mut EmulatorContext, cycles: Clock) {
         match self.dma {
             DmaTransferState::Disabled => {}
 
@@ -156,14 +156,14 @@ impl MemoryBus<MmuInternal, MmuInternal> for MmuInternal {
 
 
 impl MemoryBusConnection for MmuInternal {
-    fn on_read(&self, _ec: &mut impl EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_DMA_ADDRESS => self.dma_register_value,
             _ => 0xff,
         }
     }
 
-    fn on_write(&mut self, _ec: &mut impl EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_DMA_ADDRESS => {
                 self.dma_register_value = value;

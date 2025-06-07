@@ -22,19 +22,18 @@ use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
 use crate::emulator_device::{Clock, EmulatorDevice};
 use crate::utils::{to_u16, to_u8};
 
-type ProcessOpCode = fn(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext) -> OpCodeResult;
+type ProcessOpCode = fn(ctx: &mut OpCodeContext) -> OpCodeResult;
 
 
 /// A macro to generate an opcode implementation function.
 macro_rules! opcode {
-    ($(#[$meta:meta])? $name:ident, [$($bind_dev:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
+    ($(#[$meta:meta])? $name:ident, [$($bind_ctx:ident)?] $($body:tt)*) => {
         $(#[$meta])?
-        pub fn $name(dev: &mut EmulatorDevice, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
-            // silence 'unused' warning for dev and ctx
-            { let _ = (&dev, &ctx); }
+        pub fn $name(ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
+            // silence 'unused' warnings
+            { let _ = &ctx; }
 
-            // make dev and ctx visible to 'body', if requested
-            $(let $bind_dev = dev;)?
+            // make ctx visible to 'body', if requested
             $(let $bind_ctx = ctx;)?
 
             // paste 'body' statements
@@ -49,6 +48,7 @@ macro_rules! opcode {
 }
 
 pub(crate) use opcode;
+use crate::emulator_context::EmulatorContext;
 
 /// Data struct describing a single opcode.
 #[derive(Copy, Clone)]
@@ -81,7 +81,10 @@ pub struct OpCode {
 /// Context object to deliver additional information about the current context
 /// to the opcode implementation, but also allow the opcode implementation to
 /// deliver additional results to it's caller.
-pub struct OpCodeContext {
+pub struct OpCodeContext<'a, 'b> {
+    pub dev: &'a mut EmulatorDevice,
+    pub ec: &'a mut EmulatorContext<'b>,
+
     /// The currently executed opcode
     opcode: &'static OpCode,
 
@@ -139,10 +142,16 @@ pub struct Instruction {
 }
 
 
-impl OpCodeContext {
+impl<'a, 'b> OpCodeContext<'a, 'b> {
     /// Creates a context object for an instruction being executed.
-    pub fn for_instruction(instruction: &Instruction) -> OpCodeContext {
+    pub fn for_instruction(
+        dev: &'a mut EmulatorDevice, 
+        ec: &'a mut EmulatorContext<'b>, 
+        instruction: &Instruction
+    ) -> OpCodeContext<'a, 'b> {
         OpCodeContext {
+            dev,
+            ec,
             opcode: instruction.opcode,
             cycles: instruction.opcode.cycles,
             stage:  0,

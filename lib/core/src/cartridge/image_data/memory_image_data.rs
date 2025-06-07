@@ -15,8 +15,65 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::cartridge::image_data::{ImageData, ImageDataMut};
+
 #[cfg(feature = "dyn_alloc")]
 pub use dyn_memory_image_data::*;
+
+
+pub struct RefImageData<'a> {
+    data: &'a [u8],
+}
+
+
+pub struct MutableRefImageData<'a> {
+    data: &'a mut [u8],
+}
+
+
+impl<'a> RefImageData<'a> {
+    pub fn new(data: &'a [u8]) -> Self {
+        Self { data }
+    }
+}
+
+
+impl<'a> MutableRefImageData<'a> {
+    pub fn new(data: &'a mut [u8]) -> Self {
+        Self { data }
+    }
+}
+
+
+impl<'a> ImageData for RefImageData<'a> {
+    fn get_size(&self) -> usize {
+        self.data.len()
+    }
+
+    fn get_data(&self) -> &[u8] {
+        self.data
+    }
+}
+
+
+impl<'a> ImageData for MutableRefImageData<'a> {
+    fn get_size(&self) -> usize {
+        self.data.len()
+    }
+
+    fn get_data(&self) -> &[u8] {
+        self.data
+    }
+}
+
+
+impl<'a> ImageDataMut for MutableRefImageData<'a> {
+    fn get_data_mut(&mut self) -> &mut [u8] {
+        self.data
+    }
+}
+
+
 
 #[cfg(feature = "dyn_alloc")]
 pub mod dyn_memory_image_data {

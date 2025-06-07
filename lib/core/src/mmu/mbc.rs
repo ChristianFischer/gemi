@@ -59,10 +59,10 @@ pub enum Mbc {
 /// Trait for objects acting as memory bank controller.
 pub trait MbcImpl {
     /// Read a single byte from the device memory.
-    fn read_byte(&self, ec: &mut impl EmulatorContext, cartridge: &Cartridge, address: u16) -> u8;
+    fn read_byte(&self, ec: &mut EmulatorContext, cartridge: &Cartridge, address: u16) -> u8;
 
     /// Write a single byte into the device memory.
-    fn write_byte(&mut self, ec: &mut impl EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8);
+    fn write_byte(&mut self, ec: &mut EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8);
 }
 
 
@@ -106,7 +106,7 @@ impl Display for MemoryBankController {
 
 
 impl MbcImpl for Mbc {
-    fn read_byte(&self, ec: &mut impl EmulatorContext, cartridge: &Cartridge, address: u16) -> u8 {
+    fn read_byte(&self, ec: &mut EmulatorContext, cartridge: &Cartridge, address: u16) -> u8 {
         match self {
             Mbc::None(mbc_impl)  => mbc_impl.read_byte(ec, cartridge, address),
             Mbc::MBC1(mbc_impl)  => mbc_impl.read_byte(ec, cartridge, address),
@@ -120,7 +120,7 @@ impl MbcImpl for Mbc {
     }
 
 
-    fn write_byte(&mut self, ec: &mut impl EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
+    fn write_byte(&mut self, ec: &mut EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
         match self {
             Mbc::None(mbc_impl)  => mbc_impl.write_byte(ec, cartridge, address, value),
             Mbc::MBC1(mbc_impl)  => mbc_impl.write_byte(ec, cartridge, address, value),
@@ -156,7 +156,7 @@ pub mod mbc_none {
 
 
     impl MbcImpl for MbcNone {
-        fn read_byte(&self, ec: &mut impl EmulatorContext, _cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &mut EmulatorContext, _cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from ROM address space
                 0x0000 ..= 0x7fff => {
@@ -173,7 +173,7 @@ pub mod mbc_none {
         }
 
 
-        fn write_byte(&mut self, _ec: &mut impl EmulatorContext, _cartridge: &mut Cartridge, _address: u16, _value: u8) {
+        fn write_byte(&mut self, _ec: &mut EmulatorContext, _cartridge: &mut Cartridge, _address: u16, _value: u8) {
             // not writing any data
         }
     }
@@ -330,7 +330,7 @@ mod mbc1 {
 
 
     impl MbcImpl for Mbc1 {
-        fn read_byte(&self, ec: &mut impl EmulatorContext, cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &mut EmulatorContext, cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
@@ -360,7 +360,7 @@ mod mbc1 {
         }
 
 
-        fn write_byte(&mut self, ec: &mut impl EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, ec: &mut EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
             match (address >> 13) & 0x000f {
                 // 0x0000 - 0x1fff: enable or disable RAM
                 0x00 => {
@@ -466,7 +466,7 @@ mod mbc2 {
 
 
     impl MbcImpl for Mbc2 {
-        fn read_byte(&self, ec: &mut impl EmulatorContext, _cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &mut EmulatorContext, _cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
@@ -499,7 +499,7 @@ mod mbc2 {
         }
 
 
-        fn write_byte(&mut self, _ec: &mut impl EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, _ec: &mut EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
             match address {
                 // bank selection / RAM enable register
                 0x0000 ..= 0x3fff => {
@@ -627,7 +627,7 @@ mod mbc5 {
 
 
     impl MbcImpl for Mbc5 {
-        fn read_byte(&self, ec: &mut impl EmulatorContext, cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &mut EmulatorContext, cartridge: &Cartridge, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
@@ -657,7 +657,7 @@ mod mbc5 {
         }
 
 
-        fn write_byte(&mut self, ec: &mut impl EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, ec: &mut EmulatorContext, cartridge: &mut Cartridge, address: u16, value: u8) {
             match address {
                 // enable or disable RAM
                 0x0000 ..= 0x1fff => {

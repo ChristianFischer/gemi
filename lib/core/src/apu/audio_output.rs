@@ -87,7 +87,7 @@ impl AudioOutput {
     pub const DEFAULT_SAMPLE_RATE: u32 = 48_000;
 
 
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         Self {
             sample_rate:        Self::DEFAULT_SAMPLE_RATE,
             time_passed:        0,

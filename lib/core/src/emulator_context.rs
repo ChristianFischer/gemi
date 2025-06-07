@@ -15,25 +15,89 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::cartridge::image_data::{ImageData, ImageDataMut, ZeroImageData};
+use crate::cartridge::image_data::{ImageData, ImageDataMut, MutableRefImageData, RefImageData, ZeroImageData};
 use crate::device_type::DeviceConfig;
-use crate::ppu::graphic_data::Color;
 
 
 // todo: doc
-pub trait EmulatorContext {
-    type RomImageType: ImageData;
-    type RamImageType: ImageDataMut;
-
-    fn get_device_config(&self) -> &DeviceConfig;
-
-    fn get_cartridge_rom(&self) -> &Self::RomImageType;
-    fn get_cartridge_ram(&mut self) -> &mut Self::RamImageType;
-
-    fn put_pixel(&mut self, x: u32, y: u32, color: Color);
+pub struct EmulatorContext<'a> {
+    device_config: DeviceConfig,
+    cartridge_rom: RefImageData<'a>,
+    cartridge_ram: MutableRefImageData<'a>,
 }
 
 
+// todo: what to do here????
+pub struct EmulatorContextDataHolder<Rom, Ram>
+    where Rom: ImageData,
+          Ram: ImageDataMut
+{
+    pub device_config: DeviceConfig,
+    pub cartridge_rom: Rom,
+    pub cartridge_ram: Ram,
+}
+
+
+impl<'a> EmulatorContext<'a> {
+    pub fn new(device_config: DeviceConfig, rom_data: &'a [u8], ram_data: &'a mut [u8]) -> Self {
+        Self {
+            device_config,
+            cartridge_rom: RefImageData::new(rom_data),
+            cartridge_ram: MutableRefImageData::new(ram_data),
+        }
+    }
+
+
+    pub fn get_device_config(&self) -> &DeviceConfig {
+        &self.device_config
+    }
+
+
+    pub fn get_cartridge_rom(&self) -> &RefImageData<'a> {
+        &self.cartridge_rom
+    }
+
+
+    pub fn get_cartridge_ram(&mut self) -> &mut MutableRefImageData<'a> {
+        &mut self.cartridge_ram
+    }
+}
+
+
+impl<Rom, Ram> EmulatorContextDataHolder<Rom, Ram>
+    where Rom: ImageData,
+          Ram: ImageDataMut
+{
+    pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram) -> Self {
+        Self {
+            device_config,
+            cartridge_rom: rom_data,
+            cartridge_ram: ram_data,
+        }
+    }
+
+
+    pub fn make_context(&mut self) -> EmulatorContext {
+        EmulatorContext::new(
+            self.device_config,
+            self.cartridge_rom.get_data(),
+            self.cartridge_ram.get_data_mut()
+        )
+    }
+}
+
+
+impl EmulatorContextDataHolder<ZeroImageData, ZeroImageData> {
+    pub fn new_empty(device_config: DeviceConfig) -> Self {
+        Self {
+            device_config,
+            cartridge_rom: ZeroImageData::new(),
+            cartridge_ram: ZeroImageData::new(),
+        }
+    }
+}
+
+/*
 // todo: doc
 pub type ZeroEmulatorContext = DefaultEmulatorContext<ZeroImageData, ZeroImageData>;
 
@@ -59,8 +123,10 @@ impl<ROM: ImageData + Default, RAM: ImageDataMut + Default> DefaultEmulatorConte
         }
     }
 }
+*/
 
 
+/*
 impl<ROM: ImageData, RAM: ImageDataMut> EmulatorContext for DefaultEmulatorContext<ROM, RAM>
 {
     type RomImageType = ROM;
@@ -82,3 +148,4 @@ impl<ROM: ImageData, RAM: ImageDataMut> EmulatorContext for DefaultEmulatorConte
         _ = (x, y, color);
     }
 }
+*/

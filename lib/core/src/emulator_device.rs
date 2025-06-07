@@ -75,7 +75,7 @@ pub struct EmulatorUpdateResults {
 impl EmulatorDevice {
 
     /// Create a new GameBoy device.
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         Self {
             cpu: Cpu::new(
                 Mmu::new(
@@ -98,7 +98,7 @@ impl EmulatorDevice {
 
     /// Boot the device, initializing the Boot ROM program.
     // todo: non-mut ec?
-    pub fn initialize(&mut self, ec: &mut impl EmulatorContext) {
+    pub fn initialize(&mut self, ec: &mut EmulatorContext) {
         if self.get_peripherals().mem.has_boot_rom() {
             self.cpu.set_instruction_pointer(0x0000);
         }
@@ -108,7 +108,7 @@ impl EmulatorDevice {
     }
 
     /// setup values like expected after the boot rom was executed on the original GameBoy.
-    fn setup_initial_values(&mut self, ec: &mut impl EmulatorContext) {
+    fn setup_initial_values(&mut self, ec: &mut EmulatorContext) {
         let device_config = ec.get_device_config().clone();
         let pc = 0x0100;
         let sp = 0xfffe;
@@ -312,14 +312,14 @@ impl EmulatorDevice {
 
     /// Runs the emulator for a single step, either an instruction
     /// or to process a single HALT cycle.
-    pub fn run_single_step(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
+    pub fn run_single_step(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
         self.process_next(ec)
     }
 
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
-    pub fn run_frame(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
+    pub fn run_frame(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
         let mut results = EmulatorUpdateResults::default();
 
         // update until receiving the 'frame completed' event.
@@ -342,7 +342,7 @@ impl EmulatorDevice {
 
 
     /// Continues processing the next pending operation.
-    fn process_next(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
+    fn process_next(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
         if self.cpu.is_running() {
             if let Some(cycles) = self.cpu.handle_interrupts(ec) {
                 let signals = self.update_components(ec, cycles);
@@ -371,9 +371,9 @@ impl EmulatorDevice {
 
 
     /// Process the next opcode.
-    fn process_next_opcode(&mut self, ec: &mut impl EmulatorContext) -> EmulatorUpdateResults {
+    fn process_next_opcode(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
         let instruction = self.cpu.fetch_next_instruction(ec);
-        let mut context = OpCodeContext::for_instruction(&instruction);
+        let mut context = OpCodeContext::for_instruction(self, ec, &instruction);
         let mut signals = MemoryBusSignals::default();
         let mut total_step_cycles : Clock = 0;
 
@@ -382,19 +382,19 @@ impl EmulatorDevice {
         if instruction.opcode.cycles_ahead != 0 {
             let cycles_ahead = instruction.opcode.cycles_ahead;
             total_step_cycles += cycles_ahead;
-            signals |= self.update_components(ec, cycles_ahead);
+            signals |= context.dev.update_components(context.ec, cycles_ahead);
         }
 
         loop {
             // invoke opcode execution
-            let result = (instruction.opcode.proc)(self, &mut context);
+            let result = (instruction.opcode.proc)(&mut context);
 
             match result {
                 // the opcode was partially executed and needs time to pass on other components
                 // to update timer or memory operations.
                 OpCodeResult::StageDone(step_cycles) => {
                     total_step_cycles += step_cycles;
-                    signals |= self.update_components(ec, step_cycles);
+                    signals |= context.dev.update_components(context.ec, step_cycles);
                     context.enter_next_stage();
                 }
 
@@ -403,7 +403,7 @@ impl EmulatorDevice {
                     // get the total number of cycles consumed by this opcode and subtract the
                     // number of cycles already applied to components
                     let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
-                    signals |= self.update_components(ec, remaining_cycles);
+                    signals |= context.dev.update_components(context.ec, remaining_cycles);
 
                     break;
                 }
@@ -419,7 +419,7 @@ impl EmulatorDevice {
 
     /// Applies the time passed during CPU execution to other components as well.
     #[must_use]
-    fn update_components(&mut self, ec: &mut impl EmulatorContext, cycles: Clock) -> MemoryBusSignals {
+    fn update_components(&mut self, ec: &mut EmulatorContext, cycles: Clock) -> MemoryBusSignals {
         self.cpu.update(cycles);
         self.get_mmu_mut().update(ec, cycles);
         #[cfg(feature = "apu")]

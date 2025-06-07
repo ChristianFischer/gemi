@@ -44,7 +44,7 @@ pub struct StereoHighPassFilters {
 
 
 impl HighPassFilter {
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         let charge_factor = match ec.get_device_config().device {
             DeviceType::GameBoyDmg => CAPACITOR_CHARGE_FACTOR_BASE_DMG,
             _                      => CAPACITOR_CHARGE_FACTOR_BASE_GBC,
@@ -76,7 +76,7 @@ impl HighPassFilter {
 
 
 impl StereoHighPassFilters {
-    pub fn new(ec: &impl EmulatorContext) -> Self {
+    pub fn new(ec: &EmulatorContext) -> Self {
         Self {
             filter_left:  HighPassFilter::new(ec),
             filter_right: HighPassFilter::new(ec),

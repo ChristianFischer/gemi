@@ -14,31 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use crate::context::GameBoyContext;
+use crate::gameboy::GameBoyContextData;
 use crate::GameBoy;
 use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::memory_image_data::MemoryImageData;
-use gemi_core::cartridge::GameBoyColorSupport;
+use gemi_core::cartridge::CartridgeObject;
 use gemi_core::device_type::{DeviceConfig, DeviceType, EmulationType};
 use gemi_core::emulator_device::EmulatorDevice;
 use std::fmt::{Display, Formatter};
 
-#[cfg(feature = "file_io")]
-use std::{
-    io,
-    path::Path
-};
-
-#[cfg(feature = "file_io")]
-use gemi_core::cartridge::file_image_data::FileImageData;
-use gemi_core::cartridge::image_data::ImageData;
 
 /// A factory class to construct a GameBoy device object.
 /// Usually created via GameBoy::build()
 pub struct Builder {
     boot_rom:       Option<BootRom>,
-    cartridge_ram:  Option<MemoryImageData>,
-    cartridge_rom:  Option<MemoryImageData>,
+    cartridge:      Option<Box<CartridgeObject>>,
     device_type:    Option<DeviceType>,
 }
 
@@ -50,72 +39,12 @@ pub enum BuilderErrorCode {
 }
 
 
-#[cfg(feature = "file_io")]
-impl Builder {
-    pub const FILE_EXT_GB:  &'static str = "gb";
-    pub const FILE_EXT_GBC: &'static str = "gbc";
-    pub const FILE_EXT_RAM: &'static str = "sav";
-
-
-    /// Load a cartridge from a ROM file.
-    /// If a RAM file with the same name exists, it tries to load it as well.
-    /// Failing to load the RAM file will cause an error, but if no RAM file
-    /// exists, the cartridge will be loaded with uninitialized RAM.
-    pub fn load_files_with_default_ram(rom_file: &Path) -> io::Result<Builder> {
-        let ram_file = rom_file.with_extension(Self::FILE_EXT_RAM);
-
-        Self::load_files(
-            rom_file,
-
-            // only try to load the RAM file if it exists
-            if ram_file.exists() {
-                Some(&ram_file)
-            }
-            else {
-                None
-            }
-        )
-    }
-
-
-    /// Loads a cartridge from a ROM file.
-    #[cfg(feature = "file_io")]
-    pub fn load_file(rom_file: &Path) -> io::Result<Builder> {
-        Self::load_files(rom_file, None)
-    }
-
-
-    /// Loads a cartridge and it's RAM image from files.
-    #[cfg(feature = "file_io")]
-    pub fn load_files(rom_file: &Path, ram_file: Option<&Path>) -> io::Result<Builder> {
-        // load the cartridge from the ROM file
-        let rom_data = FileImageData::load(rom_file)?;
-
-        let ram_data = match ram_file {
-            Some(path) => Some(FileImageData::load(path)?),
-            None => None,
-        };
-
-        let mut builder = Self::new();
-
-
-        Ok(Self {
-            boot_rom:       None,
-            cartridge_rom:  Some(MemoryImageData::new(rom_data.get_data().to_vec())),
-            cartridge_ram:  ram_data.map(|d| MemoryImageData::new(d.get_data().to_vec())),
-            device_type:    None,
-        })
-    }
-}
-
-
 impl Builder {
     /// Creates a new empty GameBoy builder
     pub fn new() -> Self {
         Self {
             boot_rom:       None,
-            cartridge_rom:  None,
-            cartridge_ram:  None,
+            cartridge:      None,
             device_type:    None,
         }
     }
@@ -127,9 +56,9 @@ impl Builder {
     }
 
 
-    /// Set the cartridge ROM image to be used.
-    pub fn set_cartridge_rom(&mut self, rom: MemoryImageData) {
-        self.cartridge_rom = Some(rom);
+    /// Set the cartridge, which ROM will be executed.
+    pub fn set_cartridge(&mut self, cartridge: CartridgeObject) {
+        self.cartridge = Some(cartridge.into());
     }
 
 
@@ -149,12 +78,12 @@ impl Builder {
         }
 
         // determine the preferred device type by the cartridge properties
-        if let Some(cartridge) = &self.cartridge_rom {
-            return match cartridge.get_cgb_support() {
-                GameBoyColorSupport::None      => DeviceType::GameBoyDmg,
-                GameBoyColorSupport::Supported => DeviceType::GameBoyColor,
-                GameBoyColorSupport::Required  => DeviceType::GameBoyColor,
-            };
+        if let Some(cartridge) = &self.cartridge {
+            if let Ok(cartridge_info) = cartridge.read_cartridge_info() {
+                if cartridge_info.supports_cgb() {
+                    return DeviceType::GameBoyColor;
+                }
+            }
         }
 
         // default to classic GameBoy
@@ -169,8 +98,10 @@ impl Builder {
             DeviceType::GameBoyDmg => {}
             _ => {
                 if let Some(cartridge) = &self.cartridge {
-                    if cartridge.supports_cgb() {
-                        return EmulationType::GBC;
+                    if let Ok(cartridge_info) = cartridge.read_cartridge_info() {
+                        if cartridge_info.supports_cgb() {
+                            return EmulationType::GBC;
+                        }
                     }
                 }
             }
@@ -194,17 +125,16 @@ impl Builder {
         
         // todo: replace with zero?
         // take the ROM objects from the builder, or create default images
-        let rom_data = self.cartridge_rom.take().unwrap_or_else(|| MemoryImageData::alloc(0));
-        let ram_data = self.cartridge_ram.take().unwrap_or_else(|| MemoryImageData::alloc(0));
+        let cartridge = self.cartridge.unwrap_or_else(|| Box::new(CartridgeObject::new_empty()));
 
         // setup the emulator context
-        let mut context = GameBoyContext::new(
+        let mut context_data = GameBoyContextData {
             device_config,
-            rom_data,
-            ram_data
-        );
+            cartridge,
+        };
 
         // construct the GameBoy object
+        let mut context  = context_data.make_context();
         let mut emulator = Box::new(
             EmulatorDevice::new(&mut context)
         );
@@ -215,7 +145,7 @@ impl Builder {
         }
 
         Ok(GameBoy {
-            context,
+            context_data,
             emulator,
         })
     }
