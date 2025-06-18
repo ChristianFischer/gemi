@@ -20,11 +20,7 @@ pub use with_snapshots::Snapshot as Snapshot;
 
 #[cfg(feature = "snapshots")]
 mod with_snapshots {
-    use crate::gameboy::GameBoyContextData;
     use crate::GameBoy;
-    use gemi_core::cartridge::CartridgeObject;
-    use gemi_core::device_type::DeviceConfig;
-    use gemi_core::emulator_device::EmulatorDevice;
     use gemi_core::utils::SerializableBuffer;
     use std::fs::File;
     use std::io;
@@ -46,11 +42,7 @@ mod with_snapshots {
         /// Creates a new snapshot from an existing emulator instance.
         pub fn create_from(gb: &GameBoy) -> io::Result<Self> {
             let data = bincode::serde::encode_to_vec(
-                (
-                    &gb.emulator,
-                    &gb.context_data.device_config,
-                    &gb.context_data.cartridge,
-                ),
+                gb,
                 bincode::config::standard()
             ).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
 
@@ -60,19 +52,12 @@ mod with_snapshots {
 
         /// Restores a previously serialized snapshot into a new [GameBoy] instance.
         pub fn restore(&self) -> io::Result<GameBoy> {
-            type T = (EmulatorDevice, DeviceConfig, CartridgeObject);
-            let (result, _) = bincode::serde::decode_from_slice::<T, _>(
+            let (result, _) = bincode::serde::decode_from_slice::<GameBoy, _>(
                 &self.data,
                 bincode::config::standard()
             ).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
 
-            Ok(GameBoy {
-                context_data: GameBoyContextData {
-                    device_config: result.1,
-                    cartridge: Box::new(result.2),
-                },
-                emulator: Box::new(result.0)
-            })
+            Ok(result)
         }
 
 

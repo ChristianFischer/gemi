@@ -25,6 +25,7 @@ use core::result;
 
 
 /// Information about an IO error with the error source attached.
+#[cfg_attr(feature = "std", derive(Debug))]
 pub struct Error {
     /// An error code which describes the actual error.
     pub error_code: ErrorCode,
@@ -39,6 +40,7 @@ pub struct Error {
 
 
 /// A source type which describes the module where an error is related to.
+#[cfg_attr(feature = "std", derive(Debug))]
 pub enum Source {
     BootRomImage,
     RomImage,
@@ -47,6 +49,7 @@ pub enum Source {
 
 
 /// An error code describing an actual error.
+#[cfg_attr(feature = "std", derive(Debug))]
 pub enum ErrorCode {
     /// An unknown error occurred on loading data.
     UnknownError,
@@ -68,6 +71,7 @@ pub enum ErrorCode {
 
 
 /// Additional attributes for [ErrorCode::InvalidFileSize].
+#[cfg_attr(feature = "std", derive(Debug))]
 pub struct InvalidFileSizeError {
     /// The actual size of the file being loaded.
     pub actual: usize,

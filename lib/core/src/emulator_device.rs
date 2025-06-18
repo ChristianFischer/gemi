@@ -99,7 +99,7 @@ impl EmulatorDevice {
     /// Boot the device, initializing the Boot ROM program.
     // todo: non-mut ec?
     pub fn initialize(&mut self, ec: &mut EmulatorContext) {
-        if self.get_peripherals().mem.has_boot_rom() {
+        if ec.get_boot_rom().is_some() {
             self.cpu.set_instruction_pointer(0x0000);
         }
         else {
@@ -115,8 +115,8 @@ impl EmulatorDevice {
 
         // the title checksum is calculated on GBC and GBA in DMG compatibility mode
         // if licensee code is '1' in either old or new format
-        let title_checksum = if let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() {
-            match cartridge.get_licensee_code() {
+        let title_checksum = if true /* todo: let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() */ {
+            match ec.get_cartridge_info().get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
                     cartridge::rom_data::compute_title_checksum(ec.get_cartridge_rom())
                 }

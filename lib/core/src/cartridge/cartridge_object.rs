@@ -68,6 +68,7 @@ impl CartridgeObject {
 
     /// Reads the cartridge info from the current cartridge files.
     /// This may fail when the cartridge has no data or is corrupted.
+    #[deprecated]
     pub fn read_cartridge_info(&self) -> ioerr::Result<Cartridge> {
         Cartridge::create_from(self.rom.as_ref())
     }

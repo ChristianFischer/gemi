@@ -17,8 +17,9 @@
 
 use crate::Builder;
 use gemi_core::apu::Apu;
+use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::image_data::{ImageData, ImageDataMut};
-use gemi_core::cartridge::CartridgeObject;
+use gemi_core::cartridge::{Cartridge, CartridgeObject};
 use gemi_core::cpu::cpu::Cpu;
 use gemi_core::device_type::DeviceConfig;
 use gemi_core::emulator_context::EmulatorContext;
@@ -44,6 +45,8 @@ pub struct GameBoy {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub(crate) struct GameBoyContextData {
     pub(crate) device_config: DeviceConfig,
+    pub(crate) cartridge_info: Cartridge, // todo: move into cartridge object? + remove CartridgeObject::read_cartridge_info
+    pub(crate) boot_rom:  Option<Box<BootRom>>,
     pub(crate) cartridge: Box<CartridgeObject>,
 }
 
@@ -118,6 +121,13 @@ impl GameBoy {
     // todo: should cartridge stay optional?
     pub fn get_cartridge(&self) -> Option<&CartridgeObject> {
         Some(&self.context_data.cartridge)
+    }
+
+
+    /// Get the information about the currently loaded cartridge, if any.
+    // todo: should be optional?
+    pub fn get_cartridge_info(&self) -> Option<&Cartridge> {
+        Some(&self.context_data.cartridge_info)
     }
 
 
@@ -222,8 +232,10 @@ impl GameBoyContextData {
     pub(crate) fn make_context(&mut self) -> EmulatorContext {
         EmulatorContext::new(
             self.device_config,
+            &self.cartridge_info,
             self.cartridge.rom.get_data(),
-            self.cartridge.ram.get_data_mut()
+            self.cartridge.ram.get_data_mut(),
+            self.boot_rom.as_ref().map(|boot_rom| boot_rom.as_ref())
         )
     }
 }

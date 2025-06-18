@@ -17,16 +17,17 @@
 use crate::gameboy::GameBoyContextData;
 use crate::GameBoy;
 use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::CartridgeObject;
+use gemi_core::cartridge::{Cartridge, CartridgeObject};
 use gemi_core::device_type::{DeviceConfig, DeviceType, EmulationType};
 use gemi_core::emulator_device::EmulatorDevice;
+use gemi_core::utils::ioerr;
 use std::fmt::{Display, Formatter};
 
 
 /// A factory class to construct a GameBoy device object.
 /// Usually created via GameBoy::build()
 pub struct Builder {
-    boot_rom:       Option<BootRom>,
+    boot_rom:       Option<Box<BootRom>>,
     cartridge:      Option<Box<CartridgeObject>>,
     device_type:    Option<DeviceType>,
 }
@@ -35,6 +36,8 @@ pub struct Builder {
 /// Error codes occurred during creating an emulator instance.
 #[derive(Debug)]
 pub enum BuilderErrorCode {
+    IoError(ioerr::Error),
+    
     GameBoyColorNotSupported,
 }
 
@@ -52,7 +55,7 @@ impl Builder {
 
     /// Set the boot ROM, which will be executed before the actual ROM.
     pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
-        self.boot_rom = Some(boot_rom);
+        self.boot_rom = Some(boot_rom.into());
     }
 
 
@@ -71,19 +74,15 @@ impl Builder {
 
     /// Get the preferred device type, which is either specified explicitly
     /// or selected by the cartridge properties.
-    pub fn select_preferred_device_type(&self) -> DeviceType {
+    pub fn select_preferred_device_type(&self, cartridge_info: &Cartridge) -> DeviceType {
         // explicit type will be preferred
         if let Some(device_type) = &self.device_type {
             return *device_type;
         }
 
         // determine the preferred device type by the cartridge properties
-        if let Some(cartridge) = &self.cartridge {
-            if let Ok(cartridge_info) = cartridge.read_cartridge_info() {
-                if cartridge_info.supports_cgb() {
-                    return DeviceType::GameBoyColor;
-                }
-            }
+        if cartridge_info.supports_cgb() {
+            return DeviceType::GameBoyColor;
         }
 
         // default to classic GameBoy
@@ -93,16 +92,12 @@ impl Builder {
 
     /// Check the emulation type based on the selected device and GameBoyColor
     /// support of the selected cartridge.
-    pub fn select_emulation_type(&self, device_type: &DeviceType) -> EmulationType {
+    pub fn select_emulation_type(&self, cartridge_info: &Cartridge, device_type: &DeviceType) -> EmulationType {
         match device_type {
             DeviceType::GameBoyDmg => {}
             _ => {
-                if let Some(cartridge) = &self.cartridge {
-                    if let Ok(cartridge_info) = cartridge.read_cartridge_info() {
-                        if cartridge_info.supports_cgb() {
-                            return EmulationType::GBC;
-                        }
-                    }
+                if cartridge_info.supports_cgb() {
+                    return EmulationType::GBC;
                 }
             }
         }
@@ -113,36 +108,38 @@ impl Builder {
 
     /// Build the GameBoy device emulator based on the properties specified with this builder.
     pub fn finish(mut self) -> Result<GameBoy, BuilderErrorCode> {
+        // todo: replace with zero?
+        // take the ROM objects from the builder, or create default images
+        let boot_rom  = self.boot_rom.take();
+        let cartridge = self.cartridge.take().unwrap_or_else(|| Box::new(CartridgeObject::new_empty()));
+        
+        // read cartridge info
+        let cartridge_info = cartridge.read_cartridge_info()
+                .map_err(|err| BuilderErrorCode::IoError(err))?;
+
         // select the preferred device type based on the current config and cartridge
-        let device_type    = self.select_preferred_device_type();
-        let emulation_type = self.select_emulation_type(&device_type);
+        let device_type    = self.select_preferred_device_type(&cartridge_info);
+        let emulation_type = self.select_emulation_type(&cartridge_info, &device_type);
 
         // setup device config based on the current configuration
         let device_config = DeviceConfig {
             device: device_type,
             emulation: emulation_type,
         };
-        
-        // todo: replace with zero?
-        // take the ROM objects from the builder, or create default images
-        let cartridge = self.cartridge.unwrap_or_else(|| Box::new(CartridgeObject::new_empty()));
 
         // setup the emulator context
         let mut context_data = GameBoyContextData {
             device_config,
+            cartridge_info,
+            boot_rom,
             cartridge,
         };
 
         // construct the GameBoy object
-        let mut context  = context_data.make_context();
-        let mut emulator = Box::new(
-            EmulatorDevice::new(&mut context)
+        let context  = context_data.make_context();
+        let emulator = Box::new(
+            EmulatorDevice::new(&context)
         );
-
-        // set boot ROM, if any
-        if let Some(boot_rom) = self.boot_rom.take() {
-            emulator.get_peripherals_mut().mem.set_boot_rom(boot_rom);
-        }
 
         Ok(GameBoy {
             context_data,

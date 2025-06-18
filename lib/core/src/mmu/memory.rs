@@ -17,7 +17,6 @@
 
 use core::cmp::max;
 
-use crate::boot_rom::BootRom;
 use crate::cartridge::Cartridge;
 use crate::device_type::{DeviceConfig, EmulationType};
 use crate::emulator_context::EmulatorContext;
@@ -87,15 +86,19 @@ pub struct Memory {
     /// MemoryBankController implementation.
     mbc: Mbc,
 
-    // todo: move to context
-    boot_rom:   Option<BootRom>,
-    cartridge:  Option<Cartridge>,
+    /// Stores whether the boot rom is currently enabled or disabled.
+    boot_rom_enabled: bool,
 }
 
 
 impl Memory {
     /// Create a new Memory object.
     pub fn new(ec: &EmulatorContext) -> Self {
+        let mbc = Cartridge::create_from(ec.get_cartridge_rom())
+                .map(|info| info.get_mbc().clone())
+                .unwrap_or(MemoryBankController::None)
+        ;
+
         let num_wram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 2,
             EmulationType::GBC => 8,
@@ -123,36 +126,11 @@ impl Memory {
 
             hram: HRamBank::new(),
 
-            mbc: create_mbc(&MemoryBankController::None),
+            mbc: create_mbc(ec, &mbc),
 
-            boot_rom:   None,
-            cartridge:  None,
+            // start with enabled boot rom if one is available
+            boot_rom_enabled: ec.get_boot_rom().is_some(),
         }
-    }
-
-
-    /// Checks whether a boot rom is active or not.
-    pub fn has_boot_rom(&self) -> bool {
-        match self.boot_rom {
-            None    => false,
-            Some(_) => true,
-        }
-    }
-
-    /// Load a boot ROM into the memory.
-    pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
-        self.boot_rom = Some(boot_rom)
-    }
-
-    /// Load ROM data from a cartridge into the memory.
-    pub fn set_cartridge(&mut self, cartridge: Cartridge) {
-        self.mbc       = create_mbc(cartridge.get_mbc());
-        self.cartridge = Some(cartridge);
-    }
-
-    /// Get a reference to the currently assigned cartridge, if any.
-    pub fn get_cartridge(&self) -> Option<&Cartridge> {
-        self.cartridge.as_ref()
     }
 }
 
@@ -160,8 +138,10 @@ impl Memory {
 impl Memory {
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
     fn read_boot_rom_or_cartridge(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
-        if let Some(boot_rom) = &self.boot_rom {
-            return boot_rom.read(address);
+        if self.boot_rom_enabled {
+            if let Some(boot_rom) = ec.get_boot_rom() {
+                return boot_rom.read(address);
+            }
         }
 
         self.read_from_cartridge(ec, address)
@@ -170,19 +150,13 @@ impl Memory {
 
     /// Reads data from the cartridge.
     fn read_from_cartridge(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
-        if let Some(cartridge) = &self.cartridge {
-            return self.mbc.read_byte(ec, cartridge, address);
-        }
-
-        0xff
+        self.mbc.read_byte(ec, address)
     }
 
 
     /// Writes data to the cartridge.
     fn write_to_cartridge(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
-        if let Some(cartridge) = &mut self.cartridge {
-            self.mbc.write_byte(ec, cartridge, address, value);
-        }
+        self.mbc.write_byte(ec, address, value);
     }
 }
 
@@ -223,9 +197,11 @@ impl MemoryBusConnection for Memory {
                 0xff00 ..= 0xff7f => [] {
                     match address {
                         MEMORY_LOCATION_BOOT_ROM_DISABLE => {
-                            match self.boot_rom {
-                                Some(_) => 0x00,
-                                None    => 0xff,
+                            if self.boot_rom_enabled {
+                                0x00
+                            }
+                            else {
+                                0xff
                             }
                         },
 
@@ -278,8 +254,9 @@ impl MemoryBusConnection for Memory {
                 0xff00 ..= 0xff7f => [] {
                     match address {
                         MEMORY_LOCATION_BOOT_ROM_DISABLE => {
+                            // Boot ROM can only be disabled but never enabled
                             if (value & 0x01) != 0 {
-                                self.boot_rom = None;
+                                self.boot_rom_enabled = false;
                             }
                         },
 

@@ -14,7 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use gemi_core::cartridge::memory_image_data::MemoryImageData;
+
+// todo: remove file
+
+/*
+use gemi_core::cartridge::image_data::MemoryImageData;
 use gemi_core::device_type::DeviceConfig;
 use gemi_core::emulator_context::EmulatorContext;
 use gemi_core::ppu::graphic_data::Color;
@@ -66,3 +70,4 @@ impl EmulatorContext for GameBoyContext {
         _ = (x, y, color);
     }
 }
+*/

@@ -188,7 +188,7 @@ fn main() -> Result<(), String> {
     gb.initialize();
 
     // determine the title based on the cartridge available
-    let title = match gb.get_memory().get_cartridge() {
+    let title = match gb.get_cartridge_info() {
         Some(cartridge) => cartridge.get_title().to_string(),
         None => "GameBoy".to_string(),
     };

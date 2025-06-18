@@ -91,6 +91,7 @@ pub struct Cartridge {
 /// Helper struct to implement serialization via serde by only serializing RAM and ROM.
 #[cfg(feature = "serde")]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+// todo: check if still necessary
 struct CartridgeSerdeHelper {
     rom: SerializableBuffer<u8>,
     ram: Option<SerializableBuffer<u8>>,
@@ -411,6 +412,35 @@ impl Cartridge {
     }
 }
 
+
+impl Default for Cartridge {
+    fn default() -> Self {
+        Self {
+            #[cfg(feature = "std")]
+            title: String::from("none"),
+
+            #[cfg(feature = "std")]
+            manufacturer_code: String::from("--"),
+
+            licensee_code:  LicenseeCode::Old(0x00),
+            mbc:            MemoryBankController::None,
+
+            rom_bank_count: 0,
+            rom_size:       0,
+
+            ram_bank_count: 0,
+            ram_size:       0,
+
+            supports_cgb:   GameBoyColorSupport::None,
+            supports_sgb:   false,
+
+            has_ram:        false,
+            has_timer:      false,
+            has_battery:    false,
+            has_rumble:     false,
+        }
+    }
+}
 
 #[cfg(feature = "std")]
 impl Display for LicenseeCode {

@@ -15,15 +15,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::boot_rom::BootRom;
 use crate::cartridge::image_data::{ImageData, ImageDataMut, MutableRefImageData, RefImageData, ZeroImageData};
+use crate::cartridge::Cartridge;
 use crate::device_type::DeviceConfig;
 
 
 // todo: doc
 pub struct EmulatorContext<'a> {
-    device_config: DeviceConfig,
-    cartridge_rom: RefImageData<'a>,
-    cartridge_ram: MutableRefImageData<'a>,
+    device_config:  DeviceConfig, // todo: change into ref?
+    cartridge_info: &'a Cartridge,
+    cartridge_rom:  RefImageData<'a>,
+    cartridge_ram:  MutableRefImageData<'a>,
+    boot_rom:       Option<&'a BootRom>
 }
 
 
@@ -32,24 +36,45 @@ pub struct EmulatorContextDataHolder<Rom, Ram>
     where Rom: ImageData,
           Ram: ImageDataMut
 {
-    pub device_config: DeviceConfig,
-    pub cartridge_rom: Rom,
-    pub cartridge_ram: Ram,
+    // todo: all optional? (except device_config)
+    pub device_config:  DeviceConfig,
+    pub cartridge_info: Cartridge,
+    pub cartridge_rom:  Rom,
+    pub cartridge_ram:  Ram,
+    pub boot_rom:       Option<BootRom>,
 }
 
 
 impl<'a> EmulatorContext<'a> {
-    pub fn new(device_config: DeviceConfig, rom_data: &'a [u8], ram_data: &'a mut [u8]) -> Self {
+    pub fn new(
+        device_config: DeviceConfig,
+        cartridge_info: &'a Cartridge,
+        rom_data: &'a [u8],
+        ram_data: &'a mut [u8],
+        boot_rom: Option<&'a BootRom>
+    ) -> Self {
         Self {
             device_config,
+            cartridge_info,
             cartridge_rom: RefImageData::new(rom_data),
             cartridge_ram: MutableRefImageData::new(ram_data),
+            boot_rom,
         }
     }
 
 
     pub fn get_device_config(&self) -> &DeviceConfig {
         &self.device_config
+    }
+
+
+    pub fn get_cartridge_info(&self) -> &Cartridge {
+        self.cartridge_info
+    }
+
+
+    pub fn get_boot_rom(&self) -> Option<&BootRom> {
+        self.boot_rom
     }
 
 
@@ -71,8 +96,10 @@ impl<Rom, Ram> EmulatorContextDataHolder<Rom, Ram>
     pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram) -> Self {
         Self {
             device_config,
+            cartridge_info: Cartridge::create_from(&rom_data).unwrap(), // todo: remove unwrap
             cartridge_rom: rom_data,
             cartridge_ram: ram_data,
+            boot_rom: None,
         }
     }
 
@@ -80,8 +107,10 @@ impl<Rom, Ram> EmulatorContextDataHolder<Rom, Ram>
     pub fn make_context(&mut self) -> EmulatorContext {
         EmulatorContext::new(
             self.device_config,
+            &self.cartridge_info,
             self.cartridge_rom.get_data(),
-            self.cartridge_ram.get_data_mut()
+            self.cartridge_ram.get_data_mut(),
+            self.boot_rom.as_ref()
         )
     }
 }
@@ -91,8 +120,10 @@ impl EmulatorContextDataHolder<ZeroImageData, ZeroImageData> {
     pub fn new_empty(device_config: DeviceConfig) -> Self {
         Self {
             device_config,
+            cartridge_info: Cartridge::default(),
             cartridge_rom: ZeroImageData::new(),
             cartridge_ram: ZeroImageData::new(),
+            boot_rom: None,
         }
     }
 }
