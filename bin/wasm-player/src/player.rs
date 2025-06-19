@@ -200,13 +200,10 @@ impl WasmPlayer {
         self.gb
             .get_cartridge()
             .and_then(|cartridge| {
-                if let Ok(cartridge_info) = cartridge.read_cartridge_info() {
-                    if cartridge_info.has_ram() && cartridge_info.has_battery() {
-                        Some(cartridge.get_ram().get_data().to_vec())
-                    }
-                    else {
-                        None
-                    }
+                let cartridge_info = cartridge.get_cartridge_info();
+
+                if cartridge_info.has_ram() && cartridge_info.has_battery() {
+                    Some(cartridge.get_ram().get_data().to_vec())
                 }
                 else {
                     None

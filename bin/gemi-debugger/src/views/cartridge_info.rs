@@ -65,7 +65,7 @@ impl View for CartridgeInfoView {
         self.data_list.clear();
 
         // expect a cartridge to be present after emulator loading
-        if let Some(cart) = state.emu.get_cartridge().and_then(|cart| cart.read_cartridge_info().ok()) {
+        if let Some(cart) = state.emu.get_cartridge().map(|cart| cart.get_cartridge_info()) {
             let rom_size_str = format!("{} kiB", cart.get_rom_size() / 1024);
             let ram_size_str = format!("{} kiB", cart.get_ram_size() / 1024);
             let requires_cgb = matches!(cart.get_cgb_support(), GameBoyColorSupport::Required);

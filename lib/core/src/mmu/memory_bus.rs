@@ -62,7 +62,7 @@ pub trait MemoryBusConnection {
     /// A request to read from a memory address in the components accountability.
     /// The component has to respond to this request, if necessary by providing
     /// a default value.
-    fn on_read(&self, ec: &mut EmulatorContext, address: u16) -> u8;
+    fn on_read(&self, ec: &EmulatorContext, address: u16) -> u8;
 
     /// A request to write to a memory address in the components accountability.
     fn on_write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8);
@@ -79,7 +79,7 @@ pub trait MemoryBusConnection {
 /// To easily implement a memory mapper, the macro `impl_memory_mapper` may be used.
 pub trait MemoryMapper<TRootType> {
     // todo: doc
-    fn forward_read(root: &TRootType, ec: &mut EmulatorContext, address: u16) -> u8;
+    fn forward_read(root: &TRootType, ec: &EmulatorContext, address: u16) -> u8;
     fn forward_write(root: &mut TRootType, ec: &mut EmulatorContext, address: u16, value: u8);
 
 
@@ -109,7 +109,7 @@ pub trait MemoryBus<TRootType, TMemoryMapper>
 
     /// Loads a single byte from an address via this memory bus.
     /// The memory bus will take the data from the according component.
-    fn read(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn read(&self, ec: &EmulatorContext, address: u16) -> u8 {
         let root       = self.get_root();
         TMemoryMapper::forward_read(root, ec, address)
 
@@ -137,7 +137,7 @@ pub trait MemoryBus<TRootType, TMemoryMapper>
 macro_rules! impl_memory_mapper {
     (MemoryMapper($root:ident : $root_type:ident) for $name:ident { $($pattern:pat => $link:expr),+ }) => {
         impl MemoryMapper<$root_type> for $name {
-            fn forward_read($root: &$root_type, ec: &mut EmulatorContext, address: u16) -> u8 {
+            fn forward_read($root: &$root_type, ec: &EmulatorContext, address: u16) -> u8 {
                 match address {
                     $(
                         $pattern => {

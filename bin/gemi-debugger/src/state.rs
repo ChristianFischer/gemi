@@ -17,12 +17,11 @@
 
 use crate::selection::{Kind, Selection};
 use gemi_utils::keybindings::KeyBindings;
-use libgemi::core::cartridge::{Cartridge, CartridgeObject};
+use libgemi::core::cartridge::CartridgeObject;
 use libgemi::core::debug::DebugEvent;
 use libgemi::core::device_type::DeviceType;
 use libgemi::core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
 use libgemi::core::input::InputButton;
-use libgemi::core::mmu::memory_data::MemoryData;
 use libgemi::core::ppu::ppu::CPU_CYCLES_PER_FRAME;
 use libgemi::GameBoy;
 use serde::{Deserialize, Deserializer};

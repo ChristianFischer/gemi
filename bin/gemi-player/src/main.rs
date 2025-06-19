@@ -167,11 +167,9 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
                     .map_err(|e| format!("Failed to load cartridge: {}", e))
                     ?;
 
-                let info = cart.read_cartridge_info()
-                    .map_err(|e| format!("Cartridge is invalid: {}", e))
-                    ?;
+                let info = cart.get_cartridge_info();
 
-                print_rom_info(&file, &info);
+                print_rom_info(&file, info);
 
                 builder.set_cartridge(cart);
             }
@@ -188,8 +186,8 @@ fn main() -> Result<(), String> {
     gb.initialize();
 
     // determine the title based on the cartridge available
-    let title = match gb.get_cartridge_info() {
-        Some(cartridge) => cartridge.get_title().to_string(),
+    let title = match gb.get_cartridge() {
+        Some(cartridge) => cartridge.get_cartridge_info().get_title().to_string(),
         None => "GameBoy".to_string(),
     };
 

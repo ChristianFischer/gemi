@@ -111,15 +111,17 @@ impl Builder {
         // todo: replace with zero?
         // take the ROM objects from the builder, or create default images
         let boot_rom  = self.boot_rom.take();
-        let cartridge = self.cartridge.take().unwrap_or_else(|| Box::new(CartridgeObject::new_empty()));
+
+        // get the cartridge object or create an empty one
+        let cartridge = self.cartridge.take()
+                .unwrap_or_else(|| Box::new(CartridgeObject::new_empty()));
         
         // read cartridge info
-        let cartridge_info = cartridge.read_cartridge_info()
-                .map_err(|err| BuilderErrorCode::IoError(err))?;
+        let cartridge_info = cartridge.get_cartridge_info();
 
         // select the preferred device type based on the current config and cartridge
-        let device_type    = self.select_preferred_device_type(&cartridge_info);
-        let emulation_type = self.select_emulation_type(&cartridge_info, &device_type);
+        let device_type    = self.select_preferred_device_type(cartridge_info);
+        let emulation_type = self.select_emulation_type(cartridge_info, &device_type);
 
         // setup device config based on the current configuration
         let device_config = DeviceConfig {
@@ -128,9 +130,8 @@ impl Builder {
         };
 
         // setup the emulator context
-        let mut context_data = GameBoyContextData {
+        let context_data = GameBoyContextData {
             device_config,
-            cartridge_info,
             boot_rom,
             cartridge,
         };

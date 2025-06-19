@@ -94,7 +94,7 @@ pub struct Memory {
 impl Memory {
     /// Create a new Memory object.
     pub fn new(ec: &EmulatorContext) -> Self {
-        let mbc = Cartridge::create_from(ec.get_cartridge_rom())
+        let mbc = Cartridge::create_from(&ec.get_cartridge_rom())
                 .map(|info| info.get_mbc().clone())
                 .unwrap_or(MemoryBankController::None)
         ;
@@ -137,7 +137,7 @@ impl Memory {
 
 impl Memory {
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
-    fn read_boot_rom_or_cartridge(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn read_boot_rom_or_cartridge(&self, ec: &EmulatorContext, address: u16) -> u8 {
         if self.boot_rom_enabled {
             if let Some(boot_rom) = ec.get_boot_rom() {
                 return boot_rom.read(address);
@@ -149,7 +149,7 @@ impl Memory {
 
 
     /// Reads data from the cartridge.
-    fn read_from_cartridge(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn read_from_cartridge(&self, ec: &EmulatorContext, address: u16) -> u8 {
         self.mbc.read_byte(ec, address)
     }
 
@@ -162,7 +162,7 @@ impl Memory {
 
 
 impl MemoryBusConnection for Memory {
-    fn on_read(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, ec: &EmulatorContext, address: u16) -> u8 {
         memory_map!(
             address => {
                 0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(ec, address),

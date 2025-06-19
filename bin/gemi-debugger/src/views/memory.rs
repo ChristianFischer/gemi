@@ -154,7 +154,7 @@ impl MemoryView {
         let has_cartridge_ram = 
                 state.emu
                 .get_cartridge()
-                .and_then(|cart| cart.read_cartridge_info().ok())
+                .map(|cart| cart.get_cartridge_info())
                 .map(|info| info.has_ram())
                 .unwrap_or(false)
         ;

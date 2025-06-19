@@ -316,6 +316,35 @@ impl Cartridge {
     }
 
 
+    /// Creates a [Cartridge] object with default values.
+    pub fn new_empty() -> Self {
+        Self {
+            #[cfg(feature = "std")]
+            title: "".to_string(),
+
+            #[cfg(feature = "std")]
+            manufacturer_code: "".to_string(),
+
+            licensee_code: LicenseeCode::Old(0x00),
+
+            mbc: MemoryBankController::None,
+
+            rom_bank_count: 0,
+            rom_size: 0,
+
+            ram_bank_count: 0,
+            ram_size: 0,
+
+            supports_cgb: GameBoyColorSupport::None,
+            supports_sgb: false,
+            has_ram:      false,
+            has_timer:    false,
+            has_battery:  false,
+            has_rumble:   false,
+        }
+    }
+
+
     /// Checks if a ROM is a MBC1 multi cart ROM
     fn check_is_mbc1m_multi_cart(rom: &dyn ImageData) -> bool {
         // A ROM will be considered as 'multi cartridge' if it contains a cartridge header with

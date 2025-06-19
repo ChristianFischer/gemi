@@ -28,6 +28,7 @@ use std::path::Path;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CartridgeObject {
     // todo: private?
+    pub cartridge_info: Cartridge,
     pub rom: Box<DataBuffer>,
     pub ram: Box<DataBuffer>, // todo: make optional?
 }
@@ -36,17 +37,34 @@ pub struct CartridgeObject {
 #[cfg(feature = "dyn_alloc")]
 impl CartridgeObject {
     /// Loads cartridge ROM and RAM images.
-    pub fn with_images(rom: Box<DataBuffer>, ram: Option<Box<DataBuffer>>) -> Self {
-        Self {
-            rom,
-            ram: ram.unwrap_or_else(|| Box::new(DataBuffer::new_empty())),
-        }
+    pub fn with_images(rom: Box<DataBuffer>, ram: Option<Box<DataBuffer>>) -> ioerr::Result<Self> {
+        let cartridge_info = Cartridge::create_from(rom.as_ref())?;
+
+        let ram = ram.unwrap_or_else(|| Box::new(
+            if cartridge_info.has_ram() {
+                let mut buffer = DataBuffer::alloc(cartridge_info.get_ram_size());
+                // todo: buffer.set_file_path(rom.get_file_path().map())
+                buffer
+            }
+            else {
+                DataBuffer::new_empty()
+            }
+        ));
+
+        Ok(
+            Self {
+                cartridge_info,
+                rom,
+                ram,
+            }
+        )
     }
 
 
     /// Creates an empty cartridge with no data.
     pub fn new_empty() -> Self {
         Self {
+            cartridge_info: Cartridge::new_empty(),
             rom: Box::new(DataBuffer::new_empty()),
             ram: Box::new(DataBuffer::new_empty()),
         }
@@ -54,23 +72,17 @@ impl CartridgeObject {
 
 
     /// Loads a cartridge and optionally its RAM from a byte buffer.
-    pub fn load_from_bytes(rom: Vec<u8>, ram: Option<Vec<u8>>) -> Self {
-        Self {
-            rom: Box::new(DataBuffer::new(rom)),
-            ram: Box::new(
-                    ram
-                    .map(DataBuffer::new)
-                    .unwrap_or_else(DataBuffer::new_empty)
-            )
-        }
+    pub fn load_from_bytes(rom: Vec<u8>, ram: Option<Vec<u8>>) -> ioerr::Result<Self> {
+        Self::with_images(
+            Box::new(DataBuffer::new(rom)),
+            ram.map(|v| Box::new(DataBuffer::new(v)))
+        )
     }
 
 
-    /// Reads the cartridge info from the current cartridge files.
-    /// This may fail when the cartridge has no data or is corrupted.
-    #[deprecated]
-    pub fn read_cartridge_info(&self) -> ioerr::Result<Cartridge> {
-        Cartridge::create_from(self.rom.as_ref())
+    /// Get the [CartridgeInfo] of this cartridge object.
+    pub fn get_cartridge_info(&self) -> &Cartridge {
+        &self.cartridge_info
     }
 
 
@@ -98,9 +110,7 @@ impl CartridgeObject {
     /// `false` if the cartridge does not have battery-powered RAM or an
     /// `ioerr::Error` on error.
     pub fn flush_ram_if_any(&self) -> ioerr::Result<bool> {
-        let cartridge_info = self.read_cartridge_info()?;
-
-        if cartridge_info.has_ram() && cartridge_info.has_battery() {
+        if self.cartridge_info.has_ram() && self.cartridge_info.has_battery() {
             self
                     .get_ram()
                     .flush()
@@ -156,16 +166,14 @@ impl CartridgeObject {
     /// Loads a cartridge and it's RAM image from files.
     pub fn load_files(rom_file: &Path, ram_file: Option<&Path>) -> io::Result<Self> {
         // load the cartridge from the ROM file
-        let rom_data = DataBuffer::load_from_file(rom_file)?;
+        let rom_data = Box::new(DataBuffer::load_from_file(rom_file)?);
 
         let ram_data = match ram_file {
-            Some(path) => Some(DataBuffer::load_from_file(path)?),
+            Some(path) => Some(Box::new(DataBuffer::load_from_file(path)?)),
             None => None,
         };
 
-        Ok(Self {
-            rom: Box::new(rom_data),
-            ram: Box::new(ram_data.unwrap_or_else(DataBuffer::new_empty)),
-        })
+        Self::with_images(rom_data, ram_data)
+                .map_err(|e| io::Error::new(io::ErrorKind::Other, Box::new(e)))
     }
 }

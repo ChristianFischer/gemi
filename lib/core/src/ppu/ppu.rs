@@ -1120,7 +1120,7 @@ impl Ppu {
 
 
 impl MemoryBusConnection for Ppu {
-    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {

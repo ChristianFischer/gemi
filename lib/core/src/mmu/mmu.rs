@@ -72,7 +72,7 @@ impl Mmu {
 
 
     /// Reads a single byte value from the memory bus on a given address.
-    pub fn read_u8(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+    pub fn read_u8(&self, ec: &EmulatorContext, address: u16) -> u8 {
         self.internal.read(ec, address)
     }
 
@@ -156,7 +156,7 @@ impl MemoryBus<MmuInternal, MmuInternal> for MmuInternal {
 
 
 impl MemoryBusConnection for MmuInternal {
-    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_DMA_ADDRESS => self.dma_register_value,
             _ => 0xff,

@@ -19,7 +19,6 @@
 use std::fmt::{Display, Formatter};
 
 use crate::cartridge::image_data::{ImageData, ImageDataMut};
-use crate::cartridge::Cartridge;
 use crate::emulator_context::EmulatorContext;
 use crate::mmu::mbc::mbc1::Mbc1;
 use crate::mmu::mbc::mbc2::Mbc2;
@@ -68,7 +67,7 @@ struct MbcCartridgeInfo {
 /// Trait for objects acting as memory bank controller.
 pub trait MbcImpl {
     /// Read a single byte from the device memory.
-    fn read_byte(&self, ec: &mut EmulatorContext, address: u16) -> u8;
+    fn read_byte(&self, ec: &EmulatorContext, address: u16) -> u8;
 
     /// Write a single byte into the device memory.
     fn write_byte(&mut self, ec: &mut EmulatorContext, address: u16, value: u8);
@@ -115,7 +114,7 @@ impl Display for MemoryBankController {
 
 
 impl MbcImpl for Mbc {
-    fn read_byte(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn read_byte(&self, ec: &EmulatorContext, address: u16) -> u8 {
         match self {
             Mbc::None(mbc_impl)  => mbc_impl.read_byte(ec, address),
             Mbc::MBC1(mbc_impl)  => mbc_impl.read_byte(ec, address),
@@ -146,14 +145,12 @@ impl MbcImpl for Mbc {
 
 impl MbcCartridgeInfo {
     pub fn from(ec: &EmulatorContext) -> Self {
-        // todo: remove error code path
-        let cartridge = Cartridge::create_from(ec.get_cartridge_rom())
-                .unwrap_or_else(|_| panic!("Failed to create cartridge from ROM"));
+        let cartridge_info = ec.get_cartridge_info();
 
         Self {
-            has_ram:        cartridge.has_ram(),
-            rom_bank_count: cartridge.get_rom_bank_count(),
-            ram_bank_count: cartridge.get_ram_bank_count(),
+            has_ram:        cartridge_info.has_ram(),
+            rom_bank_count: cartridge_info.get_rom_bank_count(),
+            ram_bank_count: cartridge_info.get_ram_bank_count(),
         }
     }
 
@@ -187,7 +184,7 @@ pub mod mbc_none {
 
     impl MbcNone {
         /// Creates a default MBC object.
-        pub fn new(ec: &EmulatorContext) -> MbcNone {
+        pub fn new(_ec: &EmulatorContext) -> MbcNone {
             MbcNone {
             }
         }
@@ -195,7 +192,7 @@ pub mod mbc_none {
 
 
     impl MbcImpl for MbcNone {
-        fn read_byte(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+        fn read_byte(&self, ec: &EmulatorContext, address: u16) -> u8 {
             match address {
                 // read from ROM address space
                 0x0000 ..= 0x7fff => {
@@ -373,7 +370,7 @@ mod mbc1 {
 
 
     impl MbcImpl for Mbc1 {
-        fn read_byte(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+        fn read_byte(&self, ec: &EmulatorContext, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
@@ -431,8 +428,10 @@ mod mbc1 {
                 // 0xa000 - 0xbfff: Cartridge RAM
                 0x05 => {
                     if self.cartridge_info.has_ram() && self.ram_enabled {
-                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        ec.get_cartridge_ram().write(ram_address, value);
+                        if let Some(mut mutable_ram) = ec.get_cartridge_ram_mut() {
+                            let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                            mutable_ram.write(ram_address, value);
+                        }
                     }
                 },
 
@@ -514,7 +513,7 @@ mod mbc2 {
 
 
     impl MbcImpl for Mbc2 {
-        fn read_byte(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+        fn read_byte(&self, ec: &EmulatorContext, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
@@ -680,7 +679,7 @@ mod mbc5 {
 
 
     impl MbcImpl for Mbc5 {
-        fn read_byte(&self, ec: &mut EmulatorContext, address: u16) -> u8 {
+        fn read_byte(&self, ec: &EmulatorContext, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
@@ -742,8 +741,10 @@ mod mbc5 {
                 // Cartridge RAM
                 0xa000 ..= 0xbfff => {
                     if self.cartridge_info.has_ram() && self.ram_enabled {
-                        let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        ec.get_cartridge_ram().write(ram_address, value);
+                        if let Some(mut mutable_ram) = ec.get_cartridge_ram_mut() {
+                            let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
+                            mutable_ram.write(ram_address, value);
+                        }
                     }
                 },
 

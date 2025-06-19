@@ -304,7 +304,7 @@ impl Apu {
 
 
 impl MemoryBusConnection for Apu {
-    fn on_read(&self, _ec: &mut EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {

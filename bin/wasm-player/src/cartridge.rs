@@ -31,10 +31,7 @@ impl Cartridge {
     /// Load a cartridge from a byte array.
     #[wasm_bindgen]
     pub fn load_from_bytes(bytes: Vec<u8>) -> Result<Cartridge, String> {
-        let cartridge = NativeCartridge::load_from_bytes(bytes, None);
-
-        // read cartridge info to verify the ROM file
-        let _ = cartridge.read_cartridge_info()
+        let cartridge = NativeCartridge::load_from_bytes(bytes, None)
             .map_err(|e| format!("Failed to load cartridge: {}", e))
             ?;
 
@@ -61,9 +58,8 @@ impl Cartridge {
     #[wasm_bindgen]
     pub fn get_title(&self) -> String {
         self.cartridge
-                .read_cartridge_info()
-                .map(|info| info.get_title().clone())
-                .unwrap_or(String::from("Invalid ROM"))
+                .get_cartridge_info()
+                .get_title().clone()
     }
 
 
@@ -71,9 +67,8 @@ impl Cartridge {
     #[wasm_bindgen]
     pub fn is_gbc(&self) -> bool {
         self.cartridge
-                .read_cartridge_info()
-                .map(|info| info.supports_cgb())
-                .unwrap_or(false)
+                .get_cartridge_info()
+                .supports_cgb()
     }
 }
 

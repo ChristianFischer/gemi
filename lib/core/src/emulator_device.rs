@@ -118,7 +118,8 @@ impl EmulatorDevice {
         let title_checksum = if true /* todo: let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() */ {
             match ec.get_cartridge_info().get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
-                    cartridge::rom_data::compute_title_checksum(ec.get_cartridge_rom())
+                    let rom_data = ec.get_cartridge_rom();
+                    cartridge::rom_data::compute_title_checksum(&rom_data)
                 }
 
                 _ => 0x00

@@ -16,7 +16,7 @@
  */
 
 use crate::boot_rom::BootRom;
-use crate::cartridge::image_data::{ImageData, ImageDataMut, MutableRefImageData, RefImageData, ZeroImageData};
+use crate::cartridge::image_data::{ImageData, ImageDataMut, ZeroImageData};
 use crate::cartridge::Cartridge;
 use crate::device_type::DeviceConfig;
 
@@ -25,8 +25,8 @@ use crate::device_type::DeviceConfig;
 pub struct EmulatorContext<'a> {
     device_config:  DeviceConfig, // todo: change into ref?
     cartridge_info: &'a Cartridge,
-    cartridge_rom:  RefImageData<'a>,
-    cartridge_ram:  MutableRefImageData<'a>,
+    cartridge_rom:  RefImageOption<'a>,
+    cartridge_ram:  RefImageOption<'a>,
     boot_rom:       Option<&'a BootRom>
 }
 
@@ -45,8 +45,45 @@ pub struct EmulatorContextDataHolder<Rom, Ram>
 }
 
 
+enum RefImageOption<'a> {
+    Readonly(&'a [u8]),
+    Mutable(&'a mut [u8]),
+}
+
+
+// todo: doc
+pub struct ImageDataReader<'a> {
+    data: &'a [u8],
+}
+
+
+// todo: doc
+pub struct ImageDataWriter<'a> {
+    data: &'a mut [u8],
+}
+
+
+
 impl<'a> EmulatorContext<'a> {
+    // todo: can we unify new & new_mut?
     pub fn new(
+        device_config: DeviceConfig,
+        cartridge_info: &'a Cartridge,
+        rom_data: &'a [u8],
+        ram_data: &'a [u8],
+        boot_rom: Option<&'a BootRom>
+    ) -> Self {
+        Self {
+            device_config,
+            cartridge_info,
+            cartridge_rom: RefImageOption::Readonly(rom_data),
+            cartridge_ram: RefImageOption::Readonly(ram_data),
+            boot_rom,
+        }
+    }
+    
+    
+    pub fn new_mut(
         device_config: DeviceConfig,
         cartridge_info: &'a Cartridge,
         rom_data: &'a [u8],
@@ -56,8 +93,8 @@ impl<'a> EmulatorContext<'a> {
         Self {
             device_config,
             cartridge_info,
-            cartridge_rom: RefImageData::new(rom_data),
-            cartridge_ram: MutableRefImageData::new(ram_data),
+            cartridge_rom: RefImageOption::Readonly(rom_data),
+            cartridge_ram: RefImageOption::Mutable(ram_data),
             boot_rom,
         }
     }
@@ -78,13 +115,28 @@ impl<'a> EmulatorContext<'a> {
     }
 
 
-    pub fn get_cartridge_rom(&self) -> &RefImageData<'a> {
-        &self.cartridge_rom
+    pub fn get_cartridge_rom(&'a self) -> ImageDataReader<'a> {
+        match &self.cartridge_rom {
+            RefImageOption::Mutable(data) => ImageDataReader::<'a>{ data },
+            RefImageOption::Readonly(data) => ImageDataReader::<'a>{ data },
+        }
     }
 
 
-    pub fn get_cartridge_ram(&mut self) -> &mut MutableRefImageData<'a> {
-        &mut self.cartridge_ram
+    pub fn get_cartridge_ram(&'a self) -> ImageDataReader<'a> {
+        match &self.cartridge_ram {
+            RefImageOption::Mutable(data) => ImageDataReader::<'a>{ data },
+            RefImageOption::Readonly(data) => ImageDataReader::<'a>{ data },
+        }
+    }
+
+
+    // todo: could get..mut avoid Option?
+    pub fn get_cartridge_ram_mut<'b>(&'b mut self) -> Option<ImageDataWriter<'b>> {
+        match &mut self.cartridge_ram {
+            RefImageOption::Mutable(data) => Some(ImageDataWriter::<'b>{ data }),
+            _ => None
+        }
     }
 }
 
@@ -127,6 +179,36 @@ impl EmulatorContextDataHolder<ZeroImageData, ZeroImageData> {
         }
     }
 }
+
+
+impl<'a> ImageData for ImageDataReader<'a> {
+    fn get_size(&self) -> usize {
+        self.data.len()
+    }
+
+    fn get_data(&self) -> &[u8] {
+        self.data
+    }
+}
+
+
+impl<'a> ImageData for ImageDataWriter<'a> {
+    fn get_size(&self) -> usize {
+        self.data.len()
+    }
+
+    fn get_data(&self) -> &[u8] {
+        self.data
+    }
+}
+
+
+impl<'a> ImageDataMut for ImageDataWriter<'a> {
+    fn get_data_mut(&mut self) -> &mut [u8] {
+        self.data
+    }
+}
+
 
 /*
 // todo: doc

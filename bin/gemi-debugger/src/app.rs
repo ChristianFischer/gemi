@@ -48,8 +48,7 @@ pub struct EmulatorApplication {
     behaviour: TreeBehaviour,
 
     #[serde(skip)]
-    // todo: try to send Cartridge
-    open_file: Option<Receiver<Option<Vec<u8>>>>,
+    open_file: Option<Receiver<Option<CartridgeObject>>>,
 
     /// A user notification to be displayed in a message box.
     #[serde(skip)]
@@ -328,11 +327,10 @@ impl EmulatorApplication {
                     
                     let file_data = file_handle.read().await;
 
-                    // todo: revert?
-                    //let cartridge = CartridgeObject::load_from_bytes(file_data, None);
-
-                    //Some(cartridge)
-                    Some(file_data)
+                    match CartridgeObject::load_from_bytes(file_data, None) {
+                        Ok(cartridge) => Some(cartridge),
+                        Err(_) => None
+                    }
                 }.await;
 
                 _ = sender.send(result);
@@ -357,8 +355,6 @@ impl EmulatorApplication {
             match result {
                 // load the cartridge into the emulator
                 Ok(Some(cartridge)) => {
-                    let cartridge = CartridgeObject::load_from_bytes(cartridge, None);
-
                     // try to load the file
                     if let Err(e) = self.load_cartridge(cartridge) {
                         // display an error message on failure

@@ -246,8 +246,8 @@ impl SnapshotEntry {
         let snapshot = Snapshot::create_from(gb)?;
 
         // get ROM title
-        let rom_title = match gb.get_cartridge_info() {
-            Some(cartridge) => cartridge.get_title().to_string(),
+        let rom_title = match gb.get_cartridge() {
+            Some(cartridge) => cartridge.get_cartridge_info().get_title().to_string(),
             None => String::from("---"),
         };
 
