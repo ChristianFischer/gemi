@@ -15,10 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+mod context_data;
 mod gameboy;
 mod gameboy_builder;
 pub use gameboy::*;
 pub use gameboy_builder::*;
 
-pub mod context;
 pub mod snapshots;

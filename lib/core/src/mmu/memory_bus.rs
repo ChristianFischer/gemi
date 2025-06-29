@@ -78,19 +78,11 @@ pub trait MemoryBusConnection {
 /// A trait to implement a memory map to find the according component for each memory address.
 /// To easily implement a memory mapper, the macro `impl_memory_mapper` may be used.
 pub trait MemoryMapper<TRootType> {
-    // todo: doc
+    /// Forwards a read instruction to the component responsible for the given address.
     fn forward_read(root: &TRootType, ec: &EmulatorContext, address: u16) -> u8;
+
+    /// Forwards a write instruction to the component responsible for the given address.
     fn forward_write(root: &mut TRootType, ec: &mut EmulatorContext, address: u16, value: u8);
-
-
-    // todo: remove
-    /*
-    /// Get the component responsible to read from a given address.
-    fn map<'a>(address: u16, root: &'a TRootType) -> &'a dyn MemoryBusConnection;
-
-    /// Get the component responsible to write to a given address.
-    fn map_mut<'a>(address: u16, root: &'a mut TRootType) -> &'a mut dyn MemoryBusConnection;
-    */
 }
 
 
@@ -110,24 +102,16 @@ pub trait MemoryBus<TRootType, TMemoryMapper>
     /// Loads a single byte from an address via this memory bus.
     /// The memory bus will take the data from the according component.
     fn read(&self, ec: &EmulatorContext, address: u16) -> u8 {
-        let root       = self.get_root();
+        let root = self.get_root();
         TMemoryMapper::forward_read(root, ec, address)
-
-        // todo: remove
-        //let connection = TMemoryMapper::map(address, root);
-        //connection.on_read(ec, address)
     }
 
 
     /// Send a single byte to an address via this memory bus.
     /// The memory bus will forward the data to the according component.
     fn write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
-        let root       = self.get_root_mut();
+        let root = self.get_root_mut();
         TMemoryMapper::forward_write(root, ec, address, value);
-
-        // todo: remove
-        //let connection = TMemoryMapper::map_mut(address, root);
-        //connection.on_write(ec, address, value);
     }
 }
 

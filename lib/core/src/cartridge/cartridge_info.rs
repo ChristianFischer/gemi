@@ -119,8 +119,7 @@ pub mod rom_data {
 
 
     /// Read the ROM title from a ROM image.
-    // todo: avoid dyn
-    pub fn read_title(rom: &dyn ImageData) -> String {
+    pub fn read_title(rom: &impl ImageData) -> String {
         let data = rom.get_data();
         let mut title_length: usize = 0;
 
@@ -185,8 +184,7 @@ pub mod rom_data {
 
 impl CartridgeInfo {
     /// Loads a cartridge and optionally its RAM from a byte buffer.
-    // todo: try to avoid 'dyn'
-    pub fn create_from(rom: &dyn ImageData) -> ioerr::Result<CartridgeInfo> {
+    pub fn create_from(rom: &impl ImageData) -> ioerr::Result<CartridgeInfo> {
         if rom.get_size() < 0x0100 {
             return Err(ioerr::Error {
                 error_code:     ErrorCode::MissingHeader,

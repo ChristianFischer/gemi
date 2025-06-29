@@ -15,14 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::context_data::GameBoyContextData;
 use crate::Builder;
 use gemi_core::apu::Apu;
-use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::image_data::{ImageData, ImageDataMut};
 use gemi_core::cartridge::Cartridge;
 use gemi_core::cpu::cpu::Cpu;
 use gemi_core::device_type::DeviceConfig;
-use gemi_core::emulator_context::EmulatorContext;
 use gemi_core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
 use gemi_core::input::Input;
 use gemi_core::mmu::memory::Memory;
@@ -32,21 +30,10 @@ use gemi_core::serial::SerialPort;
 
 
 /// The GameBoy object providing access to all it's emulated components.
-// todo: #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GameBoy {
     pub(crate) context_data: GameBoyContextData,
     pub(crate) emulator: Box<EmulatorDevice>,
-}
-
-
-/// A struct holding the internal data used by the emulator.
-// todo: move to separate file?
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub(crate) struct GameBoyContextData {
-    pub(crate) device_config: DeviceConfig,
-    pub(crate) boot_rom:  Option<Box<BootRom>>,
-    pub(crate) cartridge: Box<Cartridge>,
 }
 
 
@@ -94,7 +81,6 @@ impl GameBoy {
 
 
     /// Reads a single byte from the emulator's memory bus.
-    // todo: should not require mut
     pub fn read_u8(&self, address: u16) -> u8 {
         let context = self.context_data.make_context();
         self.emulator.get_mmu().read_u8(&context, address)
@@ -217,27 +203,3 @@ impl GameBoy {
     }
 }
 
-
-impl GameBoyContextData {
-    pub(crate) fn make_context(&self) -> EmulatorContext {
-        EmulatorContext::new(
-            self.device_config,
-            &self.cartridge.cartridge_info,
-            self.cartridge.rom.get_data(),
-            self.cartridge.ram.get_data(),
-            self.boot_rom.as_ref().map(|boot_rom| boot_rom.as_ref())
-        )
-    }
-
-    
-    // todo: unify make + make_mut?
-    pub(crate) fn make_context_mut(&mut self) -> EmulatorContext {
-        EmulatorContext::new_mut(
-            self.device_config,
-            &self.cartridge.cartridge_info,
-            self.cartridge.rom.get_data(),
-            self.cartridge.ram.get_data_mut(),
-            self.boot_rom.as_ref().map(|boot_rom| boot_rom.as_ref())
-        )
-    }
-}

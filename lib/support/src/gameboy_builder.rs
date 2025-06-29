@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use crate::gameboy::GameBoyContextData;
+use crate::context_data::GameBoyContextData;
 use crate::GameBoy;
 use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::{Cartridge, CartridgeInfo};
@@ -108,15 +108,14 @@ impl Builder {
 
     /// Build the GameBoy device emulator based on the properties specified with this builder.
     pub fn finish(mut self) -> Result<GameBoy, BuilderErrorCode> {
-        // todo: replace with zero?
-        // take the ROM objects from the builder, or create default images
-        let boot_rom  = self.boot_rom.take();
+        // take the Boot ROM object from the builder or create default images
+        let boot_rom = self.boot_rom.take();
 
         // get the cartridge object or create an empty one
         let cartridge = self.cartridge.take()
                 .unwrap_or_else(|| Box::new(Cartridge::new_empty()));
         
-        // read cartridge info
+        // get cartridge info
         let cartridge_info = cartridge.get_cartridge_info();
 
         // select the preferred device type based on the current config and cartridge

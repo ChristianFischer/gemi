@@ -21,7 +21,7 @@ use std::io;
 use std::path::Path;
 
 
-// todo: rename cartridge? move to support lib?
+// todo: move to support lib?
 // todo: doc
 #[cfg(feature = "dyn_alloc")]
 #[derive(Clone)]
