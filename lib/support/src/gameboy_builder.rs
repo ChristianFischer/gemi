@@ -17,7 +17,7 @@
 use crate::gameboy::GameBoyContextData;
 use crate::GameBoy;
 use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::{Cartridge, CartridgeObject};
+use gemi_core::cartridge::{Cartridge, CartridgeInfo};
 use gemi_core::device_type::{DeviceConfig, DeviceType, EmulationType};
 use gemi_core::emulator_device::EmulatorDevice;
 use gemi_core::utils::ioerr;
@@ -28,7 +28,7 @@ use std::fmt::{Display, Formatter};
 /// Usually created via GameBoy::build()
 pub struct Builder {
     boot_rom:       Option<Box<BootRom>>,
-    cartridge:      Option<Box<CartridgeObject>>,
+    cartridge:      Option<Box<Cartridge>>,
     device_type:    Option<DeviceType>,
 }
 
@@ -60,7 +60,7 @@ impl Builder {
 
 
     /// Set the cartridge, which ROM will be executed.
-    pub fn set_cartridge(&mut self, cartridge: CartridgeObject) {
+    pub fn set_cartridge(&mut self, cartridge: Cartridge) {
         self.cartridge = Some(cartridge.into());
     }
 
@@ -74,7 +74,7 @@ impl Builder {
 
     /// Get the preferred device type, which is either specified explicitly
     /// or selected by the cartridge properties.
-    pub fn select_preferred_device_type(&self, cartridge_info: &Cartridge) -> DeviceType {
+    pub fn select_preferred_device_type(&self, cartridge_info: &CartridgeInfo) -> DeviceType {
         // explicit type will be preferred
         if let Some(device_type) = &self.device_type {
             return *device_type;
@@ -92,7 +92,7 @@ impl Builder {
 
     /// Check the emulation type based on the selected device and GameBoyColor
     /// support of the selected cartridge.
-    pub fn select_emulation_type(&self, cartridge_info: &Cartridge, device_type: &DeviceType) -> EmulationType {
+    pub fn select_emulation_type(&self, cartridge_info: &CartridgeInfo, device_type: &DeviceType) -> EmulationType {
         match device_type {
             DeviceType::GameBoyDmg => {}
             _ => {
@@ -114,7 +114,7 @@ impl Builder {
 
         // get the cartridge object or create an empty one
         let cartridge = self.cartridge.take()
-                .unwrap_or_else(|| Box::new(CartridgeObject::new_empty()));
+                .unwrap_or_else(|| Box::new(Cartridge::new_empty()));
         
         // read cartridge info
         let cartridge_info = cartridge.get_cartridge_info();

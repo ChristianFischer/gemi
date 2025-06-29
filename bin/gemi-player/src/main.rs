@@ -23,7 +23,7 @@ use std::{env, time};
 
 use libgemi::core::boot_rom::BootRom;
 use libgemi::core::cartridge::GameBoyColorSupport;
-use libgemi::core::cartridge::{Cartridge, CartridgeObject};
+use libgemi::core::cartridge::{Cartridge, CartridgeInfo};
 use libgemi::core::cpu::cpu::CPU_CLOCK_SPEED;
 use libgemi::core::device_type::DeviceType;
 use libgemi::GameBoy;
@@ -33,7 +33,7 @@ use crate::window::Window;
 mod sound_queue;
 mod window;
 
-fn print_rom_info(file: &Path, cartridge: &Cartridge) {
+fn print_rom_info(file: &Path, cartridge: &CartridgeInfo) {
     let mut features: Vec<&str> = vec![];
 
     if cartridge.has_ram() {
@@ -163,7 +163,7 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
 
             _ => {
                 let file = PathBuf::from(arg);
-                let cart = CartridgeObject::load_files_with_default_ram(&file)
+                let cart = Cartridge::load_files_with_default_ram(&file)
                     .map_err(|e| format!("Failed to load cartridge: {}", e))
                     ?;
 

@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 use crate::cartridge::image_data::{DataBuffer, ImageData, ImageDataMut};
-use crate::cartridge::Cartridge;
+use crate::cartridge::CartridgeInfo;
 use crate::utils::ioerr;
 use std::io;
 use std::path::Path;
@@ -26,19 +26,19 @@ use std::path::Path;
 #[cfg(feature = "dyn_alloc")]
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CartridgeObject {
+pub struct Cartridge {
     // todo: private?
-    pub cartridge_info: Cartridge,
+    pub cartridge_info: CartridgeInfo,
     pub rom: Box<DataBuffer>,
     pub ram: Box<DataBuffer>, // todo: make optional?
 }
 
 
 #[cfg(feature = "dyn_alloc")]
-impl CartridgeObject {
+impl Cartridge {
     /// Loads cartridge ROM and RAM images.
     pub fn with_images(rom: Box<DataBuffer>, ram: Option<Box<DataBuffer>>) -> ioerr::Result<Self> {
-        let cartridge_info = Cartridge::create_from(rom.as_ref())?;
+        let cartridge_info = CartridgeInfo::create_from(rom.as_ref())?;
 
         let ram = ram.unwrap_or_else(|| Box::new(
             if cartridge_info.has_ram() {
@@ -64,7 +64,7 @@ impl CartridgeObject {
     /// Creates an empty cartridge with no data.
     pub fn new_empty() -> Self {
         Self {
-            cartridge_info: Cartridge::new_empty(),
+            cartridge_info: CartridgeInfo::new_empty(),
             rom: Box::new(DataBuffer::new_empty()),
             ram: Box::new(DataBuffer::new_empty()),
         }
@@ -81,7 +81,7 @@ impl CartridgeObject {
 
 
     /// Get the [CartridgeInfo] of this cartridge object.
-    pub fn get_cartridge_info(&self) -> &Cartridge {
+    pub fn get_cartridge_info(&self) -> &CartridgeInfo {
         &self.cartridge_info
     }
 
@@ -129,7 +129,7 @@ impl CartridgeObject {
 
 #[cfg(feature = "dyn_alloc")]
 #[cfg(feature = "file_io")]
-impl CartridgeObject {
+impl Cartridge {
     pub const FILE_EXT_GB:  &'static str = "gb";
     pub const FILE_EXT_GBC: &'static str = "gbc";
     pub const FILE_EXT_RAM: &'static str = "sav";

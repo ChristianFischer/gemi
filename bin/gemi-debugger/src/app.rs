@@ -23,7 +23,7 @@ use egui::{ComboBox, Context};
 use egui_tiles::{Container, Tile};
 use rfd::AsyncFileDialog;
 
-use libgemi::core::cartridge::CartridgeObject;
+use libgemi::core::cartridge::Cartridge;
 use libgemi::core::ppu::graphic_data::TileMap;
 
 use crate::behaviour::TreeBehaviour;
@@ -48,7 +48,7 @@ pub struct EmulatorApplication {
     behaviour: TreeBehaviour,
 
     #[serde(skip)]
-    open_file: Option<Receiver<Option<CartridgeObject>>>,
+    open_file: Option<Receiver<Option<Cartridge>>>,
 
     /// A user notification to be displayed in a message box.
     #[serde(skip)]
@@ -251,7 +251,7 @@ impl EmulatorApplication {
 
 
     /// Loads an already created cartridge into the emulator.
-    pub fn load_cartridge(&mut self, cartridge: CartridgeObject) -> Result<(), String> {
+    pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
         let state = self.behaviour.get_state_mut();
 
         // open the ROM file
@@ -318,8 +318,8 @@ impl EmulatorApplication {
                     let file_handle = AsyncFileDialog::new()
                             .set_title("Open ROM")
                             .add_filter("GameBoy ROM Files", &[
-                                CartridgeObject::FILE_EXT_GB,
-                                CartridgeObject::FILE_EXT_GBC,
+                                Cartridge::FILE_EXT_GB,
+                                Cartridge::FILE_EXT_GBC,
                             ])
                             .pick_file()
                             .await?
@@ -327,7 +327,7 @@ impl EmulatorApplication {
                     
                     let file_data = file_handle.read().await;
 
-                    match CartridgeObject::load_from_bytes(file_data, None) {
+                    match Cartridge::load_from_bytes(file_data, None) {
                         Ok(cartridge) => Some(cartridge),
                         Err(_) => None
                     }

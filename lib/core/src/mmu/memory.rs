@@ -17,7 +17,7 @@
 
 use core::cmp::max;
 
-use crate::cartridge::Cartridge;
+use crate::cartridge::CartridgeInfo;
 use crate::device_type::{DeviceConfig, EmulationType};
 use crate::emulator_context::EmulatorContext;
 use crate::mmu::locations::*;
@@ -94,7 +94,7 @@ pub struct Memory {
 impl Memory {
     /// Create a new Memory object.
     pub fn new(ec: &EmulatorContext) -> Self {
-        let mbc = Cartridge::create_from(&ec.get_cartridge_rom())
+        let mbc = CartridgeInfo::create_from(&ec.get_cartridge_rom())
                 .map(|info| info.get_mbc().clone())
                 .unwrap_or(MemoryBankController::None)
         ;

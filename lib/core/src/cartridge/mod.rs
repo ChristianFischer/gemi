@@ -15,9 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-mod cartridge;
+mod cartridge_info;
 mod cartridge_object;
-pub use cartridge::*;
+pub use cartridge_info::*;
 pub use cartridge_object::*;
 
 pub mod image_data;

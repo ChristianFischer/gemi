@@ -60,8 +60,7 @@ pub enum LicenseeCode {
 /// This object represents a cartridge of a single game.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-// todo: rename CartridgeInfo?
-pub struct Cartridge {
+pub struct CartridgeInfo {
     #[cfg(feature = "std")]
     title: String,
 
@@ -184,16 +183,10 @@ pub mod rom_data {
 }
 
 
-impl Cartridge {
-    /// Default value to be used in [load_from_bytes] to tell the function
-    /// not to load a RAM image.
-    // todo: remove?
-    //pub const NO_RAM: Option<[u8; 0]> = None;
-
-
+impl CartridgeInfo {
     /// Loads a cartridge and optionally its RAM from a byte buffer.
     // todo: try to avoid 'dyn'
-    pub fn create_from(rom: &dyn ImageData) -> ioerr::Result<Cartridge> {
+    pub fn create_from(rom: &dyn ImageData) -> ioerr::Result<CartridgeInfo> {
         if rom.get_size() < 0x0100 {
             return Err(ioerr::Error {
                 error_code:     ErrorCode::MissingHeader,
@@ -286,7 +279,7 @@ impl Cartridge {
             }
         };
 
-        let cartridge = Cartridge {
+        let cartridge = CartridgeInfo {
             #[cfg(feature = "std")]
             title: rom_data::read_title(rom),
 
@@ -316,7 +309,7 @@ impl Cartridge {
     }
 
 
-    /// Creates a [Cartridge] object with default values.
+    /// Creates a [CartridgeInfo] object with default values.
     pub fn new_empty() -> Self {
         Self {
             #[cfg(feature = "std")]
@@ -442,7 +435,7 @@ impl Cartridge {
 }
 
 
-impl Default for Cartridge {
+impl Default for CartridgeInfo {
     fn default() -> Self {
         Self {
             #[cfg(feature = "std")]

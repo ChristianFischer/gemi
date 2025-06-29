@@ -19,7 +19,7 @@ use crate::Builder;
 use gemi_core::apu::Apu;
 use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::image_data::{ImageData, ImageDataMut};
-use gemi_core::cartridge::CartridgeObject;
+use gemi_core::cartridge::Cartridge;
 use gemi_core::cpu::cpu::Cpu;
 use gemi_core::device_type::DeviceConfig;
 use gemi_core::emulator_context::EmulatorContext;
@@ -46,7 +46,7 @@ pub struct GameBoy {
 pub(crate) struct GameBoyContextData {
     pub(crate) device_config: DeviceConfig,
     pub(crate) boot_rom:  Option<Box<BootRom>>,
-    pub(crate) cartridge: Box<CartridgeObject>,
+    pub(crate) cartridge: Box<Cartridge>,
 }
 
 
@@ -116,7 +116,7 @@ impl GameBoy {
 
     /// Get a reference to the emulator's cartridge, if any.
     // todo: should cartridge stay optional?
-    pub fn get_cartridge(&self) -> Option<&CartridgeObject> {
+    pub fn get_cartridge(&self) -> Option<&Cartridge> {
         Some(&self.context_data.cartridge)
     }
 

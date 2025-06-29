@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use libgemi::core::cartridge::CartridgeObject as NativeCartridge;
+use libgemi::core::cartridge::Cartridge as NativeCartridge;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 

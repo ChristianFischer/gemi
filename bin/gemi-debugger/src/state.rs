@@ -17,7 +17,7 @@
 
 use crate::selection::{Kind, Selection};
 use gemi_utils::keybindings::KeyBindings;
-use libgemi::core::cartridge::CartridgeObject;
+use libgemi::core::cartridge::Cartridge;
 use libgemi::core::debug::DebugEvent;
 use libgemi::core::device_type::DeviceType;
 use libgemi::core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
@@ -224,7 +224,7 @@ impl EmulatorState {
         self.last_rom_file = None;
 
         // load the cartridge from the given path
-        let cartridge = CartridgeObject::load_files_with_default_ram(path)
+        let cartridge = Cartridge::load_files_with_default_ram(path)
                 .map_err(|e| format!("Failed to load ROM: {}", e))
                 ?
         ;
@@ -241,7 +241,7 @@ impl EmulatorState {
 
     /// Takes an existing Cartridge object and load it into the emulator.
     /// If there's already a running instance of the emulator, this will be closed.
-    pub fn load_cartridge(&mut self, cartridge: CartridgeObject) -> Result<(), String> {
+    pub fn load_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
         // no path known
         self.last_rom_file = None;
 
@@ -261,7 +261,7 @@ impl EmulatorState {
 
     /// Internal function to create a new emulator instance with an existing cartridge
     /// without changing any other configuration.
-    fn instantiate_emulator_with_cartridge(&mut self, cartridge: CartridgeObject) -> Result<(), String> {
+    fn instantiate_emulator_with_cartridge(&mut self, cartridge: Cartridge) -> Result<(), String> {
         // on success build the new emulator instance
         let mut builder = GameBoy::build();
         builder.set_device_type(self.ui.get_device_type().clone().into());
@@ -359,7 +359,7 @@ impl EmulatorInstance {
 
 
     /// Get the cartridge of the currently running emulator instance, if any.
-    pub fn get_cartridge(&self) -> Option<&CartridgeObject> {
+    pub fn get_cartridge(&self) -> Option<&Cartridge> {
         self.gb.as_ref().and_then(|gb| gb.get_cartridge())
     }
 

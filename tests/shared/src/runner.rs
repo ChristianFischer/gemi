@@ -20,7 +20,7 @@ use std::panic;
 use std::path::PathBuf;
 
 use libgemi::core::boot_rom::BootRom;
-use libgemi::core::cartridge::CartridgeObject;
+use libgemi::core::cartridge::Cartridge;
 use libgemi::core::device_type::DeviceType;
 use libgemi::core::utils::to_u8;
 use libgemi::GameBoy;
@@ -118,7 +118,7 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
 
     // load the cartridge file
     let cartridge_path = PathBuf::from(workspace.get_path_to_str(&setup.cartridge_path));
-    let cartridge = CartridgeObject::load_file(&cartridge_path)
+    let cartridge = Cartridge::load_file(&cartridge_path)
         .map_err(|e| TestCaseError::SetUpError(e.to_string()))
         ?;
 
