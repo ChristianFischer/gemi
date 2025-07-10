@@ -196,10 +196,6 @@ struct PpuRegisters {
 pub struct Ppu {
     clock: Clock,
 
-    /// Current device config
-    #[deprecated(note = "Use device_config instead")]
-    device_config: DeviceConfig,
-
     /// Pending output to be sent back through the memory bus.
     signals: MemoryBusSignals,
 
@@ -337,7 +333,6 @@ impl Ppu {
         
         Ppu {
             clock: 0,
-            device_config: device_config.clone(),
             signals: MemoryBusSignals::default(),
             lcd_state: LcdState::On,
             is_first_frame: true,
@@ -368,14 +363,14 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    pub fn update(&mut self, cycles: Clock) {
+    pub fn update(&mut self, ec: &EmulatorContext, cycles: Clock) {
         match self.lcd_state {
             LcdState::On => {
                 self.clock += cycles;
 
                 match self.mode {
-                    Mode::OamScan  => self.process_oam_scan(),
-                    Mode::DrawLine => self.process_draw_line(),
+                    Mode::OamScan  => self.process_oam_scan(ec),
+                    Mode::DrawLine => self.process_draw_line(ec),
                     Mode::HBlank   => self.process_hblank(),
                     Mode::VBlank   => self.process_vblank(),
                 }
@@ -419,11 +414,11 @@ impl Ppu {
     /// Scans the object attribute memory for the current scanline
     /// to collect the objects to be drawn in this line.
     /// Enters Mode::DrawLine after the OAM scan was completed.
-    fn process_oam_scan(&mut self) {
+    fn process_oam_scan(&mut self, ec: &EmulatorContext) {
         if self.clock >= CPU_CYCLES_OAMSCAN {
             self.clock -= CPU_CYCLES_OAMSCAN;
 
-            self.current_scanline    = self.do_oam_scan_for_line(self.current_line);
+            self.current_scanline    = self.do_oam_scan_for_line(ec, self.current_line);
             self.current_line_pixel  = 0;
             self.current_line_cycles = 80;
 
@@ -434,7 +429,7 @@ impl Ppu {
 
     /// Draws pixels of the current scanline into the LCD buffer.
     /// Enters Mode::HBlank after the drawing was completed.
-    fn process_draw_line(&mut self) {
+    fn process_draw_line(&mut self, ec: &EmulatorContext) {
         let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
 
         if pixels_remaining > 0 {
@@ -447,7 +442,7 @@ impl Ppu {
             self.clock -= cycles;
 
             // process the pixels
-            self.process_draw_line_pixels(pixels_to_update);
+            self.process_draw_line_pixels(ec, pixels_to_update);
         }
         else {
             self.current_line_cycles += self.clock;
@@ -462,7 +457,7 @@ impl Ppu {
 
 
     /// Process a number of pixels within the current scanline.
-    fn process_draw_line_pixels(&mut self, pixels_to_update: Clock) {
+    fn process_draw_line_pixels(&mut self, ec: &EmulatorContext, pixels_to_update: Clock) {
         let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
         let palette_bg       = &self.memory.palettes.bgp;
         let palette_obp      = &self.memory.palettes.obp;
@@ -480,8 +475,8 @@ impl Ppu {
             }
 
             // fetch background and foreground pixels, if any
-            let fetched_pixel_background = self.fetch_background_pixel();
-            let fetched_pixel_foreground = self.fetch_foreground_pixel();
+            let fetched_pixel_background = self.fetch_background_pixel(ec);
+            let fetched_pixel_foreground = self.fetch_foreground_pixel(ec);
 
             // select palettes for background pixel
             let pixel_background = PixelFetchResultWithPalette {
@@ -499,6 +494,7 @@ impl Ppu {
 
             // select pixel to be displayed
             let pixel = self.mix_pixels(
+                    ec,
                     &pixel_background,
                     &pixel_foreground
             );
@@ -506,7 +502,7 @@ impl Ppu {
             // the first frame does not draw pixels
             if !self.is_first_frame {
                 // resolve pixel color using the according palette
-                let pixel_color = match self.device_config.emulation {
+                let pixel_color = match ec.get_device_config().emulation {
                     EmulationType::DMG => {
                         let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
                         *self.translate_dmg_color_index(&lcd_pixel)
@@ -532,7 +528,7 @@ impl Ppu {
 
 
     /// Fetch the data of the background or window layer on the current position in the active scanline.
-    fn fetch_background_pixel(&self) -> PixelFetchResult {
+    fn fetch_background_pixel(&self, ec: &EmulatorContext) -> PixelFetchResult {
         let bg_enabled      = self.check_lcdc(LcdControlFlag::BackgroundAndWindowEnabled);
         let tileset_select  = self.check_lcdc(LcdControlFlag::TileDataSelect);
         let tileset         = TileSet::by_select_bit(tileset_select);
@@ -540,7 +536,7 @@ impl Ppu {
         // check if the flag for window/background is enabled
         // on CGB the background is always active, but their priority
         // disabled by clearing the LCDC bit 0
-        if bg_enabled || self.device_config.is_gbc_enabled() {
+        if bg_enabled || ec.get_device_config().is_gbc_enabled() {
             // process window pixels instead of background, if the window was enabled for this scanline
             let tile_info = if self.current_scanline.window_enabled {
                 let window_tilemap_select = self.check_lcdc(LcdControlFlag::WindowTileMapSelect);
@@ -574,7 +570,7 @@ impl Ppu {
                 )
             };
 
-            self.read_tile_pixel(&tile_info)
+            self.read_tile_pixel(ec, &tile_info)
         }
         else {
             PixelFetchResult::none()
@@ -584,11 +580,12 @@ impl Ppu {
 
     /// Fetch the foreground pixel by reading the color of any sprite on the current
     /// position within the active scanline
-    pub fn fetch_foreground_pixel(&self) -> PixelFetchResult {
+    pub fn fetch_foreground_pixel(&self, ec: &EmulatorContext) -> PixelFetchResult {
         let sprites_enabled = self.check_lcdc(LcdControlFlag::SpritesEnabled);
 
         if sprites_enabled {
             self.read_scanline_sprite_pixel(
+                ec,
                 &self.current_scanline,
                 self.current_line_pixel
             )
@@ -602,6 +599,7 @@ impl Ppu {
     /// Selects whether to display background or foreground pixel depending on current priority bits
     pub fn mix_pixels<'a>(
             &self,
+            ec: &EmulatorContext,
             background: &'a PixelFetchResultWithPalette<'a>,
             foreground: &'a PixelFetchResultWithPalette<'a>
     ) -> &'a PixelFetchResultWithPalette<'a>
@@ -609,7 +607,7 @@ impl Ppu {
         // on GBC the meaning of the BG enabled bit is changed into master priority, which
         // disables the background priority flags, instead of disabling the whole background
         let is_master_priority =
-                self.device_config.is_gbc_enabled()
+                ec.get_device_config().is_gbc_enabled()
             &&  !self.check_lcdc(LcdControlFlag::BackgroundAndWindowEnabled)
         ;
 
@@ -767,16 +765,16 @@ impl Ppu {
 
 
     /// Clears the screen with a 'blank' color.
-    fn clear_screen(&mut self) {
+    fn clear_screen(&mut self, ec: &EmulatorContext) {
         self.lcd_buffer.fill(Self::get_blank_color(
-            &self.device_config,
+            ec.get_device_config(),
             &self.dmg_display_palette
         ));
     }
 
 
     /// Reset the PPU once it get disabled.
-    fn on_ppu_reset(&mut self) {
+    fn on_ppu_reset(&mut self, ec: &EmulatorContext) {
         self.clock                  = 0;
         self.lcd_state              = LcdState::Off;
         self.mode                   = Mode::HBlank;
@@ -784,7 +782,7 @@ impl Ppu {
         self.current_line_cycles    = 0;
         self.current_line_pixel     = 0;
         self.registers.line_compare = 0;
-        self.clear_screen();
+        self.clear_screen(ec);
     }
 
 
@@ -803,12 +801,12 @@ impl Ppu {
     }
 
     /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
-    pub fn set_dmg_display_palette(&mut self, palette: DmgDisplayPalette) {
+    pub fn set_dmg_display_palette(&mut self, ec: &EmulatorContext, palette: DmgDisplayPalette) {
         self.dmg_display_palette = palette;
         
         // clear the screen when the palette was changed.
         if self.is_first_frame {
-            self.clear_screen();
+            self.clear_screen(ec);
         }
     }
 
@@ -892,7 +890,7 @@ impl Ppu {
     }
 
     /// Performs an OAM scan and stores it's result in the 'scanline' object.
-    pub fn do_oam_scan_for_line(&self, line_number: u8) -> ScanlineData {
+    pub fn do_oam_scan_for_line(&self, ec: &EmulatorContext, line_number: u8) -> ScanlineData {
         let mut scanline = ScanlineData::new();
         scanline.line = line_number;
 
@@ -929,7 +927,7 @@ impl Ppu {
         // On GBC this behaviour can be switched by the object priority bit in 0xff6c
         //  - 0 means OAM position has priority
         //  - 1 means X position has priority
-        if !self.device_config.is_gbc_enabled() || self.registers.object_priority {
+        if !ec.get_device_config().is_gbc_enabled() || self.registers.object_priority {
             scanline.sprites[0 .. scanline.sprites_found as usize].sort_unstable_by(
                 |a, b| {
                     let ax = a.pos_x;
@@ -943,7 +941,7 @@ impl Ppu {
     }
 
     /// Reads a pixel from the current scanline sprite data on a given x position.
-    pub fn read_scanline_sprite_pixel(&self, scanline: &ScanlineData, x: u8) -> PixelFetchResult {
+    pub fn read_scanline_sprite_pixel(&self, ec: &EmulatorContext, scanline: &ScanlineData, x: u8) -> PixelFetchResult {
         // screen position considering the border offset of -8 / -16
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
@@ -973,7 +971,7 @@ impl Ppu {
 
             // if in GBC mode, check the sprite properties for the VRAM bank index
             // where to read the pixel data from
-            let vram_bank_index = if self.device_config.is_gbc_enabled() {
+            let vram_bank_index = if ec.get_device_config().is_gbc_enabled() {
                 sprite.get_gbc_vram_bank()
             }
             else {
@@ -1007,9 +1005,9 @@ impl Ppu {
     }
 
     /// Reads a single pixel from the tilemap.
-    pub fn read_tilemap_pixel(&self, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> PixelFetchResult {
+    pub fn read_tilemap_pixel(&self, ec: &EmulatorContext, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> PixelFetchResult {
         let tile = self.read_tilemap_properties(tilemap, tileset, tilemap_x, tilemap_y);
-        self.read_tile_pixel(&tile)
+        self.read_tile_pixel(ec, &tile)
     }
 
     /// Creates a set of tilemap fetch properties, which will be used for a further read operation
@@ -1032,7 +1030,7 @@ impl Ppu {
 
     /// Read the pixel value from a tile using previously created TileFetchProperties.
     #[allow(unused_mut)] // silence warning since 'mut' is only required for the cgb-block
-    pub fn read_tile_pixel(&self, tile: &TileFetchProperties) -> PixelFetchResult {
+    pub fn read_tile_pixel(&self, ec: &EmulatorContext, tile: &TileFetchProperties) -> PixelFetchResult {
         let tile_address = (tile.tilemap.base_address() + tile.tile_index - MEMORY_LOCATION_VRAM_BEGIN) as usize;
         let vram0        = &self.memory.vram_banks[0];
         let sprite       = vram0.get_at(tile_address);
@@ -1044,7 +1042,7 @@ impl Ppu {
         let mut background_priority = false;
 
         #[cfg(feature = "cgb")]
-        if self.device_config.is_gbc_enabled() {
+        if ec.get_device_config().is_gbc_enabled() {
             // read tile attributes from the same location in VRAM1
             let vram1 = &self.memory.vram_banks[1];
             let tile_attr    = vram1.get_at(tile_address);
@@ -1120,7 +1118,7 @@ impl Ppu {
 
 
 impl MemoryBusConnection for Ppu {
-    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, ec: &EmulatorContext, address: u16) -> u8 {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {
@@ -1159,7 +1157,7 @@ impl MemoryBusConnection for Ppu {
 
                     MEMORY_LOCATION_VBK => {
                         // on GBC: get the active RAM bank
-                        match self.device_config.emulation {
+                        match ec.get_device_config().emulation {
                             EmulationType::DMG => 0xff,
 
                             // register will contain the active bank in bit #0
@@ -1169,14 +1167,14 @@ impl MemoryBusConnection for Ppu {
                     },
 
                     MEMORY_LOCATION_BCPS => {
-                        match self.device_config.emulation {
+                        match ec.get_device_config().emulation {
                             EmulationType::DMG => 0xff,
                             EmulationType::GBC => self.memory.palettes.gbc_background_palette_pointer.get()
                         }
                     }
 
                     MEMORY_LOCATION_BCPD => {
-                        match self.device_config.emulation {
+                        match ec.get_device_config().emulation {
                             EmulationType::DMG => 0xff,
                             EmulationType::GBC => 
                                     self.memory.palettes.gbc_background_palette_pointer.read(
@@ -1186,14 +1184,14 @@ impl MemoryBusConnection for Ppu {
                     }
 
                     MEMORY_LOCATION_OCPS => {
-                        match self.device_config.emulation {
+                        match ec.get_device_config().emulation {
                             EmulationType::DMG => 0xff,
                             EmulationType::GBC => self.memory.palettes.gbc_object_palette_pointer.get(),
                         }
                     }
 
                     MEMORY_LOCATION_OCPD => {
-                        match self.device_config.emulation {
+                        match ec.get_device_config().emulation {
                             EmulationType::DMG => 0xff,
                             EmulationType::GBC => 
                                     self.memory.palettes.gbc_object_palette_pointer.read(
@@ -1212,7 +1210,8 @@ impl MemoryBusConnection for Ppu {
         })
     }
 
-    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
+
+    fn on_write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {
@@ -1234,7 +1233,7 @@ impl MemoryBusConnection for Ppu {
                         let is_enabled             = self.registers.lcd_control.contains(LcdControlFlag::LcdEnabled);
 
                         if was_enabled && !is_enabled {
-                            self.on_ppu_reset();
+                            self.on_ppu_reset(ec);
                         }
                         else if is_enabled && !was_enabled {
                             self.on_ppu_enabled();
@@ -1255,7 +1254,7 @@ impl MemoryBusConnection for Ppu {
 
                     MEMORY_LOCATION_VBK => {
                         // on GBC: switch VRAM bank
-                        if let EmulationType::GBC = self.device_config.emulation {
+                        if let EmulationType::GBC = ec.get_device_config().emulation {
                             let bank = value & 0x01;
                             self.memory.vram_active_bank = bank;
                         }

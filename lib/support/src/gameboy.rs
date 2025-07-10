@@ -21,6 +21,7 @@ use gemi_core::apu::Apu;
 use gemi_core::cartridge::Cartridge;
 use gemi_core::cpu::cpu::Cpu;
 use gemi_core::device_type::DeviceConfig;
+use gemi_core::emulator_context::EmulatorContext;
 use gemi_core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
 use gemi_core::input::Input;
 use gemi_core::mmu::memory::Memory;
@@ -60,6 +61,22 @@ impl GameBoy {
     /// Get the time in seconds the emulator did run.
     pub fn get_total_seconds_processed(&self) -> f32 {
         self.emulator.get_total_seconds_processed()
+    }
+
+
+    /// Runs a functor with access to the [EmulatorDevice] and an [EmulatorContext].
+    pub fn with_context_and_device(&self, f: impl FnOnce(&EmulatorContext, &EmulatorDevice)) {
+        let context = self.context_data.make_context();
+        let device  = &self.emulator;
+        f(&context, device);
+    }
+
+
+    /// Runs a functor with access to the [EmulatorDevice] and an [EmulatorContext].
+    pub fn with_context_and_device_mut(&mut self, f: impl FnOnce(&mut EmulatorContext, &mut EmulatorDevice)) {
+        let mut context = self.context_data.make_context_mut();
+        let device      = &mut self.emulator;
+        f(&mut context, device);
     }
 
 
