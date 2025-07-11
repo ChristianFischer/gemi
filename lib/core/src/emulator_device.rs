@@ -424,7 +424,7 @@ impl EmulatorDevice {
         self.cpu.update(cycles);
         self.get_mmu_mut().update(ec, cycles);
         #[cfg(feature = "apu")]
-        self.get_peripherals_mut().apu.update(cycles);
+        self.get_peripherals_mut().apu.update(ec, cycles);
         self.get_peripherals_mut().ppu.update(ec, cycles);
         self.get_peripherals_mut().timer.update(cycles);
         self.get_peripherals_mut().serial.update(cycles);

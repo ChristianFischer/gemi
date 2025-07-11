@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
+use crate::apu::ApuContext;
 use crate::utils::{as_bit_flag, get_bit};
 
 
@@ -59,14 +59,14 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
 
 
 impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
-    fn can_write_register(&self, number: u16, apu_state: &ApuState) -> bool {
+    fn can_write_register(&self, ac: &ApuContext, number: u16) -> bool {
         match number {
             1 => {
                 // on DMG, length timer can always be written to.
                 // When GameBoy Color mode is enabled, the behaviour is the same as for
                 // other registers and can only be written, when the APU is enabled.
-                if apu_state.gbc_enabled {
-                    apu_state.apu_on
+                if ac.get_device_config().is_gbc_enabled() {
+                    ac.state.apu_on
                 }
                 else {
                     true
@@ -74,12 +74,12 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
             },
 
             // other values only if APU is turned on
-            _ => apu_state.apu_on,
+            _ => ac.state.apu_on,
         }
     }
 
 
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
         match number {
             1 => {
                 // length timer initial value is write-only,
@@ -91,12 +91,12 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
                 as_bit_flag(self.length_timer_enabled, 6)
             },
 
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ac, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
         match number {
             1 => {
                 self.length_timer = Self::LENGTH_MAX - ((value & Self::LENGTH_MASK) as u16);
@@ -113,7 +113,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
                         !was_enabled
                     &&  self.length_timer_enabled
                     &&  self.length_timer != 0
-                    &&  !apu_state.fs.is_length_timer_active()
+                    &&  !ac.state.fs.is_length_timer_active()
                 {
                     // this may also disable the channel
                     return self.tick();
@@ -123,11 +123,11 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ac, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
         // length timer will be set to maximum, if zero when triggered
         // this prevents the timer to be stuck at zero
         if self.length_timer == 0 {
@@ -135,20 +135,20 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
 
             // when the sound length timer will not be activated in the next step,
             // this will cause an extra tick
-            if !apu_state.fs.is_length_timer_active() {
+            if !ac.state.fs.is_length_timer_active() {
                 self.tick();
             }
         }
 
-        default_on_trigger_event(apu_state)
+        default_on_trigger_event(ac)
     }
 
 
-    fn on_reset(&mut self, apu_state: &ApuState) {
+    fn on_reset(&mut self, ac: &ApuContext) {
         self.length_timer_enabled = false;
 
         // on GameBoy Color, the length value will be reset to the maximum.
-        if apu_state.gbc_enabled {
+        if ac.get_device_config().is_gbc_enabled() {
             self.length_timer = Self::LENGTH_MAX;
         }
     }

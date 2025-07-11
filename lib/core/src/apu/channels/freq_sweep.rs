@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2025 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
+use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
+use crate::apu::ApuContext;
 use crate::utils::{as_bit_flag, get_bit};
 
 
@@ -165,7 +165,7 @@ impl FrequencySweep {
 
 
 impl ChannelComponent for FrequencySweep {
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
         match number {
             0 => {
                     NRX0_NON_READABLE_BITS
@@ -174,12 +174,12 @@ impl ChannelComponent for FrequencySweep {
                 |   ((self.period_length & 0x07) << 4)
             },
 
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ac, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
         match number {
             0 => {
                 self.shift          = (value >> 0) & 0x07;
@@ -195,11 +195,11 @@ impl ChannelComponent for FrequencySweep {
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ac, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
         // reload the timer
         self.reload_timer();
 
@@ -216,11 +216,11 @@ impl ChannelComponent for FrequencySweep {
             }
         }
 
-        default_on_trigger_event(apu_state)
+        default_on_trigger_event(ac)
     }
 
 
-    fn on_reset(&mut self, _apu_state: &ApuState) {
+    fn on_reset(&mut self, _ac: &ApuContext) {
         *self = Self::default();
     }
 }

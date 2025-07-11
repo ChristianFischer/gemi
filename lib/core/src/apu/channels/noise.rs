@@ -17,10 +17,10 @@
 
 use core::cmp::min;
 
-use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
+use crate::apu::ApuContext;
 use crate::emulator_device::Clock;
 use crate::utils::{as_bit_flag, get_bit};
 
@@ -78,7 +78,7 @@ impl NoiseGenerator {
 
 
 impl ChannelComponent for NoiseGenerator {
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
         match number {
             1 => NR41_NON_READABLE_BITS, // unused bits
 
@@ -95,12 +95,12 @@ impl ChannelComponent for NoiseGenerator {
 
             4 => NR44_NON_READABLE_BITS | NR44_WRITE_ONLY_TRIGGER_BIT,
 
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ac, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
         match number {
             3 => {
                 let shift        = (value >> 4) & 0x0f;
@@ -124,21 +124,21 @@ impl ChannelComponent for NoiseGenerator {
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ac, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
         self.reset_timer();
 
         // reset lfsr to zero
         self.lfsr = 0;
 
-        default_on_trigger_event(apu_state)
+        default_on_trigger_event(ac)
     }
 
 
-    fn on_reset(&mut self, _apu_state: &ApuState) {
+    fn on_reset(&mut self, _ac: &ApuContext) {
         *self = Self::new();
     }
 }
@@ -189,7 +189,7 @@ impl SoundGenerator for NoiseGenerator {
     }
 
 
-    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
+    fn get_sample(&self, _ac: &ApuContext) -> u8 {
         // take bit 0 to determine whether a tone is generated or not
         let sample = (self.lfsr & 0x01) as u8;
         sample

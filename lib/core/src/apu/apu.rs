@@ -22,6 +22,7 @@ use crate::apu::channels::noise::NoiseGenerator;
 use crate::apu::channels::pulse::PulseGenerator;
 use crate::apu::channels::wave::WaveGenerator;
 use crate::apu::mixer::Mixer;
+use crate::device_type::DeviceConfig;
 use crate::emulator_context::EmulatorContext;
 use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
@@ -70,16 +71,18 @@ type Channel4 = Channel<
 pub struct ApuState {
     pub apu_on: bool,
 
-    /// Flag to store whether GBC mode is enabled.
-    // todo: use EmulatorContext instead
-    #[deprecated(note = "use EmulatorContext instead")]
-    pub gbc_enabled: bool,
-
     /// Frame Sequencer clock
     pub fs_clock: Clock,
 
     /// The frame sequencer to activate channel components periodically.
     pub fs: FrameSequencer,
+}
+
+
+// todo: doc
+pub struct ApuContext<'a> {
+    pub state: &'a ApuState,
+    pub ec: &'a EmulatorContext<'a>,
 }
 
 
@@ -171,7 +174,6 @@ impl Apu {
         Self {
             state: ApuState {
                 apu_on:      true,
-                gbc_enabled: ec.get_device_config().is_gbc_enabled(),
                 fs_clock:    0,
                 fs:          FrameSequencer::new(),
             },
@@ -189,12 +191,12 @@ impl Apu {
 
 
     /// Updates the APUs internal components with the time passed.
-    pub fn update(&mut self, cycles: Clock) {
+    pub fn update(&mut self, ec: &EmulatorContext, cycles: Clock) {
         if self.state.apu_on {
             self.update_frame_sequencer(cycles);
         }
 
-        self.update_channels(cycles);
+        self.update_channels(ec, cycles);
     }
 
 
@@ -242,7 +244,7 @@ impl Apu {
 
 
     /// Updates each channel with the time passed.
-    fn update_channels(&mut self, cycles: Clock) {
+    fn update_channels(&mut self, ec: &EmulatorContext, cycles: Clock) {
         for _ in 0..cycles {
             let run_cycles = 1;
 
@@ -254,10 +256,12 @@ impl Apu {
             }
 
             {
-                self.mixer.put(&self.ch1, &self.state);
-                self.mixer.put(&self.ch2, &self.state);
-                self.mixer.put(&self.ch3, &self.state);
-                self.mixer.put(&self.ch4, &self.state);
+                let ac = ApuContext::new(ec, &self.state);
+
+                self.mixer.put(&ac, &self.ch1);
+                self.mixer.put(&ac, &self.ch2);
+                self.mixer.put(&ac, &self.ch3);
+                self.mixer.put(&ac, &self.ch4);
 
                 // mix all input values into left & right channels
                 // according to their mixer settings
@@ -277,12 +281,14 @@ impl Apu {
 
 
     /// Reset the APUs internal data.
-    fn reset(&mut self) {
+    fn reset(&mut self, ec: &EmulatorContext) {
+        let ac = ApuContext::new(ec, &self.state);
+
         self.mixer.reset();
-        self.ch1.reset(&self.state);
-        self.ch2.reset(&self.state);
-        self.ch3.reset(&self.state);
-        self.ch4.reset(&self.state);
+        self.ch1.reset(&ac);
+        self.ch2.reset(&ac);
+        self.ch3.reset(&ac);
+        self.ch4.reset(&ac);
     }
 
 
@@ -303,31 +309,48 @@ impl Apu {
 }
 
 
+impl<'a> ApuContext<'a> {
+    fn new(ec: &'a EmulatorContext<'a>, state: &'a ApuState) -> Self {
+        Self {
+            ec,
+            state
+        }
+    }
+
+
+    pub fn get_device_config(&self) -> &DeviceConfig {
+        self.ec.get_device_config()
+    }
+}
+
+
 impl MemoryBusConnection for Apu {
-    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, ec: &EmulatorContext, address: u16) -> u8 {
+        let ac = ApuContext::new(ec, &self.state);
+
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
                 let number = address - MEMORY_LOCATION_APU_NR10;
-                self.ch1.on_read_register(number, &self.state)
+                self.ch1.on_read_register(&ac, number)
             }
 
             // Channel 2
             MEMORY_LOCATION_APU_NR21 ..= MEMORY_LOCATION_APU_NR24 => {
                 let number = address - MEMORY_LOCATION_APU_NR20;
-                self.ch2.on_read_register(number, &self.state)
+                self.ch2.on_read_register(&ac, number)
             }
 
             // Channel 3
             MEMORY_LOCATION_APU_NR30 ..= MEMORY_LOCATION_APU_NR34 => {
                 let number = address - MEMORY_LOCATION_APU_NR30;
-                self.ch3.on_read_register(number, &self.state)
+                self.ch3.on_read_register(&ac, number)
             }
 
             // Channel 4
             MEMORY_LOCATION_APU_NR41 ..= MEMORY_LOCATION_APU_NR44 => {
                 let number = address - MEMORY_LOCATION_APU_NR40;
-                self.ch4.on_read_register(number, &self.state)
+                self.ch4.on_read_register(&ac, number)
             }
 
             // Volume / VIN settings
@@ -358,7 +381,7 @@ impl MemoryBusConnection for Apu {
             // Wave RAM
             MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => {
                 // Wave RAM will be forwarded into channel 3
-                self.ch3.on_read_register(address, &self.state)
+                self.ch3.on_read_register(&ac, address)
             }
 
             _ => 0xff
@@ -366,30 +389,32 @@ impl MemoryBusConnection for Apu {
     }
 
 
-    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
+        let ac = ApuContext::new(ec, &self.state);
+
         match address {
             // Channel 1
             MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR14 => {
                 let number = address - MEMORY_LOCATION_APU_NR10;
-                self.ch1.on_write_register(number, value, &self.state);
+                self.ch1.on_write_register(&ac, number, value);
             }
 
             // Channel 2
             MEMORY_LOCATION_APU_NR20 ..= MEMORY_LOCATION_APU_NR24 => {
                 let number = address - MEMORY_LOCATION_APU_NR20;
-                self.ch2.on_write_register(number, value, &self.state);
+                self.ch2.on_write_register(&ac, number, value);
             }
 
             // Channel 3
             MEMORY_LOCATION_APU_NR30 ..= MEMORY_LOCATION_APU_NR34 => {
                 let number = address - MEMORY_LOCATION_APU_NR30;
-                self.ch3.on_write_register(number, value, &self.state);
+                self.ch3.on_write_register(&ac, number, value);
             }
 
             // Channel 4
             MEMORY_LOCATION_APU_NR40 ..= MEMORY_LOCATION_APU_NR44 => {
                 let number = address - MEMORY_LOCATION_APU_NR40;
-                self.ch4.on_write_register(number, value, &self.state);
+                self.ch4.on_write_register(&ac, number, value);
             }
 
             // Volume / VIN settings
@@ -417,7 +442,7 @@ impl MemoryBusConnection for Apu {
                         self.power_on();
                     }
                     else {
-                        self.reset();
+                        self.reset(ec);
                     }
                 }
             },
@@ -425,7 +450,7 @@ impl MemoryBusConnection for Apu {
             // Wave RAM
             MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => {
                 // Wave RAM will be forwarded into channel 3
-                self.ch3.on_write_register(address, value, &self.state);
+                self.ch3.on_write_register(&ac, address, value);
             },
 
             _ => { }

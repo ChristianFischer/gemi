@@ -20,8 +20,7 @@ extern crate sdl2;
 use crate::sound_queue::SoundQueue;
 use libgemi::core::input::{Input, InputButton};
 use libgemi::core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
-use libgemi::core::ppu::flags::LcdControlFlag;
-use libgemi::core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
+use libgemi::core::ppu::graphic_data::{Color, DmgPalette};
 use libgemi::core::ppu::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
 use libgemi::GameBoy;
 use sdl2::event::Event;
@@ -333,6 +332,9 @@ impl Window {
     /// Present the whole background on the screen.
     /// This includes the whole content even outside of the scrolling viewport.
     pub fn present_background(&mut self, ppu: &Ppu) {
+        _ = ppu;
+        // todo: restore
+        /*
         let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
         let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
         let palette = DmgPalette::create_default();
@@ -365,6 +367,7 @@ impl Window {
 
         // present the framebuffer
         self.canvas.present();
+        */
     }
 
 

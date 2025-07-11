@@ -17,11 +17,11 @@
 
 use core::cmp::min;
 
-use crate::apu::apu::ApuState;
 use crate::apu::channels::channel::{default_on_read_register, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_duty::WaveDuty;
+use crate::apu::ApuContext;
 use crate::emulator_device::Clock;
 
 
@@ -69,17 +69,17 @@ impl PulseGenerator {
 
 
 impl ChannelComponent for PulseGenerator {
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
         match number {
             1 => self.wave_duty.get_index() << 6,
             3 => NRX3_WRITE_ONLY_FREQUENCY,
             4 => NRX4_WRITE_ONLY_FREQUENCY | NRX4_NON_READABLE_BITS | NRX4_WRITE_ONLY_TRIGGER_BIT,
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ac, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
         match number {
             1 => {
                 let wave_duty_index = (value >> 6) & 0x03;
@@ -93,11 +93,11 @@ impl ChannelComponent for PulseGenerator {
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ac, number, value)
     }
 
 
-    fn on_reset(&mut self, _apu_state: &ApuState) {
+    fn on_reset(&mut self, _ac: &ApuContext) {
         *self = Self::new();
     }
 }
@@ -139,7 +139,7 @@ impl SoundGenerator for PulseGenerator {
     }
 
 
-    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
+    fn get_sample(&self, _ac: &ApuContext) -> u8 {
         let wave = self.wave_duty.get_wave_at(self.wave_duty_step);
         wave
     }
