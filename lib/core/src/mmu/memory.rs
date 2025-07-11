@@ -18,7 +18,7 @@
 use core::cmp::max;
 
 use crate::cartridge::CartridgeInfo;
-use crate::device_type::{DeviceConfig, EmulationType};
+use crate::device_type::EmulationType;
 use crate::emulator_context::EmulatorContext;
 use crate::mmu::locations::*;
 use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl, MemoryBankController};
@@ -63,10 +63,6 @@ pub type HRamBank = MemoryDataFixedSize<127>;
 /// The memory object is the owner of the emulator's memory.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Memory {
-    /// The configuration of the running device
-    #[deprecated(since = "0.1.0", note = "Use the EmulatorContext instead")]
-    device_config: DeviceConfig,
-
     /// Work RAM banks (DMG = 2 * 4kiB, GBC = 8 * 4kiB)
     #[cfg(feature = "cgb")]
     wram_banks: Vec<WRamBank>,
@@ -110,8 +106,6 @@ impl Memory {
         }
 
         Self {
-            device_config: ec.get_device_config().clone(),
-
             #[cfg(feature = "cgb")]
             wram_banks: core::iter::repeat_with(|| WRamBank::new()).take(num_wram_banks).collect(),
 
@@ -207,7 +201,7 @@ impl MemoryBusConnection for Memory {
 
                         MEMORY_LOCATION_SVBK => {
                             // on GBC: WRAM bank #1
-                            if let EmulationType::GBC = self.device_config.emulation {
+                            if let EmulationType::GBC = ec.get_device_config().emulation {
                                 self.wram_active_bank_1 | 0b_1111_1000
                             }
                             else {
@@ -262,7 +256,7 @@ impl MemoryBusConnection for Memory {
 
                         MEMORY_LOCATION_SVBK => {
                             // on GBC: switch WRAM bank #1
-                            if let EmulationType::GBC = self.device_config.emulation {
+                            if let EmulationType::GBC = ec.get_device_config().emulation {
                                 let bank = value & 0x07;
                                 self.wram_active_bank_1 = max(1, bank);
                             }
