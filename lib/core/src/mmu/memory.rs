@@ -17,11 +17,10 @@
 
 use core::cmp::max;
 
-use crate::cartridge::CartridgeInfo;
 use crate::device_type::EmulationType;
 use crate::emulator_context::EmulatorContext;
 use crate::mmu::locations::*;
-use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl, MemoryBankController};
+use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl};
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 
@@ -90,11 +89,6 @@ pub struct Memory {
 impl Memory {
     /// Create a new Memory object.
     pub fn new(ec: &EmulatorContext) -> Self {
-        let mbc = CartridgeInfo::create_from(&ec.get_cartridge_rom())
-                .map(|info| info.get_mbc().clone())
-                .unwrap_or(MemoryBankController::None)
-        ;
-
         let num_wram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 2,
             EmulationType::GBC => 8,
@@ -120,7 +114,7 @@ impl Memory {
 
             hram: HRamBank::new(),
 
-            mbc: create_mbc(ec, &mbc),
+            mbc: create_mbc(ec.get_cartridge_info().get_mbc()),
 
             // start with enabled boot rom if one is available
             boot_rom_enabled: ec.get_boot_rom().is_some(),

@@ -109,13 +109,13 @@ impl EmulatorDevice {
 
     /// setup values like expected after the boot rom was executed on the original GameBoy.
     fn setup_initial_values(&mut self, ec: &mut EmulatorContext) {
-        let device_config = ec.get_device_config().clone();
+        let device_config = ec.get_device_config();
         let pc = 0x0100;
         let sp = 0xfffe;
 
         // the title checksum is calculated on GBC and GBA in DMG compatibility mode
         // if licensee code is '1' in either old or new format
-        let title_checksum = if true /* todo: let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() */ {
+        let title_checksum = if ec.get_cartridge_info().is_cartridge_present() {
             match ec.get_cartridge_info().get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
                     let rom_data = ec.get_cartridge_rom();

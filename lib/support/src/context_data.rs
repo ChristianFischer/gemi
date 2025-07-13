@@ -34,7 +34,7 @@ pub(crate) struct GameBoyContextData {
 impl GameBoyContextData {
     pub(crate) fn make_context(&self) -> EmulatorContext {
         EmulatorContext::new(
-            self.device_config,
+            &self.device_config,
             &self.cartridge.cartridge_info,
             self.cartridge.rom.get_data(),
             self.cartridge.ram.get_data(),
@@ -46,7 +46,7 @@ impl GameBoyContextData {
     // todo: unify make + make_mut?
     pub(crate) fn make_context_mut(&mut self) -> EmulatorContext {
         EmulatorContext::new_mut(
-            self.device_config,
+            &self.device_config,
             &self.cartridge.cartridge_info,
             self.cartridge.rom.get_data(),
             self.cartridge.ram.get_data_mut(),

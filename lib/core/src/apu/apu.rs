@@ -79,7 +79,7 @@ pub struct ApuState {
 }
 
 
-// todo: doc
+/// An umbrella struct to carry a reference to ApuContext and EmulatorContext together.
 pub struct ApuContext<'a> {
     pub state: &'a ApuState,
     pub ec: &'a EmulatorContext<'a>,

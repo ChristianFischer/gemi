@@ -23,7 +23,7 @@ use crate::device_type::DeviceConfig;
 
 // todo: doc
 pub struct EmulatorContext<'a> {
-    device_config:  DeviceConfig, // todo: change into ref?
+    device_config:  &'a DeviceConfig, // todo: change into ref?
     cartridge_info: &'a CartridgeInfo,
     cartridge_rom:  RefImageOption<'a>,
     cartridge_ram:  RefImageOption<'a>,
@@ -67,7 +67,7 @@ pub struct ImageDataWriter<'a> {
 impl<'a> EmulatorContext<'a> {
     // todo: can we unify new & new_mut?
     pub fn new(
-        device_config: DeviceConfig,
+        device_config: &'a DeviceConfig,
         cartridge_info: &'a CartridgeInfo,
         rom_data: &'a [u8],
         ram_data: &'a [u8],
@@ -84,7 +84,7 @@ impl<'a> EmulatorContext<'a> {
     
     
     pub fn new_mut(
-        device_config: DeviceConfig,
+        device_config: &'a DeviceConfig,
         cartridge_info: &'a CartridgeInfo,
         rom_data: &'a [u8],
         ram_data: &'a mut [u8],
@@ -101,7 +101,7 @@ impl<'a> EmulatorContext<'a> {
 
 
     pub fn get_device_config(&self) -> &DeviceConfig {
-        &self.device_config
+        self.device_config
     }
 
 
@@ -158,7 +158,7 @@ impl<Rom, Ram> EmulatorContextDataHolder<Rom, Ram>
 
     pub fn make_context(&mut self) -> EmulatorContext {
         EmulatorContext::new(
-            self.device_config,
+            &self.device_config,
             &self.cartridge_info,
             self.cartridge_rom.get_data(),
             self.cartridge_ram.get_data_mut(),

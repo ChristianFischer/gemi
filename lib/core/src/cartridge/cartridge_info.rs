@@ -15,8 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#[cfg(feature = "serde")]
-use crate::utils::SerializableBuffer;
 #[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
 
@@ -61,6 +59,8 @@ pub enum LicenseeCode {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CartridgeInfo {
+    is_cartridge_present: bool,
+
     #[cfg(feature = "std")]
     title: String,
 
@@ -84,16 +84,6 @@ pub struct CartridgeInfo {
     has_timer: bool,
     has_battery: bool,
     has_rumble: bool,
-}
-
-
-/// Helper struct to implement serialization via serde by only serializing RAM and ROM.
-#[cfg(feature = "serde")]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-// todo: check if still necessary
-struct CartridgeSerdeHelper {
-    rom: SerializableBuffer<u8>,
-    ram: Option<SerializableBuffer<u8>>,
 }
 
 
@@ -278,6 +268,8 @@ impl CartridgeInfo {
         };
 
         let cartridge = CartridgeInfo {
+            is_cartridge_present: true,
+
             #[cfg(feature = "std")]
             title: rom_data::read_title(rom),
 
@@ -310,6 +302,8 @@ impl CartridgeInfo {
     /// Creates a [CartridgeInfo] object with default values.
     pub fn new_empty() -> Self {
         Self {
+            is_cartridge_present: false,
+
             #[cfg(feature = "std")]
             title: "".to_string(),
 
@@ -348,6 +342,13 @@ impl CartridgeInfo {
         else {
             false
         }
+    }
+
+
+    /// Checks whether a cartridge is present or not.
+    /// If `false`, this [CartridgeInfo] represents default values for a missing cartridge.
+    pub fn is_cartridge_present(&self) -> bool {
+        self.is_cartridge_present
     }
 
 
@@ -436,6 +437,8 @@ impl CartridgeInfo {
 impl Default for CartridgeInfo {
     fn default() -> Self {
         Self {
+            is_cartridge_present: false,
+
             #[cfg(feature = "std")]
             title: String::from("none"),
 
