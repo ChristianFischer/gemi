@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,18 +46,17 @@ fn test_apu_register(name: &str, address: u16) {
     let readable_bits     = get_readable_bits_for(address);
     let non_readable_bits = !readable_bits;
 
-    let mut ec_data  = EmulatorContextDataHolder::new_empty(DeviceConfig::DEFAULT_DMG);
-    let mut ec       = ec_data.make_context();
-    let mut emulator = Box::new(EmulatorDevice::new(&mut ec));
+    let mut ec       = EmulatorContextDataHolder::new_empty(DeviceConfig::DEFAULT_DMG);
+    let mut emulator = Box::new(EmulatorDevice::new(&ec));
 
     emulator.cpu.get_mmu_mut().write_u8(&mut ec, address, 0xff);
-    let result1 = emulator.cpu.get_mmu().read_u8(&mut ec, address);
+    let result1 = emulator.cpu.get_mmu().read_u8(&ec, address);
 
     // all bits are expected to be '1'
     assert_eq!(0xff, result1, "register {name} expected value: '{:08b}' got '{:08b}'", 0xff, result1);
 
     emulator.cpu.get_mmu_mut().write_u8(&mut ec, address, 0x00);
-    let result2 = emulator.cpu.get_mmu().read_u8(&mut ec, address);
+    let result2 = emulator.cpu.get_mmu().read_u8(&ec, address);
 
     // only non-readable bits are expected to be '1'
     assert_eq!(non_readable_bits, result2, "register {name} expected value: '{:08b}' got '{:08b}'", non_readable_bits, result2);
@@ -128,9 +127,8 @@ mod apu_control {
 
 #[test]
 fn test_registers_after_reset() {
-    let mut ec_data = EmulatorContextDataHolder::new_empty(DeviceConfig::DEFAULT_DMG);
-    let mut ec      = ec_data.make_context();
-    let mut emulator = Box::new(EmulatorDevice::new(&mut ec));
+    let mut ec       = EmulatorContextDataHolder::new_empty(DeviceConfig::DEFAULT_DMG);
+    let mut emulator = Box::new(EmulatorDevice::new(&ec));
 
     // turn apu on
     emulator.get_mmu_mut().write_u8(&mut ec, MEMORY_LOCATION_APU_NR52, 0x80);
@@ -142,7 +140,7 @@ fn test_registers_after_reset() {
 
     // check all registers if they return 0xff
     for register in MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR51 {
-        let value = emulator.get_mmu_mut().read_u8(&mut ec, register);
+        let value = emulator.get_mmu_mut().read_u8(&ec, register);
         assert_eq!(0xff, value);
     }
 
@@ -152,7 +150,7 @@ fn test_registers_after_reset() {
 
     // check all registers after reset
     for register in MEMORY_LOCATION_APU_NR10 ..= MEMORY_LOCATION_APU_NR51 {
-        let value             = emulator.get_mmu_mut().read_u8(&mut ec, register);
+        let value             = emulator.get_mmu_mut().read_u8(&ec, register);
         let readable_bits     = get_readable_bits_for(register);
         let non_readable_bits = !readable_bits;
 

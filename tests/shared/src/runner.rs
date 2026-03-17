@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,6 +134,11 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
         builder.set_boot_rom(boot_rom);
     }
 
+    // set the color palette for DMG emulation
+    if let Some(palette) = setup.dmg_display_palette {
+        builder.set_dmg_display_palette(palette);
+    }
+
     // create the device emulator
     let mut gb = builder.finish()
         .map_err(|e| TestCaseError::SetUpError(e.to_string()))
@@ -141,13 +146,6 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
 
     // initialize
     gb.initialize();
-
-    // set the color palette for DMG emulation
-    if let Some(palette) = setup.dmg_display_palette {
-        gb.with_context_and_device_mut(|ec, device| device
-                .get_mmu_mut().get_peripherals_mut().ppu.set_dmg_display_palette(ec, palette)
-        );
-    }
 
     Ok(gb)
 }

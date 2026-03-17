@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ use alloc::{vec, vec::Vec};
 use core::mem::take;
 
 use crate::cpu::interrupts::Interrupt;
-use crate::emulator_context::EmulatorContext;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::emulator_device::Clock;
 use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
@@ -164,7 +164,7 @@ impl SerialPort {
 
 
 impl MemoryBusConnection for SerialPort {
-    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &impl EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_SB => self.transfer_byte,
             MEMORY_LOCATION_SC => 0b_0111_1111 | as_bit_flag(self.transfer_enabled, 7),
@@ -173,7 +173,7 @@ impl MemoryBusConnection for SerialPort {
     }
 
 
-    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContextMut, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_SB => self.transfer_byte    = value,
             MEMORY_LOCATION_SC => self.transfer_enabled = get_bit(value, 7),

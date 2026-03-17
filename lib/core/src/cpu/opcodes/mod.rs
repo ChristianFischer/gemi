@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,56 +21,60 @@ mod opcodes_jump;
 mod opcodes_ld;
 
 use crate::cpu::opcode::OpCode;
+use crate::cpu::opcode::{opcode, opcode_table, OpCodeContext, OpCodeResult};
+use crate::emulator_context::EmulatorContextMut;
+use crate::emulator_device::EmulatorDevice;
 
-use crate::cpu::opcodes::opcodes_arithmetic::*;
-use crate::cpu::opcodes::opcodes_arithmetic::inc::*;
-use crate::cpu::opcodes::opcodes_arithmetic::dec::*;
 use crate::cpu::opcodes::opcodes_arithmetic::add::*;
-use crate::cpu::opcodes::opcodes_arithmetic::sub::*;
 use crate::cpu::opcodes::opcodes_arithmetic::and::*;
-use crate::cpu::opcodes::opcodes_arithmetic::xor::*;
-use crate::cpu::opcodes::opcodes_arithmetic::or::*;
+use crate::cpu::opcodes::opcodes_arithmetic::chk_bit::*;
 use crate::cpu::opcodes::opcodes_arithmetic::cp::*;
+use crate::cpu::opcodes::opcodes_arithmetic::dec::*;
+use crate::cpu::opcodes::opcodes_arithmetic::inc::*;
+use crate::cpu::opcodes::opcodes_arithmetic::or::*;
+use crate::cpu::opcodes::opcodes_arithmetic::res_bit::*;
 use crate::cpu::opcodes::opcodes_arithmetic::rl::*;
 use crate::cpu::opcodes::opcodes_arithmetic::rr::*;
-use crate::cpu::opcodes::opcodes_arithmetic::swap::*;
 use crate::cpu::opcodes::opcodes_arithmetic::set_bit::*;
-use crate::cpu::opcodes::opcodes_arithmetic::res_bit::*;
-use crate::cpu::opcodes::opcodes_arithmetic::chk_bit::*;
+use crate::cpu::opcodes::opcodes_arithmetic::sub::*;
+use crate::cpu::opcodes::opcodes_arithmetic::swap::*;
+use crate::cpu::opcodes::opcodes_arithmetic::xor::*;
+use crate::cpu::opcodes::opcodes_arithmetic::*;
 use crate::cpu::opcodes::opcodes_control::*;
 use crate::cpu::opcodes::opcodes_jump::*;
 use crate::cpu::opcodes::opcodes_ld::*;
 
 
-/// Represents an invalid opcode.
-pub static OPCODE_INVALID: OpCode = OpCode {
-    name: "[INVALID]",
-    bytes: 1,
-    cycles_ahead: 0,
-    cycles: 0,
-    proc: |_ctx| {
-        panic!();
-    }
-};
+/// Represents the prefix for the extended opcode table.
+/// This OpCode is not expected to be executed by itself,
+/// the OpCode fetcher is expected to return the according
+/// extended OpCode instead.
+opcode!(ext_prefix, [] not_implemented_proc());
+
+opcode!(unassigned_0xd3, [] not_implemented_proc());
+opcode!(unassigned_0xdb, [] not_implemented_proc());
+opcode!(unassigned_0xdd, [] not_implemented_proc());
+opcode!(unassigned_0xe3, [] not_implemented_proc());
+opcode!(unassigned_0xe4, [] not_implemented_proc());
+opcode!(unassigned_0xeb, [] not_implemented_proc());
+opcode!(unassigned_0xec, [] not_implemented_proc());
+opcode!(unassigned_0xed, [] not_implemented_proc());
+opcode!(unassigned_0xf4, [] not_implemented_proc());
+opcode!(unassigned_0xfc, [] not_implemented_proc());
+opcode!(unassigned_0xfd, [] not_implemented_proc());
 
 /// Represents an opcode which has no assigned functionality.
 /// It's not expected to find one of those in any ROM binary.
-pub static OPCODE_UNASSIGNED: OpCode = OpCode {
-    name: "[NOT ASSIGNED]",
-    bytes: 1,
-    cycles_ahead: 0,
-    cycles: 0,
-    proc: |_ctx| {
-        panic!();
-    }
-};
+fn not_implemented_proc() -> OpCodeResult {
+    panic!();
+}
 
 
+// todo: improve docs
 /// The table of all supported opcodes.
 /// The array's index is the opcodes numerical value.
-/// The table of all supported opcodes.
-/// The array's index is the opcodes numerical value.
-pub static OPCODE_TABLE: [OpCode; 256] = [
+opcode_table!(
+pub OPCODE_TABLE: [OpCode; 512] = [
     /* 0x00*/ OpCode { name: "NOP",              bytes: 1, cycles_ahead:  0, cycles:  4, proc: nop                 },
     /* 0x01*/ OpCode { name: "LD BC, ${x16}",    bytes: 3, cycles_ahead:  0, cycles: 12, proc: ld_bc_u16           },
     /* 0x02*/ OpCode { name: "LD (BC), A",       bytes: 1, cycles_ahead:  0, cycles:  8, proc: ld_bcptr_a          },
@@ -286,7 +290,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xC8*/ OpCode { name: "RET Z",            bytes: 1, cycles_ahead:  0, cycles:  8, proc: ret_z               },
     /* 0xC9*/ OpCode { name: "RET",              bytes: 1, cycles_ahead:  0, cycles: 16, proc: ret                 },
     /* 0xCA*/ OpCode { name: "JP Z, 0x{x16}",    bytes: 3, cycles_ahead:  0, cycles: 12, proc: jp_z_u16            },
-    /* 0xCB*/ OPCODE_INVALID, // prefix for extended opcode table
+    /* 0xCB*/ OpCode { name: "[0xCB]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: ext_prefix          },
     /* 0xCC*/ OpCode { name: "CALL Z, ${x16}",   bytes: 3, cycles_ahead:  0, cycles: 12, proc: call_z_u16          },
     /* 0xCD*/ OpCode { name: "CALL ${x16}",      bytes: 3, cycles_ahead:  0, cycles: 24, proc: call_u16            },
     /* 0xCE*/ OpCode { name: "ADC A, {u8}",      bytes: 2, cycles_ahead:  0, cycles:  8, proc: adc_a_u8            },
@@ -295,7 +299,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xD0*/ OpCode { name: "RET NC",           bytes: 1, cycles_ahead:  0, cycles:  8, proc: ret_nc              },
     /* 0xD1*/ OpCode { name: "POP DE",           bytes: 1, cycles_ahead:  0, cycles: 12, proc: pop_de              },
     /* 0xD2*/ OpCode { name: "JP NC, 0x{x16}",   bytes: 3, cycles_ahead:  0, cycles: 12, proc: jp_nc_u16           },
-    /* 0xD3*/ OPCODE_UNASSIGNED,
+    /* 0xD3*/ OpCode { name: "[0xD3]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xd3     },
     /* 0xD4*/ OpCode { name: "CALL NC, ${x16}",  bytes: 3, cycles_ahead:  0, cycles: 12, proc: call_nc_u16         },
     /* 0xD5*/ OpCode { name: "PUSH DE",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: push_de             },
     /* 0xD6*/ OpCode { name: "SUB A, {u8}",      bytes: 2, cycles_ahead:  0, cycles:  8, proc: sub_a_u8            },
@@ -303,26 +307,26 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xD8*/ OpCode { name: "RET C",            bytes: 1, cycles_ahead:  0, cycles:  8, proc: ret_c               },
     /* 0xD9*/ OpCode { name: "RETI",             bytes: 1, cycles_ahead:  0, cycles: 16, proc: reti                },
     /* 0xDA*/ OpCode { name: "JP C, 0x{x16}",    bytes: 3, cycles_ahead:  0, cycles: 12, proc: jp_c_u16            },
-    /* 0xDB*/ OPCODE_UNASSIGNED,
+    /* 0xDB*/ OpCode { name: "[0xDB]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xdb     },
     /* 0xDC*/ OpCode { name: "CALL C, ${x16}",   bytes: 3, cycles_ahead:  0, cycles: 12, proc: call_c_u16          },
-    /* 0xDD*/ OPCODE_UNASSIGNED,
+    /* 0xDD*/ OpCode { name: "[0xDD]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xdd     },
     /* 0xDE*/ OpCode { name: "SBC A, {u8}",      bytes: 2, cycles_ahead:  0, cycles:  8, proc: sbc_a_u8            },
     /* 0xDF*/ OpCode { name: "RST 18h",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: rst_18h             },
 
     /* 0xE0*/ OpCode { name: "LDH $ff{x8}, A",   bytes: 2, cycles_ahead:  4, cycles: 12, proc: ldh_u8_a            },
     /* 0xE1*/ OpCode { name: "POP HL",           bytes: 1, cycles_ahead:  0, cycles: 12, proc: pop_hl              },
     /* 0xE2*/ OpCode { name: "LDH (ff00+C), A",  bytes: 1, cycles_ahead:  0, cycles:  8, proc: ldh_cptr_a          },
-    /* 0xE3*/ OPCODE_UNASSIGNED,
-    /* 0xE4*/ OPCODE_UNASSIGNED,
+    /* 0xE3*/ OpCode { name: "[0xE3]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xe3     },
+    /* 0xE4*/ OpCode { name: "[0xE4]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xe4     },
     /* 0xE5*/ OpCode { name: "PUSH HL",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: push_hl             },
     /* 0xE6*/ OpCode { name: "AND A, ${x8}",     bytes: 2, cycles_ahead:  0, cycles:  8, proc: and_a_u8            },
     /* 0xE7*/ OpCode { name: "RST 20h",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: rst_20h             },
     /* 0xE8*/ OpCode { name: "ADD SP, {i8}",     bytes: 2, cycles_ahead:  0, cycles: 16, proc: add_sp_i8           },
     /* 0xE9*/ OpCode { name: "JP (HL)",          bytes: 1, cycles_ahead:  0, cycles:  4, proc: jp_hl               },
     /* 0xEA*/ OpCode { name: "LD (${x16}), A",   bytes: 3, cycles_ahead:  8, cycles: 16, proc: ld_u16ptr_a         },
-    /* 0xEB*/ OPCODE_UNASSIGNED,
-    /* 0xEC*/ OPCODE_UNASSIGNED,
-    /* 0xED*/ OPCODE_UNASSIGNED,
+    /* 0xEB*/ OpCode { name: "[0xEB]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xeb     },
+    /* 0xEC*/ OpCode { name: "[0xEC]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xec     },
+    /* 0xED*/ OpCode { name: "[0xED]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xed     },
     /* 0xEE*/ OpCode { name: "XOR A, ${x8}",     bytes: 2, cycles_ahead:  0, cycles:  8, proc: xor_a_u8            },
     /* 0xEF*/ OpCode { name: "RST 28h",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: rst_28h             },
 
@@ -330,7 +334,7 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xF1*/ OpCode { name: "POP AF",           bytes: 1, cycles_ahead:  0, cycles: 12, proc: pop_af              },
     /* 0xF2*/ OpCode { name: "LDH A, (ff00+C)",  bytes: 1, cycles_ahead:  0, cycles:  8, proc: ldh_a_cptr          },
     /* 0xF3*/ OpCode { name: "DI",               bytes: 1, cycles_ahead:  0, cycles:  4, proc: disable_interrupts  },
-    /* 0xF4*/ OPCODE_UNASSIGNED,
+    /* 0xF4*/ OpCode { name: "[0xF4]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xf4     },
     /* 0xF5*/ OpCode { name: "PUSH AF",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: push_af             },
     /* 0xF6*/ OpCode { name: "OR A, ${x8}",      bytes: 2, cycles_ahead:  0, cycles:  8, proc: or_a_u8             },
     /* 0xF7*/ OpCode { name: "RST 30h",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: rst_30h             },
@@ -338,16 +342,12 @@ pub static OPCODE_TABLE: [OpCode; 256] = [
     /* 0xF9*/ OpCode { name: "LD SP, HL",        bytes: 1, cycles_ahead:  0, cycles:  8, proc: ld_sp_hl            },
     /* 0xFA*/ OpCode { name: "LD A, (${x16})",   bytes: 3, cycles_ahead:  8, cycles: 16, proc: ld_a_u16ptr         },
     /* 0xFB*/ OpCode { name: "EI",               bytes: 1, cycles_ahead:  0, cycles:  4, proc: enable_interrupts   },
-    /* 0xFC*/ OPCODE_UNASSIGNED,
-    /* 0xFD*/ OPCODE_UNASSIGNED,
+    /* 0xFC*/ OpCode { name: "[0xFC]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xfc     },
+    /* 0xFD*/ OpCode { name: "[0xFD]",           bytes: 1, cycles_ahead:  0, cycles:  0, proc: unassigned_0xfd     },
     /* 0xFE*/ OpCode { name: "CP A, ${x8}",      bytes: 2, cycles_ahead:  0, cycles:  8, proc: cp_a_u8             },
     /* 0xFF*/ OpCode { name: "RST 38h",          bytes: 1, cycles_ahead:  0, cycles: 16, proc: rst_38h             },
-];
 
-
-/// The table of all extended opcodes.
-/// The array's index is the opcodes numerical value.
-pub static OPCODE_TABLE_EXTENDED: [OpCode; 256] = [
+// Extended OpCode Table
     /* 0x00*/ OpCode { name: "RLC B",            bytes: 1, cycles_ahead:  0, cycles:  8, proc: rlc_b               },
     /* 0x01*/ OpCode { name: "RLC C",            bytes: 1, cycles_ahead:  0, cycles:  8, proc: rlc_c               },
     /* 0x02*/ OpCode { name: "RLC D",            bytes: 1, cycles_ahead:  0, cycles:  8, proc: rlc_d               },
@@ -619,5 +619,5 @@ pub static OPCODE_TABLE_EXTENDED: [OpCode; 256] = [
     /* 0xFD*/ OpCode { name: "SET 7, L",         bytes: 1, cycles_ahead:  0, cycles:  8, proc: set_bit_7_l         },
     /* 0xFE*/ OpCode { name: "SET 7, (HL)",      bytes: 1, cycles_ahead:  4, cycles: 16, proc: set_bit_7_hlptr     },
     /* 0xFF*/ OpCode { name: "SET 7, A",         bytes: 1, cycles_ahead:  0, cycles:  8, proc: set_bit_7_a         },
-];
+]);
 

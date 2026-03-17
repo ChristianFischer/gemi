@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ use core::mem::take;
 use core::ops::Sub;
 
 use crate::cpu::interrupts::Interrupt;
-use crate::emulator_context::EmulatorContext;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
@@ -386,7 +386,7 @@ impl Timer {
 
 
 impl MemoryBusConnection for Timer {
-    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &impl EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_REGISTER_DIV  => self.internal_counter.get_div(),
             MEMORY_LOCATION_REGISTER_TIMA => self.tima,
@@ -397,7 +397,7 @@ impl MemoryBusConnection for Timer {
     }
 
 
-    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContextMut, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_REGISTER_DIV => {
                 // writing to DIV will reset the counter

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::emulator_context::EmulatorContext;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::MemoryBusConnection;
 use flagset::{flags, FlagSet};
@@ -138,7 +138,7 @@ impl InterruptRegisters {
 
 
 impl MemoryBusConnection for InterruptRegisters {
-    fn on_read(&self, _ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, _ec: &impl EmulatorContext, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged.bits() | 0b_1110_0000,
             MEMORY_LOCATION_INTERRUPTS_ENABLED => self.interrupts_enabled.bits() | self.ie_unused_bits,
@@ -148,7 +148,7 @@ impl MemoryBusConnection for InterruptRegisters {
     }
 
 
-    fn on_write(&mut self, _ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorContextMut, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_INTERRUPTS_FLAGGED => self.interrupts_flagged = Interrupts::new_truncated(value),
 

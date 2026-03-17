@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::cartridge::image_data::ImageData;
 use crate::utils::SerializableArray;
 
 
@@ -28,6 +29,7 @@ use std::{
 
 
 /// A data object containing a 256 byte boot ROM.
+// todo: remove; replace by EmulatorClient
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BootRom {
     rom: SerializableArray<u8, 256>,
@@ -76,5 +78,16 @@ impl BootRom {
     /// Get data from the boot ROM.
     pub fn read(&self, address: u16) -> u8 {
         self.rom[address as usize]
+    }
+}
+
+
+impl ImageData for BootRom {
+    fn get_size(&self) -> usize {
+        self.rom.len()
+    }
+
+    fn get_data(&self) -> &[u8] {
+        self.rom.as_slice()
     }
 }

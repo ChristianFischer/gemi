@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ impl GbcPalettePointer {
 
 
 impl VideoMemory {
-    pub fn new(ec: &EmulatorContext) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         let num_vram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 1,
             EmulationType::GBC => 2,

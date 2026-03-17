@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@ fn test_nostd() {
     };
     
     // create an EmulatorContext for the selected DeviceConfig
-    let mut ec_data = EmulatorContextDataHolder::new_empty(device_config);
-    let mut ec      = ec_data.make_context();
+    let mut ec = EmulatorContextDataHolder::new_empty(device_config);
 
     // create the emulator instance
     let mut emulator = EmulatorDevice::new(&mut ec);

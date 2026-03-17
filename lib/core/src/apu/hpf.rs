@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ pub struct StereoHighPassFilters {
 
 
 impl HighPassFilter {
-    pub fn new(ec: &EmulatorContext) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         let charge_factor = match ec.get_device_config().device {
             DeviceType::GameBoyDmg => CAPACITOR_CHARGE_FACTOR_BASE_DMG,
             _                      => CAPACITOR_CHARGE_FACTOR_BASE_GBC,
@@ -76,7 +76,7 @@ impl HighPassFilter {
 
 
 impl StereoHighPassFilters {
-    pub fn new(ec: &EmulatorContext) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         Self {
             filter_left:  HighPassFilter::new(ec),
             filter_right: HighPassFilter::new(ec),

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ use core::mem::take;
 use crate::cpu::interrupts::Interrupt;
 use crate::debug::DebugEvent;
 use crate::device_type::{DeviceConfig, DeviceType, EmulationType};
-use crate::emulator_context::EmulatorContext;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals};
@@ -322,7 +322,7 @@ impl ScanlineData {
 
 impl Ppu {
     /// Creates a new PPU object.
-    pub fn new(ec: &EmulatorContext) -> Ppu {
+    pub fn new(ec: &impl EmulatorContext) -> Ppu {
         let device_config = ec.get_device_config();
         let dmg_display_palette = match device_config.device {
             DeviceType::GameBoyDmg => DmgDisplayPalette::new_green(),
@@ -363,7 +363,7 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    pub fn update(&mut self, ec: &EmulatorContext, cycles: Clock) {
+    pub fn update(&mut self, ec: &impl EmulatorContext, cycles: Clock) {
         match self.lcd_state {
             LcdState::On => {
                 self.clock += cycles;
@@ -414,7 +414,7 @@ impl Ppu {
     /// Scans the object attribute memory for the current scanline
     /// to collect the objects to be drawn in this line.
     /// Enters Mode::DrawLine after the OAM scan was completed.
-    fn process_oam_scan(&mut self, ec: &EmulatorContext) {
+    fn process_oam_scan(&mut self, ec: &impl EmulatorContext) {
         if self.clock >= CPU_CYCLES_OAMSCAN {
             self.clock -= CPU_CYCLES_OAMSCAN;
 
@@ -429,7 +429,7 @@ impl Ppu {
 
     /// Draws pixels of the current scanline into the LCD buffer.
     /// Enters Mode::HBlank after the drawing was completed.
-    fn process_draw_line(&mut self, ec: &EmulatorContext) {
+    fn process_draw_line(&mut self, ec: &impl EmulatorContext) {
         let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
 
         if pixels_remaining > 0 {
@@ -457,7 +457,7 @@ impl Ppu {
 
 
     /// Process a number of pixels within the current scanline.
-    fn process_draw_line_pixels(&mut self, ec: &EmulatorContext, pixels_to_update: Clock) {
+    fn process_draw_line_pixels(&mut self, ec: &impl EmulatorContext, pixels_to_update: Clock) {
         let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
         let palette_bg       = &self.memory.palettes.bgp;
         let palette_obp      = &self.memory.palettes.obp;
@@ -528,7 +528,7 @@ impl Ppu {
 
 
     /// Fetch the data of the background or window layer on the current position in the active scanline.
-    fn fetch_background_pixel(&self, ec: &EmulatorContext) -> PixelFetchResult {
+    fn fetch_background_pixel(&self, ec: &impl EmulatorContext) -> PixelFetchResult {
         let bg_enabled      = self.check_lcdc(LcdControlFlag::BackgroundAndWindowEnabled);
         let tileset_select  = self.check_lcdc(LcdControlFlag::TileDataSelect);
         let tileset         = TileSet::by_select_bit(tileset_select);
@@ -580,7 +580,7 @@ impl Ppu {
 
     /// Fetch the foreground pixel by reading the color of any sprite on the current
     /// position within the active scanline
-    pub fn fetch_foreground_pixel(&self, ec: &EmulatorContext) -> PixelFetchResult {
+    pub fn fetch_foreground_pixel(&self, ec: &impl EmulatorContext) -> PixelFetchResult {
         let sprites_enabled = self.check_lcdc(LcdControlFlag::SpritesEnabled);
 
         if sprites_enabled {
@@ -599,7 +599,7 @@ impl Ppu {
     /// Selects whether to display background or foreground pixel depending on current priority bits
     pub fn mix_pixels<'a>(
             &self,
-            ec: &EmulatorContext,
+            ec: &impl EmulatorContext,
             background: &'a PixelFetchResultWithPalette<'a>,
             foreground: &'a PixelFetchResultWithPalette<'a>
     ) -> &'a PixelFetchResultWithPalette<'a>
@@ -765,7 +765,7 @@ impl Ppu {
 
 
     /// Clears the screen with a 'blank' color.
-    fn clear_screen(&mut self, ec: &EmulatorContext) {
+    fn clear_screen(&mut self, ec: &impl EmulatorContext) {
         self.lcd_buffer.fill(Self::get_blank_color(
             ec.get_device_config(),
             &self.dmg_display_palette
@@ -774,7 +774,7 @@ impl Ppu {
 
 
     /// Reset the PPU once it get disabled.
-    fn on_ppu_reset(&mut self, ec: &EmulatorContext) {
+    fn on_ppu_reset(&mut self, ec: &impl EmulatorContext) {
         self.clock                  = 0;
         self.lcd_state              = LcdState::Off;
         self.mode                   = Mode::HBlank;
@@ -801,7 +801,7 @@ impl Ppu {
     }
 
     /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
-    pub fn set_dmg_display_palette(&mut self, ec: &EmulatorContext, palette: DmgDisplayPalette) {
+    pub fn set_dmg_display_palette(&mut self, ec: &impl EmulatorContext, palette: DmgDisplayPalette) {
         self.dmg_display_palette = palette;
         
         // clear the screen when the palette was changed.
@@ -890,7 +890,7 @@ impl Ppu {
     }
 
     /// Performs an OAM scan and stores it's result in the 'scanline' object.
-    pub fn do_oam_scan_for_line(&self, ec: &EmulatorContext, line_number: u8) -> ScanlineData {
+    pub fn do_oam_scan_for_line(&self, ec: &impl EmulatorContext, line_number: u8) -> ScanlineData {
         let mut scanline = ScanlineData::new();
         scanline.line = line_number;
 
@@ -941,7 +941,7 @@ impl Ppu {
     }
 
     /// Reads a pixel from the current scanline sprite data on a given x position.
-    pub fn read_scanline_sprite_pixel(&self, ec: &EmulatorContext, scanline: &ScanlineData, x: u8) -> PixelFetchResult {
+    pub fn read_scanline_sprite_pixel(&self, ec: &impl EmulatorContext, scanline: &ScanlineData, x: u8) -> PixelFetchResult {
         // screen position considering the border offset of -8 / -16
         let screen_x = x + 8;
         let screen_y = scanline.line + 16;
@@ -1005,7 +1005,7 @@ impl Ppu {
     }
 
     /// Reads a single pixel from the tilemap.
-    pub fn read_tilemap_pixel(&self, ec: &EmulatorContext, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> PixelFetchResult {
+    pub fn read_tilemap_pixel(&self, ec: &impl EmulatorContext, tilemap: TileMap, tileset: TileSet, tilemap_x: u8, tilemap_y: u8) -> PixelFetchResult {
         let tile = self.read_tilemap_properties(tilemap, tileset, tilemap_x, tilemap_y);
         self.read_tile_pixel(ec, &tile)
     }
@@ -1030,7 +1030,7 @@ impl Ppu {
 
     /// Read the pixel value from a tile using previously created TileFetchProperties.
     #[allow(unused_mut)] // silence warning since 'mut' is only required for the cgb-block
-    pub fn read_tile_pixel(&self, ec: &EmulatorContext, tile: &TileFetchProperties) -> PixelFetchResult {
+    pub fn read_tile_pixel(&self, ec: &impl EmulatorContext, tile: &TileFetchProperties) -> PixelFetchResult {
         let tile_address = (tile.tilemap.base_address() + tile.tile_index - MEMORY_LOCATION_VRAM_BEGIN) as usize;
         let vram0        = &self.memory.vram_banks[0];
         let sprite       = vram0.get_at(tile_address);
@@ -1118,7 +1118,7 @@ impl Ppu {
 
 
 impl MemoryBusConnection for Ppu {
-    fn on_read(&self, ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, ec: &impl EmulatorContext, address: u16) -> u8 {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {
@@ -1211,7 +1211,7 @@ impl MemoryBusConnection for Ppu {
     }
 
 
-    fn on_write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, ec: &mut impl EmulatorContextMut, address: u16, value: u8) {
         memory_map!(address => {
             // Video RAM
             0x8000 ..= 0x9fff => [mapped_address] {

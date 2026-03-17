@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 by Christian Fischer
+ * Copyright (C) 2025-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,14 @@
  */
 
 use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::image_data::{ImageData, ImageDataMut};
-use gemi_core::cartridge::Cartridge;
+use gemi_core::cartridge::image_data::DataBuffer;
+use gemi_core::cartridge::{Cartridge, CartridgeInfo};
 use gemi_core::device_type::DeviceConfig;
-use gemi_core::emulator_context::EmulatorContext;
-
+use gemi_core::emulator_context::{EmulatorClient_PPU, EmulatorContext, EmulatorContextMut};
+use gemi_core::ppu::graphic_data::Color;
 
 /// A struct holding the internal data used by the emulator.
+// todo: rename? move?
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub(crate) struct GameBoyContextData {
     pub(crate) device_config: DeviceConfig,
@@ -31,26 +32,47 @@ pub(crate) struct GameBoyContextData {
 }
 
 
-impl GameBoyContextData {
-    pub(crate) fn make_context(&self) -> EmulatorContext {
-        EmulatorContext::new(
-            &self.device_config,
-            &self.cartridge.cartridge_info,
-            self.cartridge.rom.get_data(),
-            self.cartridge.ram.get_data(),
-            self.boot_rom.as_ref().map(|boot_rom| boot_rom.as_ref())
-        )
+impl EmulatorContext for GameBoyContextData {
+    type BootRomImageData = BootRom;
+    type RomImageData = DataBuffer;
+    type RamImageData = DataBuffer;
+
+
+    fn get_device_config(&self) -> &DeviceConfig {
+        &self.device_config
     }
 
+    fn get_cartridge_info(&self) -> &CartridgeInfo {
+        &self.cartridge.cartridge_info
+    }
 
-    // todo: unify make + make_mut?
-    pub(crate) fn make_context_mut(&mut self) -> EmulatorContext {
-        EmulatorContext::new_mut(
-            &self.device_config,
-            &self.cartridge.cartridge_info,
-            self.cartridge.rom.get_data(),
-            self.cartridge.ram.get_data_mut(),
-            self.boot_rom.as_ref().map(|boot_rom| boot_rom.as_ref())
-        )
+    fn get_boot_rom(&self) -> Option<&Self::BootRomImageData> {
+        self.boot_rom.as_ref().map(|b| b.as_ref())
+    }
+
+    fn get_cartridge_rom(&self) -> &Self::RomImageData {
+        &self.cartridge.rom
+    }
+
+    fn get_cartridge_ram(&self) -> &Self::RamImageData {
+        &self.cartridge.ram
     }
 }
+
+
+impl EmulatorClient_PPU for GameBoyContextData {
+    fn put_pixel(&mut self, x: u32, y: u32, color: Color) {
+        _ = (x, y, color); // todo: implement me
+    }
+}
+
+
+impl EmulatorContextMut for GameBoyContextData {
+    type RamImageDataMut = DataBuffer;
+
+    fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
+        &mut self.cartridge.ram
+    }
+}
+
+

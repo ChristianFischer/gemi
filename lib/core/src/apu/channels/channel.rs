@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::length_timer::LengthTimer;
 use crate::apu::dac::DigitalAudioConverter;
 use crate::apu::sample::{Sample, SampleResult};
-use crate::apu::ApuContext;
+use crate::apu::ApuState;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::emulator_device::Clock;
 use crate::utils::get_bit;
 
@@ -83,25 +84,26 @@ pub trait ChannelComponent {
     /// Checks whether this component can be written to in the current state.
     /// The default implementation disallows write while the APU is turned off, which
     /// is the case for most components, except the length timer.
-    fn can_write_register(&self, ac: &ApuContext, number: u16) -> bool {
-        _ = number;
-        ac.state.apu_on
+    // todo: can 'ec' be removed or replaced by EmulatorContext (non mut)?
+    fn can_write_register(&self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16) -> bool {
+        _ = (ec, number);
+        apu_state.apu_on
     }
 
     /// Called to read the value of a register.
-    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
-        default_on_read_register(ac, number)
+    fn on_read_register(&self, ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
+        default_on_read_register(ec, apu_state, number)
     }
 
     /// Called when the value of a register was written.
-    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
-       default_on_write_register(ac, number, value)
+    fn on_write_register(&mut self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
+       default_on_write_register(ec, apu_state, number, value)
     }
 
     /// Called when the channel was triggered by setting bit 7 of it's NRx4 register.
     /// This should start the channel to generate sound.
-    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
-        default_on_trigger_event(ac)
+    fn on_trigger_event(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) -> TriggerAction {
+        default_on_trigger_event(ec, apu_state)
     }
 
     /// Called when this channel was disabled.
@@ -109,27 +111,27 @@ pub trait ChannelComponent {
 
     /// Called when the APU was reset by turning it off.
     /// It's expected to every component to set it's data to '0'.
-    fn on_reset(&mut self, ac: &ApuContext);
+    fn on_reset(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState);
 }
 
 
 /// Placeholder for `on_write_register` implementations, which do not result in any special behaviour.
-pub fn default_on_write_register(ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
-    _ = (ac, number, value);
+pub fn default_on_write_register(ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
+    _ = (ec, apu_state, number, value);
     TriggerAction::None
 }
 
 
 /// Placeholder for `on_read_register` implementations, which do not result in any special behaviour.
-pub fn default_on_read_register(ac: &ApuContext, number: u16) -> u8 {
-    _ = (ac, number);
+pub fn default_on_read_register(ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
+    _ = (ec, apu_state, number);
     0x00
 }
 
 
 /// Placeholder for `on_trigger_event` implementations, which do not result in any special behaviour.
-pub fn default_on_trigger_event(ac: &ApuContext) -> TriggerAction {
-    _ = ac;
+pub fn default_on_trigger_event(ec: &impl EmulatorContext, apu_state: &ApuState) -> TriggerAction {
+    _ = (ec, apu_state);
     TriggerAction::None
 }
 
@@ -167,6 +169,51 @@ pub struct Channel<
     /// A digital audio converter to convert the digital sound value
     /// into a sound wave.
     dac: DigitalAudioConverter,
+}
+
+
+/// Invokes a functor on each active component of this channel,
+/// including the generator component.
+/// Each component is readonly and is expected to return a numeric
+/// value as a result of this operation.
+// todo: review
+macro_rules! for_each_component {
+    (@internal $self:ident, $c:ident, $body:block, $($ref_type:tt)*) => {
+        {
+            let mut results = Default::default();
+
+            if Self::has_feature_length_timer() {
+                let $c = $($ref_type)* $self.length_timer;
+                results |= $body;
+            }
+
+            if Self::has_feature_frequency_sweep() {
+                let $c = $($ref_type)* $self.freq_sweep;
+                results |= $body;
+            }
+
+            if Self::has_feature_volume_envelope() {
+                let $c = $($ref_type)* $self.vol_envelope;
+                results |= $body;
+            }
+
+            {
+                let $c = $($ref_type)* $self.generator;
+                results |= $body;
+            }
+
+            results
+        }
+    };
+
+    (&mut $self:ident, |$c:ident| $($body:tt)*) => {
+        for_each_component!(@internal $self, $c, { $($body)* }, &mut)
+    };
+
+    (&$self:ident, |$c:ident| $($body:tt)*) => {
+        for_each_component!(@internal $self, $c, { $($body)* }, &)
+    };
+
 }
 
 
@@ -252,62 +299,6 @@ impl<
     }
 
 
-    /// Invokes a functor on each active component of this channel,
-    /// including the generator component.
-    /// Each component is readonly and is expected to return a numeric
-    /// value as a result of this operation.
-    fn for_each_component<F, T>(&self, func: F) -> T
-        where F : Fn(&dyn ChannelComponent) -> T,
-              T : Default + core::ops::BitOr + core::ops::BitOrAssign
-    {
-        let mut results: T = Default::default();
-
-        if Self::has_feature_length_timer() {
-            results |= func(&self.length_timer);
-        }
-
-        if Self::has_feature_frequency_sweep() {
-            results |= func(&self.freq_sweep);
-        }
-
-        if Self::has_feature_volume_envelope() {
-            results |= func(&self.vol_envelope);
-        }
-
-        results |= func(&self.generator);
-
-        results
-    }
-
-
-    /// Invokes a functor on each active component of this channel,
-    /// including the generator component.
-    /// Any component will be mutable and is expected to return a TriggerAction
-    /// to invoke actions in result of this call.
-    fn for_each_component_mut<F, T>(&mut self, mut func: F) -> TriggerActionSet
-        where F : FnMut(&mut dyn ChannelComponent) -> T,
-              T : Into<FlagSet<TriggerAction>>
-    {
-        let mut results: TriggerActionSet = Default::default();
-
-        if Self::has_feature_length_timer() {
-            results |= func(&mut self.length_timer);
-        }
-
-        if Self::has_feature_frequency_sweep() {
-            results |= func(&mut self.freq_sweep);
-        }
-
-        if Self::has_feature_volume_envelope() {
-            results |= func(&mut self.vol_envelope);
-        }
-
-        results |= func(&mut self.generator);
-
-        results
-    }
-
-
     /// Applies a set of actions delivered by a call to `on_trigger` or `on_register_changed`
     /// events. A modified set of the actually applied results will be returned.
     fn apply_actions(&mut self, actions: impl Into<TriggerActionSet>) -> TriggerActionSet {
@@ -337,30 +328,32 @@ impl<
 
 
     /// Reads from a register which belongs to this channel.
-    pub fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
-        self.for_each_component(|c| c.on_read_register(ac, number))
+    pub fn on_read_register(&self, ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
+        for_each_component!(&self, |c| c.on_read_register(ec, apu_state, number))
     }
 
 
     /// Writes to a register which belongs to this channel.
     /// When NRx4 bit 7 was set, this will also fire the trigger event for this channel.
-    pub fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerActionSet {
-        let mut actions = self.for_each_component_mut(
+    pub fn on_write_register(&mut self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerActionSet {
+        let mut actions = for_each_component!(
+            &mut self,
             |c| {
                 // block writing to this component, if not allowed
-                if !c.can_write_register(ac, number) {
-                    return TriggerAction::None;
+                if c.can_write_register(ec, apu_state, number) {
+                    c.on_write_register(ec, apu_state, number, value)
                 }
-
-                c.on_write_register(ac, number, value)
+                else {
+                    TriggerAction::None
+                }
             }
         );
 
         // a channel may only be triggered, if the APU is not turned off
-        if ac.state.apu_on {
+        if apu_state.apu_on {
             // check whether the trigger bit was set
             if number == 4 && get_bit(value, 7) {
-                actions |= self.fire_trigger_event(ac);
+                actions |= self.fire_trigger_event(ec, apu_state);
             }
 
             // apply requested actions
@@ -372,7 +365,7 @@ impl<
 
 
     /// Fires the trigger event when the channel was triggered by writing NRx4 bit 7.
-    fn fire_trigger_event(&mut self, ac: &ApuContext) -> TriggerActionSet {
+    fn fire_trigger_event(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) -> TriggerActionSet {
         self.channel_enabled = true;
 
         // when the channel has a frequency sweep, it will initialize it's shadow frequency
@@ -383,8 +376,9 @@ impl<
         }
 
         // invoke trigger event for each component
-        let mut actions = self.for_each_component_mut(
-            |c| c.on_trigger_event(ac)
+        let mut actions = for_each_component!(
+            &mut self,
+            |c| c.on_trigger_event(ec, apu_state)
         );
 
         // DAC disabled prevents the channel from being enabled
@@ -402,7 +396,8 @@ impl<
         self.channel_enabled = false;
 
         // notify all components
-        self.for_each_component_mut(
+        let _result: TriggerActionSet = for_each_component!(
+            &mut self,
             |c| {
                 c.on_channel_disabled();
                 TriggerAction::None
@@ -412,11 +407,12 @@ impl<
 
 
     /// Reset this channel when the APU was turned off.
-    pub fn reset(&mut self, ac: &ApuContext) {
+    pub fn reset(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) {
         // notify each component to reset
-        self.for_each_component_mut(
+        let _result: TriggerActionSet = for_each_component!(
+            &mut self,
             |c| {
-                c.on_reset(ac);
+                c.on_reset(ec, apu_state);
                 TriggerAction::None
             }
         );
@@ -477,10 +473,10 @@ impl<
 
     /// Get the audio sample generated by the channels sound generator and
     /// converted by the channels DAC.
-    pub fn get_sample(&self, ac: &ApuContext) -> SampleResult<Sample> {
+    pub fn get_sample(&self, apu_state: &ApuState) -> SampleResult<Sample> {
         let value = if self.channel_enabled {
             // take the current sample from the sound generator
-            let generated_sample = self.generator.get_sample(ac);
+            let generated_sample = self.generator.get_sample(apu_state);
 
             // get the volume level from the envelope function, if available
             let volume = if Self::has_feature_volume_envelope() {

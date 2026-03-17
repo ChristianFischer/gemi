@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ impl AudioOutput {
     pub const DEFAULT_SAMPLE_RATE: u32 = 48_000;
 
 
-    pub fn new(ec: &EmulatorContext) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         Self {
             sample_rate:        Self::DEFAULT_SAMPLE_RATE,
             time_passed:        0,

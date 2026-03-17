@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
-use crate::apu::ApuContext;
+use crate::apu::ApuState;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::utils::get_bit;
 
 
@@ -132,7 +133,7 @@ impl Envelope {
 
 
 impl ChannelComponent for Envelope {
-    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             2 => {
                     self.direction.to_register_value()
@@ -140,12 +141,12 @@ impl ChannelComponent for Envelope {
                 |   ((self.initial_volume & 0x0f) << 4)
             },
 
-            _ => default_on_read_register(ac, number)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             2 => {
                 let volume        = (value >> 4) & 0x0f;
@@ -170,21 +171,21 @@ impl ChannelComponent for Envelope {
             _ => { }
         }
 
-        default_on_write_register(ac, number, value)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
+    fn on_trigger_event(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) -> TriggerAction {
         self.reload_envelope_timer();
 
         // initialize the volume from it's configured value
         self.volume = self.initial_volume;
 
-        default_on_trigger_event(ac)
+        default_on_trigger_event(ec, apu_state)
     }
 
 
-    fn on_reset(&mut self, _ac: &ApuContext) {
+    fn on_reset(&mut self, _ec: &impl EmulatorContext, _apu_state: &ApuState) {
         *self = Self::default();
     }
 }

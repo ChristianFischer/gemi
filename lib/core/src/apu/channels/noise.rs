@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ use core::cmp::min;
 use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
-use crate::apu::ApuContext;
+use crate::apu::ApuState;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::emulator_device::Clock;
 use crate::utils::{as_bit_flag, get_bit};
 
@@ -78,7 +79,7 @@ impl NoiseGenerator {
 
 
 impl ChannelComponent for NoiseGenerator {
-    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             1 => NR41_NON_READABLE_BITS, // unused bits
 
@@ -95,12 +96,12 @@ impl ChannelComponent for NoiseGenerator {
 
             4 => NR44_NON_READABLE_BITS | NR44_WRITE_ONLY_TRIGGER_BIT,
 
-            _ => default_on_read_register(ac, number)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             3 => {
                 let shift        = (value >> 4) & 0x0f;
@@ -124,21 +125,21 @@ impl ChannelComponent for NoiseGenerator {
             _ => { }
         }
 
-        default_on_write_register(ac, number, value)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
+    fn on_trigger_event(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) -> TriggerAction {
         self.reset_timer();
 
         // reset lfsr to zero
         self.lfsr = 0;
 
-        default_on_trigger_event(ac)
+        default_on_trigger_event(ec, apu_state)
     }
 
 
-    fn on_reset(&mut self, _ac: &ApuContext) {
+    fn on_reset(&mut self, _ec: &impl EmulatorContext, _apu_state: &ApuState) {
         *self = Self::new();
     }
 }
@@ -189,7 +190,7 @@ impl SoundGenerator for NoiseGenerator {
     }
 
 
-    fn get_sample(&self, _ac: &ApuContext) -> u8 {
+    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
         // take bit 0 to determine whether a tone is generated or not
         let sample = (self.lfsr & 0x01) as u8;
         sample

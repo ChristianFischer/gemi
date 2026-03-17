@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,10 @@ use crate::cartridge::LicenseeCode;
 use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8, CPU_CLOCK_SPEED};
 use crate::cpu::interrupts::InterruptRegisters;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
+use crate::cpu::opcodes::opcode_dispatch;
 use crate::debug::{DebugEvent, DebugEvents};
 use crate::device_type::{DeviceType, EmulationType};
-use crate::emulator_context::EmulatorContext;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
@@ -75,7 +76,7 @@ pub struct EmulatorUpdateResults {
 impl EmulatorDevice {
 
     /// Create a new GameBoy device.
-    pub fn new(ec: &EmulatorContext) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         Self {
             cpu: Cpu::new(
                 Mmu::new(
@@ -98,7 +99,7 @@ impl EmulatorDevice {
 
     /// Boot the device, initializing the Boot ROM program.
     // todo: non-mut ec?
-    pub fn initialize(&mut self, ec: &mut EmulatorContext) {
+    pub fn initialize(&mut self, ec: &mut impl EmulatorContextMut) {
         if ec.get_boot_rom().is_some() {
             self.cpu.set_instruction_pointer(0x0000);
         }
@@ -108,7 +109,7 @@ impl EmulatorDevice {
     }
 
     /// setup values like expected after the boot rom was executed on the original GameBoy.
-    fn setup_initial_values(&mut self, ec: &mut EmulatorContext) {
+    fn setup_initial_values(&mut self, ec: &mut impl EmulatorContextMut) {
         let device_config = ec.get_device_config();
         let pc = 0x0100;
         let sp = 0xfffe;
@@ -119,7 +120,7 @@ impl EmulatorDevice {
             match ec.get_cartridge_info().get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
                     let rom_data = ec.get_cartridge_rom();
-                    cartridge::rom_data::compute_title_checksum(&rom_data)
+                    cartridge::rom_data::compute_title_checksum(rom_data)
                 }
 
                 _ => 0x00
@@ -313,14 +314,14 @@ impl EmulatorDevice {
 
     /// Runs the emulator for a single step, either an instruction
     /// or to process a single HALT cycle.
-    pub fn run_single_step(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
+    pub fn run_single_step(&mut self, ec: &mut impl EmulatorContextMut) -> EmulatorUpdateResults {
         self.process_next(ec)
     }
 
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
-    pub fn run_frame(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
+    pub fn run_frame(&mut self, ec: &mut impl EmulatorContextMut) -> EmulatorUpdateResults {
         let mut results = EmulatorUpdateResults::default();
 
         // update until receiving the 'frame completed' event.
@@ -343,7 +344,7 @@ impl EmulatorDevice {
 
 
     /// Continues processing the next pending operation.
-    fn process_next(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
+    fn process_next(&mut self, ec: &mut impl EmulatorContextMut) -> EmulatorUpdateResults {
         if self.cpu.is_running() {
             if let Some(cycles) = self.cpu.handle_interrupts(ec) {
                 let signals = self.update_components(ec, cycles);
@@ -372,9 +373,9 @@ impl EmulatorDevice {
 
 
     /// Process the next opcode.
-    fn process_next_opcode(&mut self, ec: &mut EmulatorContext) -> EmulatorUpdateResults {
+    fn process_next_opcode(&mut self, ec: &mut impl EmulatorContextMut) -> EmulatorUpdateResults {
         let instruction = self.cpu.fetch_next_instruction(ec);
-        let mut context = OpCodeContext::for_instruction(self, ec, &instruction);
+        let mut context = OpCodeContext::for_instruction(&instruction);
         let mut signals = MemoryBusSignals::default();
         let mut total_step_cycles : Clock = 0;
 
@@ -383,19 +384,19 @@ impl EmulatorDevice {
         if instruction.opcode.cycles_ahead != 0 {
             let cycles_ahead = instruction.opcode.cycles_ahead;
             total_step_cycles += cycles_ahead;
-            signals |= context.dev.update_components(context.ec, cycles_ahead);
+            signals |= self.update_components(ec, cycles_ahead);
         }
 
         loop {
             // invoke opcode execution
-            let result = (instruction.opcode.proc)(&mut context);
+            let result = opcode_dispatch(instruction.opcode, self, ec, &mut context);
 
             match result {
                 // the opcode was partially executed and needs time to pass on other components
                 // to update timer or memory operations.
                 OpCodeResult::StageDone(step_cycles) => {
                     total_step_cycles += step_cycles;
-                    signals |= context.dev.update_components(context.ec, step_cycles);
+                    signals |= self.update_components(ec, step_cycles);
                     context.enter_next_stage();
                 }
 
@@ -404,7 +405,7 @@ impl EmulatorDevice {
                     // get the total number of cycles consumed by this opcode and subtract the
                     // number of cycles already applied to components
                     let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
-                    signals |= context.dev.update_components(context.ec, remaining_cycles);
+                    signals |= self.update_components(ec, remaining_cycles);
 
                     break;
                 }
@@ -420,7 +421,7 @@ impl EmulatorDevice {
 
     /// Applies the time passed during CPU execution to other components as well.
     #[must_use]
-    fn update_components(&mut self, ec: &mut EmulatorContext, cycles: Clock) -> MemoryBusSignals {
+    fn update_components(&mut self, ec: &mut impl EmulatorContextMut, cycles: Clock) -> MemoryBusSignals {
         self.cpu.update(cycles);
         self.get_mmu_mut().update(ec, cycles);
         #[cfg(feature = "apu")]

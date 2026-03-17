@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 by Christian Fischer
+ * Copyright (C) 2025-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,53 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::boot_rom::BootRom;
 use crate::cartridge::image_data::{ImageData, ImageDataMut, ZeroImageData};
 use crate::cartridge::CartridgeInfo;
 use crate::device_type::DeviceConfig;
-
+use crate::ppu::graphic_data::Color;
 
 // todo: doc
-pub struct EmulatorContext<'a> {
-    device_config:  &'a DeviceConfig, // todo: change into ref?
-    cartridge_info: &'a CartridgeInfo,
-    cartridge_rom:  RefImageOption<'a>,
-    cartridge_ram:  RefImageOption<'a>,
-    boot_rom:       Option<&'a BootRom>
+// todo: rename into EmulatorClient
+pub trait EmulatorContext {
+    type BootRomImageData: ImageData;
+    type RomImageData: ImageData;
+    type RamImageData: ImageData;
+
+
+    fn get_device_config(&self) -> &DeviceConfig;
+
+    fn get_cartridge_info(&self) -> &CartridgeInfo;
+
+    fn get_boot_rom(&self) -> Option<&Self::BootRomImageData>;
+
+    fn get_cartridge_rom(&self) -> &Self::RomImageData;
+
+    fn get_cartridge_ram(&self) -> &Self::RamImageData;
 }
 
 
-// todo: what to do here????
-pub struct EmulatorContextDataHolder<Rom, Ram>
+// todo: doc
+// todo: find better name; move into PPU module
+pub trait EmulatorClient_PPU {
+    fn put_pixel(&mut self, x: u32, y: u32, color: Color);
+}
+
+
+// todo: doc
+pub trait EmulatorContextMut : EmulatorContext + EmulatorClient_PPU
+{
+    type RamImageDataMut: ImageDataMut;
+
+    fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut;
+}
+
+
+
+// todo: what to do here???? rename into MockEmulatorContext?
+pub struct EmulatorContextDataHolder<Rom, Ram, BootRom>
     where Rom: ImageData,
-          Ram: ImageDataMut
+          Ram: ImageDataMut,
+          BootRom: ImageData,
 {
     // todo: all optional? (except device_config)
     pub device_config:  DeviceConfig,
@@ -45,105 +72,11 @@ pub struct EmulatorContextDataHolder<Rom, Ram>
 }
 
 
-enum RefImageOption<'a> {
-    Readonly(&'a [u8]),
-    Mutable(&'a mut [u8]),
-}
 
-
-// todo: doc
-pub struct ImageDataReader<'a> {
-    data: &'a [u8],
-}
-
-
-// todo: doc
-pub struct ImageDataWriter<'a> {
-    data: &'a mut [u8],
-}
-
-
-
-impl<'a> EmulatorContext<'a> {
-    // todo: can we unify new & new_mut?
-    pub fn new(
-        device_config: &'a DeviceConfig,
-        cartridge_info: &'a CartridgeInfo,
-        rom_data: &'a [u8],
-        ram_data: &'a [u8],
-        boot_rom: Option<&'a BootRom>
-    ) -> Self {
-        Self {
-            device_config,
-            cartridge_info,
-            cartridge_rom: RefImageOption::Readonly(rom_data),
-            cartridge_ram: RefImageOption::Readonly(ram_data),
-            boot_rom,
-        }
-    }
-    
-    
-    pub fn new_mut(
-        device_config: &'a DeviceConfig,
-        cartridge_info: &'a CartridgeInfo,
-        rom_data: &'a [u8],
-        ram_data: &'a mut [u8],
-        boot_rom: Option<&'a BootRom>
-    ) -> Self {
-        Self {
-            device_config,
-            cartridge_info,
-            cartridge_rom: RefImageOption::Readonly(rom_data),
-            cartridge_ram: RefImageOption::Mutable(ram_data),
-            boot_rom,
-        }
-    }
-
-
-    pub fn get_device_config(&self) -> &DeviceConfig {
-        self.device_config
-    }
-
-
-    pub fn get_cartridge_info(&self) -> &CartridgeInfo {
-        self.cartridge_info
-    }
-
-
-    pub fn get_boot_rom(&self) -> Option<&BootRom> {
-        self.boot_rom
-    }
-
-
-    pub fn get_cartridge_rom(&'a self) -> ImageDataReader<'a> {
-        match &self.cartridge_rom {
-            RefImageOption::Mutable(data) => ImageDataReader::<'a>{ data },
-            RefImageOption::Readonly(data) => ImageDataReader::<'a>{ data },
-        }
-    }
-
-
-    pub fn get_cartridge_ram(&'a self) -> ImageDataReader<'a> {
-        match &self.cartridge_ram {
-            RefImageOption::Mutable(data) => ImageDataReader::<'a>{ data },
-            RefImageOption::Readonly(data) => ImageDataReader::<'a>{ data },
-        }
-    }
-
-
-    // todo: could get..mut avoid Option?
-    pub fn get_cartridge_ram_mut<'b>(&'b mut self) -> Option<ImageDataWriter<'b>> {
-        match &mut self.cartridge_ram {
-            RefImageOption::Mutable(data) => Some(ImageDataWriter::<'b>{ data }),
-            _ => None
-        }
-    }
-}
-
-
-impl<Rom, Ram> EmulatorContextDataHolder<Rom, Ram>
+impl<Rom, Ram, BootRom> EmulatorContextDataHolder<Rom, Ram, BootRom>
     where Rom: ImageData,
-          Ram: ImageDataMut
+          Ram: ImageDataMut,
+          BootRom: ImageData,
 {
     pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram) -> Self {
         Self {
@@ -154,21 +87,10 @@ impl<Rom, Ram> EmulatorContextDataHolder<Rom, Ram>
             boot_rom: None,
         }
     }
-
-
-    pub fn make_context(&mut self) -> EmulatorContext {
-        EmulatorContext::new(
-            &self.device_config,
-            &self.cartridge_info,
-            self.cartridge_rom.get_data(),
-            self.cartridge_ram.get_data_mut(),
-            self.boot_rom.as_ref()
-        )
-    }
 }
 
 
-impl EmulatorContextDataHolder<ZeroImageData, ZeroImageData> {
+impl EmulatorContextDataHolder<ZeroImageData, ZeroImageData, ZeroImageData> {
     pub fn new_empty(device_config: DeviceConfig) -> Self {
         Self {
             device_config,
@@ -181,84 +103,56 @@ impl EmulatorContextDataHolder<ZeroImageData, ZeroImageData> {
 }
 
 
-impl<'a> ImageData for ImageDataReader<'a> {
-    fn get_size(&self) -> usize {
-        self.data.len()
-    }
-
-    fn get_data(&self) -> &[u8] {
-        self.data
-    }
-}
-
-
-impl<'a> ImageData for ImageDataWriter<'a> {
-    fn get_size(&self) -> usize {
-        self.data.len()
-    }
-
-    fn get_data(&self) -> &[u8] {
-        self.data
-    }
-}
-
-
-impl<'a> ImageDataMut for ImageDataWriter<'a> {
-    fn get_data_mut(&mut self) -> &mut [u8] {
-        self.data
-    }
-}
-
-
-/*
-// todo: doc
-pub type ZeroEmulatorContext = DefaultEmulatorContext<ZeroImageData, ZeroImageData>;
-
-
-// todo: doc
-pub struct DefaultEmulatorContext<
-    ROM: ImageData,
-    RAM: ImageDataMut
-> {
-    device_config: DeviceConfig,
-    cartridge_rom: ROM,
-    cartridge_ram: RAM,
-}
-
-
-impl<ROM: ImageData + Default, RAM: ImageDataMut + Default> DefaultEmulatorContext<ROM, RAM>
+impl<Rom, Ram, BootRom> EmulatorContext for EmulatorContextDataHolder<Rom, Ram, BootRom>
+where Rom: ImageData,
+      Ram: ImageDataMut,
+      BootRom: ImageData
 {
-    pub fn new(device_config: DeviceConfig) -> Self {
-        Self {
-            device_config,
-            cartridge_rom: ROM::default(),
-            cartridge_ram: RAM::default(),
-        }
-    }
-}
-*/
-
-
-/*
-impl<ROM: ImageData, RAM: ImageDataMut> EmulatorContext for DefaultEmulatorContext<ROM, RAM>
-{
-    type RomImageType = ROM;
-    type RamImageType = RAM;
+    type BootRomImageData = BootRom;
+    type RomImageData = Rom;
+    type RamImageData = Ram;
 
     fn get_device_config(&self) -> &DeviceConfig {
         &self.device_config
     }
 
-    fn get_cartridge_rom(&self) -> &Self::RomImageType {
+    fn get_cartridge_info(&self) -> &CartridgeInfo {
+        &self.cartridge_info
+    }
+
+    fn get_boot_rom(&self) -> Option<&Self::BootRomImageData> {
+        self.boot_rom.as_ref().map(|x| x as &Self::BootRomImageData)
+    }
+
+    fn get_cartridge_rom(&self) -> &Self::RomImageData {
         &self.cartridge_rom
     }
 
-    fn get_cartridge_ram(&mut self) -> &mut Self::RamImageType {
-        &mut self.cartridge_ram
+    fn get_cartridge_ram(&self) -> &Self::RamImageData {
+        &self.cartridge_ram
     }
+}
 
+
+impl<Rom, Ram, BootRom> EmulatorClient_PPU for EmulatorContextDataHolder<Rom, Ram, BootRom>
+where Rom: ImageData,
+      Ram: ImageDataMut,
+      BootRom: ImageData
+{
     fn put_pixel(&mut self, x: u32, y: u32, color: Color) {
         _ = (x, y, color);
     }
 }
-*/
+
+
+impl<Rom, Ram, BootRom> EmulatorContextMut for EmulatorContextDataHolder<Rom, Ram, BootRom>
+where Rom: ImageData,
+      Ram: ImageDataMut,
+      BootRom: ImageData
+{
+    type RamImageDataMut = Ram;
+
+    fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
+        &mut self.cartridge_ram
+    }
+}

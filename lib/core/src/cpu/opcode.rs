@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,25 @@
 #[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
 
-use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
-use crate::emulator_device::{Clock, EmulatorDevice};
+use crate::cpu::opcodes::OPCODE_TABLE;
+use crate::emulator_device::Clock;
 use crate::utils::{to_u16, to_u8};
-
-type ProcessOpCode = fn(ctx: &mut OpCodeContext) -> OpCodeResult;
 
 
 /// A macro to generate an opcode implementation function.
 macro_rules! opcode {
-    ($(#[$meta:meta])? $name:ident, [$($bind_ctx:ident)?] $($body:tt)*) => {
+    ($(#[$meta:meta])? $name:ident, [$($bind_dev:ident)? $(, $bind_ec:ident $(, $bind_ctx:ident)?)?] $($body:tt)*) => {
         $(#[$meta])?
-        pub fn $name(ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
+        pub fn $name(dev: &mut EmulatorDevice, ec: &mut impl EmulatorContextMut, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
             // silence 'unused' warnings
-            { let _ = &ctx; }
+            { let _ = (&dev, &ec, &ctx); }
 
-            // make ctx visible to 'body', if requested
-            $(let $bind_ctx = ctx;)?
+            // make dev, ec and ctx visible to 'body', if requested
+            $(let $bind_dev = dev;)?
+            $(
+                let $bind_ec  = ec;
+                $(let $bind_ctx = ctx;)?
+            )?
 
             // paste 'body' statements
             let result = {
@@ -47,8 +49,45 @@ macro_rules! opcode {
     };
 }
 
+/// A macro to generate an opcode table.
+macro_rules! opcode_table {
+    (
+        $vis:vis $table_name:ident: [OpCode; $table_size:expr] = [
+            $(
+                OpCode { name: $name:expr, bytes: $bytes:expr, cycles_ahead: $cycles_ahead:expr, cycles: $cycles:expr, proc: $proc:ident }
+            ),*
+            $(,)?
+        ]
+    ) => {
+        #[allow(non_camel_case_types)]
+        #[repr(u32)]
+        enum OpCodeProcId {
+            $(
+                $proc,
+            )*
+        }
+
+        $vis static $table_name: [OpCode; $table_size] = [
+            $(
+                OpCode { name: $name, bytes: $bytes, cycles_ahead: $cycles_ahead, cycles: $cycles, proc: OpCodeProcId::$proc as u32 },
+            )*
+        ];
+
+        // todo: avoid unsafe
+        $vis fn opcode_dispatch(oc: &OpCode, dev: &mut EmulatorDevice, ec: &mut impl EmulatorContextMut, ctx: &mut OpCodeContext) -> OpCodeResult {
+            let opcode_proc_id = unsafe { std::mem::transmute::<u32, OpCodeProcId>(oc.proc) };
+            match opcode_proc_id {
+                $(
+                    OpCodeProcId::$proc => $proc(dev, ec, ctx),
+                )*
+            }
+        }
+    }
+}
+
 pub(crate) use opcode;
-use crate::emulator_context::EmulatorContext;
+pub(crate) use opcode_table;
+
 
 /// Data struct describing a single opcode.
 #[derive(Copy, Clone)]
@@ -74,17 +113,14 @@ pub struct OpCode {
     pub cycles: Clock,
 
     /// Function pointer to the actual opcode execution.
-    pub proc: ProcessOpCode,
+    pub proc: u32,
 }
 
 
 /// Context object to deliver additional information about the current context
 /// to the opcode implementation, but also allow the opcode implementation to
 /// deliver additional results to it's caller.
-pub struct OpCodeContext<'a, 'b> {
-    pub dev: &'a mut EmulatorDevice,
-    pub ec: &'a mut EmulatorContext<'b>,
-
+pub struct OpCodeContext {
     /// The currently executed opcode
     opcode: &'static OpCode,
 
@@ -142,16 +178,10 @@ pub struct Instruction {
 }
 
 
-impl<'a, 'b> OpCodeContext<'a, 'b> {
+impl OpCodeContext {
     /// Creates a context object for an instruction being executed.
-    pub fn for_instruction(
-        dev: &'a mut EmulatorDevice, 
-        ec: &'a mut EmulatorContext<'b>, 
-        instruction: &Instruction
-    ) -> OpCodeContext<'a, 'b> {
+    pub fn for_instruction(instruction: &Instruction) -> OpCodeContext {
         OpCodeContext {
-            dev,
-            ec,
             opcode: instruction.opcode,
             cycles: instruction.opcode.cycles,
             stage:  0,
@@ -283,7 +313,7 @@ impl Instruction {
         // get the opcode, either extended or normal one
         let opcode = if opcode_byte == 0xCB {
             let (hi, _) = to_u8(opcode_id);
-            &OPCODE_TABLE_EXTENDED[hi as usize]
+            &OPCODE_TABLE[0x0100 | hi as usize]
         }
         else {
             &OPCODE_TABLE[opcode_byte as usize]

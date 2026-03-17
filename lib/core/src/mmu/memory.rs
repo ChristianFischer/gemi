@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use core::cmp::max;
-
+use crate::cartridge::image_data::ImageData;
 use crate::device_type::EmulationType;
-use crate::emulator_context::EmulatorContext;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::mmu::locations::*;
 use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl};
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
+use core::cmp::max;
 
 
 /// Stores the information of an active OAM DMA transfer
@@ -88,7 +88,7 @@ pub struct Memory {
 
 impl Memory {
     /// Create a new Memory object.
-    pub fn new(ec: &EmulatorContext) -> Self {
+    pub fn new(ec: &impl EmulatorContext) -> Self {
         let num_wram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 2,
             EmulationType::GBC => 8,
@@ -125,10 +125,10 @@ impl Memory {
 
 impl Memory {
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
-    fn read_boot_rom_or_cartridge(&self, ec: &EmulatorContext, address: u16) -> u8 {
+    fn read_boot_rom_or_cartridge(&self, ec: &impl EmulatorContext, address: u16) -> u8 {
         if self.boot_rom_enabled {
             if let Some(boot_rom) = ec.get_boot_rom() {
-                return boot_rom.read(address);
+                return boot_rom.read(address as usize);
             }
         }
 
@@ -137,20 +137,20 @@ impl Memory {
 
 
     /// Reads data from the cartridge.
-    fn read_from_cartridge(&self, ec: &EmulatorContext, address: u16) -> u8 {
+    fn read_from_cartridge(&self, ec: &impl EmulatorContext, address: u16) -> u8 {
         self.mbc.read_byte(ec, address)
     }
 
 
     /// Writes data to the cartridge.
-    fn write_to_cartridge(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn write_to_cartridge(&mut self, ec: &mut impl EmulatorContextMut, address: u16, value: u8) {
         self.mbc.write_byte(ec, address, value);
     }
 }
 
 
 impl MemoryBusConnection for Memory {
-    fn on_read(&self, ec: &EmulatorContext, address: u16) -> u8 {
+    fn on_read(&self, ec: &impl EmulatorContext, address: u16) -> u8 {
         memory_map!(
             address => {
                 0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(ec, address),
@@ -211,7 +211,7 @@ impl MemoryBusConnection for Memory {
     }
 
 
-    fn on_write(&mut self, ec: &mut EmulatorContext, address: u16, value: u8) {
+    fn on_write(&mut self, ec: &mut impl EmulatorContextMut, address: u16, value: u8) {
         memory_map!(
             address => {
                 0x0000 ..= 0x7fff => [] self.write_to_cartridge(ec, address, value),

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ use gemi_core::apu::Apu;
 use gemi_core::cartridge::Cartridge;
 use gemi_core::cpu::cpu::Cpu;
 use gemi_core::device_type::DeviceConfig;
-use gemi_core::emulator_context::EmulatorContext;
 use gemi_core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
 use gemi_core::input::Input;
 use gemi_core::mmu::memory::Memory;
@@ -47,8 +46,7 @@ impl GameBoy {
 
     /// Boot the device, initializing the Boot ROM program.
     pub fn initialize(&mut self) {
-        let mut context = self.context_data.make_context_mut();
-        self.emulator.initialize(&mut context);
+        self.emulator.initialize(&mut self.context_data);
     }
 
 
@@ -64,50 +62,29 @@ impl GameBoy {
     }
 
 
-    /// Runs a functor with access to the [EmulatorDevice] and an [EmulatorContext].
-    pub fn with_context_and_device(&self, f: impl FnOnce(&EmulatorContext, &EmulatorDevice)) {
-        let context = self.context_data.make_context();
-        let device  = &self.emulator;
-        f(&context, device);
-    }
-
-
-    /// Runs a functor with access to the [EmulatorDevice] and an [EmulatorContext].
-    pub fn with_context_and_device_mut(&mut self, f: impl FnOnce(&mut EmulatorContext, &mut EmulatorDevice)) {
-        let mut context = self.context_data.make_context_mut();
-        let device      = &mut self.emulator;
-        f(&mut context, device);
-    }
-
-
     /// Runs the emulator for a single step, either an instruction
     /// or to process a single HALT cycle.
     pub fn run_single_step(&mut self) -> EmulatorUpdateResults {
-        let mut context = self.context_data.make_context();
-        self.emulator.run_single_step(&mut context)
+        self.emulator.run_single_step(&mut self.context_data)
     }
 
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
     pub fn run_frame(&mut self) -> EmulatorUpdateResults {
-        // todo: possible issue: calling make_context instead of _mut should lead into a compile error
-        let mut context = self.context_data.make_context_mut();
-        self.emulator.run_frame(&mut context)
+        self.emulator.run_frame(&mut self.context_data)
     }
 
 
     /// Reads a single byte from the emulator's memory bus.
     pub fn read_u8(&self, address: u16) -> u8 {
-        let context = self.context_data.make_context();
-        self.emulator.get_mmu().read_u8(&context, address)
+        self.emulator.get_mmu().read_u8(&self.context_data, address)
     }
 
 
     /// Writes a single byte into the emulator's memory bus.
     pub fn write_u8(&mut self, address: u16, value: u8) {
-        let mut context = self.context_data.make_context_mut();
-        self.emulator.get_mmu_mut().write_u8(&mut context, address, value)
+        self.emulator.get_mmu_mut().write_u8(&mut self.context_data, address, value)
     }
 
 

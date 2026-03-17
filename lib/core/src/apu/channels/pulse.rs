@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@ use crate::apu::channels::channel::{default_on_read_register, default_on_write_r
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_duty::WaveDuty;
-use crate::apu::ApuContext;
+use crate::apu::ApuState;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::emulator_device::Clock;
 
 
@@ -69,17 +70,17 @@ impl PulseGenerator {
 
 
 impl ChannelComponent for PulseGenerator {
-    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             1 => self.wave_duty.get_index() << 6,
             3 => NRX3_WRITE_ONLY_FREQUENCY,
             4 => NRX4_WRITE_ONLY_FREQUENCY | NRX4_NON_READABLE_BITS | NRX4_WRITE_ONLY_TRIGGER_BIT,
-            _ => default_on_read_register(ac, number)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             1 => {
                 let wave_duty_index = (value >> 6) & 0x03;
@@ -93,11 +94,11 @@ impl ChannelComponent for PulseGenerator {
             _ => { }
         }
 
-        default_on_write_register(ac, number, value)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_reset(&mut self, _ac: &ApuContext) {
+    fn on_reset(&mut self, _ec: &impl EmulatorContext, _apu_state: &ApuState) {
         *self = Self::new();
     }
 }
@@ -139,7 +140,7 @@ impl SoundGenerator for PulseGenerator {
     }
 
 
-    fn get_sample(&self, _ac: &ApuContext) -> u8 {
+    fn get_sample(&self, _apu_state: &ApuState) -> u8 {
         let wave = self.wave_duty.get_wave_at(self.wave_duty_step);
         wave
     }

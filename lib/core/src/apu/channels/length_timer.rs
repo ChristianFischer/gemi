@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
-use crate::apu::ApuContext;
+use crate::apu::ApuState;
+use crate::emulator_context::{EmulatorContext, EmulatorContextMut};
 use crate::utils::{as_bit_flag, get_bit};
 
 
@@ -59,14 +60,14 @@ impl<const LENGTH_BITS: u8> LengthTimer<LENGTH_BITS> {
 
 
 impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
-    fn can_write_register(&self, ac: &ApuContext, number: u16) -> bool {
+    fn can_write_register(&self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16) -> bool {
         match number {
             1 => {
                 // on DMG, length timer can always be written to.
                 // When GameBoy Color mode is enabled, the behaviour is the same as for
                 // other registers and can only be written, when the APU is enabled.
-                if ac.get_device_config().is_gbc_enabled() {
-                    ac.state.apu_on
+                if ec.get_device_config().is_gbc_enabled() {
+                    apu_state.apu_on
                 }
                 else {
                     true
@@ -74,12 +75,12 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
             },
 
             // other values only if APU is turned on
-            _ => ac.state.apu_on,
+            _ => apu_state.apu_on,
         }
     }
 
 
-    fn on_read_register(&self, ac: &ApuContext, number: u16) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorContext, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             1 => {
                 // length timer initial value is write-only,
@@ -91,12 +92,12 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
                 as_bit_flag(self.length_timer_enabled, 6)
             },
 
-            _ => default_on_read_register(ac, number)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, ac: &ApuContext, number: u16, value: u8) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorContextMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             1 => {
                 self.length_timer = Self::LENGTH_MAX - ((value & Self::LENGTH_MASK) as u16);
@@ -113,7 +114,7 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
                         !was_enabled
                     &&  self.length_timer_enabled
                     &&  self.length_timer != 0
-                    &&  !ac.state.fs.is_length_timer_active()
+                    &&  !apu_state.fs.is_length_timer_active()
                 {
                     // this may also disable the channel
                     return self.tick();
@@ -123,11 +124,11 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
             _ => { }
         }
 
-        default_on_write_register(ac, number, value)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, ac: &ApuContext) -> TriggerAction {
+    fn on_trigger_event(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) -> TriggerAction {
         // length timer will be set to maximum, if zero when triggered
         // this prevents the timer to be stuck at zero
         if self.length_timer == 0 {
@@ -135,22 +136,24 @@ impl<const LENGTH_BITS: u8> ChannelComponent for LengthTimer<LENGTH_BITS> {
 
             // when the sound length timer will not be activated in the next step,
             // this will cause an extra tick
-            if !ac.state.fs.is_length_timer_active() {
+            if !apu_state.fs.is_length_timer_active() {
                 self.tick();
             }
         }
 
-        default_on_trigger_event(ac)
+        default_on_trigger_event(ec, apu_state)
     }
 
 
-    fn on_reset(&mut self, ac: &ApuContext) {
+    fn on_reset(&mut self, ec: &impl EmulatorContext, apu_state: &ApuState) {
         self.length_timer_enabled = false;
 
         // on GameBoy Color, the length value will be reset to the maximum.
-        if ac.get_device_config().is_gbc_enabled() {
+        if ec.get_device_config().is_gbc_enabled() {
             self.length_timer = Self::LENGTH_MAX;
         }
+
+        _ = apu_state;
     }
 }
 

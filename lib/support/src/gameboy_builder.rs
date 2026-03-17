@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 by Christian Fischer
+ * Copyright (C) 2025-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::{Cartridge, CartridgeInfo};
 use gemi_core::device_type::{DeviceConfig, DeviceType, EmulationType};
 use gemi_core::emulator_device::EmulatorDevice;
+use gemi_core::ppu::graphic_data::DmgDisplayPalette;
 use gemi_core::utils::ioerr;
 use std::fmt::{Display, Formatter};
 
@@ -27,9 +28,10 @@ use std::fmt::{Display, Formatter};
 /// A factory class to construct a GameBoy device object.
 /// Usually created via GameBoy::build()
 pub struct Builder {
-    boot_rom:       Option<Box<BootRom>>,
-    cartridge:      Option<Box<Cartridge>>,
-    device_type:    Option<DeviceType>,
+    boot_rom:               Option<Box<BootRom>>,
+    cartridge:              Option<Box<Cartridge>>,
+    device_type:            Option<DeviceType>,
+    dmg_display_palette:    Option<DmgDisplayPalette>,
 }
 
 
@@ -46,9 +48,10 @@ impl Builder {
     /// Creates a new empty GameBoy builder
     pub fn new() -> Self {
         Self {
-            boot_rom:       None,
-            cartridge:      None,
-            device_type:    None,
+            boot_rom:               None,
+            cartridge:              None,
+            device_type:            None,
+            dmg_display_palette:    None,
         }
     }
 
@@ -106,6 +109,11 @@ impl Builder {
     }
 
 
+    pub fn set_dmg_display_palette(&mut self, palette: DmgDisplayPalette) {
+        self.dmg_display_palette = Some(palette);
+    }
+
+
     /// Build the GameBoy device emulator based on the properties specified with this builder.
     pub fn finish(mut self) -> Result<GameBoy, BuilderErrorCode> {
         // take the Boot ROM object from the builder or create default images
@@ -136,10 +144,17 @@ impl Builder {
         };
 
         // construct the GameBoy object
-        let context  = context_data.make_context();
-        let emulator = Box::new(
-            EmulatorDevice::new(&context)
+        let mut emulator = Box::new(
+            EmulatorDevice::new(&context_data)
         );
+
+        if let Some(palette) = self.dmg_display_palette {
+            emulator
+                    .get_mmu_mut()
+                    .get_peripherals_mut()
+                    .ppu
+                    .set_dmg_display_palette(&context_data, palette);
+        }
 
         Ok(GameBoy {
             context_data,
