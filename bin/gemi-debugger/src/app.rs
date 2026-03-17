@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ use libgemi::core::ppu::graphic_data::TileMap;
 
 use crate::behaviour::TreeBehaviour;
 use crate::event::UiEvent;
-use crate::state::{EmulatorDeviceType, EmulatorState, UpdateMode, UpdateStepMode};
+use crate::state::{EmulatorDeviceType, EmulatorState, RomSource, UpdateMode, UpdateStepMode};
 use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
@@ -372,6 +372,25 @@ impl EmulatorApplication {
                 // ignore as long as the channel is empty
                 Err(TryRecvError::Empty) => { }
             }
+        }
+
+        // todo: refactor file loading
+        match self.get_state_mut().ui.take_will_open() {
+            Some(RomSource::RomFile(file)) => {
+                let result = self.open_rom(&file);
+                if let Err(e) = result {
+                    self.display_message_box(&format!("Error Loading ROM: {}", e));
+                }
+            },
+
+            Some(RomSource::Cartridge(cartridge)) => {
+                let result = self.load_cartridge(cartridge);
+                if let Err(e) = result {
+                    self.display_message_box(&format!("Error Loading Cartridge: {}", e));
+                }
+            }
+
+            None => {}
         }
     }
 

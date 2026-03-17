@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,6 +78,14 @@ pub enum UpdateStepMode {
 }
 
 
+/// A source for running a ROM, could be either a file or an existing cartridge.
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum RomSource {
+    RomFile(PathBuf),
+    Cartridge(Cartridge),
+}
+
+
 
 /// An object handling the current state of the emulator.
 /// This provides functionality to load ROMs and serialize the emulator state.
@@ -122,6 +130,9 @@ pub struct UiStates {
     /// When [update_mode] is [UpdateMode::Step], this determines
     /// which kind of step to perform.
     update_step_mode: UpdateStepMode,
+
+    /// When a UI wants to open a ROM file, this will be stored here.
+    will_open: Option<RomSource>,
 
     /// Describes the currently selected focus item within the UI.
     pub focus: Selection,
@@ -456,6 +467,19 @@ impl UiStates {
     pub fn set_update_step_mode(&mut self, mode: UpdateStepMode) {
         self.update_step_mode = mode;
     }
+
+
+    /// Assign an ROM file or cartridge to be opened next frame.
+    pub fn set_will_open(&mut self, source: RomSource) {
+        self.will_open = Some(source);
+    }
+
+
+    /// Take the assigned ROM source to be opened.
+    /// The value will be cleared afterwards.
+    pub fn take_will_open(&mut self) -> Option<RomSource> {
+        self.will_open.take()
+    }
 }
 
 
@@ -490,6 +514,7 @@ impl Default for EmulatorState {
                 device_type:        EmulatorDeviceType::GameBoyColor,
                 update_mode:        UpdateMode::Paused,
                 update_step_mode:   UpdateStepMode::Frame,
+                will_open:          None,
                 focus:              Selection::new(Kind::Focus),
                 hover:              Selection::new(Kind::Hover),
             },

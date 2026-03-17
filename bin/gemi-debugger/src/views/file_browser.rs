@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ use std::path::PathBuf;
 
 use egui::{Link, ScrollArea, Ui};
 
-use crate::state::EmulatorState;
+use crate::state::{EmulatorState, RomSource};
 use crate::views::View;
 
 /// A file browser view to list ROM files from within the current working directory.
@@ -105,7 +105,7 @@ impl FileBrowserView {
 
 
     fn on_clicked_rom(&self, state: &mut EmulatorState, path: &PathBuf) {
-        _ = state.open_rom(path);
+        state.ui.set_will_open(RomSource::RomFile(path.clone()))
     }
 }
 
