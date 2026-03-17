@@ -541,7 +541,7 @@ impl Ppu {
             let tile_info = if self.current_scanline.window_enabled {
                 let window_tilemap_select = self.check_lcdc(LcdControlFlag::WindowTileMapSelect);
                 let window_tilemap        = TileMap::by_select_bit(window_tilemap_select);
-                let position_in_window_x  = self.current_line_pixel+7 - self.registers.window_x;
+                let position_in_window_x  = self.current_line_pixel.wrapping_add(7).wrapping_sub(self.registers.window_x);
                 let position_in_window_y  = self.window_line;
 
                 self.read_tilemap_properties(
