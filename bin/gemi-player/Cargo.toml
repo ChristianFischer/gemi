@@ -13,6 +13,10 @@ path = "../../lib/core"
 [dependencies.gemi-utils]
 path = "../../lib/utils"
 
-[dependencies.sdl2]
-version = "0.37.0"
-features = ["bundled", "static-link", "unsafe_textures"]
+[dependencies.sdl3]
+version = "0.17.3"
+features = [
+    "build-from-source-static",
+    "static-link",
+    "unsafe_textures"
+]

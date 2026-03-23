@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use eframe::epaint::{Color32, Stroke};
-use egui::scroll_area::ScrollBarVisibility;
+use eframe::epaint::{Color32, Stroke, StrokeKind};
+use egui::scroll_area::{ScrollBarVisibility, ScrollSource};
 use egui::{pos2, vec2, Grid, Pos2, Rect, ScrollArea, Sense, Ui, Widget};
 
 use gemi_core::gameboy::GameBoy;
@@ -110,7 +110,7 @@ impl TileMapView {
         ScrollArea::new([true, true])
                 .auto_shrink([false, false])
                 .scroll_bar_visibility(ScrollBarVisibility::AlwaysVisible)
-                .drag_to_scroll(false)
+                .scroll_source(ScrollSource::SCROLL_BAR + ScrollSource::MOUSE_WHEEL)
                 .show(ui, |ui| {
                     Grid::new("tilemap_grid")
                             .num_columns(TILE_COLS)
@@ -306,7 +306,8 @@ impl TileMapView {
         ui.painter().rect_stroke(
                 tile_bounds.expand(1.0),
                 3.0,
-                Stroke::new(2.0, color)
+                Stroke::new(2.0, color),
+                StrokeKind::Inside
         );
     }
 }

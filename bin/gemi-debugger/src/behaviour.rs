@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,9 +107,9 @@ impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
         // new ui object using the child rectangle
         let mut child_ui = Ui::new(
                 ui.ctx().clone(),
-                ui.layer_id(),
                 ui.id().with(_tile_id),
                 UiBuilder::new()
+                    .layer_id(ui.layer_id())
                     .max_rect(child_rect)
         );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ use std::cmp::min;
 use std::ops::{Add, Div, Mul, Sub};
 
 use eframe::emath::Rect;
-use eframe::epaint::{ColorImage, Stroke};
 use eframe::epaint::textures::TextureOptions;
-use egui::{Color32, Context, Grid, Image, Pos2, Sense, TextureHandle, Ui, Vec2, vec2, Widget};
+use eframe::epaint::{ColorImage, Stroke, StrokeKind};
+use egui::{vec2, Color32, Context, Grid, Image, Pos2, Sense, TextureHandle, Ui, Vec2, Widget};
 
 use gemi_core::gameboy::{Clock, GameBoy};
 use gemi_core::ppu::flags::LcdControlFlag;
@@ -343,7 +343,8 @@ impl EmulatorDisplayView {
         ui.painter().rect_stroke(
             sprite_bounds,
             2.0,
-            Stroke::new(2.0, color)
+            Stroke::new(2.0, color),
+            StrokeKind::Inside
         );
     }
 }

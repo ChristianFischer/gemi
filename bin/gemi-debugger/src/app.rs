@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ use std::path::PathBuf;
 use std::sync::mpsc::{channel, Receiver, TryRecvError};
 
 use eframe::{CreationContext, Frame};
-use egui::{ComboBox, Context};
+use egui::{ComboBox, Context, UiKind};
 use egui_tiles::{Container, Tile};
 use rfd::AsyncFileDialog;
 
@@ -290,7 +290,7 @@ impl EmulatorApplication {
     fn update_submenu_file(&mut self, ui: &mut egui::Ui, _frame: &mut Frame) {
         // "Open" button to open a ROM file
         if ui.button("Open").clicked() {
-            ui.close_menu();
+            ui.close_kind(UiKind::Menu);
 
             // open a file dialog to select a ROM file
             self.open_file_dialog();
@@ -300,7 +300,7 @@ impl EmulatorApplication {
         {
             // "Quit" button to close the application
             if ui.button("Quit").clicked() {
-                ui.close_menu();
+                ui.close_kind(UiKind::Menu);
                 ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
             }
         }

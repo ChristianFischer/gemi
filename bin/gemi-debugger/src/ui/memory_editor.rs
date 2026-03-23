@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ use eframe::epaint::text::TextWrapMode;
 use eframe::epaint::Color32;
 use egui::collapsing_header::{paint_default_icon, CollapsingState};
 use egui::text_edit::TextEditOutput;
-use egui::{pos2, vec2, Grid, Id, Key, Label, PointerButton, ScrollArea, Sense, Stroke, TextStyle, Ui, Vec2, Widget, WidgetText};
+use egui::{pos2, vec2, Grid, Id, Key, Label, PointerButton, ScrollArea, Sense, Stroke, StrokeKind, TextStyle, Ui, Vec2, Widget, WidgetText};
 
 
 /// A placeholder value in case when a memory address was not readable.
@@ -739,7 +739,8 @@ impl<Source> MemoryEditor<Source> {
                         ui.painter().rect_stroke(
                             highlight_bounds,
                             2.0,
-                            Stroke::new(2.0, highlight.color)
+                            Stroke::new(2.0, highlight.color),
+                            StrokeKind::Inside
                         );
                     } 
                     else {
@@ -922,8 +923,8 @@ impl<Source> MemoryEditor<Source> {
         // store the cursor position of this frame
         self.rt.edit_label_cursor_position = match text_edit_output.cursor_range {
             Some(cursor) => {
-                let a = cursor.primary.ccursor.index;
-                let b = cursor.primary.ccursor.index;
+                let a = cursor.primary.index;
+                let b = cursor.primary.index;
 
                 // Only return a cursor position if both cursors are equal,
                 // meaning there is no selection

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-extern crate sdl2;
-
-use gemi_core::input::{Input, InputButton};
+use crate::sound_queue::SoundQueue;
+use crate::BoxError;
 use gemi_core::gameboy::GameBoy;
+use gemi_core::input::{Input, InputButton};
 use gemi_core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
 use gemi_core::ppu::flags::LcdControlFlag;
 use gemi_core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
 use gemi_core::ppu::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use sdl2::rect::Rect;
-use sdl2::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
-use crate::sound_queue::SoundQueue;
+use sdl3::event::Event;
+use sdl3::keyboard::Keycode;
+use sdl3::rect::Rect;
+use sdl3::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
 
 
 #[derive(PartialEq)]
@@ -57,7 +56,7 @@ pub struct BufferedTexture {
 /// A window to present the Gameboy's output.
 pub struct Window {
     display_scale:      u32,
-    event_pump:         sdl2::EventPump,
+    event_pump:         sdl3::EventPump,
     canvas:             WindowCanvas,
     texture_game:       BufferedTexture,
     texture_background: BufferedTexture,
@@ -82,8 +81,8 @@ fn make_keybindings() -> KeyBindings {
             (InputButton::DPadDown,     vec![Keycode::S,    Keycode::Down   ]),
             (InputButton::A,            vec![Keycode::E,    Keycode::X      ]),
             (InputButton::B,            vec![Keycode::Q,    Keycode::Y      ]),
-            (InputButton::Select,       vec![Keycode::Num1, Keycode::LShift ]),
-            (InputButton::Start,        vec![Keycode::Num2, Keycode::Return ]),
+            (InputButton::Select,       vec![Keycode::_1,   Keycode::LShift ]),
+            (InputButton::Start,        vec![Keycode::_2,   Keycode::Return ]),
         ]
     )
 }
@@ -91,12 +90,11 @@ fn make_keybindings() -> KeyBindings {
 
 impl BufferedTexture {
     /// Creates a new texture from a TextureCreator with a specific size.
-    pub fn new<T>(texture_creator: &TextureCreator<T>, width: u32, height: u32) -> Result<BufferedTexture, String> {
+    pub fn new<T>(texture_creator: &TextureCreator<T>, width: u32, height: u32) -> Result<BufferedTexture, BoxError> {
         let size = (width * height * 4) as usize;
 
         let texture = texture_creator
             .create_texture_streaming(None, width, height)
-            .map_err(|e| e.to_string())
             ?
         ;
 
@@ -140,7 +138,7 @@ impl BufferedTexture {
     }
 
     /// Copy the texture content into the given canvas.
-    pub fn copy_to_canvas(&self, canvas: &mut WindowCanvas, display_scale: u32) -> Result<(), String> {
+    pub fn copy_to_canvas(&self, canvas: &mut WindowCanvas, display_scale: u32) -> Result<(), sdl3::Error> {
         canvas.copy(
             &self.texture,
             Rect::new(0, 0, self.width, self.height),
@@ -152,10 +150,10 @@ impl BufferedTexture {
 
 impl Window {
     /// Creates a new window with a given size and title.
-    pub fn create(title: &str, gb: &mut GameBoy) -> Result<Window, String> {
+    pub fn create(title: &str, gb: &mut GameBoy) -> Result<Window, BoxError> {
         let display_scale = 4;
 
-        let sdl = sdl2::init()?;
+        let sdl = sdl3::init()?;
         let video = sdl.video()?;
         let event_pump = sdl.event_pump()?;
 
@@ -163,18 +161,10 @@ impl Window {
             .window(title, SCREEN_W * display_scale, SCREEN_H * display_scale)
             .position_centered()
             .build()
-            .map_err(|e| e.to_string())
             ?
         ;
 
-        let canvas = window
-            .into_canvas()
-            .accelerated()
-            .present_vsync()
-            .build()
-            .map_err(|e| e.to_string())
-            ?
-        ;
+        let canvas = window.into_canvas();
 
         let texture_creator    = canvas.texture_creator();
         let texture_game       = BufferedTexture::new(&texture_creator, SCREEN_W, SCREEN_H)?;

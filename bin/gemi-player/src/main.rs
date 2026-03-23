@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 
 extern crate core;
 
-use std::{env, time};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
+use std::{env, time};
 
 use gemi_core::boot_rom::BootRom;
 use gemi_core::cartridge::Cartridge;
@@ -28,6 +28,9 @@ use gemi_core::cpu::cpu::CPU_CLOCK_SPEED;
 use gemi_core::gameboy::{DeviceType, GameBoy};
 
 use crate::window::Window;
+
+pub type BoxError = Box<dyn std::error::Error>;
+
 
 mod sound_queue;
 mod window;
@@ -193,7 +196,10 @@ fn main() -> Result<(), String> {
     };
 
     // create window
-    let mut window = Window::create(&title, &mut gb)?;
+    let mut window = Window::create(&title, &mut gb)
+            .map_err(|e| e.to_string())
+            ?
+    ;
 
     // run the game
     run(&mut window, &mut gb);

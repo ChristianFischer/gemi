@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use egui::{Color32, Grid, Response, Sense, TextStyle, Ui, Vec2};
+use egui::{Color32, Grid, Response, Sense, StrokeKind, TextStyle, Ui, Vec2};
 
 use gemi_core::gameboy::GameBoy;
 use gemi_core::ppu::graphic_data::{Color, DmgDisplayPalette, DmgPalette, GbcPaletteData, SpritePixelValue};
@@ -160,7 +160,13 @@ impl PaletteView {
         );
 
         let (rect, response) = ui.allocate_exact_size(Vec2::splat(text_height), Sense::hover());
-        ui.painter().rect(rect, 0.0, color32, ui.visuals().window_stroke);
+        ui.painter().rect(
+            rect,
+            0.0,
+            color32,
+            ui.visuals().window_stroke,
+            StrokeKind::Inside
+        );
 
         response
     }
