@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
-use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
 
-use gemi_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
-use gemi_core::gameboy::{DeviceType, EmulationType, GameBoy};
-use gemi_core::input::InputButton;
-use gemi_core::mmu::memory_data::MemoryData;
-
 use crate::cartridge::Cartridge;
+use libgemi::core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
+use libgemi::core::device_type::{DeviceType, EmulationType};
+use libgemi::core::input::InputButton;
+use libgemi::GameBoy;
+
 
 /// Web Assembly frontend for the emulator.
 /// This will be instantiated from JS provides an interface to the emulator backend.
@@ -112,7 +112,7 @@ impl WasmPlayer {
         ;
 
         // finalize and initialize the emulator
-        let mut gb = builder.finish()?;
+        let mut gb = builder.finish().map_err(|e| e.to_string())?;
         gb.initialize();
 
         Ok(
@@ -159,7 +159,7 @@ impl WasmPlayer {
     /// After doing so, audio samples may be received via [take_audio_samples].
     #[wasm_bindgen]
     pub fn open_audio(&mut self, sample_rate: u32) -> Result<(), JsValue> {
-        self.samples_receiver = self.gb.get_peripherals_mut().apu.get_audio_output().open_channel(AudioOutputSpec {
+        self.samples_receiver = self.gb.get_apu_mut().get_audio_output().open_channel(AudioOutputSpec {
             sample_rate
         });
 
@@ -196,19 +196,17 @@ impl WasmPlayer {
     /// get the current RAM data as a byte array.
     #[wasm_bindgen]
     pub fn save_cartridge_ram(&self) -> Option<Vec<u8>> {
-        self.gb
-            .get_peripherals().mem
-            .get_cartridge()
-            .as_ref()
-            .map(|cartridge| {
-                if cartridge.has_ram() && cartridge.has_battery() {
-                    Some(cartridge.get_ram().as_slice().to_vec())
-                }
-                else {
-                    None
-                }
-            })
-            .flatten()
+        use libgemi::core::cartridge::image_data::ImageData;
+
+        let cartridge      = self.gb.get_cartridge();
+        let cartridge_info = cartridge.get_cartridge_info();
+
+        if cartridge_info.has_ram() && cartridge_info.has_battery() {
+            Some(cartridge.get_ram().get_data().to_vec())
+        }
+        else {
+            None
+        }
    }
 
 
@@ -231,7 +229,7 @@ impl WasmPlayer {
 
     /// Render the current frame to the canvas.
     pub fn render_frame(&mut self) -> Result<(), JsValue> {
-        let frame = self.gb.get_peripherals().ppu.get_lcd();
+        let frame = self.gb.get_ppu().get_lcd();
         let image = ImageData::new_with_u8_clamped_array_and_sh(
             wasm_bindgen::Clamped(frame.get_pixels_as_slice()),
             frame.get_width(),

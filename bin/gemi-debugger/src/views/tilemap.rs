@@ -19,12 +19,12 @@ use eframe::epaint::{Color32, Stroke, StrokeKind};
 use egui::scroll_area::{ScrollBarVisibility, ScrollSource};
 use egui::{pos2, vec2, Grid, Pos2, Rect, ScrollArea, Sense, Ui, Widget};
 
-use gemi_core::gameboy::GameBoy;
-use gemi_core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
-use gemi_core::ppu::flags::LcdControlFlag;
-use gemi_core::ppu::graphic_data::{TileMap, TileSet};
-use gemi_core::ppu::ppu::{TILE_ATTR_BIT_H_FLIP, TILE_ATTR_BIT_VRAM_BANK, TILE_ATTR_BIT_V_FLIP};
-use gemi_core::utils::get_bit;
+use libgemi::core::mmu::locations::MEMORY_LOCATION_VRAM_BEGIN;
+use libgemi::core::ppu::flags::LcdControlFlag;
+use libgemi::core::ppu::graphic_data::{TileMap, TileSet};
+use libgemi::core::ppu::ppu::{TILE_ATTR_BIT_H_FLIP, TILE_ATTR_BIT_VRAM_BANK, TILE_ATTR_BIT_V_FLIP};
+use libgemi::core::utils::get_bit;
+use libgemi::GameBoy;
 
 use crate::event::UiEvent;
 use crate::highlight::test_selection;
@@ -70,11 +70,11 @@ impl View for TileMapView {
 
 
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
-        match state.emu.get_emulator() {
+        match state.emu.get_gameboy() {
             None => {}
 
-            Some(emu) => {
-                self.render_tilemap(ui, emu, &mut state.ui);
+            Some(gb) => {
+                self.render_tilemap(ui, gb, &mut state.ui);
             }
         }
     }
@@ -129,8 +129,8 @@ impl TileMapView {
 
 
     /// Renders the whole tilemap as a 32x32 grid.
-    fn render_tilemap_grid(&self, ui: &mut Ui, emu: &GameBoy, ui_states: &mut UiStates) {
-        let ppu     = &emu.get_peripherals().ppu;
+    fn render_tilemap_grid(&self, ui: &mut Ui, gb: &GameBoy, ui_states: &mut UiStates) {
+        let ppu     = gb.get_ppu();
         let vram0   = ppu.get_vram(0);
         let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
 
@@ -142,7 +142,7 @@ impl TileMapView {
                 let tile_number               = vram0[tilemap_field_vram_offset];
                 let tile_image_index          = tileset.get_tile_image_index(tile_number);
 
-                let draw_tile = if emu.get_config().is_gbc_enabled() {
+                let draw_tile = if gb.get_config().is_gbc_enabled() {
                     let vram1            = ppu.get_vram(1);
                     let tile_attributes  = vram1[tilemap_field_vram_offset];
                     let tile_image_bank  = get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8;
@@ -221,7 +221,7 @@ impl TileMapView {
                                 ui.end_row();
 
                                 // display tooltip
-                                if emu.get_config().is_gbc_enabled() {
+                                if gb.get_config().is_gbc_enabled() {
                                     let vram1            = ppu.get_vram(1);
                                     let tile_attributes  = vram1[tilemap_field_vram_offset];
                                     let tile_image_bank  = get_bit(tile_attributes, TILE_ATTR_BIT_VRAM_BANK) as u8;

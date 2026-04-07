@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::apu::Apu;
-use crate::boot_rom::BootRom;
-use crate::cartridge::{Cartridge, GameBoyColorSupport, LicenseeCode};
+use crate::apu::Apu;
+use crate::cartridge;
+use crate::cartridge::LicenseeCode;
 use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8, CPU_CLOCK_SPEED};
 use crate::cpu::interrupts::InterruptRegisters;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
+use crate::cpu::opcodes::opcode_dispatch;
 use crate::debug::{DebugEvent, DebugEvents};
-// re-export some types
-pub use crate::device_type::{DeviceType, EmulationType};
+use crate::device_type::{DeviceType, EmulationType};
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::input::Input;
 use crate::mmu::memory::Memory;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
@@ -33,41 +34,15 @@ use crate::serial::SerialPort;
 use crate::timer::Timer;
 use crate::utils::{carrying_add_u8, get_high};
 
+
 /// Type to measure clock ticks of the device.
 /// Alias for unsigned 64bit integer.
 pub type Clock = u64;
 
 
-/// A struct containing the setup information of the running device.
-#[derive(Copy, Clone)]
+/// The device object providing access to all it's emulated components.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DeviceConfig {
-    /// The current device type being running.
-    pub device: DeviceType,
-
-    /// The current emulation mode (DMG compatibility or Color support)
-    pub emulation: EmulationType,
-
-    /// Flag if opcodes should be printed
-    pub print_opcodes: bool,
-}
-
-
-/// A factory class to construct a GameBoy device object.
-/// Usually created via GameBoy::build()
-pub struct Builder {
-    boot_rom:      Option<BootRom>,
-    cartridge:     Option<Cartridge>,
-    device_type:   Option<DeviceType>,
-    print_opcodes: bool,
-}
-
-
-/// The GameBoy object providing access to all it's emulated components.
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct GameBoy {
-    device_config: DeviceConfig,
-
+pub struct EmulatorDevice {
     pub cpu: Cpu,
 
     total_cycles: Clock,
@@ -77,13 +52,13 @@ pub struct GameBoy {
 /// A set of components connected together via memory bus.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Peripherals {
-    pub apu:        Box<Apu>,
-    pub ppu:        Box<Ppu>,
-    pub mem:        Box<Memory>,
-    pub timer:      Box<Timer>,
-    pub input:      Box<Input>,
-    pub serial:     Box<SerialPort>,
-    pub interrupts: Box<InterruptRegisters>,
+    pub apu:        Apu,
+    pub ppu:        Ppu,
+    pub mem:        Memory,
+    pub timer:      Timer,
+    pub input:      Input,
+    pub serial:     SerialPort,
+    pub interrupts: InterruptRegisters,
 }
 
 
@@ -98,177 +73,53 @@ pub struct EmulatorUpdateResults {
 }
 
 
-impl DeviceConfig {
-    /// Checks whether the current device is running with GameBoyColor support enabled.
-    /// The running device needs to be a GBC or GBA *and* running a cartridge
-    /// with GameBoy Color support.
-    pub fn is_gbc_enabled(&self) -> bool {
-        match self.emulation {
-            EmulationType::DMG => false,
-            EmulationType::GBC => true,
-        }
-    }
-}
-
-
-impl Builder {
-    /// Creates a new empty GameBoy builder
-    pub fn new() -> Self {
-        Self {
-            boot_rom:      None,
-            cartridge:     None,
-            device_type:   None,
-            print_opcodes: false,
-        }
-    }
-
-    /// Set the boot ROM, which will be executed before the actual ROM.
-    pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
-        self.boot_rom = Some(boot_rom);
-    }
-
-    /// Set the cartridge, which ROM will be executed.
-    pub fn set_cartridge(&mut self, cartridge: Cartridge) {
-        self.cartridge = Some(cartridge);
-    }
-
-    /// Override the preferred device type.
-    /// If not specified, the device type will be determined by the cartridge type.
-    pub fn set_device_type(&mut self, device_type: DeviceType) {
-        self.device_type = Some(device_type);
-    }
-
-    /// Configures whether the emulator should print all opcodes being executed or not.
-    pub fn set_print_opcodes(&mut self, print: bool) {
-        self.print_opcodes = print;
-    }
-
-    /// Get the preferred device type, which is either specified explicitly
-    /// or selected by the cartridge properties.
-    pub fn select_preferred_device_type(&self) -> DeviceType {
-        // explicit type will be preferred
-        if let Some(device_type) = &self.device_type {
-            return *device_type;
-        }
-
-        // determine the preferred device type by the cartridge properties
-        if let Some(cartridge) = &self.cartridge {
-            return match cartridge.get_cgb_support() {
-                GameBoyColorSupport::None      => DeviceType::GameBoyDmg,
-                GameBoyColorSupport::Supported => DeviceType::GameBoyColor,
-                GameBoyColorSupport::Required  => DeviceType::GameBoyColor,
-            };
-        }
-
-        // default to classic GameBoy
-        DeviceType::GameBoyDmg
-    }
-
-    /// Check the emulation type based on the selected device and GameBoyColor
-    /// support of the selected cartridge.
-    pub fn select_emulation_type(&self, device_type: &DeviceType) -> EmulationType {
-        match device_type {
-            DeviceType::GameBoyDmg => {}
-            _ => {
-                if let Some(cartridge) = &self.cartridge {
-                    if cartridge.supports_cgb() {
-                        return EmulationType::GBC;
-                    }
-                }
-            }
-        }
-
-        EmulationType::DMG
-    }
-
-    /// Build the GameBoy device emulator based on the properties specified with this builder.
-    pub fn finish(mut self) -> Result<GameBoy, String> {
-        // select the preferred device type based on the current config and cartridge
-        let device_type    = self.select_preferred_device_type();
-        let emulation_type = self.select_emulation_type(&device_type);
-
-        // setup device config based on the current configuration
-        let device_config = DeviceConfig {
-            device: device_type,
-            emulation: emulation_type,
-            print_opcodes: self.print_opcodes
-        };
-
-        // construct the GameBoy object
-        let mut gb = GameBoy::new(device_config)?;
-
-        // set boot ROM, if any
-        if let Some(boot_rom) = self.boot_rom.take() {
-            gb.get_peripherals_mut().mem.set_boot_rom(boot_rom);
-        }
-
-        // insert cartridge, if any
-        if let Some(cartridge) = self.cartridge.take() {
-            gb.get_peripherals_mut().mem.set_cartridge(cartridge);
-        }
-
-        Ok(gb)
-    }
-}
-
-
-impl GameBoy {
-    /// Creates a builder to build up the device.
-    pub fn build() -> Builder {
-        Builder::new()
-    }
+impl EmulatorDevice {
 
     /// Create a new GameBoy device.
-    pub fn new(device_config: DeviceConfig) -> Result<GameBoy,String> {
-        Ok(
-            GameBoy {
-                device_config,
+    pub fn new(ec: &impl EmulatorClient) -> Self {
+        Self {
+            cpu: Cpu::new(
+                Mmu::new(
+                    Peripherals {
+                        apu:        Apu::new(ec),
+                        ppu:        Ppu::new(ec),
+                        mem:        Memory::new(ec),
+                        timer:      Timer::new(),
+                        input:      Input::new(),
+                        serial:     SerialPort::new(),
+                        interrupts: InterruptRegisters::new(),
+                    }
+                )
+            ),
 
-                cpu: Cpu::new(
-                    Mmu::new(
-                        Peripherals {
-                            apu:        Box::new(Apu::new(device_config)),
-                            ppu:        Box::new(Ppu::new(device_config)),
-                            mem:        Box::new(Memory::new(device_config)),
-                            timer:      Box::new(Timer::new()),
-                            input:      Box::new(Input::new()),
-                            serial:     Box::new(SerialPort::new()),
-                            interrupts: Box::new(InterruptRegisters::new()),
-                        }
-                    )
-                ),
-
-                total_cycles: 0,
-            }
-        )
+            total_cycles: 0,
+        }
     }
 
-    /// Get the configuration of the current GameBoy device.
-    pub fn get_config(&self) -> &DeviceConfig {
-        &self.device_config
-    }
 
     /// Boot the device, initializing the Boot ROM program.
-    pub fn initialize(&mut self) {
-        if self.get_peripherals().mem.has_boot_rom() {
+    pub fn initialize(&mut self, ec: &mut impl EmulatorClientMut) {
+        if ec.get_boot_rom().is_some() {
             self.cpu.set_instruction_pointer(0x0000);
         }
         else {
-            self.setup_initial_values();
+            self.setup_initial_values(ec);
         }
     }
 
     /// setup values like expected after the boot rom was executed on the original GameBoy.
-    fn setup_initial_values(&mut self) {
+    fn setup_initial_values(&mut self, ec: &mut impl EmulatorClientMut) {
+        let device_config = ec.get_device_config();
         let pc = 0x0100;
         let sp = 0xfffe;
 
         // the title checksum is calculated on GBC and GBA in DMG compatibility mode
         // if licensee code is '1' in either old or new format
-        let title_checksum = if let Some(cartridge) = self.get_peripherals().mem.get_cartridge().as_ref() {
-            match cartridge.get_licensee_code() {
+        let title_checksum = if ec.get_cartridge_info().is_cartridge_present() {
+            match ec.get_cartridge_info().get_licensee_code() {
                 LicenseeCode::Old(1) | LicenseeCode::New(1) => {
-                    cartridge.compute_title_checksum()
+                    let rom_data = ec.get_cartridge_rom();
+                    cartridge::rom_data::compute_title_checksum(rom_data)
                 }
 
                 _ => 0x00
@@ -280,11 +131,11 @@ impl GameBoy {
         };
 
         // read cartridge header checksum
-        let header_checksum = self.get_mmu().read_u8(0x14d);
+        let header_checksum = self.get_mmu().read_u8(ec, 0x14d);
 
         // select initial values based on device type and emulation mode
         let (a, flag_z, flag_n, flag_h, flag_c, b, c, d, e, h, l) =
-            match (self.device_config.device, self.device_config.emulation)
+            match (device_config.device, device_config.emulation)
         {
             // classic GameBoy
             (DeviceType::GameBoyDmg, _) => {
@@ -369,25 +220,25 @@ impl GameBoy {
             // placeholder for unknown/unused entries
             const X : u8 = 0xff;
 
-            let dma = match self.device_config.device {
+            let dma = match device_config.device {
                 DeviceType::GameBoyColor | DeviceType::GameBoyAdvance => 0x00,
                 _ => 0xff,
             };
             
             // set the initial vram bank index to 0 on GBC
-            let vbk = match self.device_config.emulation {
+            let vbk = match device_config.emulation {
                 EmulationType::DMG => 0xff,
                 EmulationType::GBC => 0xfe,
             };
 
             // GBC prefers object priority by OAM index, DMG by sprite x position
-            let opri = match self.device_config.emulation {
+            let opri = match device_config.emulation {
                 EmulationType::DMG => 0xff,
                 EmulationType::GBC => 0xfe,
             };
 
             // Timer, LCD-STAT and LY depends on how long the boot rom took for execution
-            let (timer_counter, tac, lcds, ly) = match self.device_config.device {
+            let (timer_counter, tac, lcds, ly) = match device_config.device {
                 _ => (0xabf0, 0xf8, 0x85, 0x00)
             };
 
@@ -416,7 +267,7 @@ impl GameBoy {
 
             // apply selected values
             for i in 0..=255 {
-                self.get_mmu_mut().write_u8(0xff00 + i, io_reg_data[i as usize]);
+                self.get_mmu_mut().write_u8(ec, 0xff00 + i, io_reg_data[i as usize]);
             }
 
             self.get_peripherals_mut().timer.initialize_counter(timer_counter, tac);
@@ -462,19 +313,19 @@ impl GameBoy {
 
     /// Runs the emulator for a single step, either an instruction
     /// or to process a single HALT cycle.
-    pub fn run_single_step(&mut self) -> EmulatorUpdateResults {
-        self.process_next()
+    pub fn run_single_step(&mut self, ec: &mut impl EmulatorClientMut) -> EmulatorUpdateResults {
+        self.process_next(ec)
     }
 
 
     /// Continues running the program located on the cartridge,
     /// until the PPU has completed one single frame.
-    pub fn run_frame(&mut self) -> EmulatorUpdateResults {
+    pub fn run_frame(&mut self, ec: &mut impl EmulatorClientMut) -> EmulatorUpdateResults {
         let mut results = EmulatorUpdateResults::default();
 
         // update until receiving the 'frame completed' event.
         loop {
-            results += self.process_next();
+            results += self.process_next(ec);
 
             // stop after completing one frame
             if results.events.contains(DebugEvent::PpuFrameCompleted) {
@@ -492,10 +343,10 @@ impl GameBoy {
 
 
     /// Continues processing the next pending operation.
-    fn process_next(&mut self) -> EmulatorUpdateResults {
+    fn process_next(&mut self, ec: &mut impl EmulatorClientMut) -> EmulatorUpdateResults {
         if self.cpu.is_running() {
-            if let Some(cycles) = self.cpu.handle_interrupts() {
-                let signals = self.update_components(cycles);
+            if let Some(cycles) = self.cpu.handle_interrupts(ec) {
+                let signals = self.update_components(ec, cycles);
 
                 EmulatorUpdateResults {
                     cycles,
@@ -503,14 +354,14 @@ impl GameBoy {
                 }
             }
             else {
-                self.process_next_opcode()
+                self.process_next_opcode(ec)
             }
         }
         else {
             // when in HALT state just pass 4 cycles
             // where the CPU idles
             let halt_cycle = 4;
-            let signals    = self.update_components(halt_cycle);
+            let signals    = self.update_components(ec, halt_cycle);
 
             EmulatorUpdateResults {
                 cycles: halt_cycle,
@@ -521,8 +372,8 @@ impl GameBoy {
 
 
     /// Process the next opcode.
-    fn process_next_opcode(&mut self) -> EmulatorUpdateResults {
-        let instruction = self.cpu.fetch_next_instruction();
+    fn process_next_opcode(&mut self, ec: &mut impl EmulatorClientMut) -> EmulatorUpdateResults {
+        let instruction = self.cpu.fetch_next_instruction(ec);
         let mut context = OpCodeContext::for_instruction(&instruction);
         let mut signals = MemoryBusSignals::default();
         let mut total_step_cycles : Clock = 0;
@@ -532,19 +383,19 @@ impl GameBoy {
         if instruction.opcode.cycles_ahead != 0 {
             let cycles_ahead = instruction.opcode.cycles_ahead;
             total_step_cycles += cycles_ahead;
-            signals |= self.update_components(cycles_ahead);
+            signals |= self.update_components(ec, cycles_ahead);
         }
 
         loop {
             // invoke opcode execution
-            let result = (instruction.opcode.proc)(self, &mut context);
+            let result = opcode_dispatch(instruction.opcode, self, ec, &mut context);
 
             match result {
                 // the opcode was partially executed and needs time to pass on other components
                 // to update timer or memory operations.
                 OpCodeResult::StageDone(step_cycles) => {
                     total_step_cycles += step_cycles;
-                    signals |= self.update_components(step_cycles);
+                    signals |= self.update_components(ec, step_cycles);
                     context.enter_next_stage();
                 }
 
@@ -553,23 +404,11 @@ impl GameBoy {
                     // get the total number of cycles consumed by this opcode and subtract the
                     // number of cycles already applied to components
                     let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
-                    signals |= self.update_components(remaining_cycles);
+                    signals |= self.update_components(ec, remaining_cycles);
 
                     break;
                 }
             }
-        }
-
-        // print opcode and CPU state if enabled
-        if self.device_config.print_opcodes {
-            println!(
-                "/* {:04x} [{:02x}]{} */ {:<16}    ; {}",
-                instruction.opcode_address,
-                instruction.opcode_id,
-                if instruction.opcode_id <= 0xff { "  " } else { "" },
-                instruction.to_string(),
-                self.cpu
-            );
         }
 
         EmulatorUpdateResults {
@@ -581,11 +420,12 @@ impl GameBoy {
 
     /// Applies the time passed during CPU execution to other components as well.
     #[must_use]
-    fn update_components(&mut self, cycles: Clock) -> MemoryBusSignals {
+    fn update_components(&mut self, ec: &mut impl EmulatorClientMut, cycles: Clock) -> MemoryBusSignals {
         self.cpu.update(cycles);
-        self.get_mmu_mut().update(cycles);
-        self.get_peripherals_mut().apu.update(cycles);
-        self.get_peripherals_mut().ppu.update(cycles);
+        self.get_mmu_mut().update(ec, cycles);
+        #[cfg(feature = "apu")]
+        self.get_peripherals_mut().apu.update(ec, cycles);
+        self.get_peripherals_mut().ppu.update(ec, cycles);
         self.get_peripherals_mut().timer.update(cycles);
         self.get_peripherals_mut().serial.update(cycles);
         self.get_peripherals_mut().input.update();
@@ -610,7 +450,7 @@ impl GameBoy {
 }
 
 
-impl std::ops::Add for EmulatorUpdateResults {
+impl core::ops::Add for EmulatorUpdateResults {
     type Output = EmulatorUpdateResults;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -622,7 +462,7 @@ impl std::ops::Add for EmulatorUpdateResults {
 }
 
 
-impl std::ops::AddAssign for EmulatorUpdateResults {
+impl core::ops::AddAssign for EmulatorUpdateResults {
     fn add_assign(&mut self, rhs: Self) {
         self.cycles += rhs.cycles;
         self.events |= rhs.events;

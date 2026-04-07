@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::min;
+#[cfg(feature = "dyn_alloc")]
+use alloc::boxed::Box;
+use core::cmp::min;
+
 use std::sync::mpsc::{channel, Receiver, Sender};
 
 use crate::apu::hpf::StereoHighPassFilters;
 use crate::apu::sample::{SampleResult, StereoSample};
 use crate::cpu::cpu::CPU_CLOCK_SPEED;
-use crate::gameboy::{Clock, DeviceConfig};
+use crate::emulator_client::EmulatorClient;
+use crate::emulator_device::Clock;
 use crate::utils::SerializableArray;
 
 
@@ -83,7 +87,7 @@ impl AudioOutput {
     pub const DEFAULT_SAMPLE_RATE: u32 = 48_000;
 
 
-    pub fn new(device_config: DeviceConfig) -> Self {
+    pub fn new(ec: &impl EmulatorClient) -> Self {
         Self {
             sample_rate:        Self::DEFAULT_SAMPLE_RATE,
             time_passed:        0,
@@ -92,7 +96,7 @@ impl AudioOutput {
             current_sample:     StereoSample::default(),
             buffer:             Box::new([StereoSample::default(); SAMPLE_BUFFER_SIZE].into()),
             buffer_insert_pos:  0,
-            high_pass_filter:   StereoHighPassFilters::new(device_config),
+            high_pass_filter:   StereoHighPassFilters::new(ec),
             sender:             None,
         }
     }

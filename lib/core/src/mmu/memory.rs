@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::max;
-use std::io;
-
-use crate::boot_rom::BootRom;
-use crate::cartridge::Cartridge;
-use crate::gameboy::{DeviceConfig, EmulationType};
+use crate::cartridge::image_data::FixedSizeImageData;
+use crate::device_type::EmulationType;
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::mmu::locations::*;
-use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl, MemoryBankController};
+use crate::mmu::mbc::{create_mbc, Mbc, MbcImpl};
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
+use core::cmp::max;
 
 
 /// Stores the information of an active OAM DMA transfer
@@ -64,11 +62,13 @@ pub type HRamBank = MemoryDataFixedSize<127>;
 /// The memory object is the owner of the emulator's memory.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Memory {
-    /// The configuration of the running device
-    device_config: DeviceConfig,
-
     /// Work RAM banks (DMG = 2 * 4kiB, GBC = 8 * 4kiB)
+    #[cfg(feature = "cgb")]
     wram_banks: Vec<WRamBank>,
+
+    /// Work RAM banks (DMG only 2 * 4kiB)
+    #[cfg(not(feature = "cgb"))]
+    wram_banks: [WRamBank; 2],
 
     /// Active Work RAM banks.
     /// Bank 0 is fixed, Bank 1 can be switched between 1-7 on GBC.
@@ -81,108 +81,81 @@ pub struct Memory {
     /// MemoryBankController implementation.
     mbc: Mbc,
 
-    boot_rom:   Option<BootRom>,
-    cartridge:  Option<Cartridge>,
+    /// Stores whether the boot rom is currently enabled or disabled.
+    boot_rom_enabled: bool,
 }
 
 
 impl Memory {
     /// Create a new Memory object.
-    pub fn new(device_config: DeviceConfig) -> Self {
-        let num_wram_banks = match device_config.emulation {
+    pub fn new(ec: &impl EmulatorClient) -> Self {
+        let num_wram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 2,
             EmulationType::GBC => 8,
         };
 
-        Self {
-            device_config,
+        #[cfg(not(feature = "cgb"))]
+        {
+            _ = num_wram_banks;
+        }
 
-            wram_banks: std::iter::repeat_with(|| WRamBank::new()).take(num_wram_banks).collect(),
+        Self {
+            #[cfg(feature = "cgb")]
+            wram_banks: core::iter::repeat_with(|| WRamBank::new()).take(num_wram_banks).collect(),
+
+            #[cfg(not(feature = "cgb"))]
+            wram_banks: [
+                WRamBank::new(),
+                WRamBank::new(),
+            ],
+
             wram_active_bank_0: 0,
             wram_active_bank_1: 1,
 
             hram: HRamBank::new(),
 
-            mbc: create_mbc(&MemoryBankController::None),
+            mbc: create_mbc(ec.get_cartridge_info().get_mbc()),
 
-            boot_rom:   None,
-            cartridge:  None,
+            // start with enabled boot rom if one is available
+            boot_rom_enabled: ec.get_boot_rom().is_some(),
         }
-    }
-
-
-    /// Checks whether a boot rom is active or not.
-    pub fn has_boot_rom(&self) -> bool {
-        match self.boot_rom {
-            None    => false,
-            Some(_) => true,
-        }
-    }
-
-    /// Load a boot ROM into the memory.
-    pub fn set_boot_rom(&mut self, boot_rom: BootRom) {
-        self.boot_rom = Some(boot_rom)
-    }
-
-    /// Load ROM data from a cartridge into the memory.
-    pub fn set_cartridge(&mut self, cartridge: Cartridge) {
-        self.mbc       = create_mbc(cartridge.get_mbc());
-        self.cartridge = Some(cartridge);
-    }
-
-    /// Get a reference to the currently assigned cartridge, if any.
-    pub fn get_cartridge(&self) -> Option<&Cartridge> {
-        self.cartridge.as_ref()
-    }
-
-    /// Save the cartridge RAM, if any.
-    pub fn save_cartridge_ram_to_file_if_any(&self) -> io::Result<()> {
-        if let Some(cartridge) = &self.cartridge {
-            cartridge.save_ram_to_file_if_any()?;
-        }
-
-        Ok(())
     }
 }
 
 
 impl Memory {
     /// Reads data from the boot rom, if any, otherwise from the cartridge.
-    fn read_boot_rom_or_cartridge(&self, address: u16) -> u8 {
-        if let Some(boot_rom) = &self.boot_rom {
-            return boot_rom.read(address);
+    fn read_boot_rom_or_cartridge(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
+        if self.boot_rom_enabled {
+            if let Some(boot_rom) = ec.get_boot_rom() {
+                return boot_rom.get_data()[address as usize];
+            }
         }
 
-        self.read_from_cartridge(address)
+        self.read_from_cartridge(ec, address)
     }
 
 
     /// Reads data from the cartridge.
-    fn read_from_cartridge(&self, address: u16) -> u8 {
-        if let Some(cartridge) = &self.cartridge {
-            return self.mbc.read_byte(cartridge, address);
-        }
-
-        0xff
+    fn read_from_cartridge(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
+        self.mbc.read_byte(ec, address)
     }
 
 
     /// Writes data to the cartridge.
-    fn write_to_cartridge(&mut self, address: u16, value: u8) {
-        if let Some(cartridge) = &mut self.cartridge {
-            self.mbc.write_byte(cartridge, address, value);
-        }
+    fn write_to_cartridge(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
+        self.mbc.write_byte(ec, address, value);
     }
 }
 
 
 impl MemoryBusConnection for Memory {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
         memory_map!(
             address => {
-                0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(address),
-                0x0100 ..= 0x7fff => [] self.read_from_cartridge(address),
-                0xa000 ..= 0xbfff => [] self.read_from_cartridge(address),
+                0x0000 ..= 0x00ff => [] self.read_boot_rom_or_cartridge(ec, address),
+                0x0100 ..= 0x7fff => [] self.read_from_cartridge(ec, address),
+                0xa000 ..= 0xbfff => [] self.read_from_cartridge(ec, address),
 
                 0xc000 ..= 0xcfff => [mapped_address] {
                     let bank = &self.wram_banks[self.wram_active_bank_0 as usize];
@@ -196,7 +169,7 @@ impl MemoryBusConnection for Memory {
 
                 0xe000 ..= 0xfdff => [mapped_address] {
                     // echo RAM; mapped into WRAM (0xc000 - 0xddff)
-                    self.on_read((mapped_address + 0xc000) as u16)
+                    self.on_read(ec, (mapped_address + 0xc000) as u16)
                 },
 
                 0xfea0 ..= 0xfeff => [] {
@@ -212,15 +185,17 @@ impl MemoryBusConnection for Memory {
                 0xff00 ..= 0xff7f => [] {
                     match address {
                         MEMORY_LOCATION_BOOT_ROM_DISABLE => {
-                            match self.boot_rom {
-                                Some(_) => 0x00,
-                                None    => 0xff,
+                            if self.boot_rom_enabled {
+                                0x00
+                            }
+                            else {
+                                0xff
                             }
                         },
 
                         MEMORY_LOCATION_SVBK => {
                             // on GBC: WRAM bank #1
-                            if let EmulationType::GBC = self.device_config.emulation {
+                            if let EmulationType::GBC = ec.get_device_config().emulation {
                                 self.wram_active_bank_1 | 0b_1111_1000
                             }
                             else {
@@ -236,11 +211,11 @@ impl MemoryBusConnection for Memory {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
         memory_map!(
             address => {
-                0x0000 ..= 0x7fff => [] self.write_to_cartridge(address, value),
-                0xa000 ..= 0xbfff => [] self.write_to_cartridge(address, value),
+                0x0000 ..= 0x7fff => [] self.write_to_cartridge(ec, address, value),
+                0xa000 ..= 0xbfff => [] self.write_to_cartridge(ec, address, value),
 
                 0xc000 ..= 0xcfff => [mapped_address] {
                     let bank = &mut self.wram_banks[self.wram_active_bank_0 as usize];
@@ -254,7 +229,7 @@ impl MemoryBusConnection for Memory {
 
                 0xe000 ..= 0xfdff => [mapped_address] {
                     // echo RAM; mapped into WRAM (0xc000 - 0xddff)
-                    self.on_write((mapped_address + 0xc000) as u16, value)
+                    self.on_write(ec, (mapped_address + 0xc000) as u16, value)
                 },
 
                 0xfea0 ..= 0xfeff => [] { /* unusable ram area */ },
@@ -267,14 +242,15 @@ impl MemoryBusConnection for Memory {
                 0xff00 ..= 0xff7f => [] {
                     match address {
                         MEMORY_LOCATION_BOOT_ROM_DISABLE => {
+                            // Boot ROM can only be disabled but never enabled
                             if (value & 0x01) != 0 {
-                                self.boot_rom = None;
+                                self.boot_rom_enabled = false;
                             }
                         },
 
                         MEMORY_LOCATION_SVBK => {
                             // on GBC: switch WRAM bank #1
-                            if let EmulationType::GBC = self.device_config.emulation {
+                            if let EmulationType::GBC = ec.get_device_config().emulation {
                                 let bank = value & 0x07;
                                 self.wram_active_bank_1 = max(1, bank);
                             }

@@ -6,5 +6,5 @@ edition = "2021"
 
 [dependencies]
 
-[dependencies.gemi-core]
-path = "../../lib/core"
+[dependencies.libgemi]
+path = "../gemi"

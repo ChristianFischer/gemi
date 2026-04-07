@@ -17,12 +17,12 @@
 
 use crate::sound_queue::SoundQueue;
 use crate::BoxError;
-use gemi_core::gameboy::GameBoy;
-use gemi_core::input::{Input, InputButton};
-use gemi_core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
-use gemi_core::ppu::flags::LcdControlFlag;
-use gemi_core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
-use gemi_core::ppu::ppu::{LcdBuffer, Ppu, SCREEN_H, SCREEN_W};
+use libgemi::core::input::{Input, InputButton};
+use libgemi::core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
+use libgemi::core::ppu::flags::LcdControlFlag;
+use libgemi::core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
+use libgemi::core::ppu::ppu::{LcdBuffer, SCREEN_H, SCREEN_W};
+use libgemi::GameBoy;
 use sdl3::event::Event;
 use sdl3::keyboard::Keycode;
 use sdl3::rect::Rect;
@@ -171,7 +171,7 @@ impl Window {
         let texture_background = BufferedTexture::new(&texture_creator, 256, 256)?;
         let texture_objects    = BufferedTexture::new(&texture_creator, 16*8, 24*8)?;
 
-        let audio = SoundQueue::create(&sdl, &mut gb.get_peripherals_mut().apu)?;
+        let audio = SoundQueue::create(&sdl, gb.get_apu_mut())?;
 
         Ok(Window {
             display_scale,
@@ -286,11 +286,11 @@ impl Window {
     }
 
     /// Presents the content of a LCD buffer on the window.
-    pub fn present(&mut self, lcd: &LcdBuffer, ppu: &Ppu) {
+    pub fn present(&mut self, gb: &GameBoy) {
         match self.display_mode {
-            DisplayMode::Game       => self.present_game(lcd),
-            DisplayMode::Background => self.present_background(ppu),
-            DisplayMode::Objects    => self.present_objects(ppu),
+            DisplayMode::Game       => self.present_game(gb.get_ppu().get_lcd()),
+            DisplayMode::Background => self.present_background(gb),
+            DisplayMode::Objects    => self.present_objects(gb),
         }
     }
 
@@ -322,7 +322,8 @@ impl Window {
 
     /// Present the whole background on the screen.
     /// This includes the whole content even outside of the scrolling viewport.
-    pub fn present_background(&mut self, ppu: &Ppu) {
+    pub fn present_background(&mut self, gb: &GameBoy) {
+        let ppu     = gb.get_ppu();
         let tilemap = TileMap::by_select_bit(ppu.check_lcdc(LcdControlFlag::BackgroundTileMapSelect));
         let tileset = TileSet::by_select_bit(ppu.check_lcdc(LcdControlFlag::TileDataSelect));
         let palette = DmgPalette::create_default();
@@ -331,6 +332,7 @@ impl Window {
         for background_y in 0..255 {
             for background_x in 0..255 {
                 let sprite_pixel = ppu.read_tilemap_pixel(
+                    gb.get_config(),
                     tilemap,
                     tileset,
                     background_x,
@@ -359,7 +361,8 @@ impl Window {
 
 
     /// Presents the list of objects from the video memory.
-    pub fn present_objects(&mut self, ppu: &Ppu) {
+    pub fn present_objects(&mut self, gb: &GameBoy) {
+        let ppu             = gb.get_ppu();
         let objects_per_row = 16;
         let objects_rows    = 24;
         let palette         = DmgPalette::create_default();

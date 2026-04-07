@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,11 @@ use std::fmt::{Debug, Formatter};
 use std::panic;
 use std::path::PathBuf;
 
-use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::Cartridge;
-use gemi_core::gameboy::{DeviceType, GameBoy};
-use gemi_core::utils::to_u8;
+use libgemi::boot_rom::BootRom;
+use libgemi::cartridge::Cartridge;
+use libgemi::core::device_type::DeviceType;
+use libgemi::core::utils::to_u8;
+use libgemi::GameBoy;
 
 use crate::checks::blargg_checks::check_blargg_test_passed;
 use crate::checks::check_display::compare_display_with_image;
@@ -30,6 +31,7 @@ use crate::checks::gambatte_checks::check_gambatte_display_code;
 use crate::checks::mooneye_checks::check_mooneye_test_passed;
 use crate::io_utils::Workspace;
 use crate::test_config::{CheckResultConfig, EmulatorTestCase, RunConfig, SetUpConfig};
+
 
 /// The maximum number of frames allowed per emulator run,
 /// before it's considered as an error.
@@ -124,25 +126,26 @@ pub fn create_device_with_config(workspace: &Workspace, device_type: &DeviceType
 
     // load the boot ROM if any
     if let Some(boot_rom_path) = &setup.boot_rom_path {
-        let boot_rom = BootRom::load_file(&boot_rom_path)
+        let path = PathBuf::from(workspace.get_path_to_str(boot_rom_path));
+        let boot_rom = BootRom::load_file(&path)
             .map_err(|e| TestCaseError::SetUpError(e.to_string()))
             ?;
 
         builder.set_boot_rom(boot_rom);
     }
 
+    // set the color palette for DMG emulation
+    if let Some(palette) = setup.dmg_display_palette {
+        builder.set_dmg_display_palette(palette);
+    }
+
     // create the device emulator
     let mut gb = builder.finish()
-        .map_err(|e| TestCaseError::SetUpError(e))
+        .map_err(|e| TestCaseError::SetUpError(e.to_string()))
         ?;
 
     // initialize
     gb.initialize();
-
-    // set the color palette for DMG emulation
-    if let Some(palette) = setup.dmg_display_palette {
-        gb.get_peripherals_mut().ppu.set_dmg_display_palette(palette);
-    }
 
     Ok(gb)
 }
@@ -183,7 +186,7 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> Result<u3
 
         // stop running when in HALT state
         if config.stop_on_halt {
-            if !gb.cpu.is_running() {
+            if !gb.get_cpu().is_running() {
                 stop_next_frame = true;
             }
         }
@@ -191,7 +194,7 @@ pub fn run_to_stop_conditions(gb: &mut GameBoy, config: &RunConfig) -> Result<u3
         // stop if the emulator is stuck in an infinite loop
         // like JR -2
         if config.stop_on_infinite_loop {
-            let current_address = gb.cpu.get_instruction_pointer();
+            let current_address = gb.get_cpu().get_instruction_pointer();
             let (addr_high, addr_low) = to_u8(current_address);
 
             // check for JR -2
@@ -232,7 +235,7 @@ fn check_for_opcode_sequence(gb: &GameBoy, address: u16, sequence: &[u8]) -> boo
         let i_addr = address + (i as u16);
 
         let byte_expected = sequence[i];
-        let byte_read     = gb.get_mmu().read_u8(i_addr);
+        let byte_read     = gb.read_u8(i_addr);
 
         if byte_read != byte_expected {
             return false;
@@ -281,7 +284,7 @@ pub fn run_test_case_for_result(workspace: &Workspace, test_case: &EmulatorTestC
 
     // enable serial output, if required for any result check
     if result.requires_serial_output() {
-        gb.get_peripherals_mut().serial.enable_output_queue(true);
+        gb.get_serial_port_mut().enable_output_queue(true);
     }
 
     // Run

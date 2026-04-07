@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#[cfg(feature = "cgb")]
+use alloc::vec::Vec;
 
-use crate::gameboy::{DeviceConfig, EmulationType};
+use crate::device_type::EmulationType;
+use crate::emulator_client::EmulatorClient;
 use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 use crate::ppu::graphic_data::{DmgPalette, GbcPaletteData, Sprite};
@@ -47,7 +50,12 @@ pub struct GbcPalettePointer {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VideoMemory {
     /// Video RAM (DMG = 1 * 8kiB, GBC = 2 * 8kiB)
+    #[cfg(feature = "cgb")]
     pub vram_banks: Vec<VRamBank>,
+
+    /// Video RAM (DMG only = 1 * 8kiB)
+    #[cfg(not(feature = "cgb"))]
+    pub vram_banks: [VRamBank; 1],
 
     /// Active Video RAM Bank (0-1, CGB only)
     pub vram_active_bank: u8,
@@ -125,14 +133,24 @@ impl GbcPalettePointer {
 
 
 impl VideoMemory {
-    pub fn new(device_config: DeviceConfig) -> Self {
-        let num_vram_banks = match device_config.emulation {
+    pub fn new(ec: &impl EmulatorClient) -> Self {
+        let num_vram_banks = match ec.get_device_config().emulation {
             EmulationType::DMG => 1,
             EmulationType::GBC => 2,
         };
 
+        #[cfg(not(feature = "cgb"))]
+        {
+            _ = num_vram_banks;
+        }
+
         Self {
-            vram_banks: std::iter::repeat_with(|| VRamBank::new()).take(num_vram_banks).collect(),
+            #[cfg(feature = "cgb")]
+            vram_banks: core::iter::repeat_with(|| VRamBank::new()).take(num_vram_banks).collect(),
+
+            #[cfg(not(feature = "cgb"))]
+            vram_banks: [VRamBank::new()],
+
             vram_active_bank: 0,
 
             oam: OamRamBank::new([Sprite::empty(); 40]),

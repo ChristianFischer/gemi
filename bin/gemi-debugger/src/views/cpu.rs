@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,14 @@
 
 use egui::{Grid, Label, PointerButton, Sense, Ui, Vec2, Widget};
 
-use gemi_core::cpu::cpu::{CpuFlag, RegisterR8};
-use gemi_core::gameboy::GameBoy;
-use gemi_core::utils::to_u8;
+use libgemi::core::cpu::cpu::{CpuFlag, RegisterR8};
+use libgemi::core::emulator_device::EmulatorDevice;
+use libgemi::core::utils::to_u8;
 
 use crate::state::EmulatorState;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
+
 
 /// A view to display runtime information about the CPU.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -160,7 +161,7 @@ impl CpuView {
         ui.separator();
 
         // Interrupts and HALT flags (readonly)
-        if let Some(emu) = state.emu.get_emulator_mut() {
+        if let Some(emu) = state.emu.get_emulator() {
             let mut is_ime  = emu.cpu.is_interrupts_enabled();
             let mut is_halt = emu.cpu.is_running() == false;
             ui.checkbox(&mut is_ime,  "Interrupts Enabled");
@@ -237,8 +238,8 @@ impl CpuView {
         &mut self,
         ui: &mut Ui, state: &mut EmulatorState,
         expected_edit_mode: EditMode,
-        on_read_value: impl FnOnce(&GameBoy) -> String,
-        on_write_value: impl FnOnce(&mut GameBoy, &String)
+        on_read_value: impl FnOnce(&EmulatorDevice) -> String,
+        on_write_value: impl FnOnce(&mut EmulatorDevice, &String)
     ) {
         let is_paused = state.ui.is_paused();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::min;
+use core::cmp::min;
 
-use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_write_register, TriggerAction};
+use crate::apu::channels::channel::{default_on_read_register, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_duty::WaveDuty;
-use crate::gameboy::Clock;
+use crate::apu::ApuState;
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
+use crate::emulator_device::Clock;
 
 
 const NRX3_WRITE_ONLY_FREQUENCY : u8    = 0b_1111_1111;
@@ -69,17 +70,17 @@ impl PulseGenerator {
 
 
 impl ChannelComponent for PulseGenerator {
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorClient, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             1 => self.wave_duty.get_index() << 6,
             3 => NRX3_WRITE_ONLY_FREQUENCY,
             4 => NRX4_WRITE_ONLY_FREQUENCY | NRX4_NON_READABLE_BITS | NRX4_WRITE_ONLY_TRIGGER_BIT,
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorClientMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             1 => {
                 let wave_duty_index = (value >> 6) & 0x03;
@@ -93,11 +94,11 @@ impl ChannelComponent for PulseGenerator {
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_reset(&mut self, _apu_state: &ApuState) {
+    fn on_reset(&mut self, _ec: &impl EmulatorClient, _apu_state: &ApuState) {
         *self = Self::new();
     }
 }

@@ -1,0 +1,13 @@
+[package]
+name = "gemi-mock"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dependencies.gemi-core]
+path = "../core"
+features = [
+    "std",
+    "dyn_alloc",
+]

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
 
 use crate::cpu::opcode::{Instruction, OpCode};
-use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
-use crate::gameboy::Clock;
+use crate::cpu::opcodes::OPCODE_TABLE;
+use crate::emulator_client::EmulatorClientMut;
+use crate::emulator_device::Clock;
 use crate::mmu::mmu::Mmu;
 use crate::utils::{change_bit, get_bit, to_u16, to_u8};
 
@@ -144,6 +146,8 @@ impl RegisterR16 {
     }
 }
 
+
+#[cfg(feature = "std")]
 impl Display for RegisterR8 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
@@ -159,6 +163,8 @@ impl Display for RegisterR8 {
     }
 }
 
+
+#[cfg(feature = "std")]
 impl Display for RegisterR16 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
@@ -169,6 +175,7 @@ impl Display for RegisterR16 {
         })
     }
 }
+
 
 impl CpuFlag {
     /// Get the bit inside the flags register which stores
@@ -239,7 +246,7 @@ impl Cpu {
     }
 
     /// Handles any pending interrupts.
-    pub fn handle_interrupts(&mut self) -> Option<Clock> {
+    pub fn handle_interrupts(&mut self, ec: &mut impl EmulatorClientMut) -> Option<Clock> {
         match self.ime {
             ImeState::Enabled => {
                 let cpu_state = &mut self.get_mmu_mut().get_peripherals_mut().interrupts;
@@ -249,7 +256,7 @@ impl Cpu {
                     self.ime = ImeState::Disabled;
 
                     // call the address of the interrupt
-                    self.call_addr(interrupt.address());
+                    self.call_addr(ec, interrupt.address());
 
                     // stop handling other interrupts
                     return Some(20);
@@ -340,115 +347,115 @@ impl Cpu {
 
     /// Fetches the next opcode on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
-    pub fn fetch_next_opcode(&mut self) -> &'static OpCode {
-        let opcode_byte = self.fetch_u8();
+    pub fn fetch_next_opcode(&mut self, ec: &mut impl EmulatorClientMut) -> &'static OpCode {
+        let opcode_byte = self.fetch_u8(ec);
         if opcode_byte != 0xCB {
             &OPCODE_TABLE[opcode_byte as usize]
         }
         else {
-            let opcode_byte_extended = self.fetch_u8();
-            &OPCODE_TABLE_EXTENDED[opcode_byte_extended as usize]
+            let opcode_byte_extended = self.fetch_u8(ec);
+            &OPCODE_TABLE[0x0100 | opcode_byte_extended as usize]
         }
     }
 
     /// Fetches the next instruction on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
-    pub fn fetch_next_instruction(&mut self) -> Instruction {
+    pub fn fetch_next_instruction(&mut self, ec: &mut impl EmulatorClientMut) -> Instruction {
         let opcode_address = self.instruction_pointer;
-        let opcode_byte    = self.get_next_byte() as u16;
-        let opcode_id      = if opcode_byte == 0xCB { self.get_next_u16() } else { opcode_byte };
-        let opcode         = self.fetch_next_opcode();
+        let opcode_byte    = self.get_next_byte(ec) as u16;
+        let opcode_id      = if opcode_byte == 0xCB { self.get_next_u16(ec) } else { opcode_byte };
+        let opcode         = self.fetch_next_opcode(ec);
 
         Instruction {
             opcode,
             opcode_id,
             opcode_address,
             arg: [
-                self.mmu.read_u8(self.instruction_pointer),
-                self.mmu.read_u8(self.instruction_pointer.wrapping_add(1))
+                self.mmu.read_u8(ec, self.instruction_pointer),
+                self.mmu.read_u8(ec, self.instruction_pointer.wrapping_add(1))
             ]
         }
     }
 
     /// Get the next byte on the current location of the instruction pointer, without moving it.
-    pub fn get_next_byte(&self) -> u8 {
-        self.mmu.read_u8(self.instruction_pointer)
+    pub fn get_next_byte(&self, ec: &mut impl EmulatorClientMut) -> u8 {
+        self.mmu.read_u8(ec, self.instruction_pointer)
     }
 
     /// Get the next byte relative to the current location of the instruction pointer, without moving it.
-    pub fn get_next_byte_at(&self, offset: u16) -> u8 {
-        self.mmu.read_u8(self.instruction_pointer + offset)
+    pub fn get_next_byte_at(&self, ec: &mut impl EmulatorClientMut, offset: u16) -> u8 {
+        self.mmu.read_u8(ec, self.instruction_pointer + offset)
     }
 
     /// Get the next i8 value on the current location of the instruction pointer, without moving it.
-    pub fn get_next_i8(&self) -> i8 {
-        self.get_next_byte() as i8
+    pub fn get_next_i8(&self, ec: &mut impl EmulatorClientMut) -> i8 {
+        self.get_next_byte(ec) as i8
     }
 
     /// Get the next u8 value on the current location of the instruction pointer, without moving it.
-    pub fn get_next_u8(&self) -> u8 {
-        self.get_next_byte()
+    pub fn get_next_u8(&self, ec: &mut impl EmulatorClientMut) -> u8 {
+        self.get_next_byte(ec)
     }
 
     /// Get the next u16 value on the current location of the instruction pointer, without moving it.
-    pub fn get_next_u16(&self) -> u16 {
-        let low  = self.get_next_byte_at(0);
-        let high = self.get_next_byte_at(1);
+    pub fn get_next_u16(&self, ec: &mut impl EmulatorClientMut) -> u16 {
+        let low  = self.get_next_byte_at(ec, 0);
+        let high = self.get_next_byte_at(ec, 1);
         to_u16(high, low)
     }
 
     /// Fetches the next u8 value on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
-    pub fn fetch_u8(&mut self) -> u8 {
-        let value = self.get_next_byte();
+    pub fn fetch_u8(&mut self, ec: &mut impl EmulatorClientMut) -> u8 {
+        let value = self.get_next_byte(ec);
         self.instruction_pointer += 1;
         value
     }
 
     /// Fetches the next u16 value on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
-    pub fn fetch_u16(&mut self) -> u16 {
-        let low  = self.fetch_u8();
-        let high = self.fetch_u8();
+    pub fn fetch_u16(&mut self, ec: &mut impl EmulatorClientMut) -> u16 {
+        let low  = self.fetch_u8(ec);
+        let high = self.fetch_u8(ec);
         to_u16(high, low)
     }
 
     /// Fetches the next u8 value on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
-    pub fn fetch_i8(&mut self) -> i8 {
-        self.fetch_u8() as i8
+    pub fn fetch_i8(&mut self, ec: &mut impl EmulatorClientMut) -> i8 {
+        self.fetch_u8(ec) as i8
     }
 
     /// Fetches the next u8 value on the current location of the instruction pointer.
     /// The instruction pointer will be forwarded to the next instruction.
-    pub fn fetch_i16(&mut self) -> i16 {
-        self.fetch_u16() as i16
+    pub fn fetch_i16(&mut self, ec: &mut impl EmulatorClientMut) -> i16 {
+        self.fetch_u16(ec) as i16
     }
 
     /// Pushes a 8bit value on the stack, moving the stack pointer.
-    pub fn push_u8(&mut self, value: u8) {
+    pub fn push_u8(&mut self, ec: &mut impl EmulatorClientMut, value: u8) {
         self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        self.mmu.write_u8(self.stack_pointer, value);
+        self.mmu.write_u8(ec, self.stack_pointer, value);
     }
 
     /// Pushes a 16bit value on the stack, moving the stack pointer.
-    pub fn push_u16(&mut self, value: u16) {
+    pub fn push_u16(&mut self, ec: &mut impl EmulatorClientMut, value: u16) {
         let (high, low) = to_u8(value);
-        self.push_u8(high);
-        self.push_u8(low);
+        self.push_u8(ec, high);
+        self.push_u8(ec, low);
     }
 
     /// Pops a 8bit value from the stack, moving the stack pointer.
-    pub fn pop_u8(&mut self) -> u8 {
-        let value = self.mmu.read_u8(self.stack_pointer);
+    pub fn pop_u8(&mut self, ec: &mut impl EmulatorClientMut) -> u8 {
+        let value = self.mmu.read_u8(ec, self.stack_pointer);
         self.stack_pointer = self.stack_pointer.wrapping_add(1);
         value
     }
 
     /// Pops a 8bit value from the stack, moving the stack pointer.
-    pub fn pop_u16(&mut self) -> u16 {
-        let low  = self.pop_u8();
-        let high = self.pop_u8();
+    pub fn pop_u16(&mut self, ec: &mut impl EmulatorClientMut) -> u16 {
+        let low  = self.pop_u8(ec);
+        let high = self.pop_u8(ec);
         to_u16(high, low)
     }
 
@@ -513,16 +520,16 @@ impl Cpu {
     /// Performs a call to a given address.
     /// Saves the current instruction pointer on the stack and then moves
     /// the instruction pointer to the new address.
-    pub fn call_addr(&mut self, address: u16) {
+    pub fn call_addr(&mut self, ec: &mut impl EmulatorClientMut, address: u16) {
         let instruction_pointer = self.get_instruction_pointer();
-        self.push_u16(instruction_pointer);
+        self.push_u16(ec, instruction_pointer);
         self.set_instruction_pointer(address);
     }
 
     /// Returns from a previous call.
     /// Reads the value of the instruction pointer from the stack.
-    pub fn ret_from_call(&mut self) {
-        let instruction_pointer = self.pop_u16();
+    pub fn ret_from_call(&mut self, ec: &mut impl EmulatorClientMut) {
+        let instruction_pointer = self.pop_u16(ec);
         self.set_instruction_pointer(instruction_pointer);
     }
 
@@ -557,6 +564,7 @@ impl Cpu {
     }
 
     /// Creates a string representation of the current CPU flags.
+    #[cfg(feature = "std")]
     pub fn flags_to_string(&self) -> String {
         format!(
             "{}{}{}{}",
@@ -568,6 +576,7 @@ impl Cpu {
     }
 
     /// Creates a string representation of the current CPU registers.
+    #[cfg(feature = "std")]
     pub fn registers_to_string(&self) -> String {
         format!(
             "A={:02x} F={:02x} B={:02x} C={:02x} D={:02x} E={:02x} H={:02x} L={:02x} SP={:04x} IP={:04x}",
@@ -586,6 +595,7 @@ impl Cpu {
 }
 
 
+#[cfg(feature = "std")]
 impl Display for Cpu {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(

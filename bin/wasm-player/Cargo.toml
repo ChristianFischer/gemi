@@ -18,8 +18,8 @@ features = [
     "ImageData",
 ]
 
-[dependencies.gemi-core]
-path = "../../lib/core"
+[dependencies.libgemi]
+path = "../../lib/gemi"
 
 [dependencies.gemi-utils]
 path = "../../lib/utils"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::mem::take;
+#[cfg(feature = "dyn_alloc")]
+use alloc::{vec, vec::Vec};
+
+use core::mem::take;
 
 use crate::cpu::interrupts::Interrupt;
-use crate::gameboy::Clock;
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
+use crate::emulator_device::Clock;
 use crate::mmu::locations::{MEMORY_LOCATION_SB, MEMORY_LOCATION_SC};
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::utils::{as_bit_flag, get_bit};
@@ -49,6 +53,7 @@ pub struct SerialPort {
     transfer_byte: u8,
 
     /// A queue of all bytes sent by the device.
+    #[cfg(feature = "dyn_alloc")]
     output_queue: Vec<u8>,
 
     /// A flag to enable or disable the output queue.
@@ -64,6 +69,7 @@ impl SerialPort {
             signals:                MemoryBusSignals::default(),
             transfer_enabled:       false,
             transfer_byte:          0x00,
+            #[cfg(feature = "dyn_alloc")]
             output_queue:           vec![],
             output_queue_enabled:   false,
         }
@@ -77,6 +83,7 @@ impl SerialPort {
         if self.clock >= UPDATE_TIME_SERIAL_TRANSFER {
             if self.transfer_enabled {
                 // store the data only if the output queue is enabled
+                #[cfg(feature = "dyn_alloc")]
                 if self.output_queue_enabled {
                     self.output_queue.push(self.transfer_byte);
                 }
@@ -87,7 +94,6 @@ impl SerialPort {
                 // ..  and raise serial transfer interrupt
                 self.request_interrupt(Interrupt::Serial);
             }
-
 
             self.clock -= UPDATE_TIME_SERIAL_TRANSFER;
         }
@@ -107,12 +113,15 @@ impl SerialPort {
 
 
     /// Get the data currently in the output queue.
+    #[cfg(feature = "dyn_alloc")]
     pub fn get_output(&self) -> Vec<u8> {
         self.output_queue.clone()
     }
 
 
     /// Get the data currently in the output queue interpreted as a text string.
+    #[cfg(feature = "std")]
+    #[cfg(feature = "dyn_alloc")]
     pub fn get_output_as_text(&self) -> String {
         self.get_output()
             .into_iter()
@@ -123,6 +132,7 @@ impl SerialPort {
 
     /// Takes the data currently in the output queue.
     /// The data will then be removed from the current output queue.
+    #[cfg(feature = "dyn_alloc")]
     pub fn take_output(&mut self) -> Vec<u8> {
         take(&mut self.output_queue)
     }
@@ -130,6 +140,8 @@ impl SerialPort {
 
     /// Takes the data currently in the output queue interpreted as a text string.
     /// The data will then be removed from the current output queue.
+    #[cfg(feature = "std")]
+    #[cfg(feature = "dyn_alloc")]
     pub fn take_output_as_text(&mut self) -> String {
         self.take_output()
             .into_iter()
@@ -139,6 +151,7 @@ impl SerialPort {
 
 
     /// Takes the next byte from the output queue.
+    #[cfg(feature = "dyn_alloc")]
     pub fn take_next(&mut self) -> Option<u8> {
         if !self.output_queue.is_empty() {
             let next_byte = self.output_queue.remove(0);
@@ -151,7 +164,7 @@ impl SerialPort {
 
 
 impl MemoryBusConnection for SerialPort {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, _ec: &impl EmulatorClient, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_SB => self.transfer_byte,
             MEMORY_LOCATION_SC => 0b_0111_1111 | as_bit_flag(self.transfer_enabled, 7),
@@ -160,7 +173,7 @@ impl MemoryBusConnection for SerialPort {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_SB => self.transfer_byte    = value,
             MEMORY_LOCATION_SC => self.transfer_enabled = get_bit(value, 7),

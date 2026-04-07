@@ -15,26 +15,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
 
-use crate::cpu::opcodes::{OPCODE_TABLE, OPCODE_TABLE_EXTENDED};
-use crate::gameboy::{Clock, GameBoy};
+use crate::cpu::opcodes::OPCODE_TABLE;
+use crate::emulator_device::Clock;
 use crate::utils::{to_u16, to_u8};
-
-type ProcessOpCode = fn(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> OpCodeResult;
 
 
 /// A macro to generate an opcode implementation function.
 macro_rules! opcode {
-    ($(#[$meta:meta])? $name:ident, [$($bind_gb:ident)? $(, $bind_ctx:ident)?] $($body:tt)*) => {
+    ($(#[$meta:meta])? $name:ident, [$($bind_dev:ident)? $(, $bind_ec:ident $(, $bind_ctx:ident)?)?] $($body:tt)*) => {
         $(#[$meta])?
-        pub fn $name(gb: &mut GameBoy, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
-            // silence 'unused' warning for gb and ctx
-            { let _ = (&gb, &ctx); }
+        pub fn $name(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext) -> crate::cpu::opcode::OpCodeResult {
+            // silence 'unused' warnings
+            { let _ = (&dev, &ec, &ctx); }
 
-            // make gb and ctx visible to 'body', if requested
-            $(let $bind_gb  = gb;)?
-            $(let $bind_ctx = ctx;)?
+            // make dev, ec and ctx visible to 'body', if requested
+            $(let $bind_dev = dev;)?
+            $(
+                let $bind_ec  = ec;
+                $(let $bind_ctx = ctx;)?
+            )?
 
             // paste 'body' statements
             let result = {
@@ -47,7 +49,44 @@ macro_rules! opcode {
     };
 }
 
+/// A macro to generate an opcode table.
+macro_rules! opcode_table {
+    (
+        $vis:vis $table_name:ident: [OpCode; $table_size:expr] = [
+            $(
+                OpCode { name: $name:expr, bytes: $bytes:expr, cycles_ahead: $cycles_ahead:expr, cycles: $cycles:expr, proc: $proc:ident }
+            ),*
+            $(,)?
+        ]
+    ) => {
+        #[allow(non_camel_case_types)]
+        #[repr(u32)]
+        enum OpCodeProcId {
+            $(
+                $proc,
+            )*
+        }
+
+        $vis static $table_name: [OpCode; $table_size] = [
+            $(
+                OpCode { name: $name, bytes: $bytes, cycles_ahead: $cycles_ahead, cycles: $cycles, proc: OpCodeProcId::$proc as u32 },
+            )*
+        ];
+
+        $vis fn opcode_dispatch(oc: &OpCode, dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext) -> OpCodeResult {
+            let opcode_proc_id = unsafe { core::mem::transmute::<u32, OpCodeProcId>(oc.proc) };
+            match opcode_proc_id {
+                $(
+                    OpCodeProcId::$proc => $proc(dev, ec, ctx),
+                )*
+            }
+        }
+    }
+}
+
 pub(crate) use opcode;
+pub(crate) use opcode_table;
+
 
 /// Data struct describing a single opcode.
 #[derive(Copy, Clone)]
@@ -73,7 +112,7 @@ pub struct OpCode {
     pub cycles: Clock,
 
     /// Function pointer to the actual opcode execution.
-    pub proc: ProcessOpCode,
+    pub proc: u32,
 }
 
 
@@ -188,6 +227,7 @@ impl From<()> for OpCodeResult {
 
 impl OpCode {
     /// Split the attribute string into tokens.
+    #[cfg(feature = "std")]
     pub fn tokenize(&self) -> Vec<Token<'_>> {
         let mut characters = self.name;
         let mut tokens     = Vec::new();
@@ -246,15 +286,15 @@ impl Instruction {
         where F: Fn(u16) -> u8
     {
         let mut cursor = address;
-        
+
         // helper function to read from the current address cursor and then increment it
         let mut read_at_cursor = || {
             let value = read(cursor);
             cursor = cursor.wrapping_add(1);
-            
+
             value
         };
-        
+
         let opcode_address = address;
         let opcode_byte    = read_at_cursor();
 
@@ -272,7 +312,7 @@ impl Instruction {
         // get the opcode, either extended or normal one
         let opcode = if opcode_byte == 0xCB {
             let (hi, _) = to_u8(opcode_id);
-            &OPCODE_TABLE_EXTENDED[hi as usize]
+            &OPCODE_TABLE[0x0100 | hi as usize]
         }
         else {
             &OPCODE_TABLE[opcode_byte as usize]
@@ -300,6 +340,7 @@ impl Instruction {
 
 
     /// Get the replacement string for an argument placeholder.
+    #[cfg(feature = "std")]
     pub fn resolve_argument(&self, arg: &str) -> String {
         let arg0 = self.arg[0];
         let arg1 = self.arg[1];
@@ -338,9 +379,25 @@ impl Instruction {
             _ => arg.to_string()
         }
     }
+
+
+    /// Format a line as it could be displayed in a disassembly.
+    /// The line will contain the instructions address, opcode Id and
+    /// the actual instruction with the opcode name and parameters
+    #[cfg(feature = "std")]
+    pub fn format_disassembly_line(&self) -> String {
+        format!(
+            "/* {:04x} [{:02x}]{} */ {:<16}",
+            self.opcode_address,
+            self.opcode_id,
+            if self.opcode_id <= 0xff { "  " } else { "" },
+            self.to_string()
+        )
+    }
 }
 
 
+#[cfg(feature = "std")]
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut label = self.opcode.name.to_string();

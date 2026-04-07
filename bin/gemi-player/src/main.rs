@@ -21,11 +21,12 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 use std::{env, time};
 
-use gemi_core::boot_rom::BootRom;
-use gemi_core::cartridge::Cartridge;
-use gemi_core::cartridge::GameBoyColorSupport;
-use gemi_core::cpu::cpu::CPU_CLOCK_SPEED;
-use gemi_core::gameboy::{DeviceType, GameBoy};
+use libgemi::boot_rom::BootRom;
+use libgemi::cartridge::{Cartridge, CartridgeInfo};
+use libgemi::core::cartridge::GameBoyColorSupport;
+use libgemi::core::cpu::cpu::CPU_CLOCK_SPEED;
+use libgemi::core::device_type::DeviceType;
+use libgemi::GameBoy;
 
 use crate::window::Window;
 
@@ -35,7 +36,7 @@ pub type BoxError = Box<dyn std::error::Error>;
 mod sound_queue;
 mod window;
 
-fn print_rom_info(file: &Path, cartridge: &Cartridge) {
+fn print_rom_info(file: &Path, cartridge: &CartridgeInfo) {
     let mut features: Vec<&str> = vec![];
 
     if cartridge.has_ram() {
@@ -84,11 +85,9 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
 
         // update window
         {
-            let peripherals = gb.get_peripherals_mut();
-
             window.poll_events();
-            window.apply_button_states(&mut peripherals.input);
-            window.present(peripherals.ppu.get_lcd(), &peripherals.ppu);
+            window.apply_button_states(gb.get_input_mut());
+            window.present(gb);
         }
 
         // handle frame times
@@ -131,7 +130,9 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
                 let filename = args.next()
                     .expect("'--boot' needs to be followed by the path to a valid boot rom");
 
-                let boot_rom = BootRom::load_file(&filename).unwrap();
+                let file_path = Path::new(&filename);
+
+                let boot_rom = BootRom::load_file(file_path).unwrap();
                 builder.set_boot_rom(boot_rom);
             }
 
@@ -162,10 +163,6 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
             "--sgb2" => {
                 builder.set_device_type(DeviceType::SuperGameBoy2);
             }
-            
-            "--print-opcodes" => {
-                builder.set_print_opcodes(true);
-            }
 
             _ => {
                 let file = PathBuf::from(arg);
@@ -173,14 +170,16 @@ fn make_gameboy_instance() -> Result<GameBoy, String> {
                     .map_err(|e| format!("Failed to load cartridge: {}", e))
                     ?;
 
-                print_rom_info(&file, &cart);
+                let info = cart.get_cartridge_info();
+
+                print_rom_info(&file, info);
 
                 builder.set_cartridge(cart);
             }
         }
     }
 
-    builder.finish()
+    builder.finish().map_err(|e| e.to_string())
 }
 
 
@@ -190,10 +189,12 @@ fn main() -> Result<(), String> {
     gb.initialize();
 
     // determine the title based on the cartridge available
-    let title = match gb.get_peripherals().mem.get_cartridge() {
-        Some(cartridge) => cartridge.get_title().to_string(),
-        None => "GameBoy".to_string(),
-    };
+    let title = gb
+            .get_cartridge()
+            .get_cartridge_info()
+            .get_title()
+            .to_string()
+    ;
 
     // create window
     let mut window = Window::create(&title, &mut gb)
@@ -205,9 +206,11 @@ fn main() -> Result<(), String> {
     run(&mut window, &mut gb);
 
     // after running the cartridge, save it's on-chip-RAM, if any
-    gb.get_peripherals().mem.save_cartridge_ram_to_file_if_any()
-        .map_err(|e| format!("Failed to save cartridge RAM: {}", e))
-        ?
+    gb
+            .get_cartridge()
+            .flush_ram_if_any()
+            .map_err(|e| format!("Failed to save cartridge RAM: {}", e))
+            ?
     ;
 
     // everything went ok

@@ -1,0 +1,58 @@
+[package]
+name = "libgemi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies.gemi-core]
+path = "../core"
+features = [
+    "std",
+    "dyn_alloc",
+]
+
+[dependencies]
+bincode = { version = "2.0.1", default-features = false, features = ["std", "serde"], optional = true }
+serde = { version = "1.0.214", default-features = false, features = ["std"], optional = true }
+
+
+[features]
+default = [
+    "file_io",
+    "cgb",
+    "apu",
+    "serde",
+    "snapshots",
+]
+
+# `file_io` adds functions to load and write RAM and ROM images from and into files.
+# This is enabled by default and may be disabled for environments which do not
+# support file access.
+file_io = [
+    "gemi-core/file_io",
+]
+
+# Enables GameBoyColor support
+# GBC requires additional memory, so disabling will reduce memory usage of the emulator
+cgb = [
+    "gemi-core/cgb",
+]
+
+# Enables the audio processing unit.
+# Disabling will remove audio support and can be used to reduce executable size.
+apu = [
+    "gemi-core/apu",
+]
+
+# Enables support for serialisation/deserialisation using the "serde" crate
+serde = [
+    "gemi-core/serde",
+    "dep:bincode",
+    "dep:serde",
+]
+
+# Supports creating and loading snapshots of the whole emulator state.
+# This will add some more dependencies like serialisation using serde,
+# data compression and may increase the executable size noticeable.
+snapshots = [
+    "serde"
+]

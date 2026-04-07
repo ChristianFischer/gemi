@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  */
 
 use crate::apu::sample::{Sample, SampleResult, StereoSample};
-use crate::gameboy::{DeviceConfig, DeviceType};
-
+use crate::device_type::DeviceType;
+use crate::emulator_client::EmulatorClient;
 
 /// Charge factor per frame on classic GameBoy models.
 const CAPACITOR_CHARGE_FACTOR_BASE_DMG : f32 = 0.999958;
@@ -44,8 +44,8 @@ pub struct StereoHighPassFilters {
 
 
 impl HighPassFilter {
-    pub fn new(device_config: DeviceConfig) -> Self {
-        let charge_factor = match device_config.device {
+    pub fn new(ec: &impl EmulatorClient) -> Self {
+        let charge_factor = match ec.get_device_config().device {
             DeviceType::GameBoyDmg => CAPACITOR_CHARGE_FACTOR_BASE_DMG,
             _                      => CAPACITOR_CHARGE_FACTOR_BASE_GBC,
         };
@@ -76,10 +76,10 @@ impl HighPassFilter {
 
 
 impl StereoHighPassFilters {
-    pub fn new(device_config: DeviceConfig) -> Self {
+    pub fn new(ec: &impl EmulatorClient) -> Self {
         Self {
-            filter_left:  HighPassFilter::new(device_config),
-            filter_right: HighPassFilter::new(device_config),
+            filter_left:  HighPassFilter::new(ec),
+            filter_right: HighPassFilter::new(ec),
         }
     }
 

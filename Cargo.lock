@@ -1476,8 +1476,8 @@ dependencies = [
 name = "gemi"
 version = "0.1.0"
 dependencies = [
- "gemi-core",
  "gemi-utils",
+ "libgemi",
  "sdl3",
 ]
 
@@ -1486,8 +1486,8 @@ name = "gemi-core"
 version = "0.1.0"
 dependencies = [
  "base64",
- "bincode",
  "flagset",
+ "gemi-mock",
  "serde",
  "zstd",
 ]
@@ -1502,19 +1502,26 @@ dependencies = [
  "egui_extras",
  "egui_tiles",
  "futures",
- "gemi-core",
  "gemi-utils",
  "lazy_static",
+ "libgemi",
  "rfd",
  "serde",
  "wasm-bindgen-futures",
 ]
 
 [[package]]
-name = "gemi-utils"
+name = "gemi-mock"
 version = "0.1.0"
 dependencies = [
  "gemi-core",
+]
+
+[[package]]
+name = "gemi-utils"
+version = "0.1.0"
+dependencies = [
+ "libgemi",
 ]
 
 [[package]]
@@ -2253,6 +2260,15 @@ name = "libc"
 version = "0.2.183"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5b646652bf6661599e1da8901b3b9522896f01e736bad5f723fe7a3a27f899d"
+
+[[package]]
+name = "libgemi"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "gemi-core",
+ "serde",
+]
 
 [[package]]
 name = "libloading"
@@ -3890,7 +3906,7 @@ dependencies = [
 name = "testrunner"
 version = "0.1.0"
 dependencies = [
- "gemi-core",
+ "libgemi",
  "tests-generator",
  "tests-shared",
 ]
@@ -3899,7 +3915,7 @@ dependencies = [
 name = "tests-generator"
 version = "0.1.0"
 dependencies = [
- "gemi-core",
+ "libgemi",
  "tests-shared",
 ]
 
@@ -3907,8 +3923,8 @@ dependencies = [
 name = "tests-shared"
 version = "0.1.0"
 dependencies = [
- "gemi-core",
  "image",
+ "libgemi",
  "reqwest",
  "zip-extract",
 ]
@@ -4251,9 +4267,9 @@ checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.12.0"
+version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
+checksum = "da36089a805484bcccfffe0739803392c8298778a2d2f09febf76fac5ad9025b"
 
 [[package]]
 name = "unicode-width"
@@ -4284,8 +4300,8 @@ name = "update-test-report"
 version = "0.1.0"
 dependencies = [
  "futures",
- "gemi-core",
  "indicatif",
+ "libgemi",
  "tests-shared",
  "tokio",
  "tokio-stream",
@@ -4460,8 +4476,8 @@ dependencies = [
 name = "wasm-player"
 version = "0.1.0"
 dependencies = [
- "gemi-core",
  "gemi-utils",
+ "libgemi",
  "wasm-bindgen",
  "web-sys",
 ]

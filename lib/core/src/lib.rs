@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(feature = "dyn_alloc")]
+extern crate alloc;
+extern crate core;
+
 pub mod apu;
-pub mod boot_rom;
 pub mod cartridge;
 pub mod cpu;
 pub mod debug;
 pub mod device_type;
-pub mod gameboy;
+pub mod emulator_client;
+pub mod emulator_device;
 pub mod input;
 pub mod mmu;
 pub mod ppu;
 pub mod serial;
-pub mod snapshots;
 pub mod timer;
 pub mod utils;
+

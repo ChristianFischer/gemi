@@ -21,14 +21,13 @@ use std::sync::mpsc::{channel, Receiver, TryRecvError};
 use eframe::{CreationContext, Frame};
 use egui::{ComboBox, Context, UiKind};
 use egui_tiles::{Container, Tile};
+use libgemi::cartridge::Cartridge;
+use libgemi::core::ppu::graphic_data::TileMap;
 use rfd::AsyncFileDialog;
-
-use gemi_core::cartridge::Cartridge;
-use gemi_core::ppu::graphic_data::TileMap;
 
 use crate::behaviour::TreeBehaviour;
 use crate::event::UiEvent;
-use crate::state::{EmulatorDevice, EmulatorState, UpdateMode, UpdateStepMode};
+use crate::state::{EmulatorDeviceType, EmulatorState, UpdateMode, UpdateStepMode};
 use crate::strings::*;
 use crate::ui::sprite_cache;
 use crate::ui::utils::visit_tiles;
@@ -142,7 +141,7 @@ impl Default for EmulatorApplication {
                     ViewClass::new_file_browser(),
                     ViewClass::new_snapshots(),
                 ]
-            } 
+            }
             else {
                 vec![
                     ViewClass::new_snapshots(),
@@ -317,11 +316,14 @@ impl EmulatorApplication {
                     // open an async file request using rfd
                     let file_handle = AsyncFileDialog::new()
                             .set_title("Open ROM")
-                            .add_filter("GameBoy ROM Files", &["gb", "gbc"])
+                            .add_filter("GameBoy ROM Files", &[
+                                Cartridge::FILE_EXT_GB,
+                                Cartridge::FILE_EXT_GBC,
+                            ])
                             .pick_file()
                             .await?
                     ;
-                    
+
                     let file_data = file_handle.read().await;
 
                     let cartridge = Cartridge::load_from_bytes(file_data, None)
@@ -425,7 +427,7 @@ impl EmulatorApplication {
                         |i| all_modes[i].to_string()
                     )
             ;
-            
+
             if response.changed() {
                 state.ui.set_update_step_mode(all_modes[selected_index]);
             }
@@ -438,13 +440,13 @@ impl EmulatorApplication {
             let mut selected_index = *state.ui.get_device_type() as usize;
 
             let all_types = [
-                EmulatorDevice::GameBoyDmg,
-                EmulatorDevice::GameBoyPocket,
-                EmulatorDevice::GameBoyColor,
-                EmulatorDevice::GameBoyAdvance,
-                EmulatorDevice::GameBoyAdvanceSP,
-                EmulatorDevice::SuperGameBoy,
-                EmulatorDevice::SuperGameBoy2,
+                EmulatorDeviceType::GameBoyDmg,
+                EmulatorDeviceType::GameBoyPocket,
+                EmulatorDeviceType::GameBoyColor,
+                EmulatorDeviceType::GameBoyAdvance,
+                EmulatorDeviceType::GameBoyAdvanceSP,
+                EmulatorDeviceType::SuperGameBoy,
+                EmulatorDeviceType::SuperGameBoy2,
             ];
 
             let response = ComboBox::from_id_salt("device_type")
@@ -560,25 +562,25 @@ impl EmulatorApplication {
     fn handle_view_insert(&mut self) {
         if let Some(insert) = self.behaviour.take_view_insert() {
             let tile = self.tree.tiles.insert_pane(insert.view);
-            
+
             match self.tree.tiles.get_mut(insert.insert_at) {
                 Some(Tile::Container(container)) => {
                     match container {
                         Container::Tabs(tabs)     => { tabs.add_child(tile); tabs.set_active(tile); },
                         Container::Linear(linear) => { linear.add_child(tile); },
                         Container::Grid(grid)     => { grid.add_child(tile); },
-                    }                   
+                    }
                 },
-                
-                _ => { 
+
+                _ => {
                     self.tree.tiles.remove(tile);
                 }
             }
         }
     }
-    
-    
-    /// Send a single event to all views. 
+
+
+    /// Send a single event to all views.
     fn send_event(&mut self, event: UiEvent) {
         visit_tiles(
             &mut self.tree,

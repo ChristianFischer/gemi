@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
+use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
+use crate::apu::ApuState;
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::utils::{as_bit_flag, get_bit};
 
 
@@ -37,7 +38,8 @@ pub enum FrequencySweepResult {
 }
 
 
-// todo: doc
+/// Represents a frequency sweep mechanism typically within the sound emulation.
+/// Based on its parameters, this will periodically adjust the channel frequency.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FrequencySweep {
     /// Flag to store whether the frequency sweep is enabled or not.
@@ -135,7 +137,7 @@ impl FrequencySweep {
                     }
                 }
                 else {
-                    return FrequencySweepResult::None
+                    FrequencySweepResult::None
                 }
             }
         }
@@ -165,7 +167,7 @@ impl FrequencySweep {
 
 
 impl ChannelComponent for FrequencySweep {
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorClient, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             0 => {
                     NRX0_NON_READABLE_BITS
@@ -174,12 +176,12 @@ impl ChannelComponent for FrequencySweep {
                 |   ((self.period_length & 0x07) << 4)
             },
 
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorClientMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             0 => {
                 self.shift          = (value >> 0) & 0x07;
@@ -195,11 +197,11 @@ impl ChannelComponent for FrequencySweep {
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+    fn on_trigger_event(&mut self, ec: &impl EmulatorClient, apu_state: &ApuState) -> TriggerAction {
         // reload the timer
         self.reload_timer();
 
@@ -216,11 +218,11 @@ impl ChannelComponent for FrequencySweep {
             }
         }
 
-        default_on_trigger_event(apu_state)
+        default_on_trigger_event(ec, apu_state)
     }
 
 
-    fn on_reset(&mut self, _apu_state: &ApuState) {
+    fn on_reset(&mut self, _ec: &impl EmulatorClient, _apu_state: &ApuState) {
         *self = Self::default();
     }
 }

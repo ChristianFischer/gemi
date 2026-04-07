@@ -42,10 +42,10 @@ struct FileBrowserRuntime {
 struct Folder {
     /// The folder's name.
     name: String,
-    
+
     /// Subfolders of this folder.
     subdirectories: Vec<Folder>,
-    
+
     /// ROM files within this folder.
     files: Vec<PathBuf>,
 }
@@ -121,7 +121,7 @@ impl FileBrowserRuntime {
 
 impl Folder {
     /// Parse a folder's content into a [Folder] object.
-    /// This only reads `max_depth` levels into the folder structure to prevent 
+    /// This only reads `max_depth` levels into the folder structure to prevent
     /// this function from loading too much data.
     pub fn parse(path: PathBuf, max_depth: u32) -> Self {
         match path.read_dir() {

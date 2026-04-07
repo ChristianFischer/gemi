@@ -16,9 +16,9 @@
  */
 
 use crate::BoxError;
-use gemi_core::apu::apu::Apu;
-use gemi_core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
-use gemi_core::apu::{audio_output, sample};
+use libgemi::core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
+use libgemi::core::apu::Apu;
+use libgemi::core::apu::{audio_output, sample};
 use sdl3::audio::*;
 use sdl3::Sdl;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ use std::ops::Range;
 
 use egui::Ui;
 
-use gemi_core::gameboy::GameBoy;
-use gemi_core::mmu::locations::{MEMORY_LOCATION_OAM_BEGIN, MEMORY_LOCATION_SPRITES_BEGIN};
-use gemi_core::ppu::graphic_data::TileMap;
+use libgemi::core::mmu::locations::{MEMORY_LOCATION_OAM_BEGIN, MEMORY_LOCATION_SPRITES_BEGIN};
+use libgemi::core::ppu::graphic_data::TileMap;
+use libgemi::GameBoy;
 
 use crate::event::UiEvent;
 use crate::event::UiEvent::SelectionChanged;
@@ -30,6 +30,7 @@ use crate::state::EmulatorState;
 use crate::ui::memory_editor::MemoryEditor;
 use crate::ui::style::GemiStyle;
 use crate::views::View;
+
 
 /// A view to display the emulator's memory.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -42,7 +43,7 @@ impl MemoryView {
     /// Creates a new [`MemoryView`] object.
     pub fn new() -> Self {
         let mut memory_editor = MemoryEditor::new();
-        
+
         // prepare two types of highlights, one for selections one for hover
         memory_editor.add_highlight_range(GemiStyle::BACKGROUND_HIGHLIGHT_SELECTION);
         memory_editor.add_highlight_range(GemiStyle::BACKGROUND_HIGHLIGHT_HOVER);
@@ -150,12 +151,13 @@ impl MemoryView {
 
     /// Refreshes the memory map of the editor.
     fn refresh_memory_map(&mut self, state: &mut EmulatorState) {
-        let has_cartridge_ram = if let Some(cart) = state.emu.get_cartridge() {
-            cart.has_ram()
-        }
-        else {
-            false
-        };
+        let has_cartridge_ram =
+                state.emu
+                .get_cartridge()
+                .map(|cart| cart.get_cartridge_info())
+                .map(|info| info.has_ram())
+                .unwrap_or(false)
+        ;
 
         self.memory_editor.clear_memory_areas();
         self.memory_editor.add_memory_area("ROM Bank #0",      0x0000..=0x3fff, false);
@@ -176,20 +178,20 @@ impl MemoryView {
     fn display_memory_editor(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         let is_paused = state.ui.is_paused();
 
-        if let Some(emu) = state.emu.get_emulator_mut() {
+        if let Some(gb) = state.emu.get_gameboy_mut() {
             // allow editing while paused
             self.memory_editor.set_editable(is_paused);
 
             self.memory_editor.show(
                 ui,
-                emu,
+                gb,
 
                 // reading memory
-                |emu, address| {
+                |gb, address| {
                     match address {
                         // we can only read an address, if the address is in a valid 16 bit range
                         0x0000 ..= 0xffff => {
-                            let value = emu.get_mmu().read_u8(address as u16);
+                            let value = gb.read_u8(address as u16);
                             Some(value)
                         }
 
@@ -207,7 +209,7 @@ impl MemoryView {
                         /* WRAM Bank #1",     */  | 0xD000..=0xDFFF
                         /* OAM",              */  | 0xFE00..=0xFE9F
                         /* HRAM",             */  | 0xFF80..=0xFFFE => {
-                            emu.get_mmu_mut().write_u8(address as u16, value);
+                            emu.write_u8(address as u16, value);
                         }
 
                         _ => { }

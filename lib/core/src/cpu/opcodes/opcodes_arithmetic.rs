@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@
  */
 
 use crate::cpu::cpu::{CpuFlag, RegisterR16, RegisterR8};
-use crate::gameboy::GameBoy;
-use crate::utils::{carrying_add_u16, carrying_add_u8, carrying_sub_u8};
 use crate::cpu::opcode::{opcode, OpCodeContext, OpCodeResult};
+use crate::emulator_client::EmulatorClientMut;
+use crate::emulator_device::EmulatorDevice;
+use crate::utils::{carrying_add_u16, carrying_add_u8, carrying_sub_u8};
 
 
 ////////////////////////////////////////////////
@@ -43,55 +44,55 @@ pub mod inc {
     use super::*;
 
     /// Increments a 8bit value.
-    fn increment_u8v(gb: &mut GameBoy, value: u8) -> u8 {
+    fn increment_u8v(dev: &mut EmulatorDevice, value: u8) -> u8 {
         let result = value.wrapping_add(1);
 
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, (result & 0x0f) == 0);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, (result & 0x0f) == 0);
 
         result
     }
 
     /// Increments a 16bit value.
-    fn increment_u16v(_gb: &mut GameBoy, value: u16) -> u16 {
+    fn increment_u16v(_dev: &mut EmulatorDevice, value: u16) -> u16 {
         let result = value.wrapping_add(1);
         result
     }
 
     /// Increments a value
     /// r8 <- r8 + 1
-    fn increment_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = increment_u8v(gb, value);
-        gb.cpu.set_r8(r8, result);
+    fn increment_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = increment_u8v(dev, value);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Increments a value
     /// r16 <- r16 + 1
-    fn increment_r16(gb: &mut GameBoy, r16: RegisterR16) {
-        let value  = gb.cpu.get_r16(r16);
-        let result = increment_u16v(gb, value);
-        gb.cpu.set_r16(r16, result);
+    fn increment_r16(dev: &mut EmulatorDevice, r16: RegisterR16) {
+        let value  = dev.cpu.get_r16(r16);
+        let result = increment_u16v(dev, value);
+        dev.cpu.set_r16(r16, result);
     }
 
     /// Increments a value.
     /// (r16) <- (r16) + 1
-    fn increment_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
+    fn increment_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             }
 
             1 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.cpu.get_intermediate_value();
-                let result  = increment_u8v(gb, value);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.cpu.get_intermediate_value();
+                let result  = increment_u8v(dev, value);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             }
@@ -102,27 +103,27 @@ pub mod inc {
 
 
     // INC r8
-    opcode!(inc_a, [gb] increment_r8(gb, RegisterR8::A));
-    opcode!(inc_b, [gb] increment_r8(gb, RegisterR8::B));
-    opcode!(inc_c, [gb] increment_r8(gb, RegisterR8::C));
-    opcode!(inc_d, [gb] increment_r8(gb, RegisterR8::D));
-    opcode!(inc_e, [gb] increment_r8(gb, RegisterR8::E));
-    opcode!(inc_h, [gb] increment_r8(gb, RegisterR8::H));
-    opcode!(inc_l, [gb] increment_r8(gb, RegisterR8::L));
+    opcode!(inc_a, [dev] increment_r8(dev, RegisterR8::A));
+    opcode!(inc_b, [dev] increment_r8(dev, RegisterR8::B));
+    opcode!(inc_c, [dev] increment_r8(dev, RegisterR8::C));
+    opcode!(inc_d, [dev] increment_r8(dev, RegisterR8::D));
+    opcode!(inc_e, [dev] increment_r8(dev, RegisterR8::E));
+    opcode!(inc_h, [dev] increment_r8(dev, RegisterR8::H));
+    opcode!(inc_l, [dev] increment_r8(dev, RegisterR8::L));
 
     // INC r16
-    opcode!(inc_bc, [gb] increment_r16(gb, RegisterR16::BC));
-    opcode!(inc_de, [gb] increment_r16(gb, RegisterR16::DE));
-    opcode!(inc_hl, [gb] increment_r16(gb, RegisterR16::HL));
+    opcode!(inc_bc, [dev] increment_r16(dev, RegisterR16::BC));
+    opcode!(inc_de, [dev] increment_r16(dev, RegisterR16::DE));
+    opcode!(inc_hl, [dev] increment_r16(dev, RegisterR16::HL));
 
     // INC (r16)
-    opcode!(inc_hlptr, [gb, ctx] increment_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(inc_hlptr, [dev, ec, ctx] increment_r16ptr(dev, ec, ctx, RegisterR16::HL));
 
     // INC SP
-    opcode!(inc_sp, [gb] {
-        let sp_old = gb.cpu.get_stack_pointer();
+    opcode!(inc_sp, [dev] {
+        let sp_old = dev.cpu.get_stack_pointer();
         let sp_new = sp_old.wrapping_add(1);
-        gb.cpu.set_stack_pointer(sp_new);
+        dev.cpu.set_stack_pointer(sp_new);
     });
 }
 
@@ -133,55 +134,55 @@ pub mod dec {
     use super::*;
 
     /// Decrements a 8bit value.
-    fn decrement_u8v(gb: &mut GameBoy, value: u8) -> u8 {
+    fn decrement_u8v(dev: &mut EmulatorDevice, value: u8) -> u8 {
         let result = value.wrapping_sub(1);
     
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  true);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, (result & 0x0f) == 0x0f);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, true);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, (result & 0x0f) == 0x0f);
     
         result
     }
     
     /// Decrements a 16bit value.
-    fn decrement_u16v(_gb: &mut GameBoy, value: u16) -> u16 {
+    fn decrement_u16v(_dev: &mut EmulatorDevice, value: u16) -> u16 {
         let result = value.wrapping_sub(1);
         result
     }
     
     /// Decrements a value
     /// r8 <- r8 - 1
-    fn decrement_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = decrement_u8v(gb, value);
-        gb.cpu.set_r8(r8, result);
+    fn decrement_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = decrement_u8v(dev, value);
+        dev.cpu.set_r8(r8, result);
     }
     
     /// Decrements a value
     /// r16 <- r16 - 1
-    fn decrement_r16(gb: &mut GameBoy, r16: RegisterR16) {
-        let value  = gb.cpu.get_r16(r16);
-        let result = decrement_u16v(gb, value);
-        gb.cpu.set_r16(r16, result);
+    fn decrement_r16(dev: &mut EmulatorDevice, r16: RegisterR16) {
+        let value  = dev.cpu.get_r16(r16);
+        let result = decrement_u16v(dev, value);
+        dev.cpu.set_r16(r16, result);
     }
     
     /// Decrements a value.
     /// (r16) <- (r16) - 1
-    fn decrement_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
+    fn decrement_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             },
 
             1 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value = gb.cpu.get_intermediate_value();
-                let result  = decrement_u8v(gb, value);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value = dev.cpu.get_intermediate_value();
+                let result  = decrement_u8v(dev, value);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             },
@@ -192,27 +193,27 @@ pub mod dec {
     
 
     // DEC r8
-    opcode!(dec_a, [gb] decrement_r8(gb, RegisterR8::A));    
-    opcode!(dec_b, [gb] decrement_r8(gb, RegisterR8::B));    
-    opcode!(dec_c, [gb] decrement_r8(gb, RegisterR8::C));    
-    opcode!(dec_d, [gb] decrement_r8(gb, RegisterR8::D));    
-    opcode!(dec_e, [gb] decrement_r8(gb, RegisterR8::E));    
-    opcode!(dec_h, [gb] decrement_r8(gb, RegisterR8::H));    
-    opcode!(dec_l, [gb] decrement_r8(gb, RegisterR8::L));
+    opcode!(dec_a, [dev] decrement_r8(dev, RegisterR8::A));
+    opcode!(dec_b, [dev] decrement_r8(dev, RegisterR8::B));
+    opcode!(dec_c, [dev] decrement_r8(dev, RegisterR8::C));
+    opcode!(dec_d, [dev] decrement_r8(dev, RegisterR8::D));
+    opcode!(dec_e, [dev] decrement_r8(dev, RegisterR8::E));
+    opcode!(dec_h, [dev] decrement_r8(dev, RegisterR8::H));
+    opcode!(dec_l, [dev] decrement_r8(dev, RegisterR8::L));
 
     // DEC r16
-    opcode!(dec_bc, [gb] decrement_r16(gb, RegisterR16::BC));    
-    opcode!(dec_de, [gb] decrement_r16(gb, RegisterR16::DE));    
-    opcode!(dec_hl, [gb] decrement_r16(gb, RegisterR16::HL));
+    opcode!(dec_bc, [dev] decrement_r16(dev, RegisterR16::BC));
+    opcode!(dec_de, [dev] decrement_r16(dev, RegisterR16::DE));
+    opcode!(dec_hl, [dev] decrement_r16(dev, RegisterR16::HL));
 
     // DEC (r16)
-    opcode!(dec_hlptr, [gb, ctx] decrement_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(dec_hlptr, [dev, ec, ctx] decrement_r16ptr(dev, ec, ctx, RegisterR16::HL));
 
     // DEC SP
-    opcode!(dec_sp, [gb] {
-        let sp_old = gb.cpu.get_stack_pointer();
+    opcode!(dec_sp, [dev] {
+        let sp_old = dev.cpu.get_stack_pointer();
         let sp_new = sp_old.wrapping_sub(1);
-        gb.cpu.set_stack_pointer(sp_new);
+        dev.cpu.set_stack_pointer(sp_new);
     });
 }
 
@@ -224,88 +225,88 @@ pub mod add {
 
     /// Adds two values and stores it into a 8bit register.
     /// r8 <- r8 + value + (carry flag, if add_carry)
-    fn add_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8, add_carry: bool) {
-        let current_carry = add_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
-        let current_value = gb.cpu.get_r8(r8);
+    fn add_r8_u8v(dev: &mut EmulatorDevice, r8: RegisterR8, value: u8, add_carry: bool) {
+        let current_carry = add_carry && dev.cpu.is_flag_set(CpuFlag::Carry);
+        let current_value = dev.cpu.get_r8(r8);
         let (result, half_carry, carry) = carrying_add_u8(current_value, value, current_carry);
 
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
-        gb.cpu.set_flag(CpuFlag::Carry,     carry);
-        gb.cpu.set_r8(r8, result as u8);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+        dev.cpu.set_flag(CpuFlag::Carry, carry);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Adds two values and stores it into a 8bit register.
     /// dst <- dst + u8 + (carry flag, if add_carry)
-    fn add_r8_u8(gb: &mut GameBoy, dst: RegisterR8, add_carry: bool) {
-        let value = gb.cpu.fetch_u8();
-        add_r8_u8v(gb, dst, value, add_carry);
+    fn add_r8_u8(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, add_carry: bool) {
+        let value = dev.cpu.fetch_u8(ec);
+        add_r8_u8v(dev, dst, value, add_carry);
     }
 
     /// Adds two values and stores it into a 8bit register.
     /// dst <- dst + src + (carry flag, if add_carry)
-    fn add_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8, add_carry: bool) {
-        let value = gb.cpu.get_r8(src);
-        add_r8_u8v(gb, dst, value, add_carry);
+    fn add_r8_r8(dev: &mut EmulatorDevice, _ec: &mut impl EmulatorClientMut, dst: RegisterR8, src: RegisterR8, add_carry: bool) {
+        let value = dev.cpu.get_r8(src);
+        add_r8_u8v(dev, dst, value, add_carry);
     }
 
     /// Adds two values and stores it into a 8bit register.
     /// dst <- dst + (src_ptr) + (carry flag, if add_carry)
-    fn add_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16, add_carry: bool) {
-        let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.get_mmu().read_u8(address);
-        add_r8_u8v(gb, dst, value, add_carry);
+    fn add_r8_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, src_ptr: RegisterR16, add_carry: bool) {
+        let address = dev.cpu.get_r16(src_ptr);
+        let value   = dev.get_mmu().read_u8(ec, address);
+        add_r8_u8v(dev, dst, value, add_carry);
     }
 
     /// Adds two values and stores it into a 16bit register.
     /// r16 <- r16 + value
-    fn add_r16_u16v(gb: &mut GameBoy, r16: RegisterR16, value: u16) {
-        let current_value = gb.cpu.get_r16(r16);
+    fn add_r16_u16v(dev: &mut EmulatorDevice, r16: RegisterR16, value: u16) {
+        let current_value = dev.cpu.get_r16(r16);
         let (result, half_carry, carry) = carrying_add_u16(current_value, value, false);
 
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
-        gb.cpu.set_flag(CpuFlag::Carry,     carry);
-        gb.cpu.set_r16(r16, result as u16);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+        dev.cpu.set_flag(CpuFlag::Carry, carry);
+        dev.cpu.set_r16(r16, result);
     }
 
     /// Adds two values and stores it into a 16bit register.
     /// dst <- dst + src
-    fn add_r16_r16(gb: &mut GameBoy, dst: RegisterR16, src: RegisterR16) {
-        let value = gb.cpu.get_r16(src);
-        add_r16_u16v(gb, dst, value);
+    fn add_r16_r16(dev: &mut EmulatorDevice, dst: RegisterR16, src: RegisterR16) {
+        let value = dev.cpu.get_r16(src);
+        add_r16_u16v(dev, dst, value);
     }
 
 
     // ADD r8, ?
-    opcode!(add_a_u8,    [gb] add_r8_u8(gb, RegisterR8::A, false));
-    opcode!(add_a_a,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::A, false));
-    opcode!(add_a_b,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::B, false));
-    opcode!(add_a_c,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::C, false));
-    opcode!(add_a_d,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::D, false));
-    opcode!(add_a_e,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::E, false));
-    opcode!(add_a_h,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::H, false));
-    opcode!(add_a_l,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::L, false));
-    opcode!(add_a_hlptr, [gb] add_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL, false));
+    opcode!(add_a_u8,    [dev, ec] add_r8_u8(dev, ec, RegisterR8::A, false));
+    opcode!(add_a_a,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A, false));
+    opcode!(add_a_b,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B, false));
+    opcode!(add_a_c,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C, false));
+    opcode!(add_a_d,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D, false));
+    opcode!(add_a_e,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E, false));
+    opcode!(add_a_h,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H, false));
+    opcode!(add_a_l,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L, false));
+    opcode!(add_a_hlptr, [dev, ec] add_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL, false));
 
     // add with carry flag
     // ADC r8, ?
-    opcode!(adc_a_u8,    [gb] add_r8_u8(gb, RegisterR8::A, true));
-    opcode!(adc_a_a,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::A, true));
-    opcode!(adc_a_b,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::B, true));
-    opcode!(adc_a_c,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::C, true));
-    opcode!(adc_a_d,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::D, true));
-    opcode!(adc_a_e,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::E, true));
-    opcode!(adc_a_h,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::H, true));
-    opcode!(adc_a_l,     [gb] add_r8_r8(gb, RegisterR8::A, RegisterR8::L, true));
-    opcode!(adc_a_hlptr, [gb] add_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL, true));
+    opcode!(adc_a_u8,    [dev, ec] add_r8_u8(dev, ec, RegisterR8::A, true));
+    opcode!(adc_a_a,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A, true));
+    opcode!(adc_a_b,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B, true));
+    opcode!(adc_a_c,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C, true));
+    opcode!(adc_a_d,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D, true));
+    opcode!(adc_a_e,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E, true));
+    opcode!(adc_a_h,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H, true));
+    opcode!(adc_a_l,     [dev, ec] add_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L, true));
+    opcode!(adc_a_hlptr, [dev, ec] add_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL, true));
 
     // ADD r16, r16
-    opcode!(add_hl_bc, [gb] add_r16_r16(gb, RegisterR16::HL, RegisterR16::BC));
-    opcode!(add_hl_de, [gb] add_r16_r16(gb, RegisterR16::HL, RegisterR16::DE));
-    opcode!(add_hl_hl, [gb] add_r16_r16(gb, RegisterR16::HL, RegisterR16::HL));
-    opcode!(add_hl_sp, [gb] add_r16_u16v(gb, RegisterR16::HL, gb.cpu.get_stack_pointer()));
+    opcode!(add_hl_bc, [dev] add_r16_r16(dev, RegisterR16::HL, RegisterR16::BC));
+    opcode!(add_hl_de, [dev] add_r16_r16(dev, RegisterR16::HL, RegisterR16::DE));
+    opcode!(add_hl_hl, [dev] add_r16_r16(dev, RegisterR16::HL, RegisterR16::HL));
+    opcode!(add_hl_sp, [dev] add_r16_u16v(dev, RegisterR16::HL, dev.cpu.get_stack_pointer()));
 }
 
 
@@ -316,63 +317,63 @@ pub mod sub {
 
     /// Subtracts a value from another one and stores the result into a 8bit register.
     /// r8 <- r8 - value - (carry flag, if sub_carry)
-    fn sub_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8, sub_carry: bool) {
-        let current_carry = sub_carry && gb.cpu.is_flag_set(CpuFlag::Carry);
-        let current_value = gb.cpu.get_r8(r8);
+    fn sub_r8_u8v(dev: &mut EmulatorDevice, r8: RegisterR8, value: u8, sub_carry: bool) {
+        let current_carry = sub_carry && dev.cpu.is_flag_set(CpuFlag::Carry);
+        let current_value = dev.cpu.get_r8(r8);
         let (result, half_carry, carry) = carrying_sub_u8(current_value, value, current_carry);
 
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  true);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
-        gb.cpu.set_flag(CpuFlag::Carry,     carry);
-        gb.cpu.set_r8(r8, result as u8);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, true);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+        dev.cpu.set_flag(CpuFlag::Carry, carry);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Adds two values and stores it into a 8bit register.
     /// dst <- dst + u8 + (carry flag, if add_carry)
-    fn sub_r8_u8(gb: &mut GameBoy, dst: RegisterR8, add_carry: bool) {
-        let value = gb.cpu.fetch_u8();
-        sub_r8_u8v(gb, dst, value, add_carry);
+    fn sub_r8_u8(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, add_carry: bool) {
+        let value = dev.cpu.fetch_u8(ec);
+        sub_r8_u8v(dev, dst, value, add_carry);
     }
 
     /// Subtracts a value from another one and stores the result into a 8bit register.
     /// dst <- dst - src - (carry flag, if sub_carry)
-    fn sub_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8, sub_carry: bool) {
-        let value = gb.cpu.get_r8(src);
-        sub_r8_u8v(gb, dst, value, sub_carry);
+    fn sub_r8_r8(dev: &mut EmulatorDevice, _ec: &mut impl EmulatorClientMut, dst: RegisterR8, src: RegisterR8, sub_carry: bool) {
+        let value = dev.cpu.get_r8(src);
+        sub_r8_u8v(dev, dst, value, sub_carry);
     }
 
     /// Subtracts a value from another one and stores the result into a 8bit register.
     /// dst <- dst - (src_ptr) - (carry flag, if sub_carry)
-    fn sub_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16, sub_carry: bool) {
-        let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.get_mmu().read_u8(address);
-        sub_r8_u8v(gb, dst, value, sub_carry);
+    fn sub_r8_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, src_ptr: RegisterR16, sub_carry: bool) {
+        let address = dev.cpu.get_r16(src_ptr);
+        let value   = dev.get_mmu().read_u8(ec, address);
+        sub_r8_u8v(dev, dst, value, sub_carry);
     }
 
 
     // SUB r8, ?
-    opcode!(sub_a_u8,    [gb] sub_r8_u8(gb, RegisterR8::A, false));
-    opcode!(sub_a_a,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::A, false));
-    opcode!(sub_a_b,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::B, false));
-    opcode!(sub_a_c,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::C, false));
-    opcode!(sub_a_d,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::D, false));
-    opcode!(sub_a_e,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::E, false));
-    opcode!(sub_a_h,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::H, false));
-    opcode!(sub_a_l,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::L, false));
-    opcode!(sub_a_hlptr, [gb] sub_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL, false));
+    opcode!(sub_a_u8,    [dev, ec] sub_r8_u8(dev, ec, RegisterR8::A, false));
+    opcode!(sub_a_a,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A, false));
+    opcode!(sub_a_b,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B, false));
+    opcode!(sub_a_c,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C, false));
+    opcode!(sub_a_d,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D, false));
+    opcode!(sub_a_e,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E, false));
+    opcode!(sub_a_h,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H, false));
+    opcode!(sub_a_l,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L, false));
+    opcode!(sub_a_hlptr, [dev, ec] sub_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL, false));
 
     // subtract with carry flag
     // SUB r8, ?
-    opcode!(sbc_a_u8,    [gb] sub_r8_u8(gb, RegisterR8::A, true));
-    opcode!(sbc_a_a,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::A, true));
-    opcode!(sbc_a_b,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::B, true));
-    opcode!(sbc_a_c,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::C, true));
-    opcode!(sbc_a_d,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::D, true));
-    opcode!(sbc_a_e,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::E, true));
-    opcode!(sbc_a_h,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::H, true));
-    opcode!(sbc_a_l,     [gb] sub_r8_r8(gb, RegisterR8::A, RegisterR8::L, true));
-    opcode!(sbc_a_hlptr, [gb] sub_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL, true));
+    opcode!(sbc_a_u8,    [dev, ec] sub_r8_u8(dev, ec, RegisterR8::A, true));
+    opcode!(sbc_a_a,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A, true));
+    opcode!(sbc_a_b,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B, true));
+    opcode!(sbc_a_c,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C, true));
+    opcode!(sbc_a_d,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D, true));
+    opcode!(sbc_a_e,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E, true));
+    opcode!(sbc_a_h,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H, true));
+    opcode!(sbc_a_l,     [dev, ec] sub_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L, true));
+    opcode!(sbc_a_hlptr, [dev, ec] sub_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL, true));
 }
 
 
@@ -382,13 +383,13 @@ pub mod rl {
     use super::*;
 
     /// Shifts or rotates a value to the left.
-    fn shift_left_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
-        shift_left_u8v_nc(gb, value, op, NullCheck::Check)
+    fn shift_left_u8v(dev: &mut EmulatorDevice, value: u8, op: ShiftOp) -> u8 {
+        shift_left_u8v_nc(dev, value, op, NullCheck::Check)
     }
 
     /// Shifts or rotates a value to the left.
-    fn shift_left_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
-        let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
+    fn shift_left_u8v_nc(dev: &mut EmulatorDevice, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
+        let carry    = dev.cpu.is_flag_set(CpuFlag::Carry) as u8;
         let left_bit = (value >> 7) & 1;
 
         let result = match op {
@@ -403,30 +404,30 @@ pub mod rl {
             NullCheck::ClearFlag => false,
         };
 
-        gb.cpu.set_flag(CpuFlag::Zero,      null_bit);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, false);
-        gb.cpu.set_flag(CpuFlag::Carry,     left_bit != 0);
+        dev.cpu.set_flag(CpuFlag::Zero, null_bit);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, false);
+        dev.cpu.set_flag(CpuFlag::Carry, left_bit != 0);
 
         result
     }
 
     /// Shifts or rotates a value on a 16bit pointer to the left.
-    fn shift_left_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16, op: ShiftOp) -> OpCodeResult {
+    fn shift_left_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16, op: ShiftOp) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             }
 
             1 => {
-                let address = gb.cpu.get_r16(r16ptr);
-                let value   = gb.cpu.get_intermediate_value();
-                let result  = shift_left_u8v(gb, value, op);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16ptr);
+                let value   = dev.cpu.get_intermediate_value();
+                let result  = shift_left_u8v(dev, value, op);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             }
@@ -436,84 +437,84 @@ pub mod rl {
     }
 
     /// Performs an arithmetic shift left of the value of a register.
-    fn sla_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_left_u8v(gb, value, ShiftOp::ShiftArithmetic);
-        gb.cpu.set_r8(r8, result);
+    fn sla_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_left_u8v(dev, value, ShiftOp::ShiftArithmetic);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Performs an arithmetic shift left of the value on a memory location.
-    fn sla_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_left_r16ptr(gb, ctx, r16ptr, ShiftOp::ShiftArithmetic)
+    fn sla_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_left_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::ShiftArithmetic)
     }
 
     /// Rotates the value of a register to the left through the carry flag.
-    fn rl_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        rl_r8_nc(gb, r8, NullCheck::Check);
+    fn rl_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        rl_r8_nc(dev, r8, NullCheck::Check);
     }
 
     /// Rotates the value of a register to the left through the carry flag.
-    fn rl_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_left_u8v_nc(gb, value, ShiftOp::RotateThroughCarry, nullcheck);
-        gb.cpu.set_r8(r8, result);
+    fn rl_r8_nc(dev: &mut EmulatorDevice, r8: RegisterR8, nullcheck: NullCheck) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_left_u8v_nc(dev, value, ShiftOp::RotateThroughCarry, nullcheck);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Rotates the value on a memory location to the left through the carry flag.
-    fn rl_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_left_r16ptr(gb, ctx, r16ptr, ShiftOp::RotateThroughCarry)
+    fn rl_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_left_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::RotateThroughCarry)
     }
 
     /// Rotates the value of a register to the left.
-    fn rlc_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        rlc_r8_nc(gb, r8, NullCheck::Check);
+    fn rlc_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        rlc_r8_nc(dev, r8, NullCheck::Check);
     }
 
     /// Rotates the value of a register to the left.
-    fn rlc_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_left_u8v_nc(gb, value, ShiftOp::Rotate, nullcheck);
-        gb.cpu.set_r8(r8, result);
+    fn rlc_r8_nc(dev: &mut EmulatorDevice, r8: RegisterR8, nullcheck: NullCheck) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_left_u8v_nc(dev, value, ShiftOp::Rotate, nullcheck);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Rotates the value on a memory location to the left.
-    fn rlc_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_left_r16ptr(gb, ctx, r16ptr, ShiftOp::Rotate)
+    fn rlc_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_left_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::Rotate)
     }
 
 
     // arithmetic shift left
-    opcode!(sla_a,     [gb] sla_r8(gb, RegisterR8::A));
-    opcode!(sla_b,     [gb] sla_r8(gb, RegisterR8::B));
-    opcode!(sla_c,     [gb] sla_r8(gb, RegisterR8::C));
-    opcode!(sla_d,     [gb] sla_r8(gb, RegisterR8::D));
-    opcode!(sla_e,     [gb] sla_r8(gb, RegisterR8::E));
-    opcode!(sla_h,     [gb] sla_r8(gb, RegisterR8::H));
-    opcode!(sla_l,     [gb] sla_r8(gb, RegisterR8::L));
+    opcode!(sla_a,     [dev] sla_r8(dev, RegisterR8::A));
+    opcode!(sla_b,     [dev] sla_r8(dev, RegisterR8::B));
+    opcode!(sla_c,     [dev] sla_r8(dev, RegisterR8::C));
+    opcode!(sla_d,     [dev] sla_r8(dev, RegisterR8::D));
+    opcode!(sla_e,     [dev] sla_r8(dev, RegisterR8::E));
+    opcode!(sla_h,     [dev] sla_r8(dev, RegisterR8::H));
+    opcode!(sla_l,     [dev] sla_r8(dev, RegisterR8::L));
 
     // rotate left through carry flag
-    opcode!(rla,      [gb] rl_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
-    opcode!(rl_a,     [gb] rl_r8(gb, RegisterR8::A));
-    opcode!(rl_b,     [gb] rl_r8(gb, RegisterR8::B));
-    opcode!(rl_c,     [gb] rl_r8(gb, RegisterR8::C));
-    opcode!(rl_d,     [gb] rl_r8(gb, RegisterR8::D));
-    opcode!(rl_e,     [gb] rl_r8(gb, RegisterR8::E));
-    opcode!(rl_h,     [gb] rl_r8(gb, RegisterR8::H));
-    opcode!(rl_l,     [gb] rl_r8(gb, RegisterR8::L));
+    opcode!(rla,       [dev] rl_r8_nc(dev, RegisterR8::A, NullCheck::ClearFlag));
+    opcode!(rl_a,      [dev] rl_r8(dev, RegisterR8::A));
+    opcode!(rl_b,      [dev] rl_r8(dev, RegisterR8::B));
+    opcode!(rl_c,      [dev] rl_r8(dev, RegisterR8::C));
+    opcode!(rl_d,      [dev] rl_r8(dev, RegisterR8::D));
+    opcode!(rl_e,      [dev] rl_r8(dev, RegisterR8::E));
+    opcode!(rl_h,      [dev] rl_r8(dev, RegisterR8::H));
+    opcode!(rl_l,      [dev] rl_r8(dev, RegisterR8::L));
 
     // rotate left (carry flag just set)
-    opcode!(rlca,      [gb] rlc_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
-    opcode!(rlc_a,     [gb] rlc_r8(gb, RegisterR8::A));
-    opcode!(rlc_b,     [gb] rlc_r8(gb, RegisterR8::B));
-    opcode!(rlc_c,     [gb] rlc_r8(gb, RegisterR8::C));
-    opcode!(rlc_d,     [gb] rlc_r8(gb, RegisterR8::D));
-    opcode!(rlc_e,     [gb] rlc_r8(gb, RegisterR8::E));
-    opcode!(rlc_h,     [gb] rlc_r8(gb, RegisterR8::H));
-    opcode!(rlc_l,     [gb] rlc_r8(gb, RegisterR8::L));
+    opcode!(rlca,      [dev] rlc_r8_nc(dev, RegisterR8::A, NullCheck::ClearFlag));
+    opcode!(rlc_a,     [dev] rlc_r8(dev, RegisterR8::A));
+    opcode!(rlc_b,     [dev] rlc_r8(dev, RegisterR8::B));
+    opcode!(rlc_c,     [dev] rlc_r8(dev, RegisterR8::C));
+    opcode!(rlc_d,     [dev] rlc_r8(dev, RegisterR8::D));
+    opcode!(rlc_e,     [dev] rlc_r8(dev, RegisterR8::E));
+    opcode!(rlc_h,     [dev] rlc_r8(dev, RegisterR8::H));
+    opcode!(rlc_l,     [dev] rlc_r8(dev, RegisterR8::L));
 
-    opcode!(sla_hlptr, [gb, ctx] sla_r16ptr(gb, ctx, RegisterR16::HL));
-    opcode!(rl_hlptr,  [gb, ctx] rl_r16ptr (gb, ctx, RegisterR16::HL));
-    opcode!(rlc_hlptr, [gb, ctx] rlc_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(sla_hlptr, [dev, ec, ctx] sla_r16ptr(dev, ec, ctx, RegisterR16::HL));
+    opcode!(rl_hlptr,  [dev, ec, ctx] rl_r16ptr (dev, ec, ctx, RegisterR16::HL));
+    opcode!(rlc_hlptr, [dev, ec, ctx] rlc_r16ptr(dev, ec, ctx, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -522,13 +523,13 @@ pub mod rr {
     use super::*;
 
     /// Shifts or rotates a value to the right.
-    fn shift_right_u8v(gb: &mut GameBoy, value: u8, op: ShiftOp) -> u8 {
-        shift_right_u8v_nc(gb, value, op, NullCheck::Check)
+    fn shift_right_u8v(dev: &mut EmulatorDevice, value: u8, op: ShiftOp) -> u8 {
+        shift_right_u8v_nc(dev, value, op, NullCheck::Check)
     }
 
     /// Shifts or rotates a value to the right.
-    fn shift_right_u8v_nc(gb: &mut GameBoy, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
-        let carry    = gb.cpu.is_flag_set(CpuFlag::Carry) as u8;
+    fn shift_right_u8v_nc(dev: &mut EmulatorDevice, value: u8, op: ShiftOp, nullcheck: NullCheck) -> u8 {
+        let carry    = dev.cpu.is_flag_set(CpuFlag::Carry) as u8;
         let left_bit = (value >> 7) & 1;
         let right_bit= value & 1;
 
@@ -544,30 +545,30 @@ pub mod rr {
             NullCheck::ClearFlag => false,
         };
 
-        gb.cpu.set_flag(CpuFlag::Zero,      null_bit);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, false);
-        gb.cpu.set_flag(CpuFlag::Carry,     right_bit != 0);
+        dev.cpu.set_flag(CpuFlag::Zero, null_bit);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, false);
+        dev.cpu.set_flag(CpuFlag::Carry, right_bit != 0);
 
         result
     }
 
     /// Shifts or rotates a value on a 16bit pointer to the right.
-    fn shift_right_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16, op: ShiftOp) -> OpCodeResult {
+    fn shift_right_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16, op: ShiftOp) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             }
 
             1 => {
-                let address = gb.cpu.get_r16(r16ptr);
-                let value   = gb.cpu.get_intermediate_value();
-                let result  = shift_right_u8v(gb, value, op);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16ptr);
+                let value   = dev.cpu.get_intermediate_value();
+                let result  = shift_right_u8v(dev, value, op);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             }
@@ -578,106 +579,106 @@ pub mod rr {
 
 
     /// Performs an arithmetic shift right of the value of a register.
-    fn sra_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_right_u8v(gb, value, ShiftOp::ShiftArithmetic);
-        gb.cpu.set_r8(r8, result);
+    fn sra_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_right_u8v(dev, value, ShiftOp::ShiftArithmetic);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Performs an arithmetic shift right of the value on a memory location.
-    fn sra_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::ShiftArithmetic)
+    fn sra_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::ShiftArithmetic)
     }
 
     /// Performs an arithmetic shift right of the value of a register.
-    fn srl_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_right_u8v(gb, value, ShiftOp::ShiftLogical);
-        gb.cpu.set_r8(r8, result);
+    fn srl_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_right_u8v(dev, value, ShiftOp::ShiftLogical);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Performs an arithmetic shift right of the value on a memory location.
-    fn srl_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::ShiftLogical)
+    fn srl_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::ShiftLogical)
     }
 
     /// Rotates the value of a register to the right through the carry flag.
-    fn rr_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        rr_r8_nc(gb, r8, NullCheck::Check);
+    fn rr_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        rr_r8_nc(dev, r8, NullCheck::Check);
     }
 
     /// Rotates the value of a register to the right through the carry flag.
-    fn rr_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_right_u8v_nc(gb, value, ShiftOp::RotateThroughCarry, nullcheck);
-        gb.cpu.set_r8(r8, result);
+    fn rr_r8_nc(dev: &mut EmulatorDevice, r8: RegisterR8, nullcheck: NullCheck) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_right_u8v_nc(dev, value, ShiftOp::RotateThroughCarry, nullcheck);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Rotates the value on a memory location to the right through the carry flag.
-    fn rr_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::RotateThroughCarry)
+    fn rr_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::RotateThroughCarry)
     }
 
     /// Rotates the value of a register to the right.
-    fn rrc_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        rrc_r8_nc(gb, r8, NullCheck::Check);
+    fn rrc_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        rrc_r8_nc(dev, r8, NullCheck::Check);
     }
 
     /// Rotates the value of a register to the right.
-    fn rrc_r8_nc(gb: &mut GameBoy, r8: RegisterR8, nullcheck: NullCheck) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = shift_right_u8v_nc(gb, value, ShiftOp::Rotate, nullcheck);
-        gb.cpu.set_r8(r8, result);
+    fn rrc_r8_nc(dev: &mut EmulatorDevice, r8: RegisterR8, nullcheck: NullCheck) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = shift_right_u8v_nc(dev, value, ShiftOp::Rotate, nullcheck);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Rotates the value on a memory location to the right.
-    fn rrc_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
-        shift_right_r16ptr(gb, ctx, r16ptr, ShiftOp::Rotate)
+    fn rrc_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16ptr: RegisterR16) -> OpCodeResult {
+        shift_right_r16ptr(dev, ec, ctx, r16ptr, ShiftOp::Rotate)
     }
 
 
     // arithmetic shift right
-    opcode!(sra_a,     [gb] sra_r8(gb, RegisterR8::A));
-    opcode!(sra_b,     [gb] sra_r8(gb, RegisterR8::B));
-    opcode!(sra_c,     [gb] sra_r8(gb, RegisterR8::C));
-    opcode!(sra_d,     [gb] sra_r8(gb, RegisterR8::D));
-    opcode!(sra_e,     [gb] sra_r8(gb, RegisterR8::E));
-    opcode!(sra_h,     [gb] sra_r8(gb, RegisterR8::H));
-    opcode!(sra_l,     [gb] sra_r8(gb, RegisterR8::L));
+    opcode!(sra_a,     [dev] sra_r8(dev, RegisterR8::A));
+    opcode!(sra_b,     [dev] sra_r8(dev, RegisterR8::B));
+    opcode!(sra_c,     [dev] sra_r8(dev, RegisterR8::C));
+    opcode!(sra_d,     [dev] sra_r8(dev, RegisterR8::D));
+    opcode!(sra_e,     [dev] sra_r8(dev, RegisterR8::E));
+    opcode!(sra_h,     [dev] sra_r8(dev, RegisterR8::H));
+    opcode!(sra_l,     [dev] sra_r8(dev, RegisterR8::L));
 
     // logical shift right
-    opcode!(srl_a,     [gb] srl_r8(gb, RegisterR8::A));
-    opcode!(srl_b,     [gb] srl_r8(gb, RegisterR8::B));
-    opcode!(srl_c,     [gb] srl_r8(gb, RegisterR8::C));
-    opcode!(srl_d,     [gb] srl_r8(gb, RegisterR8::D));
-    opcode!(srl_e,     [gb] srl_r8(gb, RegisterR8::E));
-    opcode!(srl_h,     [gb] srl_r8(gb, RegisterR8::H));
-    opcode!(srl_l,     [gb] srl_r8(gb, RegisterR8::L));
+    opcode!(srl_a,     [dev] srl_r8(dev, RegisterR8::A));
+    opcode!(srl_b,     [dev] srl_r8(dev, RegisterR8::B));
+    opcode!(srl_c,     [dev] srl_r8(dev, RegisterR8::C));
+    opcode!(srl_d,     [dev] srl_r8(dev, RegisterR8::D));
+    opcode!(srl_e,     [dev] srl_r8(dev, RegisterR8::E));
+    opcode!(srl_h,     [dev] srl_r8(dev, RegisterR8::H));
+    opcode!(srl_l,     [dev] srl_r8(dev, RegisterR8::L));
 
     // rotate right through carry flag
-    opcode!(rra,      [gb] rr_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
-    opcode!(rr_a,     [gb] rr_r8(gb, RegisterR8::A));
-    opcode!(rr_b,     [gb] rr_r8(gb, RegisterR8::B));
-    opcode!(rr_c,     [gb] rr_r8(gb, RegisterR8::C));
-    opcode!(rr_d,     [gb] rr_r8(gb, RegisterR8::D));
-    opcode!(rr_e,     [gb] rr_r8(gb, RegisterR8::E));
-    opcode!(rr_h,     [gb] rr_r8(gb, RegisterR8::H));
-    opcode!(rr_l,     [gb] rr_r8(gb, RegisterR8::L));
+    opcode!(rra,       [dev] rr_r8_nc(dev, RegisterR8::A, NullCheck::ClearFlag));
+    opcode!(rr_a,      [dev] rr_r8(dev, RegisterR8::A));
+    opcode!(rr_b,      [dev] rr_r8(dev, RegisterR8::B));
+    opcode!(rr_c,      [dev] rr_r8(dev, RegisterR8::C));
+    opcode!(rr_d,      [dev] rr_r8(dev, RegisterR8::D));
+    opcode!(rr_e,      [dev] rr_r8(dev, RegisterR8::E));
+    opcode!(rr_h,      [dev] rr_r8(dev, RegisterR8::H));
+    opcode!(rr_l,      [dev] rr_r8(dev, RegisterR8::L));
 
     // rotate right (carry flag just set)
-    opcode!(rrca,      [gb] rrc_r8_nc(gb, RegisterR8::A, NullCheck::ClearFlag));
-    opcode!(rrc_a,     [gb] rrc_r8(gb, RegisterR8::A));
-    opcode!(rrc_b,     [gb] rrc_r8(gb, RegisterR8::B));
-    opcode!(rrc_c,     [gb] rrc_r8(gb, RegisterR8::C));
-    opcode!(rrc_d,     [gb] rrc_r8(gb, RegisterR8::D));
-    opcode!(rrc_e,     [gb] rrc_r8(gb, RegisterR8::E));
-    opcode!(rrc_h,     [gb] rrc_r8(gb, RegisterR8::H));
-    opcode!(rrc_l,     [gb] rrc_r8(gb, RegisterR8::L));
+    opcode!(rrca,      [dev] rrc_r8_nc(dev, RegisterR8::A, NullCheck::ClearFlag));
+    opcode!(rrc_a,     [dev] rrc_r8(dev, RegisterR8::A));
+    opcode!(rrc_b,     [dev] rrc_r8(dev, RegisterR8::B));
+    opcode!(rrc_c,     [dev] rrc_r8(dev, RegisterR8::C));
+    opcode!(rrc_d,     [dev] rrc_r8(dev, RegisterR8::D));
+    opcode!(rrc_e,     [dev] rrc_r8(dev, RegisterR8::E));
+    opcode!(rrc_h,     [dev] rrc_r8(dev, RegisterR8::H));
+    opcode!(rrc_l,     [dev] rrc_r8(dev, RegisterR8::L));
 
-    opcode!(sra_hlptr, [gb, ctx] sra_r16ptr(gb, ctx, RegisterR16::HL));
-    opcode!(srl_hlptr, [gb, ctx] srl_r16ptr(gb, ctx, RegisterR16::HL));
-    opcode!(rr_hlptr,  [gb, ctx] rr_r16ptr (gb, ctx, RegisterR16::HL));
-    opcode!(rrc_hlptr, [gb, ctx] rrc_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(sra_hlptr, [dev, ec, ctx] sra_r16ptr(dev, ec, ctx, RegisterR16::HL));
+    opcode!(srl_hlptr, [dev, ec, ctx] srl_r16ptr(dev, ec, ctx, RegisterR16::HL));
+    opcode!(rr_hlptr,  [dev, ec, ctx] rr_r16ptr (dev, ec, ctx, RegisterR16::HL));
+    opcode!(rrc_hlptr, [dev, ec, ctx] rrc_r16ptr(dev, ec, ctx, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -686,40 +687,40 @@ pub mod swap {
     use super::*;
 
     /// Swaps the low and high nibble of a byte.
-    fn swap_nibbles_u8v(gb: &mut GameBoy, value: u8) -> u8 {
+    fn swap_nibbles_u8v(dev: &mut EmulatorDevice, value: u8) -> u8 {
         let low   = (value >> 0) & 0x0f;
         let high  = (value >> 4) & 0x0f;
         let result = (low << 4) | (high);
 
-        gb.cpu.clear_flags();
-        gb.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.clear_flags();
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
 
         result
     }
 
     /// Swaps the low and high nibble of a 8bit register.
-    fn swap_r8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = swap_nibbles_u8v(gb, value);
-        gb.cpu.set_r8(r8, result);
+    fn swap_r8(dev: &mut EmulatorDevice, r8: RegisterR8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = swap_nibbles_u8v(dev, value);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Swaps the low and high nibble of a byte at the address of a 16bit register pointer.
-    fn swap_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
+    fn swap_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16_ptr: RegisterR16) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             }
 
             1 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.cpu.get_intermediate_value();
-                let result  = swap_nibbles_u8v(gb, value);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.cpu.get_intermediate_value();
+                let result  = swap_nibbles_u8v(dev, value);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             }
@@ -730,15 +731,15 @@ pub mod swap {
 
 
     // swap low and high nibbles of registers
-    opcode!(swap_a,     [gb] swap_r8(gb, RegisterR8::A));
-    opcode!(swap_b,     [gb] swap_r8(gb, RegisterR8::B));
-    opcode!(swap_c,     [gb] swap_r8(gb, RegisterR8::C));
-    opcode!(swap_d,     [gb] swap_r8(gb, RegisterR8::D));
-    opcode!(swap_e,     [gb] swap_r8(gb, RegisterR8::E));
-    opcode!(swap_h,     [gb] swap_r8(gb, RegisterR8::H));
-    opcode!(swap_l,     [gb] swap_r8(gb, RegisterR8::L));
+    opcode!(swap_a,     [dev] swap_r8(dev, RegisterR8::A));
+    opcode!(swap_b,     [dev] swap_r8(dev, RegisterR8::B));
+    opcode!(swap_c,     [dev] swap_r8(dev, RegisterR8::C));
+    opcode!(swap_d,     [dev] swap_r8(dev, RegisterR8::D));
+    opcode!(swap_e,     [dev] swap_r8(dev, RegisterR8::E));
+    opcode!(swap_h,     [dev] swap_r8(dev, RegisterR8::H));
+    opcode!(swap_l,     [dev] swap_r8(dev, RegisterR8::L));
 
-    opcode!(swap_hlptr, [gb, ctx] swap_r16ptr(gb, ctx, RegisterR16::HL));
+    opcode!(swap_hlptr, [dev, ec, ctx] swap_r16ptr(dev, ec, ctx, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -748,36 +749,36 @@ pub mod set_bit {
 
     /// Set bit n of a given 8bit value.
     /// value | (1 << bit)
-    fn set_bit_u8v(_gb: &mut GameBoy, value: u8, bit: u8) -> u8 {
+    fn set_bit_u8v(_dev: &mut EmulatorDevice, value: u8, bit: u8) -> u8 {
         let result = value | (1 << bit);
         result
     }
 
     /// Set bit n of in the given register.
     /// r8 <- r8 | (1 << bit)
-    fn set_bit_r8(gb: &mut GameBoy, r8: RegisterR8, bit: u8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = set_bit_u8v(gb, value, bit);
-        gb.cpu.set_r8(r8, result);
+    fn set_bit_r8(dev: &mut EmulatorDevice, r8: RegisterR8, bit: u8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = set_bit_u8v(dev, value, bit);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Set bit n on a memory address.
     /// (r16) <- (r16) | (1 << bit)
-    fn set_bit_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16, bit: u8) -> OpCodeResult {
+    fn set_bit_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16_ptr: RegisterR16, bit: u8) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             }
 
             1 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.cpu.get_intermediate_value();
-                let result  = set_bit_u8v(gb, value, bit);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.cpu.get_intermediate_value();
+                let result  = set_bit_u8v(dev, value, bit);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             }
@@ -787,78 +788,78 @@ pub mod set_bit {
     }
 
 
-    opcode!(set_bit_0_a, [gb] set_bit_r8(gb, RegisterR8::A, 0));
-    opcode!(set_bit_0_b, [gb] set_bit_r8(gb, RegisterR8::B, 0));
-    opcode!(set_bit_0_c, [gb] set_bit_r8(gb, RegisterR8::C, 0));
-    opcode!(set_bit_0_d, [gb] set_bit_r8(gb, RegisterR8::D, 0));
-    opcode!(set_bit_0_e, [gb] set_bit_r8(gb, RegisterR8::E, 0));
-    opcode!(set_bit_0_h, [gb] set_bit_r8(gb, RegisterR8::H, 0));
-    opcode!(set_bit_0_l, [gb] set_bit_r8(gb, RegisterR8::L, 0));
+    opcode!(set_bit_0_a, [dev] set_bit_r8(dev, RegisterR8::A, 0));
+    opcode!(set_bit_0_b, [dev] set_bit_r8(dev, RegisterR8::B, 0));
+    opcode!(set_bit_0_c, [dev] set_bit_r8(dev, RegisterR8::C, 0));
+    opcode!(set_bit_0_d, [dev] set_bit_r8(dev, RegisterR8::D, 0));
+    opcode!(set_bit_0_e, [dev] set_bit_r8(dev, RegisterR8::E, 0));
+    opcode!(set_bit_0_h, [dev] set_bit_r8(dev, RegisterR8::H, 0));
+    opcode!(set_bit_0_l, [dev] set_bit_r8(dev, RegisterR8::L, 0));
 
-    opcode!(set_bit_1_a, [gb] set_bit_r8(gb, RegisterR8::A, 1));
-    opcode!(set_bit_1_b, [gb] set_bit_r8(gb, RegisterR8::B, 1));
-    opcode!(set_bit_1_c, [gb] set_bit_r8(gb, RegisterR8::C, 1));
-    opcode!(set_bit_1_d, [gb] set_bit_r8(gb, RegisterR8::D, 1));
-    opcode!(set_bit_1_e, [gb] set_bit_r8(gb, RegisterR8::E, 1));
-    opcode!(set_bit_1_h, [gb] set_bit_r8(gb, RegisterR8::H, 1));
-    opcode!(set_bit_1_l, [gb] set_bit_r8(gb, RegisterR8::L, 1));
+    opcode!(set_bit_1_a, [dev] set_bit_r8(dev, RegisterR8::A, 1));
+    opcode!(set_bit_1_b, [dev] set_bit_r8(dev, RegisterR8::B, 1));
+    opcode!(set_bit_1_c, [dev] set_bit_r8(dev, RegisterR8::C, 1));
+    opcode!(set_bit_1_d, [dev] set_bit_r8(dev, RegisterR8::D, 1));
+    opcode!(set_bit_1_e, [dev] set_bit_r8(dev, RegisterR8::E, 1));
+    opcode!(set_bit_1_h, [dev] set_bit_r8(dev, RegisterR8::H, 1));
+    opcode!(set_bit_1_l, [dev] set_bit_r8(dev, RegisterR8::L, 1));
 
-    opcode!(set_bit_2_a, [gb] set_bit_r8(gb, RegisterR8::A, 2));
-    opcode!(set_bit_2_b, [gb] set_bit_r8(gb, RegisterR8::B, 2));
-    opcode!(set_bit_2_c, [gb] set_bit_r8(gb, RegisterR8::C, 2));
-    opcode!(set_bit_2_d, [gb] set_bit_r8(gb, RegisterR8::D, 2));
-    opcode!(set_bit_2_e, [gb] set_bit_r8(gb, RegisterR8::E, 2));
-    opcode!(set_bit_2_h, [gb] set_bit_r8(gb, RegisterR8::H, 2));
-    opcode!(set_bit_2_l, [gb] set_bit_r8(gb, RegisterR8::L, 2));
+    opcode!(set_bit_2_a, [dev] set_bit_r8(dev, RegisterR8::A, 2));
+    opcode!(set_bit_2_b, [dev] set_bit_r8(dev, RegisterR8::B, 2));
+    opcode!(set_bit_2_c, [dev] set_bit_r8(dev, RegisterR8::C, 2));
+    opcode!(set_bit_2_d, [dev] set_bit_r8(dev, RegisterR8::D, 2));
+    opcode!(set_bit_2_e, [dev] set_bit_r8(dev, RegisterR8::E, 2));
+    opcode!(set_bit_2_h, [dev] set_bit_r8(dev, RegisterR8::H, 2));
+    opcode!(set_bit_2_l, [dev] set_bit_r8(dev, RegisterR8::L, 2));
 
-    opcode!(set_bit_3_a, [gb] set_bit_r8(gb, RegisterR8::A, 3));
-    opcode!(set_bit_3_b, [gb] set_bit_r8(gb, RegisterR8::B, 3));
-    opcode!(set_bit_3_c, [gb] set_bit_r8(gb, RegisterR8::C, 3));
-    opcode!(set_bit_3_d, [gb] set_bit_r8(gb, RegisterR8::D, 3));
-    opcode!(set_bit_3_e, [gb] set_bit_r8(gb, RegisterR8::E, 3));
-    opcode!(set_bit_3_h, [gb] set_bit_r8(gb, RegisterR8::H, 3));
-    opcode!(set_bit_3_l, [gb] set_bit_r8(gb, RegisterR8::L, 3));
+    opcode!(set_bit_3_a, [dev] set_bit_r8(dev, RegisterR8::A, 3));
+    opcode!(set_bit_3_b, [dev] set_bit_r8(dev, RegisterR8::B, 3));
+    opcode!(set_bit_3_c, [dev] set_bit_r8(dev, RegisterR8::C, 3));
+    opcode!(set_bit_3_d, [dev] set_bit_r8(dev, RegisterR8::D, 3));
+    opcode!(set_bit_3_e, [dev] set_bit_r8(dev, RegisterR8::E, 3));
+    opcode!(set_bit_3_h, [dev] set_bit_r8(dev, RegisterR8::H, 3));
+    opcode!(set_bit_3_l, [dev] set_bit_r8(dev, RegisterR8::L, 3));
 
-    opcode!(set_bit_4_a, [gb] set_bit_r8(gb, RegisterR8::A, 4));
-    opcode!(set_bit_4_b, [gb] set_bit_r8(gb, RegisterR8::B, 4));
-    opcode!(set_bit_4_c, [gb] set_bit_r8(gb, RegisterR8::C, 4));
-    opcode!(set_bit_4_d, [gb] set_bit_r8(gb, RegisterR8::D, 4));
-    opcode!(set_bit_4_e, [gb] set_bit_r8(gb, RegisterR8::E, 4));
-    opcode!(set_bit_4_h, [gb] set_bit_r8(gb, RegisterR8::H, 4));
-    opcode!(set_bit_4_l, [gb] set_bit_r8(gb, RegisterR8::L, 4));
+    opcode!(set_bit_4_a, [dev] set_bit_r8(dev, RegisterR8::A, 4));
+    opcode!(set_bit_4_b, [dev] set_bit_r8(dev, RegisterR8::B, 4));
+    opcode!(set_bit_4_c, [dev] set_bit_r8(dev, RegisterR8::C, 4));
+    opcode!(set_bit_4_d, [dev] set_bit_r8(dev, RegisterR8::D, 4));
+    opcode!(set_bit_4_e, [dev] set_bit_r8(dev, RegisterR8::E, 4));
+    opcode!(set_bit_4_h, [dev] set_bit_r8(dev, RegisterR8::H, 4));
+    opcode!(set_bit_4_l, [dev] set_bit_r8(dev, RegisterR8::L, 4));
 
-    opcode!(set_bit_5_a, [gb] set_bit_r8(gb, RegisterR8::A, 5));
-    opcode!(set_bit_5_b, [gb] set_bit_r8(gb, RegisterR8::B, 5));
-    opcode!(set_bit_5_c, [gb] set_bit_r8(gb, RegisterR8::C, 5));
-    opcode!(set_bit_5_d, [gb] set_bit_r8(gb, RegisterR8::D, 5));
-    opcode!(set_bit_5_e, [gb] set_bit_r8(gb, RegisterR8::E, 5));
-    opcode!(set_bit_5_h, [gb] set_bit_r8(gb, RegisterR8::H, 5));
-    opcode!(set_bit_5_l, [gb] set_bit_r8(gb, RegisterR8::L, 5));
+    opcode!(set_bit_5_a, [dev] set_bit_r8(dev, RegisterR8::A, 5));
+    opcode!(set_bit_5_b, [dev] set_bit_r8(dev, RegisterR8::B, 5));
+    opcode!(set_bit_5_c, [dev] set_bit_r8(dev, RegisterR8::C, 5));
+    opcode!(set_bit_5_d, [dev] set_bit_r8(dev, RegisterR8::D, 5));
+    opcode!(set_bit_5_e, [dev] set_bit_r8(dev, RegisterR8::E, 5));
+    opcode!(set_bit_5_h, [dev] set_bit_r8(dev, RegisterR8::H, 5));
+    opcode!(set_bit_5_l, [dev] set_bit_r8(dev, RegisterR8::L, 5));
 
-    opcode!(set_bit_6_a, [gb] set_bit_r8(gb, RegisterR8::A, 6));
-    opcode!(set_bit_6_b, [gb] set_bit_r8(gb, RegisterR8::B, 6));
-    opcode!(set_bit_6_c, [gb] set_bit_r8(gb, RegisterR8::C, 6));
-    opcode!(set_bit_6_d, [gb] set_bit_r8(gb, RegisterR8::D, 6));
-    opcode!(set_bit_6_e, [gb] set_bit_r8(gb, RegisterR8::E, 6));
-    opcode!(set_bit_6_h, [gb] set_bit_r8(gb, RegisterR8::H, 6));
-    opcode!(set_bit_6_l, [gb] set_bit_r8(gb, RegisterR8::L, 6));
+    opcode!(set_bit_6_a, [dev] set_bit_r8(dev, RegisterR8::A, 6));
+    opcode!(set_bit_6_b, [dev] set_bit_r8(dev, RegisterR8::B, 6));
+    opcode!(set_bit_6_c, [dev] set_bit_r8(dev, RegisterR8::C, 6));
+    opcode!(set_bit_6_d, [dev] set_bit_r8(dev, RegisterR8::D, 6));
+    opcode!(set_bit_6_e, [dev] set_bit_r8(dev, RegisterR8::E, 6));
+    opcode!(set_bit_6_h, [dev] set_bit_r8(dev, RegisterR8::H, 6));
+    opcode!(set_bit_6_l, [dev] set_bit_r8(dev, RegisterR8::L, 6));
 
-    opcode!(set_bit_7_a, [gb] set_bit_r8(gb, RegisterR8::A, 7));
-    opcode!(set_bit_7_b, [gb] set_bit_r8(gb, RegisterR8::B, 7));
-    opcode!(set_bit_7_c, [gb] set_bit_r8(gb, RegisterR8::C, 7));
-    opcode!(set_bit_7_d, [gb] set_bit_r8(gb, RegisterR8::D, 7));
-    opcode!(set_bit_7_e, [gb] set_bit_r8(gb, RegisterR8::E, 7));
-    opcode!(set_bit_7_h, [gb] set_bit_r8(gb, RegisterR8::H, 7));
-    opcode!(set_bit_7_l, [gb] set_bit_r8(gb, RegisterR8::L, 7));
+    opcode!(set_bit_7_a, [dev] set_bit_r8(dev, RegisterR8::A, 7));
+    opcode!(set_bit_7_b, [dev] set_bit_r8(dev, RegisterR8::B, 7));
+    opcode!(set_bit_7_c, [dev] set_bit_r8(dev, RegisterR8::C, 7));
+    opcode!(set_bit_7_d, [dev] set_bit_r8(dev, RegisterR8::D, 7));
+    opcode!(set_bit_7_e, [dev] set_bit_r8(dev, RegisterR8::E, 7));
+    opcode!(set_bit_7_h, [dev] set_bit_r8(dev, RegisterR8::H, 7));
+    opcode!(set_bit_7_l, [dev] set_bit_r8(dev, RegisterR8::L, 7));
 
-    opcode!(set_bit_0_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 0));
-    opcode!(set_bit_1_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 1));
-    opcode!(set_bit_2_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 2));
-    opcode!(set_bit_3_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 3));
-    opcode!(set_bit_4_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 4));
-    opcode!(set_bit_5_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 5));
-    opcode!(set_bit_6_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 6));
-    opcode!(set_bit_7_hlptr, [gb, ctx] set_bit_r16ptr(gb, ctx, RegisterR16::HL, 7));
+    opcode!(set_bit_0_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 0));
+    opcode!(set_bit_1_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 1));
+    opcode!(set_bit_2_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 2));
+    opcode!(set_bit_3_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 3));
+    opcode!(set_bit_4_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 4));
+    opcode!(set_bit_5_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 5));
+    opcode!(set_bit_6_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 6));
+    opcode!(set_bit_7_hlptr, [dev, ec, ctx] set_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 7));
 }
 
 ////////////////////////////////////////////////
@@ -868,36 +869,36 @@ pub mod res_bit {
 
     /// Resets bit n of a given 8bit value.
     /// value & !(1 << bit)
-    fn res_bit_u8v(_gb: &mut GameBoy, value: u8, bit: u8) -> u8 {
+    fn res_bit_u8v(_dev: &mut EmulatorDevice, value: u8, bit: u8) -> u8 {
         let result = value & !(1 << bit);
         result
     }
 
     /// Resets bit n of in the given register.
     /// r8 <- r8 & !(1 << bit)
-    fn res_bit_r8(gb: &mut GameBoy, r8: RegisterR8, bit: u8) {
-        let value  = gb.cpu.get_r8(r8);
-        let result = res_bit_u8v(gb, value, bit);
-        gb.cpu.set_r8(r8, result);
+    fn res_bit_r8(dev: &mut EmulatorDevice, r8: RegisterR8, bit: u8) {
+        let value  = dev.cpu.get_r8(r8);
+        let result = res_bit_u8v(dev, value, bit);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Resets bit n on a memory address.
     /// (r16) <- (r16) & !(1 << bit)
-    fn res_bit_r16ptr(gb: &mut GameBoy, ctx: &mut OpCodeContext, r16_ptr: RegisterR16, bit: u8) -> OpCodeResult {
+    fn res_bit_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, ctx: &mut OpCodeContext, r16_ptr: RegisterR16, bit: u8) -> OpCodeResult {
         match ctx.get_stage() {
             0 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.get_mmu().read_u8(address);
-                gb.cpu.set_intermediate_value(value);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.get_mmu().read_u8(ec, address);
+                dev.cpu.set_intermediate_value(value);
 
                 OpCodeResult::StageDone(4)
             }
 
             1 => {
-                let address = gb.cpu.get_r16(r16_ptr);
-                let value   = gb.cpu.get_intermediate_value();
-                let result  = res_bit_u8v(gb, value, bit);
-                gb.get_mmu_mut().write_u8(address, result);
+                let address = dev.cpu.get_r16(r16_ptr);
+                let value   = dev.cpu.get_intermediate_value();
+                let result  = res_bit_u8v(dev, value, bit);
+                dev.get_mmu_mut().write_u8(ec, address, result);
 
                 OpCodeResult::Done
             }
@@ -907,78 +908,78 @@ pub mod res_bit {
     }
 
 
-    opcode!(res_bit_0_a, [gb] res_bit_r8(gb, RegisterR8::A, 0));
-    opcode!(res_bit_0_b, [gb] res_bit_r8(gb, RegisterR8::B, 0));
-    opcode!(res_bit_0_c, [gb] res_bit_r8(gb, RegisterR8::C, 0));
-    opcode!(res_bit_0_d, [gb] res_bit_r8(gb, RegisterR8::D, 0));
-    opcode!(res_bit_0_e, [gb] res_bit_r8(gb, RegisterR8::E, 0));
-    opcode!(res_bit_0_h, [gb] res_bit_r8(gb, RegisterR8::H, 0));
-    opcode!(res_bit_0_l, [gb] res_bit_r8(gb, RegisterR8::L, 0));
+    opcode!(res_bit_0_a, [dev] res_bit_r8(dev, RegisterR8::A, 0));
+    opcode!(res_bit_0_b, [dev] res_bit_r8(dev, RegisterR8::B, 0));
+    opcode!(res_bit_0_c, [dev] res_bit_r8(dev, RegisterR8::C, 0));
+    opcode!(res_bit_0_d, [dev] res_bit_r8(dev, RegisterR8::D, 0));
+    opcode!(res_bit_0_e, [dev] res_bit_r8(dev, RegisterR8::E, 0));
+    opcode!(res_bit_0_h, [dev] res_bit_r8(dev, RegisterR8::H, 0));
+    opcode!(res_bit_0_l, [dev] res_bit_r8(dev, RegisterR8::L, 0));
 
-    opcode!(res_bit_1_a, [gb] res_bit_r8(gb, RegisterR8::A, 1));
-    opcode!(res_bit_1_b, [gb] res_bit_r8(gb, RegisterR8::B, 1));
-    opcode!(res_bit_1_c, [gb] res_bit_r8(gb, RegisterR8::C, 1));
-    opcode!(res_bit_1_d, [gb] res_bit_r8(gb, RegisterR8::D, 1));
-    opcode!(res_bit_1_e, [gb] res_bit_r8(gb, RegisterR8::E, 1));
-    opcode!(res_bit_1_h, [gb] res_bit_r8(gb, RegisterR8::H, 1));
-    opcode!(res_bit_1_l, [gb] res_bit_r8(gb, RegisterR8::L, 1));
+    opcode!(res_bit_1_a, [dev] res_bit_r8(dev, RegisterR8::A, 1));
+    opcode!(res_bit_1_b, [dev] res_bit_r8(dev, RegisterR8::B, 1));
+    opcode!(res_bit_1_c, [dev] res_bit_r8(dev, RegisterR8::C, 1));
+    opcode!(res_bit_1_d, [dev] res_bit_r8(dev, RegisterR8::D, 1));
+    opcode!(res_bit_1_e, [dev] res_bit_r8(dev, RegisterR8::E, 1));
+    opcode!(res_bit_1_h, [dev] res_bit_r8(dev, RegisterR8::H, 1));
+    opcode!(res_bit_1_l, [dev] res_bit_r8(dev, RegisterR8::L, 1));
 
-    opcode!(res_bit_2_a, [gb] res_bit_r8(gb, RegisterR8::A, 2));
-    opcode!(res_bit_2_b, [gb] res_bit_r8(gb, RegisterR8::B, 2));
-    opcode!(res_bit_2_c, [gb] res_bit_r8(gb, RegisterR8::C, 2));
-    opcode!(res_bit_2_d, [gb] res_bit_r8(gb, RegisterR8::D, 2));
-    opcode!(res_bit_2_e, [gb] res_bit_r8(gb, RegisterR8::E, 2));
-    opcode!(res_bit_2_h, [gb] res_bit_r8(gb, RegisterR8::H, 2));
-    opcode!(res_bit_2_l, [gb] res_bit_r8(gb, RegisterR8::L, 2));
+    opcode!(res_bit_2_a, [dev] res_bit_r8(dev, RegisterR8::A, 2));
+    opcode!(res_bit_2_b, [dev] res_bit_r8(dev, RegisterR8::B, 2));
+    opcode!(res_bit_2_c, [dev] res_bit_r8(dev, RegisterR8::C, 2));
+    opcode!(res_bit_2_d, [dev] res_bit_r8(dev, RegisterR8::D, 2));
+    opcode!(res_bit_2_e, [dev] res_bit_r8(dev, RegisterR8::E, 2));
+    opcode!(res_bit_2_h, [dev] res_bit_r8(dev, RegisterR8::H, 2));
+    opcode!(res_bit_2_l, [dev] res_bit_r8(dev, RegisterR8::L, 2));
 
-    opcode!(res_bit_3_a, [gb] res_bit_r8(gb, RegisterR8::A, 3));
-    opcode!(res_bit_3_b, [gb] res_bit_r8(gb, RegisterR8::B, 3));
-    opcode!(res_bit_3_c, [gb] res_bit_r8(gb, RegisterR8::C, 3));
-    opcode!(res_bit_3_d, [gb] res_bit_r8(gb, RegisterR8::D, 3));
-    opcode!(res_bit_3_e, [gb] res_bit_r8(gb, RegisterR8::E, 3));
-    opcode!(res_bit_3_h, [gb] res_bit_r8(gb, RegisterR8::H, 3));
-    opcode!(res_bit_3_l, [gb] res_bit_r8(gb, RegisterR8::L, 3));
+    opcode!(res_bit_3_a, [dev] res_bit_r8(dev, RegisterR8::A, 3));
+    opcode!(res_bit_3_b, [dev] res_bit_r8(dev, RegisterR8::B, 3));
+    opcode!(res_bit_3_c, [dev] res_bit_r8(dev, RegisterR8::C, 3));
+    opcode!(res_bit_3_d, [dev] res_bit_r8(dev, RegisterR8::D, 3));
+    opcode!(res_bit_3_e, [dev] res_bit_r8(dev, RegisterR8::E, 3));
+    opcode!(res_bit_3_h, [dev] res_bit_r8(dev, RegisterR8::H, 3));
+    opcode!(res_bit_3_l, [dev] res_bit_r8(dev, RegisterR8::L, 3));
 
-    opcode!(res_bit_4_a, [gb] res_bit_r8(gb, RegisterR8::A, 4));
-    opcode!(res_bit_4_b, [gb] res_bit_r8(gb, RegisterR8::B, 4));
-    opcode!(res_bit_4_c, [gb] res_bit_r8(gb, RegisterR8::C, 4));
-    opcode!(res_bit_4_d, [gb] res_bit_r8(gb, RegisterR8::D, 4));
-    opcode!(res_bit_4_e, [gb] res_bit_r8(gb, RegisterR8::E, 4));
-    opcode!(res_bit_4_h, [gb] res_bit_r8(gb, RegisterR8::H, 4));
-    opcode!(res_bit_4_l, [gb] res_bit_r8(gb, RegisterR8::L, 4));
+    opcode!(res_bit_4_a, [dev] res_bit_r8(dev, RegisterR8::A, 4));
+    opcode!(res_bit_4_b, [dev] res_bit_r8(dev, RegisterR8::B, 4));
+    opcode!(res_bit_4_c, [dev] res_bit_r8(dev, RegisterR8::C, 4));
+    opcode!(res_bit_4_d, [dev] res_bit_r8(dev, RegisterR8::D, 4));
+    opcode!(res_bit_4_e, [dev] res_bit_r8(dev, RegisterR8::E, 4));
+    opcode!(res_bit_4_h, [dev] res_bit_r8(dev, RegisterR8::H, 4));
+    opcode!(res_bit_4_l, [dev] res_bit_r8(dev, RegisterR8::L, 4));
 
-    opcode!(res_bit_5_a, [gb] res_bit_r8(gb, RegisterR8::A, 5));
-    opcode!(res_bit_5_b, [gb] res_bit_r8(gb, RegisterR8::B, 5));
-    opcode!(res_bit_5_c, [gb] res_bit_r8(gb, RegisterR8::C, 5));
-    opcode!(res_bit_5_d, [gb] res_bit_r8(gb, RegisterR8::D, 5));
-    opcode!(res_bit_5_e, [gb] res_bit_r8(gb, RegisterR8::E, 5));
-    opcode!(res_bit_5_h, [gb] res_bit_r8(gb, RegisterR8::H, 5));
-    opcode!(res_bit_5_l, [gb] res_bit_r8(gb, RegisterR8::L, 5));
+    opcode!(res_bit_5_a, [dev] res_bit_r8(dev, RegisterR8::A, 5));
+    opcode!(res_bit_5_b, [dev] res_bit_r8(dev, RegisterR8::B, 5));
+    opcode!(res_bit_5_c, [dev] res_bit_r8(dev, RegisterR8::C, 5));
+    opcode!(res_bit_5_d, [dev] res_bit_r8(dev, RegisterR8::D, 5));
+    opcode!(res_bit_5_e, [dev] res_bit_r8(dev, RegisterR8::E, 5));
+    opcode!(res_bit_5_h, [dev] res_bit_r8(dev, RegisterR8::H, 5));
+    opcode!(res_bit_5_l, [dev] res_bit_r8(dev, RegisterR8::L, 5));
 
-    opcode!(res_bit_6_a, [gb] res_bit_r8(gb, RegisterR8::A, 6));
-    opcode!(res_bit_6_b, [gb] res_bit_r8(gb, RegisterR8::B, 6));
-    opcode!(res_bit_6_c, [gb] res_bit_r8(gb, RegisterR8::C, 6));
-    opcode!(res_bit_6_d, [gb] res_bit_r8(gb, RegisterR8::D, 6));
-    opcode!(res_bit_6_e, [gb] res_bit_r8(gb, RegisterR8::E, 6));
-    opcode!(res_bit_6_h, [gb] res_bit_r8(gb, RegisterR8::H, 6));
-    opcode!(res_bit_6_l, [gb] res_bit_r8(gb, RegisterR8::L, 6));
+    opcode!(res_bit_6_a, [dev] res_bit_r8(dev, RegisterR8::A, 6));
+    opcode!(res_bit_6_b, [dev] res_bit_r8(dev, RegisterR8::B, 6));
+    opcode!(res_bit_6_c, [dev] res_bit_r8(dev, RegisterR8::C, 6));
+    opcode!(res_bit_6_d, [dev] res_bit_r8(dev, RegisterR8::D, 6));
+    opcode!(res_bit_6_e, [dev] res_bit_r8(dev, RegisterR8::E, 6));
+    opcode!(res_bit_6_h, [dev] res_bit_r8(dev, RegisterR8::H, 6));
+    opcode!(res_bit_6_l, [dev] res_bit_r8(dev, RegisterR8::L, 6));
 
-    opcode!(res_bit_7_a, [gb] res_bit_r8(gb, RegisterR8::A, 7));
-    opcode!(res_bit_7_b, [gb] res_bit_r8(gb, RegisterR8::B, 7));
-    opcode!(res_bit_7_c, [gb] res_bit_r8(gb, RegisterR8::C, 7));
-    opcode!(res_bit_7_d, [gb] res_bit_r8(gb, RegisterR8::D, 7));
-    opcode!(res_bit_7_e, [gb] res_bit_r8(gb, RegisterR8::E, 7));
-    opcode!(res_bit_7_h, [gb] res_bit_r8(gb, RegisterR8::H, 7));
-    opcode!(res_bit_7_l, [gb] res_bit_r8(gb, RegisterR8::L, 7));
+    opcode!(res_bit_7_a, [dev] res_bit_r8(dev, RegisterR8::A, 7));
+    opcode!(res_bit_7_b, [dev] res_bit_r8(dev, RegisterR8::B, 7));
+    opcode!(res_bit_7_c, [dev] res_bit_r8(dev, RegisterR8::C, 7));
+    opcode!(res_bit_7_d, [dev] res_bit_r8(dev, RegisterR8::D, 7));
+    opcode!(res_bit_7_e, [dev] res_bit_r8(dev, RegisterR8::E, 7));
+    opcode!(res_bit_7_h, [dev] res_bit_r8(dev, RegisterR8::H, 7));
+    opcode!(res_bit_7_l, [dev] res_bit_r8(dev, RegisterR8::L, 7));
 
-    opcode!(res_bit_0_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 0));
-    opcode!(res_bit_1_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 1));
-    opcode!(res_bit_2_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 2));
-    opcode!(res_bit_3_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 3));
-    opcode!(res_bit_4_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 4));
-    opcode!(res_bit_5_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 5));
-    opcode!(res_bit_6_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 6));
-    opcode!(res_bit_7_hlptr, [gb, ctx] res_bit_r16ptr(gb, ctx, RegisterR16::HL, 7));
+    opcode!(res_bit_0_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 0));
+    opcode!(res_bit_1_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 1));
+    opcode!(res_bit_2_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 2));
+    opcode!(res_bit_3_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 3));
+    opcode!(res_bit_4_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 4));
+    opcode!(res_bit_5_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 5));
+    opcode!(res_bit_6_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 6));
+    opcode!(res_bit_7_hlptr, [dev, ec, ctx] res_bit_r16ptr(dev, ec, ctx, RegisterR16::HL, 7));
 }
 
 ////////////////////////////////////////////////
@@ -988,100 +989,100 @@ pub mod chk_bit {
 
     /// Checks if bit n of a value is set.
     /// Set the Zero flag, if the bit was 0.
-    fn check_bit_u8v(gb: &mut GameBoy, value: u8, bit: u8) {
+    fn check_bit_u8v(dev: &mut EmulatorDevice, value: u8, bit: u8) {
         let result = value & (1 << bit);
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, true);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, true);
     }
 
     /// Checks if bit n of a register is set.
     /// Set the Zero flag, if the bit was 0.
-    fn check_bit_r8(gb: &mut GameBoy, r8: RegisterR8, bit: u8) {
-        let value  = gb.cpu.get_r8(r8);
-        check_bit_u8v(gb, value, bit);
+    fn check_bit_r8(dev: &mut EmulatorDevice, r8: RegisterR8, bit: u8) {
+        let value  = dev.cpu.get_r8(r8);
+        check_bit_u8v(dev, value, bit);
     }
 
     /// Checks if bit n on a memory address is set.
     /// Set the Zero flag, if the bit was 0.
-    fn check_bit_r16ptr(gb: &mut GameBoy, r16_ptr: RegisterR16, bit: u8) {
-        let address = gb.cpu.get_r16(r16_ptr);
-        let value   = gb.get_mmu().read_u8(address);
-        check_bit_u8v(gb, value, bit);
+    fn check_bit_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, r16_ptr: RegisterR16, bit: u8) {
+        let address = dev.cpu.get_r16(r16_ptr);
+        let value   = dev.get_mmu().read_u8(ec, address);
+        check_bit_u8v(dev, value, bit);
     }
 
 
-    opcode!(check_bit_0_a,     [gb] check_bit_r8(gb, RegisterR8::A, 0));
-    opcode!(check_bit_0_b,     [gb] check_bit_r8(gb, RegisterR8::B, 0));
-    opcode!(check_bit_0_c,     [gb] check_bit_r8(gb, RegisterR8::C, 0));
-    opcode!(check_bit_0_d,     [gb] check_bit_r8(gb, RegisterR8::D, 0));
-    opcode!(check_bit_0_e,     [gb] check_bit_r8(gb, RegisterR8::E, 0));
-    opcode!(check_bit_0_h,     [gb] check_bit_r8(gb, RegisterR8::H, 0));
-    opcode!(check_bit_0_l,     [gb] check_bit_r8(gb, RegisterR8::L, 0));
-    opcode!(check_bit_0_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 0));
+    opcode!(check_bit_0_a,     [dev] check_bit_r8(dev, RegisterR8::A, 0));
+    opcode!(check_bit_0_b,     [dev] check_bit_r8(dev, RegisterR8::B, 0));
+    opcode!(check_bit_0_c,     [dev] check_bit_r8(dev, RegisterR8::C, 0));
+    opcode!(check_bit_0_d,     [dev] check_bit_r8(dev, RegisterR8::D, 0));
+    opcode!(check_bit_0_e,     [dev] check_bit_r8(dev, RegisterR8::E, 0));
+    opcode!(check_bit_0_h,     [dev] check_bit_r8(dev, RegisterR8::H, 0));
+    opcode!(check_bit_0_l,     [dev] check_bit_r8(dev, RegisterR8::L, 0));
+    opcode!(check_bit_0_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 0));
 
-    opcode!(check_bit_1_a,     [gb] check_bit_r8(gb, RegisterR8::A, 1));
-    opcode!(check_bit_1_b,     [gb] check_bit_r8(gb, RegisterR8::B, 1));
-    opcode!(check_bit_1_c,     [gb] check_bit_r8(gb, RegisterR8::C, 1));
-    opcode!(check_bit_1_d,     [gb] check_bit_r8(gb, RegisterR8::D, 1));
-    opcode!(check_bit_1_e,     [gb] check_bit_r8(gb, RegisterR8::E, 1));
-    opcode!(check_bit_1_h,     [gb] check_bit_r8(gb, RegisterR8::H, 1));
-    opcode!(check_bit_1_l,     [gb] check_bit_r8(gb, RegisterR8::L, 1));
-    opcode!(check_bit_1_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 1));
+    opcode!(check_bit_1_a,     [dev] check_bit_r8(dev, RegisterR8::A, 1));
+    opcode!(check_bit_1_b,     [dev] check_bit_r8(dev, RegisterR8::B, 1));
+    opcode!(check_bit_1_c,     [dev] check_bit_r8(dev, RegisterR8::C, 1));
+    opcode!(check_bit_1_d,     [dev] check_bit_r8(dev, RegisterR8::D, 1));
+    opcode!(check_bit_1_e,     [dev] check_bit_r8(dev, RegisterR8::E, 1));
+    opcode!(check_bit_1_h,     [dev] check_bit_r8(dev, RegisterR8::H, 1));
+    opcode!(check_bit_1_l,     [dev] check_bit_r8(dev, RegisterR8::L, 1));
+    opcode!(check_bit_1_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 1));
 
-    opcode!(check_bit_2_a,     [gb] check_bit_r8(gb, RegisterR8::A, 2));
-    opcode!(check_bit_2_b,     [gb] check_bit_r8(gb, RegisterR8::B, 2));
-    opcode!(check_bit_2_c,     [gb] check_bit_r8(gb, RegisterR8::C, 2));
-    opcode!(check_bit_2_d,     [gb] check_bit_r8(gb, RegisterR8::D, 2));
-    opcode!(check_bit_2_e,     [gb] check_bit_r8(gb, RegisterR8::E, 2));
-    opcode!(check_bit_2_h,     [gb] check_bit_r8(gb, RegisterR8::H, 2));
-    opcode!(check_bit_2_l,     [gb] check_bit_r8(gb, RegisterR8::L, 2));
-    opcode!(check_bit_2_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 2));
+    opcode!(check_bit_2_a,     [dev] check_bit_r8(dev, RegisterR8::A, 2));
+    opcode!(check_bit_2_b,     [dev] check_bit_r8(dev, RegisterR8::B, 2));
+    opcode!(check_bit_2_c,     [dev] check_bit_r8(dev, RegisterR8::C, 2));
+    opcode!(check_bit_2_d,     [dev] check_bit_r8(dev, RegisterR8::D, 2));
+    opcode!(check_bit_2_e,     [dev] check_bit_r8(dev, RegisterR8::E, 2));
+    opcode!(check_bit_2_h,     [dev] check_bit_r8(dev, RegisterR8::H, 2));
+    opcode!(check_bit_2_l,     [dev] check_bit_r8(dev, RegisterR8::L, 2));
+    opcode!(check_bit_2_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 2));
 
-    opcode!(check_bit_3_a,     [gb] check_bit_r8(gb, RegisterR8::A, 3));
-    opcode!(check_bit_3_b,     [gb] check_bit_r8(gb, RegisterR8::B, 3));
-    opcode!(check_bit_3_c,     [gb] check_bit_r8(gb, RegisterR8::C, 3));
-    opcode!(check_bit_3_d,     [gb] check_bit_r8(gb, RegisterR8::D, 3));
-    opcode!(check_bit_3_e,     [gb] check_bit_r8(gb, RegisterR8::E, 3));
-    opcode!(check_bit_3_h,     [gb] check_bit_r8(gb, RegisterR8::H, 3));
-    opcode!(check_bit_3_l,     [gb] check_bit_r8(gb, RegisterR8::L, 3));
-    opcode!(check_bit_3_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 3));
+    opcode!(check_bit_3_a,     [dev] check_bit_r8(dev, RegisterR8::A, 3));
+    opcode!(check_bit_3_b,     [dev] check_bit_r8(dev, RegisterR8::B, 3));
+    opcode!(check_bit_3_c,     [dev] check_bit_r8(dev, RegisterR8::C, 3));
+    opcode!(check_bit_3_d,     [dev] check_bit_r8(dev, RegisterR8::D, 3));
+    opcode!(check_bit_3_e,     [dev] check_bit_r8(dev, RegisterR8::E, 3));
+    opcode!(check_bit_3_h,     [dev] check_bit_r8(dev, RegisterR8::H, 3));
+    opcode!(check_bit_3_l,     [dev] check_bit_r8(dev, RegisterR8::L, 3));
+    opcode!(check_bit_3_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 3));
 
-    opcode!(check_bit_4_a,     [gb] check_bit_r8(gb, RegisterR8::A, 4));
-    opcode!(check_bit_4_b,     [gb] check_bit_r8(gb, RegisterR8::B, 4));
-    opcode!(check_bit_4_c,     [gb] check_bit_r8(gb, RegisterR8::C, 4));
-    opcode!(check_bit_4_d,     [gb] check_bit_r8(gb, RegisterR8::D, 4));
-    opcode!(check_bit_4_e,     [gb] check_bit_r8(gb, RegisterR8::E, 4));
-    opcode!(check_bit_4_h,     [gb] check_bit_r8(gb, RegisterR8::H, 4));
-    opcode!(check_bit_4_l,     [gb] check_bit_r8(gb, RegisterR8::L, 4));
-    opcode!(check_bit_4_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 4));
+    opcode!(check_bit_4_a,     [dev] check_bit_r8(dev, RegisterR8::A, 4));
+    opcode!(check_bit_4_b,     [dev] check_bit_r8(dev, RegisterR8::B, 4));
+    opcode!(check_bit_4_c,     [dev] check_bit_r8(dev, RegisterR8::C, 4));
+    opcode!(check_bit_4_d,     [dev] check_bit_r8(dev, RegisterR8::D, 4));
+    opcode!(check_bit_4_e,     [dev] check_bit_r8(dev, RegisterR8::E, 4));
+    opcode!(check_bit_4_h,     [dev] check_bit_r8(dev, RegisterR8::H, 4));
+    opcode!(check_bit_4_l,     [dev] check_bit_r8(dev, RegisterR8::L, 4));
+    opcode!(check_bit_4_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 4));
 
-    opcode!(check_bit_5_a,     [gb] check_bit_r8(gb, RegisterR8::A, 5));
-    opcode!(check_bit_5_b,     [gb] check_bit_r8(gb, RegisterR8::B, 5));
-    opcode!(check_bit_5_c,     [gb] check_bit_r8(gb, RegisterR8::C, 5));
-    opcode!(check_bit_5_d,     [gb] check_bit_r8(gb, RegisterR8::D, 5));
-    opcode!(check_bit_5_e,     [gb] check_bit_r8(gb, RegisterR8::E, 5));
-    opcode!(check_bit_5_h,     [gb] check_bit_r8(gb, RegisterR8::H, 5));
-    opcode!(check_bit_5_l,     [gb] check_bit_r8(gb, RegisterR8::L, 5));
-    opcode!(check_bit_5_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 5));
+    opcode!(check_bit_5_a,     [dev] check_bit_r8(dev, RegisterR8::A, 5));
+    opcode!(check_bit_5_b,     [dev] check_bit_r8(dev, RegisterR8::B, 5));
+    opcode!(check_bit_5_c,     [dev] check_bit_r8(dev, RegisterR8::C, 5));
+    opcode!(check_bit_5_d,     [dev] check_bit_r8(dev, RegisterR8::D, 5));
+    opcode!(check_bit_5_e,     [dev] check_bit_r8(dev, RegisterR8::E, 5));
+    opcode!(check_bit_5_h,     [dev] check_bit_r8(dev, RegisterR8::H, 5));
+    opcode!(check_bit_5_l,     [dev] check_bit_r8(dev, RegisterR8::L, 5));
+    opcode!(check_bit_5_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 5));
 
-    opcode!(check_bit_6_a,     [gb] check_bit_r8(gb, RegisterR8::A, 6));
-    opcode!(check_bit_6_b,     [gb] check_bit_r8(gb, RegisterR8::B, 6));
-    opcode!(check_bit_6_c,     [gb] check_bit_r8(gb, RegisterR8::C, 6));
-    opcode!(check_bit_6_d,     [gb] check_bit_r8(gb, RegisterR8::D, 6));
-    opcode!(check_bit_6_e,     [gb] check_bit_r8(gb, RegisterR8::E, 6));
-    opcode!(check_bit_6_h,     [gb] check_bit_r8(gb, RegisterR8::H, 6));
-    opcode!(check_bit_6_l,     [gb] check_bit_r8(gb, RegisterR8::L, 6));
-    opcode!(check_bit_6_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 6));
+    opcode!(check_bit_6_a,     [dev] check_bit_r8(dev, RegisterR8::A, 6));
+    opcode!(check_bit_6_b,     [dev] check_bit_r8(dev, RegisterR8::B, 6));
+    opcode!(check_bit_6_c,     [dev] check_bit_r8(dev, RegisterR8::C, 6));
+    opcode!(check_bit_6_d,     [dev] check_bit_r8(dev, RegisterR8::D, 6));
+    opcode!(check_bit_6_e,     [dev] check_bit_r8(dev, RegisterR8::E, 6));
+    opcode!(check_bit_6_h,     [dev] check_bit_r8(dev, RegisterR8::H, 6));
+    opcode!(check_bit_6_l,     [dev] check_bit_r8(dev, RegisterR8::L, 6));
+    opcode!(check_bit_6_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 6));
 
-    opcode!(check_bit_7_a,     [gb] check_bit_r8(gb, RegisterR8::A, 7));
-    opcode!(check_bit_7_b,     [gb] check_bit_r8(gb, RegisterR8::B, 7));
-    opcode!(check_bit_7_c,     [gb] check_bit_r8(gb, RegisterR8::C, 7));
-    opcode!(check_bit_7_d,     [gb] check_bit_r8(gb, RegisterR8::D, 7));
-    opcode!(check_bit_7_e,     [gb] check_bit_r8(gb, RegisterR8::E, 7));
-    opcode!(check_bit_7_h,     [gb] check_bit_r8(gb, RegisterR8::H, 7));
-    opcode!(check_bit_7_l,     [gb] check_bit_r8(gb, RegisterR8::L, 7));
-    opcode!(check_bit_7_hlptr, [gb] check_bit_r16ptr(gb, RegisterR16::HL, 7));
+    opcode!(check_bit_7_a,     [dev] check_bit_r8(dev, RegisterR8::A, 7));
+    opcode!(check_bit_7_b,     [dev] check_bit_r8(dev, RegisterR8::B, 7));
+    opcode!(check_bit_7_c,     [dev] check_bit_r8(dev, RegisterR8::C, 7));
+    opcode!(check_bit_7_d,     [dev] check_bit_r8(dev, RegisterR8::D, 7));
+    opcode!(check_bit_7_e,     [dev] check_bit_r8(dev, RegisterR8::E, 7));
+    opcode!(check_bit_7_h,     [dev] check_bit_r8(dev, RegisterR8::H, 7));
+    opcode!(check_bit_7_l,     [dev] check_bit_r8(dev, RegisterR8::L, 7));
+    opcode!(check_bit_7_hlptr, [dev, ec] check_bit_r16ptr(dev, ec, RegisterR16::HL, 7));
 }
 
 ////////////////////////////////////////////////
@@ -1090,50 +1091,50 @@ pub mod cp {
     use super::*;
 
     /// Compares two values.
-    fn cp_u8v_u8v(gb: &mut GameBoy, value1: u8, value2: u8) {
+    fn cp_u8v_u8v(dev: &mut EmulatorDevice, value1: u8, value2: u8) {
         let (_, half_carry, carry) = carrying_sub_u8(value1, value2, false);
 
-        gb.cpu.set_flag(CpuFlag::Zero,      value1 == value2);
-        gb.cpu.set_flag(CpuFlag::Negative,  true);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
-        gb.cpu.set_flag(CpuFlag::Carry,     carry);
+        dev.cpu.set_flag(CpuFlag::Zero, value1 == value2);
+        dev.cpu.set_flag(CpuFlag::Negative, true);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, half_carry);
+        dev.cpu.set_flag(CpuFlag::Carry, carry);
     }
 
     /// Compares two values.
     /// cp r8, u8
-    fn cp_r8_u8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value1 = gb.cpu.get_r8(r8);
-        let value2 = gb.cpu.fetch_u8();
-        cp_u8v_u8v(gb, value1, value2);
+    fn cp_r8_u8(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, r8: RegisterR8) {
+        let value1 = dev.cpu.get_r8(r8);
+        let value2 = dev.cpu.fetch_u8(ec);
+        cp_u8v_u8v(dev, value1, value2);
     }
 
     /// Compares two values.
     /// cp dst, src
-    fn cp_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
-        let value1 = gb.cpu.get_r8(dst);
-        let value2 = gb.cpu.get_r8(src);
-        cp_u8v_u8v(gb, value1, value2);
+    fn cp_r8_r8(dev: &mut EmulatorDevice, _ec: &mut impl EmulatorClientMut, dst: RegisterR8, src: RegisterR8) {
+        let value1 = dev.cpu.get_r8(dst);
+        let value2 = dev.cpu.get_r8(src);
+        cp_u8v_u8v(dev, value1, value2);
     }
 
     /// Compares two values.
     /// cp dst, (src_ptr)
-    fn cp_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
-        let value1  = gb.cpu.get_r8(dst);
-        let address = gb.cpu.get_r16(src_ptr);
-        let value2  = gb.get_mmu().read_u8(address);
-        cp_u8v_u8v(gb, value1, value2);
+    fn cp_r8_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, src_ptr: RegisterR16) {
+        let value1  = dev.cpu.get_r8(dst);
+        let address = dev.cpu.get_r16(src_ptr);
+        let value2  = dev.get_mmu().read_u8(ec, address);
+        cp_u8v_u8v(dev, value1, value2);
     }
 
 
-    opcode!(cp_a_u8,    [gb] cp_r8_u8(gb, RegisterR8::A));
-    opcode!(cp_a_a,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::A));
-    opcode!(cp_a_b,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::B));
-    opcode!(cp_a_c,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::C));
-    opcode!(cp_a_d,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::D));
-    opcode!(cp_a_e,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::E));
-    opcode!(cp_a_h,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::H));
-    opcode!(cp_a_l,     [gb] cp_r8_r8(gb, RegisterR8::A, RegisterR8::L));
-    opcode!(cp_a_hlptr, [gb] cp_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL));
+    opcode!(cp_a_u8,    [dev, ec] cp_r8_u8(dev, ec, RegisterR8::A));
+    opcode!(cp_a_a,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A));
+    opcode!(cp_a_b,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B));
+    opcode!(cp_a_c,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C));
+    opcode!(cp_a_d,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D));
+    opcode!(cp_a_e,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E));
+    opcode!(cp_a_h,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H));
+    opcode!(cp_a_l,     [dev, ec] cp_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L));
+    opcode!(cp_a_hlptr, [dev, ec] cp_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -1143,48 +1144,48 @@ pub mod and {
 
     /// Computes a bitwise AND.
     /// r8 <- r8 & value
-    fn and_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
-        let old_value = gb.cpu.get_r8(r8);
+    fn and_r8_u8v(dev: &mut EmulatorDevice, r8: RegisterR8, value: u8) {
+        let old_value = dev.cpu.get_r8(r8);
         let result    = old_value & value;
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, true);
-        gb.cpu.set_flag(CpuFlag::Carry,     false);
-        gb.cpu.set_r8(r8, result);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, true);
+        dev.cpu.set_flag(CpuFlag::Carry, false);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Computes a bitwise AND.
     /// dst <- dst & u8
-    fn and_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
-        let value = gb.cpu.fetch_u8();
-        and_r8_u8v(gb, dst, value);
+    fn and_r8_u8(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8) {
+        let value = dev.cpu.fetch_u8(ec);
+        and_r8_u8v(dev, dst, value);
     }
 
     /// Computes a bitwise AND.
     /// dst <- dst & src
-    fn and_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
-        let value = gb.cpu.get_r8(src);
-        and_r8_u8v(gb, dst, value);
+    fn and_r8_r8(dev: &mut EmulatorDevice, _ec: &mut impl EmulatorClientMut, dst: RegisterR8, src: RegisterR8) {
+        let value = dev.cpu.get_r8(src);
+        and_r8_u8v(dev, dst, value);
     }
 
     /// Computes a bitwise AND.
     /// dst <- dst & (src_ptr)
-    fn and_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.get_mmu().read_u8(address);
-        and_r8_u8v(gb, dst, value);
+    fn and_r8_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, src_ptr: RegisterR16) {
+        let address = dev.cpu.get_r16(src_ptr);
+        let value   = dev.get_mmu().read_u8(ec, address);
+        and_r8_u8v(dev, dst, value);
     }
 
 
-    opcode!(and_a_u8,    [gb] and_r8_u8(gb, RegisterR8::A));
-    opcode!(and_a_a,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::A));
-    opcode!(and_a_b,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::B));
-    opcode!(and_a_c,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::C));
-    opcode!(and_a_d,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::D));
-    opcode!(and_a_e,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::E));
-    opcode!(and_a_h,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::H));
-    opcode!(and_a_l,     [gb] and_r8_r8(gb, RegisterR8::A, RegisterR8::L));
-    opcode!(and_a_hlptr, [gb] and_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL));
+    opcode!(and_a_u8,    [dev, ec] and_r8_u8(dev, ec, RegisterR8::A));
+    opcode!(and_a_a,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A));
+    opcode!(and_a_b,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B));
+    opcode!(and_a_c,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C));
+    opcode!(and_a_d,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D));
+    opcode!(and_a_e,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E));
+    opcode!(and_a_h,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H));
+    opcode!(and_a_l,     [dev, ec] and_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L));
+    opcode!(and_a_hlptr, [dev, ec] and_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -1194,48 +1195,48 @@ pub mod or {
 
     /// Computes a bitwise OR.
     /// r8 <- r8 | value
-    fn or_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
-        let old_value = gb.cpu.get_r8(r8);
+    fn or_r8_u8v(dev: &mut EmulatorDevice, r8: RegisterR8, value: u8) {
+        let old_value = dev.cpu.get_r8(r8);
         let result    = old_value | value;
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, false);
-        gb.cpu.set_flag(CpuFlag::Carry,     false);
-        gb.cpu.set_r8(r8, result);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, false);
+        dev.cpu.set_flag(CpuFlag::Carry, false);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Computes a bitwise OR.
     /// dst <- dst | u8
-    fn or_r8_u8(gb: &mut GameBoy, dst: RegisterR8) {
-        let value = gb.cpu.fetch_u8();
-        or_r8_u8v(gb, dst, value);
+    fn or_r8_u8(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8) {
+        let value = dev.cpu.fetch_u8(ec);
+        or_r8_u8v(dev, dst, value);
     }
 
     /// Computes a bitwise OR.
     /// dst <- dst | src
-    fn or_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
-        let value = gb.cpu.get_r8(src);
-        or_r8_u8v(gb, dst, value);
+    fn or_r8_r8(dev: &mut EmulatorDevice, _ec: &mut impl EmulatorClientMut, dst: RegisterR8, src: RegisterR8) {
+        let value = dev.cpu.get_r8(src);
+        or_r8_u8v(dev, dst, value);
     }
 
     /// Computes a bitwise OR.
     /// dst <- dst | (src_ptr)
-    fn or_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.get_mmu().read_u8(address);
-        or_r8_u8v(gb, dst, value);
+    fn or_r8_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, src_ptr: RegisterR16) {
+        let address = dev.cpu.get_r16(src_ptr);
+        let value   = dev.get_mmu().read_u8(ec, address);
+        or_r8_u8v(dev, dst, value);
     }
 
 
-    opcode!(or_a_u8,    [gb] or_r8_u8(gb, RegisterR8::A));
-    opcode!(or_a_a,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::A));
-    opcode!(or_a_b,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::B));
-    opcode!(or_a_c,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::C));
-    opcode!(or_a_d,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::D));
-    opcode!(or_a_e,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::E));
-    opcode!(or_a_h,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::H));
-    opcode!(or_a_l,     [gb] or_r8_r8(gb, RegisterR8::A, RegisterR8::L));
-    opcode!(or_a_hlptr, [gb] or_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL));
+    opcode!(or_a_u8,    [dev, ec] or_r8_u8(dev, ec, RegisterR8::A));
+    opcode!(or_a_a,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A));
+    opcode!(or_a_b,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B));
+    opcode!(or_a_c,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C));
+    opcode!(or_a_d,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D));
+    opcode!(or_a_e,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E));
+    opcode!(or_a_h,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H));
+    opcode!(or_a_l,     [dev, ec] or_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L));
+    opcode!(or_a_hlptr, [dev, ec] or_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
@@ -1245,60 +1246,60 @@ pub mod xor {
 
     /// Computes a bitwise XOR.
     /// r8 <- r8 ^ value
-    fn xor_r8_u8v(gb: &mut GameBoy, r8: RegisterR8, value: u8) {
-        let old_value = gb.cpu.get_r8(r8);
+    fn xor_r8_u8v(dev: &mut EmulatorDevice, r8: RegisterR8, value: u8) {
+        let old_value = dev.cpu.get_r8(r8);
         let result    = old_value ^ value;
-        gb.cpu.set_flag(CpuFlag::Zero,      result == 0);
-        gb.cpu.set_flag(CpuFlag::Negative,  false);
-        gb.cpu.set_flag(CpuFlag::HalfCarry, false);
-        gb.cpu.set_flag(CpuFlag::Carry,     false);
-        gb.cpu.set_r8(r8, result);
+        dev.cpu.set_flag(CpuFlag::Zero, result == 0);
+        dev.cpu.set_flag(CpuFlag::Negative, false);
+        dev.cpu.set_flag(CpuFlag::HalfCarry, false);
+        dev.cpu.set_flag(CpuFlag::Carry, false);
+        dev.cpu.set_r8(r8, result);
     }
 
     /// Computes a bitwise XOR.
     /// dst <- dst ^ src
-    fn xor_r8_r8(gb: &mut GameBoy, dst: RegisterR8, src: RegisterR8) {
-        let value = gb.cpu.get_r8(src);
-        xor_r8_u8v(gb, dst, value);
+    fn xor_r8_r8(dev: &mut EmulatorDevice, _ec: &mut impl EmulatorClientMut, dst: RegisterR8, src: RegisterR8) {
+        let value = dev.cpu.get_r8(src);
+        xor_r8_u8v(dev, dst, value);
     }
 
     /// Computes a bitwise XOR.
     /// dst <- dst ^ (src_ptr)
-    fn xor_r8_r16ptr(gb: &mut GameBoy, dst: RegisterR8, src_ptr: RegisterR16) {
-        let address = gb.cpu.get_r16(src_ptr);
-        let value   = gb.get_mmu().read_u8(address);
-        xor_r8_u8v(gb, dst, value);
+    fn xor_r8_r16ptr(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, dst: RegisterR8, src_ptr: RegisterR16) {
+        let address = dev.cpu.get_r16(src_ptr);
+        let value   = dev.get_mmu().read_u8(ec, address);
+        xor_r8_u8v(dev, dst, value);
     }
 
 
-    fn xor_r8_u8(gb: &mut GameBoy, r8: RegisterR8) {
-        let value = gb.cpu.fetch_u8();
-        xor_r8_u8v(gb, r8, value);
+    fn xor_r8_u8(dev: &mut EmulatorDevice, ec: &mut impl EmulatorClientMut, r8: RegisterR8) {
+        let value = dev.cpu.fetch_u8(ec);
+        xor_r8_u8v(dev, r8, value);
     }
 
 
-    opcode!(xor_a_u8,    [gb] xor_r8_u8(gb, RegisterR8::A));
-    opcode!(xor_a_a,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::A));
-    opcode!(xor_a_b,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::B));
-    opcode!(xor_a_c,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::C));
-    opcode!(xor_a_d,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::D));
-    opcode!(xor_a_e,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::E));
-    opcode!(xor_a_h,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::H));
-    opcode!(xor_a_l,     [gb] xor_r8_r8(gb, RegisterR8::A, RegisterR8::L));
-    opcode!(xor_a_hlptr, [gb] xor_r8_r16ptr(gb, RegisterR8::A, RegisterR16::HL));
+    opcode!(xor_a_u8,    [dev, ec] xor_r8_u8(dev, ec, RegisterR8::A));
+    opcode!(xor_a_a,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::A));
+    opcode!(xor_a_b,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::B));
+    opcode!(xor_a_c,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::C));
+    opcode!(xor_a_d,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::D));
+    opcode!(xor_a_e,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::E));
+    opcode!(xor_a_h,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::H));
+    opcode!(xor_a_l,     [dev, ec] xor_r8_r8(dev, ec, RegisterR8::A, RegisterR8::L));
+    opcode!(xor_a_hlptr, [dev, ec] xor_r8_r16ptr(dev, ec, RegisterR8::A, RegisterR16::HL));
 }
 
 ////////////////////////////////////////////////
 //// other
 
 // Convert a BCD Number.
-opcode!(daa, [gb] {
-    let mut a     = gb.cpu.get_r8(RegisterR8::A);
-    let mut half  = gb.cpu.is_flag_set(CpuFlag::HalfCarry);
-    let mut carry = gb.cpu.is_flag_set(CpuFlag::Carry);
+opcode!(daa, [dev] {
+    let mut a     = dev.cpu.get_r8(RegisterR8::A);
+    let mut half  = dev.cpu.is_flag_set(CpuFlag::HalfCarry);
+    let mut carry = dev.cpu.is_flag_set(CpuFlag::Carry);
     let mut tmp_a = a as u16;
 
-    if gb.cpu.is_flag_set(CpuFlag::Negative) {
+    if dev.cpu.is_flag_set(CpuFlag::Negative) {
         if half {
             tmp_a = tmp_a.wrapping_sub(0x06);
 
@@ -1325,33 +1326,33 @@ opcode!(daa, [gb] {
     carry |= (tmp_a & 0x0100) != 0;
     half   = false;
 
-    gb.cpu.set_flag(CpuFlag::Zero,      a == 0);
-    gb.cpu.set_flag(CpuFlag::HalfCarry, half);
-    gb.cpu.set_flag(CpuFlag::Carry,     carry);
+    dev.cpu.set_flag(CpuFlag::Zero,      a == 0);
+    dev.cpu.set_flag(CpuFlag::HalfCarry, half);
+    dev.cpu.set_flag(CpuFlag::Carry,     carry);
 
-    gb.cpu.set_r8(RegisterR8::A, a);
+    dev.cpu.set_r8(RegisterR8::A, a);
 });
 
 // Complement
-opcode!(cpl_a, [gb] {
-    let value  = gb.cpu.get_r8(RegisterR8::A);
+opcode!(cpl_a, [dev] {
+    let value  = dev.cpu.get_r8(RegisterR8::A);
     let result = !value;
-    gb.cpu.set_r8(RegisterR8::A, result);
-    gb.cpu.set_flag(CpuFlag::Negative,  true);
-    gb.cpu.set_flag(CpuFlag::HalfCarry, true);
+    dev.cpu.set_r8(RegisterR8::A, result);
+    dev.cpu.set_flag(CpuFlag::Negative,  true);
+    dev.cpu.set_flag(CpuFlag::HalfCarry, true);
 });
 
 // Set Carry flag.
-opcode!(scf, [gb] {
-    gb.cpu.set_flag(CpuFlag::Negative,  false);
-    gb.cpu.set_flag(CpuFlag::HalfCarry, false);
-    gb.cpu.set_flag(CpuFlag::Carry,     true);
+opcode!(scf, [dev] {
+    dev.cpu.set_flag(CpuFlag::Negative,  false);
+    dev.cpu.set_flag(CpuFlag::HalfCarry, false);
+    dev.cpu.set_flag(CpuFlag::Carry,     true);
 });
 
 // Change carry flag
-opcode!(ccf, [gb] {
-    gb.cpu.set_flag(CpuFlag::Negative,  false);
-    gb.cpu.set_flag(CpuFlag::HalfCarry, false);
-    gb.cpu.set_flag(CpuFlag::Carry,     !gb.cpu.is_flag_set(CpuFlag::Carry));
+opcode!(ccf, [dev] {
+    dev.cpu.set_flag(CpuFlag::Negative,  false);
+    dev.cpu.set_flag(CpuFlag::HalfCarry, false);
+    dev.cpu.set_flag(CpuFlag::Carry,     !dev.cpu.is_flag_set(CpuFlag::Carry));
 });
 

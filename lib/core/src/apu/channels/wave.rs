@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::min;
+use core::cmp::min;
 
-use crate::apu::apu::ApuState;
-use crate::apu::channels::channel::{ChannelComponent, default_on_read_register, default_on_trigger_event, default_on_write_register, TriggerAction};
+use crate::apu::channels::channel::{default_on_read_register, default_on_trigger_event, default_on_write_register, ChannelComponent, TriggerAction};
 use crate::apu::channels::frequency::Frequency;
 use crate::apu::channels::generator::SoundGenerator;
 use crate::apu::channels::wave_ram::{WaveRam, WaveRamPositionCursor};
-use crate::gameboy::Clock;
+use crate::apu::ApuState;
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
+use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::utils::{as_bit_flag, get_bit};
 
@@ -112,13 +113,13 @@ impl WaveGenerator {
     /// the current state of the wave channel and the device we're running.
     /// This function maps the requested byte into the address which will actually be accessed
     /// or `None` if the wave ram is currently not accessible.
-    pub fn get_wave_ram_access(&self, requested_address: u16, apu_state: &ApuState) -> Option<u8> {
+    pub fn get_wave_ram_access(&self, ec: &impl EmulatorClient, requested_address: u16) -> Option<u8> {
         if !self.channel_enabled {
             // Wave RAM is completely accessible, when channel is disabled
             let index = (requested_address - MEMORY_LOCATION_APU_WAVE_RAM_BEGIN) & 0x0f;
             Some(index as u8)
         }
-        else if apu_state.device_config.is_gbc_enabled() || (self.wave_ram_access_timeout > 0) {
+        else if ec.get_device_config().is_gbc_enabled() || (self.wave_ram_access_timeout > 0) {
             // with the channel enabled, the access is restricted to the last
             // address being read by the sound generator.
             // On DMG this is only possible within 2 cycles after the data was read,
@@ -135,8 +136,8 @@ impl WaveGenerator {
 
     /// Reads data from the Wave RAM given the requested memory address.
     /// This takes into account when the access is restricted when the channel is enabled.
-    pub fn read_wave_ram(&self, requested_address: u16, apu_state: &ApuState) -> u8 {
-        if let Some(address) = self.get_wave_ram_access(requested_address, apu_state) {
+    pub fn read_wave_ram(&self, ec: &impl EmulatorClient, requested_address: u16) -> u8 {
+        if let Some(address) = self.get_wave_ram_access(ec, requested_address) {
             self.wave_ram[address]
         }
         else {
@@ -147,8 +148,8 @@ impl WaveGenerator {
 
     /// Writes data to the Wave RAM given the requested memory address.
     /// This takes into account when the access is restricted when the channel is enabled.
-    pub fn write_wave_ram(&mut self, requested_address: u16, value: u8, apu_state: &ApuState) {
-        if let Some(address) = self.get_wave_ram_access(requested_address, apu_state) {
+    pub fn write_wave_ram(&mut self, ec: &impl EmulatorClient, requested_address: u16, value: u8) {
+        if let Some(address) = self.get_wave_ram_access(ec, requested_address) {
             self.wave_ram[address] = value;
         }
     }
@@ -156,7 +157,9 @@ impl WaveGenerator {
 
 
 impl ChannelComponent for WaveGenerator {
-    fn can_write_register(&self, number: u16, apu_state: &ApuState) -> bool {
+    fn can_write_register(&self, ec: &impl EmulatorClient, apu_state: &ApuState, number: u16) -> bool {
+        _ = ec;
+
         match number {
             // Wave RAM is always writable
             MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => true,
@@ -165,7 +168,7 @@ impl ChannelComponent for WaveGenerator {
     }
 
 
-    fn on_read_register(&self, number: u16, apu_state: &ApuState) -> u8 {
+    fn on_read_register(&self, ec: &impl EmulatorClient, apu_state: &ApuState, number: u16) -> u8 {
         match number {
             0 => NR30_NON_READABLE_BITS | as_bit_flag(self.dac_enabled, 7),
             2 => NR32_NON_READABLE_BITS | (self.output_level << 5),
@@ -174,15 +177,15 @@ impl ChannelComponent for WaveGenerator {
 
             // Wave RAM
             MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => {
-                self.read_wave_ram(number, apu_state)
+                self.read_wave_ram(ec, number)
             }
 
-            _ => default_on_read_register(number, apu_state)
+            _ => default_on_read_register(ec, apu_state, number)
         }
     }
 
 
-    fn on_write_register(&mut self, number: u16, value: u8, apu_state: &ApuState) -> TriggerAction {
+    fn on_write_register(&mut self, ec: &mut impl EmulatorClientMut, apu_state: &ApuState, number: u16, value: u8) -> TriggerAction {
         match number {
             0 => {
                 self.dac_enabled = get_bit(value, 7);
@@ -211,21 +214,21 @@ impl ChannelComponent for WaveGenerator {
 
             // Wave RAM
             MEMORY_LOCATION_APU_WAVE_RAM_BEGIN ..= MEMORY_LOCATION_APU_WAVE_RAM_END => {
-                self.write_wave_ram(number, value, apu_state);
+                self.write_wave_ram(ec, number, value);
             }
 
             _ => { }
         }
 
-        default_on_write_register(number, value, apu_state)
+        default_on_write_register(ec, apu_state, number, value)
     }
 
 
-    fn on_trigger_event(&mut self, apu_state: &ApuState) -> TriggerAction {
+    fn on_trigger_event(&mut self, ec: &impl EmulatorClient, apu_state: &ApuState) -> TriggerAction {
         if
                 self.channel_enabled // was already enabled
             &&  self.wave_timer == 2 // wave ram is about to be read when the timer expires
-            &&  !apu_state.device_config.is_gbc_enabled()
+            &&  !ec.get_device_config().is_gbc_enabled()
         {
             self.wave_ram.do_wave_ram_corruption(&self.wave_ram_position);
         }
@@ -236,7 +239,7 @@ impl ChannelComponent for WaveGenerator {
         self.wave_ram_last_address  = 0;
         self.wave_timer             = 6; // required to pass Blargg's test 09-wave-read-while-on
 
-        default_on_trigger_event(apu_state)
+        default_on_trigger_event(ec, apu_state)
     }
 
 
@@ -245,7 +248,7 @@ impl ChannelComponent for WaveGenerator {
     }
 
 
-    fn on_reset(&mut self, _apu_state: &ApuState) {
+    fn on_reset(&mut self, _ec: &impl EmulatorClient, _apu_state: &ApuState) {
         // reset everything except wave ram
         *self = Self {
             wave_ram: self.wave_ram,

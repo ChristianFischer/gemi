@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
 
-use crate::cartridge::Cartridge;
+use crate::cartridge::image_data::{ImageData, ImageDataMut};
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::mmu::mbc::mbc1::Mbc1;
 use crate::mmu::mbc::mbc2::Mbc2;
 use crate::mmu::mbc::mbc5::Mbc5;
@@ -26,6 +28,7 @@ use crate::mmu::mbc::mbc_none::MbcNone;
 
 /// Type of memory bank controller to be used
 #[derive(Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum MemoryBankController {
     None,
     MBC1,
@@ -55,10 +58,10 @@ pub enum Mbc {
 /// Trait for objects acting as memory bank controller.
 pub trait MbcImpl {
     /// Read a single byte from the device memory.
-    fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8;
+    fn read_byte(&self, ec: &impl EmulatorClient, address: u16) -> u8;
 
     /// Write a single byte into the device memory.
-    fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8);
+    fn write_byte(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8);
 }
 
 
@@ -70,11 +73,19 @@ pub fn create_mbc(kind: &MemoryBankController) -> Mbc {
         MemoryBankController::MBC1M => Mbc::MBC1(Mbc1::new_multicart()),
         MemoryBankController::MBC2  => Mbc::MBC2(Mbc2::new()),
         MemoryBankController::MBC5  => Mbc::MBC5(Mbc5::new()),
-        _                           => panic!("Not implemented {}", kind)
+
+        _ => {
+            #[cfg(feature = "std")]
+            unimplemented!("Not implemented: {}", kind);
+
+            #[cfg(not(feature = "std"))]
+            unimplemented!("Not implemented")
+        }
     }
 }
 
 
+#[cfg(feature = "std")]
 impl Display for MemoryBankController {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let name = match *self {
@@ -94,30 +105,30 @@ impl Display for MemoryBankController {
 
 
 impl MbcImpl for Mbc {
-    fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+    fn read_byte(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
         match self {
-            Mbc::None(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC1(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC1M(mbc_impl) => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC2(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC3(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC5(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC6(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
-            Mbc::MBC7(mbc_impl)  => mbc_impl.read_byte(cartridge, address),
+            Mbc::None(mbc_impl)  => mbc_impl.read_byte(ec, address),
+            Mbc::MBC1(mbc_impl)  => mbc_impl.read_byte(ec, address),
+            Mbc::MBC1M(mbc_impl) => mbc_impl.read_byte(ec, address),
+            Mbc::MBC2(mbc_impl)  => mbc_impl.read_byte(ec, address),
+            Mbc::MBC3(mbc_impl)  => mbc_impl.read_byte(ec, address),
+            Mbc::MBC5(mbc_impl)  => mbc_impl.read_byte(ec, address),
+            Mbc::MBC6(mbc_impl)  => mbc_impl.read_byte(ec, address),
+            Mbc::MBC7(mbc_impl)  => mbc_impl.read_byte(ec, address),
         }
     }
 
 
-    fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+    fn write_byte(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
         match self {
-            Mbc::None(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC1(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC1M(mbc_impl) => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC2(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC3(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC5(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC6(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
-            Mbc::MBC7(mbc_impl)  => mbc_impl.write_byte(cartridge, address, value),
+            Mbc::None(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC1(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC1M(mbc_impl) => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC2(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC3(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC5(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC6(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
+            Mbc::MBC7(mbc_impl)  => mbc_impl.write_byte(ec, address, value),
         }
     }
 }
@@ -143,11 +154,11 @@ pub mod mbc_none {
 
 
     impl MbcImpl for MbcNone {
-        fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
             match address {
                 // read from ROM address space
                 0x0000 ..= 0x7fff => {
-                    cartridge.get_rom().get_at(address as usize)
+                    ec.get_cartridge_rom().read(address as usize)
                 },
 
                 // RAM address space (not available on non-MBC)
@@ -160,7 +171,7 @@ pub mod mbc_none {
         }
 
 
-        fn write_byte(&mut self, _cartridge: &mut Cartridge, _address: u16, _value: u8) {
+        fn write_byte(&mut self, _ec: &mut impl EmulatorClientMut, _address: u16, _value: u8) {
             // not writing any data
         }
     }
@@ -169,7 +180,6 @@ pub mod mbc_none {
 
 mod mbc1 {
     use super::*;
-    use crate::mmu::memory_data::MemoryData;
 
 
     /// Type 1 Memory Bank Controller:
@@ -251,7 +261,7 @@ mod mbc1 {
         /// After writing to one of the bank selection registers,
         /// this function is used to calculate the actual RAM and ROM bank numbers
         /// as well as the offsets to read and write inside the ROM and RAM images.
-        fn update_selected_banks(&mut self, cartridge: &Cartridge) {
+        fn update_selected_banks(&mut self, ec: &impl EmulatorClient) {
             let mut rom_bank_0 = 0u32;
             let mut rom_bank_1 = 0u32;
             let mut ram_bank   = 0u32;
@@ -295,9 +305,9 @@ mod mbc1 {
             }
 
             // store the rom bank and the offset to be added to all requested addresses
-            if cartridge.get_rom_bank_count() != 0 {
-                rom_bank_0 = rom_bank_0 % cartridge.get_rom_bank_count();
-                rom_bank_1 = rom_bank_1 % cartridge.get_rom_bank_count();
+            if ec.get_cartridge_info().get_rom_bank_count() != 0 {
+                rom_bank_0 = rom_bank_0 % ec.get_cartridge_info().get_rom_bank_count();
+                rom_bank_1 = rom_bank_1 % ec.get_cartridge_info().get_rom_bank_count();
 
                 self.rom_bank_0_selected = rom_bank_0;
                 self.rom_bank_0_offset   = (rom_bank_0 as usize) * 0x4000;
@@ -307,8 +317,8 @@ mod mbc1 {
             }
 
             // store the ram bank and the offset to be added to all addresses
-            if cartridge.get_ram_bank_count() != 0 {
-                ram_bank = ram_bank % cartridge.get_ram_bank_count();
+            if ec.get_cartridge_info().get_ram_bank_count() != 0 {
+                ram_bank = ram_bank % ec.get_cartridge_info().get_ram_bank_count();
 
                 self.ram_bank_selected = ram_bank;
                 self.ram_bank_offset   = (ram_bank as usize) * 0x2000;
@@ -318,25 +328,25 @@ mod mbc1 {
 
 
     impl MbcImpl for Mbc1 {
-        fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
                     let rom_address = (address as usize) + self.rom_bank_0_offset;
-                    cartridge.get_rom().get_at(rom_address)
+                    ec.get_cartridge_rom().read(rom_address)
                 },
 
                 // read from the switchable ROM bank
                 0x4000 ..= 0x7fff => {
                     let rom_address = (address as usize) + self.rom_bank_1_offset - 0x4000;
-                    cartridge.get_rom().get_at(rom_address)
+                    ec.get_cartridge_rom().read(rom_address)
                 },
 
                 // read from switchable RAM bank.
                 0xa000 ..= 0xbfff => {
-                    if cartridge.has_ram() && self.ram_enabled {
+                    if ec.get_cartridge_info().has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        cartridge.get_ram().get_at(ram_address)
+                        ec.get_cartridge_ram().read(ram_address)
                     }
                     else {
                         0xff
@@ -348,7 +358,7 @@ mod mbc1 {
         }
 
 
-        fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
             match (address >> 13) & 0x000f {
                 // 0x0000 - 0x1fff: enable or disable RAM
                 0x00 => {
@@ -358,26 +368,26 @@ mod mbc1 {
                 // 0x2000 - 0x3fff: select ROM bank
                 0x01 => {
                     self.bank_selection_0 = value & 0x1f;
-                    self.update_selected_banks(cartridge);
+                    self.update_selected_banks(ec);
                 },
 
                 // 0x4000 - 0x5fff: select RAM bank
                 0x02 => {
                     self.bank_selection_1 = value & 0x03;
-                    self.update_selected_banks(cartridge);
+                    self.update_selected_banks(ec);
                 },
 
                 // 0x6000 - 0x7fff: switch ROM / RAM mode
                 0x03 => {
                     self.mode = value & 0x01;
-                    self.update_selected_banks(cartridge);
+                    self.update_selected_banks(ec);
                 },
 
                 // 0xa000 - 0xbfff: Cartridge RAM
                 0x05 => {
-                    if cartridge.has_ram() && self.ram_enabled {
+                    if ec.get_cartridge_info().has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        cartridge.get_ram_mut().set_at(ram_address, value);
+                        ec.get_cartridge_ram_mut().write(ram_address, value);
                     }
                 },
 
@@ -410,6 +420,7 @@ mod mbc2 {
         rom_bank_offset:   usize,
 
         /// 512 half-bytes Built-in RAM.
+        // todo: should be implemented using cartridge RAM instead of a MBC object member
         ram: MemoryDataFixedSize<512>,
 
         /// Sets if the RAM bank is enabled or not.
@@ -435,7 +446,7 @@ mod mbc2 {
         /// After writing to one of the bank selection registers,
         /// this function is used to calculate the actual RAM and ROM bank numbers
         /// as well as the offsets to read and write inside the ROM and RAM images.
-        fn update_selected_banks(&mut self, cartridge: &Cartridge) {
+        fn update_selected_banks(&mut self, ec: &impl EmulatorClient) {
             let rom_bank = if self.bank_selection_0 != 0 {
                 self.bank_selection_0 as u32
             }
@@ -445,8 +456,8 @@ mod mbc2 {
 
             // store the rom bank and the offset to be added to all
             // requested addresses, beginning with 0x4000
-            if cartridge.get_rom_bank_count() != 0 {
-                self.rom_bank_selected = rom_bank % cartridge.get_rom_bank_count();
+            if ec.get_cartridge_info().get_rom_bank_count() != 0 {
+                self.rom_bank_selected = rom_bank % ec.get_cartridge_info().get_rom_bank_count();
                 self.rom_bank_offset   = (self.rom_bank_selected as usize) * 0x4000;
             }
         }
@@ -454,18 +465,18 @@ mod mbc2 {
 
 
     impl MbcImpl for Mbc2 {
-        fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
                     let rom_address = address as usize;
-                    cartridge.get_rom().get_at(rom_address)
+                    ec.get_cartridge_rom().read(rom_address)
                 },
 
                 // read from the switchable ROM bank
                 0x4000 ..= 0x7fff => {
                     let rom_address = (address as usize) + self.rom_bank_offset - 0x4000;
-                    cartridge.get_rom().get_at(rom_address)
+                    ec.get_cartridge_rom().read(rom_address)
                 },
 
                 // read from switchable RAM bank.
@@ -487,7 +498,7 @@ mod mbc2 {
         }
 
 
-        fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
             match address {
                 // bank selection / RAM enable register
                 0x0000 ..= 0x3fff => {
@@ -495,7 +506,7 @@ mod mbc2 {
                     if get_bit(get_high(address), 0) {
                         // .. take the value to select the ROM bank number ..
                         self.bank_selection_0 = value & 0x0f;
-                        self.update_selected_banks(cartridge);
+                        self.update_selected_banks(ec);
                     }
                     else {
                         // .. otherwise take the value to enable or disable RAM
@@ -531,7 +542,6 @@ mod mbc2 {
 
 mod mbc5 {
     use super::*;
-    use crate::mmu::memory_data::MemoryData;
 
 
     /// Type 5 Memory Bank Controller:
@@ -589,7 +599,7 @@ mod mbc5 {
         /// After writing to one of the bank selection registers,
         /// this function is used to calculate the actual RAM and ROM bank numbers
         /// as well as the offsets to read and write inside the ROM and RAM images.
-        fn update_selected_banks(&mut self, cartridge: &Cartridge) {
+        fn update_selected_banks(&mut self, ec: &impl EmulatorClient) {
             let rom_bank =
                 (self.rom_bank_selection_0 as u32)
               | ((self.rom_bank_selection_1 as u32 & 0x01) << 8)
@@ -601,14 +611,14 @@ mod mbc5 {
 
             // store the rom bank and the offset to be added to all
             // requested addresses, beginning with 0x4000
-            if cartridge.get_rom_bank_count() != 0 {
-                self.rom_bank_selected = rom_bank % cartridge.get_rom_bank_count();
+            if ec.get_cartridge_info().get_rom_bank_count() != 0 {
+                self.rom_bank_selected = rom_bank % ec.get_cartridge_info().get_rom_bank_count();
                 self.rom_bank_offset   = (self.rom_bank_selected as usize) * 0x4000;
             }
 
             // store the ram bank and the offset to be added to all addresses
-            if cartridge.get_ram_bank_count() != 0 {
-                self.ram_bank_selected = ram_bank % cartridge.get_ram_bank_count();
+            if ec.get_cartridge_info().get_ram_bank_count() != 0 {
+                self.ram_bank_selected = ram_bank % ec.get_cartridge_info().get_ram_bank_count();
                 self.ram_bank_offset   = (self.ram_bank_offset as usize) * 0x2000;
             }
         }
@@ -616,25 +626,25 @@ mod mbc5 {
 
 
     impl MbcImpl for Mbc5 {
-        fn read_byte(&self, cartridge: &Cartridge, address: u16) -> u8 {
+        fn read_byte(&self, ec: &impl EmulatorClient, address: u16) -> u8 {
             match address {
                 // read from fixed ROM bank, which is always bank 0.
                 0x0000 ..= 0x3fff => {
                     let rom_address = address as usize;
-                    cartridge.get_rom().get_at(rom_address)
+                    ec.get_cartridge_rom().read(rom_address)
                 },
 
                 // read from the switchable ROM bank
                 0x4000 ..= 0x7fff => {
                     let rom_address = (address as usize) + self.rom_bank_offset - 0x4000;
-                    cartridge.get_rom().get_at(rom_address)
+                    ec.get_cartridge_rom().read(rom_address)
                 },
 
                 // read from switchable RAM bank.
                 0xa000 ..= 0xbfff => {
-                    if cartridge.has_ram() && self.ram_enabled {
+                    if ec.get_cartridge_info().has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) + self.ram_bank_offset - 0xa000;
-                        cartridge.get_ram().get_at(ram_address)
+                        ec.get_cartridge_ram().read(ram_address)
                     }
                     else {
                         0xff
@@ -646,7 +656,7 @@ mod mbc5 {
         }
 
 
-        fn write_byte(&mut self, cartridge: &mut Cartridge, address: u16, value: u8) {
+        fn write_byte(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
             match address {
                 // enable or disable RAM
                 0x0000 ..= 0x1fff => {
@@ -656,19 +666,19 @@ mod mbc5 {
                 // ROM bank selection #0
                 0x2000 ..= 0x2fff => {
                     self.rom_bank_selection_0 = value;
-                    self.update_selected_banks(cartridge);
+                    self.update_selected_banks(ec);
                 },
 
                 // ROM bank selection #1
                 0x3000 ..= 0x3fff => {
                     self.rom_bank_selection_1 = value;
-                    self.update_selected_banks(cartridge);
+                    self.update_selected_banks(ec);
                 },
 
                 // RAM bank selection
                 0x4000 ..= 0x5fff => {
                     self.ram_bank_selection_0 = value & 0x0f;
-                    self.update_selected_banks(cartridge);
+                    self.update_selected_banks(ec);
                 },
 
                 // invalid address
@@ -677,9 +687,9 @@ mod mbc5 {
 
                 // Cartridge RAM
                 0xa000 ..= 0xbfff => {
-                    if cartridge.has_ram() && self.ram_enabled {
+                    if ec.get_cartridge_info().has_ram() && self.ram_enabled {
                         let ram_address = (address as usize) - 0xa000 + self.ram_bank_offset;
-                        cartridge.get_ram_mut().set_at(ram_address, value);
+                        ec.get_cartridge_ram_mut().write(ram_address, value);
                     }
                 },
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use std::cmp::min;
+#[cfg(feature = "std")]
 use std::fmt::{Display, Formatter};
-use std::mem::take;
-use std::ops::Sub;
+
+use core::cmp::min;
+use core::mem::take;
+use core::ops::Sub;
 
 use crate::cpu::interrupts::Interrupt;
-use crate::gameboy::Clock;
+use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
+use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
 use crate::utils::{as_bit_flag, get_bit, get_high};
@@ -257,6 +260,7 @@ impl InternalCounter {
 }
 
 
+#[cfg(feature = "std")]
 impl Display for InternalCounter {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:04x}", self.value)
@@ -382,7 +386,7 @@ impl Timer {
 
 
 impl MemoryBusConnection for Timer {
-    fn on_read(&self, address: u16) -> u8 {
+    fn on_read(&self, _ec: &impl EmulatorClient, address: u16) -> u8 {
         match address {
             MEMORY_LOCATION_REGISTER_DIV  => self.internal_counter.get_div(),
             MEMORY_LOCATION_REGISTER_TIMA => self.tima,
@@ -393,7 +397,7 @@ impl MemoryBusConnection for Timer {
     }
 
 
-    fn on_write(&mut self, address: u16, value: u8) {
+    fn on_write(&mut self, _ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
         match address {
             MEMORY_LOCATION_REGISTER_DIV => {
                 // writing to DIV will reset the counter

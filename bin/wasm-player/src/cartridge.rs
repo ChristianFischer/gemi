@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use libgemi::cartridge::Cartridge as NativeCartridge;
 use wasm_bindgen::prelude::wasm_bindgen;
-use gemi_core::cartridge::Cartridge as NativeCartridge;
-use gemi_core::mmu::memory_data::MemoryData;
 
 
 /// A wrapper around the internal cartridge type to expose it to the JS side.
@@ -56,14 +55,18 @@ impl Cartridge {
     /// Get the title of the cartridge.
     #[wasm_bindgen]
     pub fn get_title(&self) -> String {
-        self.cartridge.get_title().clone()
+        self.cartridge
+                .get_cartridge_info()
+                .get_title().clone()
     }
 
 
     /// Checks whether this cartridge supports GameBoy Color features or not.
     #[wasm_bindgen]
     pub fn is_gbc(&self) -> bool {
-        self.cartridge.supports_cgb()
+        self.cartridge
+                .get_cartridge_info()
+                .supports_cgb()
     }
 }
 

@@ -15,90 +15,117 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::utils::SerdeSupport;
-use std::ops::{Deref, DerefMut};
+#[cfg(feature = "dyn_alloc")]
+pub use serializable_buffer::*;
+
+#[cfg(feature = "dyn_alloc")]
+mod serializable_buffer {
+    use alloc::vec::Vec;
+
+    use core::ops::{Deref, DerefMut};
+
+    use crate::mmu::memory_data::MemoryDataFixedSize;
+    use crate::utils::SerdeSupport;
 
 
-/// A struct to be used as a replacement for a `Vec`, which
-/// is intended to be serialized and likely holds a large amount of data.
-/// Unlike a normal `Vec`, this struct serializes its data into
-/// a compressed base64 encoded string instead of a list of numbers.
-#[derive(Clone)]
-pub struct SerializableBuffer<T: SerdeSupport + Clone>(
-    Vec<T>
-);
+    /// A struct to be used as a replacement for a `Vec`, which
+    /// is intended to be serialized and likely holds a large amount of data.
+    /// Unlike a normal `Vec`, this struct serializes its data into
+    /// a compressed base64 encoded string instead of a list of numbers.
+    #[derive(Clone)]
+    pub struct SerializableBuffer<T: SerdeSupport + Clone>(
+        Vec<T>
+    );
+
+    impl<T: SerdeSupport + Clone> SerializableBuffer<T> {
+        /// Get a vector containing a copy of the internal data.
+        pub fn to_vec(&self) -> Vec<T> {
+            self.0.clone()
+        }
 
 
-impl<T: SerdeSupport + Clone> From<Vec<T>> for SerializableBuffer<T> {
-    fn from(value: Vec<T>) -> Self {
-        Self(value)
+        /// Get the data slice stored in this object.
+        pub fn as_slice(&self) -> &[T] {
+            &self.0
+        }
     }
-}
 
-
-impl<T: SerdeSupport + Clone> Into<Vec<T>> for SerializableBuffer<T> {
-    fn into(self) -> Vec<T> {
-        self.0
+    impl<T: SerdeSupport + Clone, const S: usize> From<[T; S]> for SerializableBuffer<T> {
+        fn from(value: [T; S]) -> Self {
+            Self(value.into())
+        }
     }
-}
 
-
-impl<T: SerdeSupport + Clone> Deref for SerializableBuffer<T> {
-    type Target = Vec<T>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    impl<const S: usize> From<MemoryDataFixedSize<S>> for SerializableBuffer<u8> {
+        fn from(value: MemoryDataFixedSize<S>) -> Self {
+            let array: [u8; S] = value.into();
+            Self(array.into())
+        }
     }
-}
 
-
-impl<T: SerdeSupport + Clone> DerefMut for SerializableBuffer<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+    impl<T: SerdeSupport + Clone> From<Vec<T>> for SerializableBuffer<T> {
+        fn from(value: Vec<T>) -> Self {
+            Self(value)
+        }
     }
-}
 
-
-impl<'a, T: SerdeSupport + Clone> IntoIterator for &'a SerializableBuffer<T> {
-    type Item = &'a T;
-    type IntoIter = std::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter()
+    impl<T: SerdeSupport + Clone> Into<Vec<T>> for SerializableBuffer<T> {
+        fn into(self) -> Vec<T> {
+            self.0
+        }
     }
-}
 
+    impl<T: SerdeSupport + Clone> Deref for SerializableBuffer<T> {
+        type Target = Vec<T>;
 
-impl<'a, T: SerdeSupport + Clone> IntoIterator for &'a mut SerializableBuffer<T> {
-    type Item = &'a mut T;
-    type IntoIter = std::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter_mut()
+        fn deref(&self) -> &Self::Target {
+            &self.0
+        }
     }
-}
 
-
-
-#[cfg(feature = "serde")]
-impl<T: SerdeSupport + Clone> serde::Serialize for SerializableBuffer<T> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-            S: serde::Serializer
-    {
-        crate::utils::serde::serialize::serialize_bytes(serializer, &self.0)
+    impl<T: SerdeSupport + Clone> DerefMut for SerializableBuffer<T> {
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            &mut self.0
+        }
     }
-}
 
+    impl<'a, T: SerdeSupport + Clone> IntoIterator for &'a SerializableBuffer<T> {
+        type Item = &'a T;
+        type IntoIter = core::slice::Iter<'a, T>;
 
-#[cfg(feature = "serde")]
-impl<'de, T: SerdeSupport + Clone> serde::Deserialize<'de> for SerializableBuffer<T> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-            D: serde::Deserializer<'de>
-    {
-        let v = crate::utils::serde::serialize::deserialize_bytes(deserializer)?;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter()
+        }
+    }
 
-        Ok(SerializableBuffer::from(v))
+    impl<'a, T: SerdeSupport + Clone> IntoIterator for &'a mut SerializableBuffer<T> {
+        type Item = &'a mut T;
+        type IntoIter = core::slice::IterMut<'a, T>;
+
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter_mut()
+        }
+    }
+
+    #[cfg(feature = "serde")]
+    impl<T: SerdeSupport + Clone> serde::Serialize for SerializableBuffer<T> {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+                S: serde::Serializer
+        {
+            crate::utils::serde::serialize::serialize_bytes(serializer, &self.0)
+        }
+    }
+
+    #[cfg(feature = "serde")]
+    impl<'de, T: SerdeSupport + Clone> serde::Deserialize<'de> for SerializableBuffer<T> {
+        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where
+                D: serde::Deserializer<'de>
+        {
+            let v = crate::utils::serde::serialize::deserialize_bytes(deserializer)?;
+
+            Ok(SerializableBuffer::from(v))
+        }
     }
 }
