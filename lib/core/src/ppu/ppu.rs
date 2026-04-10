@@ -20,18 +20,18 @@ use core::mem::take;
 
 use crate::cpu::interrupts::Interrupt;
 use crate::debug::DebugEvent;
-use crate::device_type::{DeviceConfig, DeviceType, EmulationType};
+use crate::device_type::{DeviceConfig, EmulationType};
 use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals};
-use crate::mmu::memory_data::mapped::MemoryDataMapped;
 use crate::mmu::memory_data::MemoryData;
 use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
 use crate::ppu::graphic_data::*;
+use crate::ppu::ppu_client::PpuClient;
 use crate::ppu::sprite_image::SpriteImage;
 use crate::ppu::video_memory::{OamRam, OamRamBank, Palettes, VideoMemory};
-use crate::utils::{get_bit, SerializableArray};
+use crate::utils::get_bit;
 
 
 pub const SCREEN_W: u32 = 160;
@@ -51,16 +51,6 @@ pub const TILE_ATTR_BIT_VRAM_BANK:                  u8 = 3;
 pub const TILE_ATTR_BIT_H_FLIP:                     u8 = 5;
 pub const TILE_ATTR_BIT_V_FLIP:                     u8 = 6;
 pub const TILE_ATTR_BIT_BG_TO_OAM_PRIO:             u8 = 7;
-
-
-type PixelArray160x144  = SerializableArray<Color, SCREEN_PIXELS>;
-type PixelBuffer160x144 = MemoryDataMapped<PixelArray160x144>;
-
-
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct LcdBuffer {
-    pixels: PixelBuffer160x144,
-}
 
 
 #[derive(Copy, Clone)]
@@ -230,19 +220,6 @@ pub struct Ppu {
     /// This in independent of the frame line counter (LY) and just updated
     /// when window pixels were drawn for the current scanline.
     window_line: u8,
-
-    /// If in DMG mode, a set of RGB colors to translate the LCD intensity values
-    /// into RGB colors to be displayed on color screens.
-    dmg_display_palette: DmgDisplayPalette,
-
-    /// The data buffer to store the actual viewport content presented to the display.
-    #[cfg(not(feature = "dyn_alloc"))]
-    lcd_buffer: LcdBuffer,
-
-    /// The data buffer to store the actual viewport content presented to the display.
-    // todo: temporary fix to break deep nested objects causing stack overflows on deserialization
-    #[cfg(feature = "dyn_alloc")]
-    lcd_buffer: Box<LcdBuffer>,
 }
 
 
@@ -257,59 +234,6 @@ impl PixelFetchResult {
             sprite_priority: 0,
             background_priority: false,
         }
-    }
-}
-
-
-impl LcdBuffer {
-    pub fn alloc() -> LcdBuffer {
-        LcdBuffer::allow_with_color(Color::white())
-    }
-
-    pub fn allow_with_color(color: Color) -> LcdBuffer {
-        LcdBuffer {
-            pixels: PixelBuffer160x144::new([color; SCREEN_PIXELS])
-        }
-    }
-
-
-    /// Get the width of the buffer image content.
-    pub fn get_width(&self) -> u32 {
-        SCREEN_W
-    }
-
-    /// Get the height of the buffer image content.
-    pub fn get_height(&self) -> u32 {
-        SCREEN_H
-    }
-
-    /// Get the value of a specific pixel.
-    pub fn get_pixel(&self, x: u32, y: u32) -> &Color {
-        let index = x + (y * SCREEN_W);
-        &self.pixels.get()[index as usize]
-    }
-
-    /// Set the value of a specific pixel.
-    pub fn set_pixel(&mut self, x: u32, y: u32, color: Color) {
-        let index = x + (y * SCREEN_W);
-        self.pixels.get_mut()[index as usize] = color;
-    }
-
-    /// Fill the whole screen with a single solid color.
-    pub fn fill(&mut self, color: Color) {
-        for pixel in self.pixels.get_mut() {
-            *pixel = color;
-        }
-    }
-
-    /// Get the pixel data to be displayed.
-    pub fn get_pixels(&self) -> &PixelBuffer160x144 {
-        &self.pixels
-    }
-
-    /// Get the pixel data to be displayed as a slice of bytes.
-    pub fn get_pixels_as_slice(&self) -> &[u8] {
-        self.pixels.as_slice()
     }
 }
 
@@ -329,14 +253,6 @@ impl ScanlineData {
 impl Ppu {
     /// Creates a new PPU object.
     pub fn new(ec: &impl EmulatorClient) -> Ppu {
-        let device_config = ec.get_device_config();
-        let dmg_display_palette = match device_config.device {
-            DeviceType::GameBoyDmg => DmgDisplayPalette::new_green(),
-            _ => DmgDisplayPalette::new_gray(),
-        };
-
-        let blank_color = Self::get_blank_color(&device_config, &dmg_display_palette);
-
         Ppu {
             clock: 0,
             signals: MemoryBusSignals::default(),
@@ -350,20 +266,6 @@ impl Ppu {
             current_line_cycles: 0,
             current_scanline: ScanlineData::new(),
             window_line: 0,
-            dmg_display_palette,
-            #[cfg(not(feature = "dyn_alloc"))]
-            lcd_buffer: LcdBuffer::allow_with_color(blank_color),
-            #[cfg(feature = "dyn_alloc")]
-            lcd_buffer: Box::new(LcdBuffer::allow_with_color(blank_color)),
-        }
-    }
-
-
-    /// Get the blank color for a disabled screen.
-    fn get_blank_color(device_config: &DeviceConfig, dmg_display_palette: &DmgDisplayPalette) -> Color {
-        match device_config.emulation {
-            EmulationType::DMG => dmg_display_palette.get_colors()[0],
-            EmulationType::GBC => Color::white(),
         }
     }
 
@@ -372,7 +274,7 @@ impl Ppu {
     /// This function takes the amount of ticks to be processed
     /// and the return value tells when VBlank finished and
     /// a whole new frame was generated.
-    pub fn update(&mut self, ec: &impl EmulatorClient, cycles: Clock) {
+    pub fn update(&mut self, ec: &mut impl EmulatorClientMut, cycles: Clock) {
         match self.lcd_state {
             LcdState::On => {
                 self.clock += cycles;
@@ -438,7 +340,7 @@ impl Ppu {
 
     /// Draws pixels of the current scanline into the LCD buffer.
     /// Enters Mode::HBlank after the drawing was completed.
-    fn process_draw_line(&mut self, ec: &impl EmulatorClient) {
+    fn process_draw_line(&mut self, ec: &mut impl EmulatorClientMut) {
         let pixels_remaining = SCREEN_W - (self.current_line_pixel as u32);
 
         if pixels_remaining > 0 {
@@ -466,7 +368,7 @@ impl Ppu {
 
 
     /// Process a number of pixels within the current scanline.
-    fn process_draw_line_pixels(&mut self, ec: &impl EmulatorClient, pixels_to_update: Clock) {
+    fn process_draw_line_pixels(&mut self, ec: &mut impl EmulatorClientMut, pixels_to_update: Clock) {
         let window_enabled   = self.check_lcdc(LcdControlFlag::WindowEnabled);
         let palette_bg       = &self.memory.palettes.bgp;
         let palette_obp      = &self.memory.palettes.obp;
@@ -511,23 +413,24 @@ impl Ppu {
             // the first frame does not draw pixels
             if !self.is_first_frame {
                 // resolve pixel color using the according palette
-                let pixel_color = match ec.get_device_config().emulation {
+                // and send it to the frontend for rendering
+                match ec.get_device_config().emulation {
                     EmulationType::DMG => {
-                        let lcd_pixel = pixel.palette_dmg.get_color(&pixel.data.value);
-                        *self.translate_dmg_color_index(&lcd_pixel)
+                        ec.get_ppu_client_mut().put_dmg_pixel(
+                            self.current_line_pixel as u32,
+                            self.current_line as u32,
+                            pixel.palette_dmg.get_color(&pixel.data.value)
+                        );
                     }
 
                     EmulationType::GBC => {
-                        pixel.palette_gbc.get_color(&pixel.data.value)
+                        ec.get_ppu_client_mut().put_color_pixel(
+                            self.current_line_pixel as u32,
+                            self.current_line as u32,
+                            pixel.palette_gbc.get_color(&pixel.data.value)
+                        );
                     }
                 };
-
-                // write pixel into LCD buffer
-                self.lcd_buffer.set_pixel(
-                    self.current_line_pixel as u32,
-                    self.current_line as u32,
-                    pixel_color
-                );
             }
 
             // set next pixel to compute
@@ -774,16 +677,13 @@ impl Ppu {
 
 
     /// Clears the screen with a 'blank' color.
-    fn clear_screen(&mut self, ec: &impl EmulatorClient) {
-        self.lcd_buffer.fill(Self::get_blank_color(
-            ec.get_device_config(),
-            &self.dmg_display_palette
-        ));
+    fn clear_screen(&mut self, ec: &mut impl EmulatorClientMut) {
+        ec.get_ppu_client_mut().clear_screen();
     }
 
 
     /// Reset the PPU once it get disabled.
-    fn on_ppu_reset(&mut self, ec: &impl EmulatorClient) {
+    fn on_ppu_reset(&mut self, ec: &mut impl EmulatorClientMut) {
         self.clock                  = 0;
         self.lcd_state              = LcdState::Off;
         self.mode                   = Mode::HBlank;
@@ -809,26 +709,6 @@ impl Ppu {
         self.signals.interrupts |= interrupt;
     }
 
-    /// Set the palette to be used to translate DMG LCD color values into RGBA colors.
-    pub fn set_dmg_display_palette(&mut self, ec: &impl EmulatorClient, palette: DmgDisplayPalette) {
-        self.dmg_display_palette = palette;
-
-        // clear the screen when the palette was changed.
-        if self.is_first_frame {
-            self.clear_screen(ec);
-        }
-    }
-
-    /// Get the current palette to be used to translate DMG LCD color intensities into RGBA colors
-    pub fn get_dmg_display_palette(&self) -> &DmgDisplayPalette {
-        &self.dmg_display_palette
-    }
-
-    /// Get the RGBA color for any color color index.
-    pub fn translate_dmg_color_index(&self, pixel: &DmgLcdPixel) -> &Color {
-        self.get_dmg_display_palette().get_color(pixel)
-    }
-
     /// Get the index of the line currently being drawn.
     pub fn get_current_line(&self) -> u8 {
         self.current_line
@@ -837,11 +717,6 @@ impl Ppu {
     /// Get the index of the pixel currently being drawn.
     pub fn get_current_line_pixel(&self) -> u8 {
         self.current_line_pixel
-    }
-
-    /// Get the LCD buffer which contains the actual data sent to the device's display.
-    pub fn get_lcd(&self) -> &LcdBuffer {
-        &self.lcd_buffer
     }
 
     /// Get the OAM table.

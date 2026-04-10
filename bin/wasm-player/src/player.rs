@@ -229,7 +229,7 @@ impl WasmPlayer {
 
     /// Render the current frame to the canvas.
     pub fn render_frame(&mut self) -> Result<(), JsValue> {
-        let frame = self.gb.get_ppu().get_lcd();
+        let frame = self.gb.get_display().get_lcd();
         let image = ImageData::new_with_u8_clamped_array_and_sh(
             wasm_bindgen::Clamped(frame.get_pixels_as_slice()),
             frame.get_width(),

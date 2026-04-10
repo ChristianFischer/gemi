@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 pub mod flags;
 pub mod graphic_data;
+pub mod lcd_buffer;
 pub mod ppu;
+pub mod ppu_client;
 pub mod sprite_image;
 pub mod video_memory;

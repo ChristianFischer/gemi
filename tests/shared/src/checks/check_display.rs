@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ use crate::test_config::LcdColorMod;
 use image::ImageReader;
 use image::{Rgba, RgbaImage};
 use libgemi::core::ppu::graphic_data::Color;
-use libgemi::core::ppu::ppu::LcdBuffer;
+use libgemi::core::ppu::lcd_buffer::LcdBuffer;
 use libgemi::GameBoy;
 use std::cmp::min;
 
@@ -146,7 +146,7 @@ pub fn create_comparison_pattern(expected_image: &RgbaImage, lcd_buffer: &LcdBuf
 /// Compares the content of the emulators LCD buffer with a reference image.
 pub fn compare_display_with_image(gb: &GameBoy, image_path: &str, color_mod: &LcdColorMod) -> Result<(), TestCaseError> {
     let expected_image = load_image_from_file(&image_path)?;
-    let lcd_buffer     = gb.get_ppu().get_lcd();
+    let lcd_buffer     = gb.get_display().get_lcd();
     let compare_image  = apply_color_mod(&lcd_buffer, &color_mod);
 
     // check if both images have the same size

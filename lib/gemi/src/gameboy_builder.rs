@@ -18,6 +18,7 @@
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, CartridgeInfo};
 use crate::client_data::GameBoyClientData;
+use crate::display::GameBoyDisplay;
 use crate::GameBoy;
 
 use crate::core::device_type::{DeviceConfig, DeviceType, EmulationType};
@@ -138,27 +139,28 @@ impl Builder {
             emulation: emulation_type,
         };
 
+        // create the display based on the selected device config
+        let mut display = Box::new(GameBoyDisplay::for_device(device_config));
+
+        // apply the DMG display palette, if specified
+        if let Some(dmg_display_palette) = self.dmg_display_palette {
+            display.set_dmg_display_palette(dmg_display_palette);
+        }
+
         // setup the emulator context
         let context_data = Box::new(
             GameBoyClientData {
                 device_config,
                 boot_rom,
                 cartridge,
+                display,
             }
         );
 
         // construct the GameBoy object
-        let mut emulator = Box::new(
+        let emulator = Box::new(
             EmulatorDevice::new(context_data.as_ref())
         );
-
-        if let Some(palette) = self.dmg_display_palette {
-            emulator
-                    .get_mmu_mut()
-                    .get_peripherals_mut()
-                    .ppu
-                    .set_dmg_display_palette(context_data.as_ref(), palette);
-        }
 
         Ok(GameBoy {
             client_data: context_data,

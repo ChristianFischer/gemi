@@ -28,6 +28,7 @@ use crate::core::mmu::memory::Memory;
 use crate::core::mmu::mmu::Mmu;
 use crate::core::ppu::ppu::Ppu;
 use crate::core::serial::SerialPort;
+use crate::display::GameBoyDisplay;
 
 
 /// The GameBoy object providing access to all it's emulated components.
@@ -110,6 +111,12 @@ impl GameBoy {
     /// Get the actual emulator instance.
     pub fn get_emulator_mut(&mut self) -> &mut EmulatorDevice {
         &mut self.emulator
+    }
+
+
+    /// Get the emulator's display.
+    pub fn get_display(&self) -> &GameBoyDisplay {
+        &self.client_data.display
     }
 
 

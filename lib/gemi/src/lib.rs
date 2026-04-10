@@ -18,6 +18,7 @@
 pub mod boot_rom;
 pub mod cartridge;
 mod client_data;
+mod display;
 mod gameboy;
 mod gameboy_builder;
 pub mod snapshots;
@@ -25,5 +26,6 @@ pub mod snapshots;
 // re-export the core library as "gemi::core"
 pub use gemi_core as core;
 
+pub use display::*;
 pub use gameboy::*;
 pub use gameboy_builder::*;

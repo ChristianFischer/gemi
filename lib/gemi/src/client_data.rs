@@ -19,6 +19,7 @@ use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, CartridgeInfo, DataBuffer};
 use crate::core::device_type::DeviceConfig;
 use crate::core::emulator_client::{EmulatorClient, EmulatorClientMut};
+use crate::display::GameBoyDisplay;
 
 
 /// A struct holding the internal data used by the emulator.
@@ -27,6 +28,7 @@ pub(crate) struct GameBoyClientData {
     pub(crate) device_config: DeviceConfig,
     pub(crate) boot_rom:  Option<Box<BootRom>>,
     pub(crate) cartridge: Box<Cartridge>,
+    pub(crate) display:   Box<GameBoyDisplay>,
 }
 
 
@@ -60,9 +62,15 @@ impl EmulatorClient for GameBoyClientData {
 
 impl EmulatorClientMut for GameBoyClientData {
     type RamImageDataMut = DataBuffer;
+    type PpuClient = GameBoyDisplay;
+
 
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
         self.cartridge.get_ram_mut()
+    }
+
+    fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient {
+        &mut self.display
     }
 }
 

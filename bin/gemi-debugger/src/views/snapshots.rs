@@ -51,7 +51,7 @@ struct SnapshotEntry {
 
     /// Time when the snapshot was taken.
     created_at: DateTime<Utc>,
-    
+
     /// The device type the snapshot was created on.
     created_on_device: DeviceType,
 
@@ -140,8 +140,8 @@ impl SnapshotsView {
             selected_entry: None,
         }
     }
-    
-    
+
+
     fn update_toolbar(&mut self, ui: &mut Ui, state: &mut EmulatorState) {
         // Button "new"
         {
@@ -173,7 +173,7 @@ impl SnapshotsView {
     fn display_entry(&mut self, _state: &mut EmulatorState, mut row: TableRow, item_height: f32) {
         let index = row.index();
         let entry = &mut self.snapshots[index];
-        
+
         // is selected?
         row.set_selected(self.selected_entry == Some(index));
 
@@ -199,7 +199,7 @@ impl SnapshotsView {
         row.col(|ui| {
             ui.label(&entry.rom_title);
         });
-        
+
         // Device type
         row.col(|ui| {
             ui.label(entry.created_on_device.get_abbreviation());
@@ -225,7 +225,7 @@ impl SnapshotsView {
 
         // Remainder
         row.col(|_| { });
-        
+
         // handle interactions
         if row.response().double_clicked() {
         }
@@ -254,7 +254,7 @@ impl SnapshotEntry {
         ;
 
         // create image data of the screen to generate a thumbnail
-        let lcd  = gb.get_ppu().get_lcd();
+        let lcd  = gb.get_display().get_lcd();
         let image = ColorImage::from_rgba_unmultiplied(
             [lcd.get_width() as usize, lcd.get_height() as usize],
             lcd.get_pixels().as_slice()

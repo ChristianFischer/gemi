@@ -21,13 +21,13 @@ use libgemi::core::input::{Input, InputButton};
 use libgemi::core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
 use libgemi::core::ppu::flags::LcdControlFlag;
 use libgemi::core::ppu::graphic_data::{Color, DmgPalette, TileMap, TileSet};
-use libgemi::core::ppu::ppu::{LcdBuffer, SCREEN_H, SCREEN_W};
+use libgemi::core::ppu::lcd_buffer::LcdBuffer;
+use libgemi::core::ppu::ppu::{SCREEN_H, SCREEN_W};
 use libgemi::GameBoy;
 use sdl3::event::Event;
 use sdl3::keyboard::Keycode;
 use sdl3::rect::Rect;
 use sdl3::render::{Texture, TextureCreator, UpdateTextureError, WindowCanvas};
-
 
 #[derive(PartialEq)]
 pub enum DisplayMode {
@@ -288,7 +288,7 @@ impl Window {
     /// Presents the content of a LCD buffer on the window.
     pub fn present(&mut self, gb: &GameBoy) {
         match self.display_mode {
-            DisplayMode::Game       => self.present_game(gb.get_ppu().get_lcd()),
+            DisplayMode::Game       => self.present_game(gb.get_display().get_lcd()),
             DisplayMode::Background => self.present_background(gb),
             DisplayMode::Objects    => self.present_objects(gb),
         }
@@ -340,7 +340,7 @@ impl Window {
                 );
 
                 let pixel = palette.get_color(&sprite_pixel.value);
-                let color = ppu.translate_dmg_color_index(&pixel);
+                let color = gb.get_display().translate_dmg_color_index(&pixel);
 
                 self.texture_background.set_color(background_x as u32, background_y as u32, color);
             }
@@ -383,7 +383,7 @@ impl Window {
 
                         let pixel = palette.get_color(&sprite_pixel);
 
-                        let pixel_color = ppu.translate_dmg_color_index(&pixel);
+                        let pixel_color = gb.get_display().translate_dmg_color_index(&pixel);
                         let texture_x   = (object_x as u32 * 8) + (object_pixel_x as u32);
                         let texture_y   = (object_y as u32 * 8) + (object_pixel_y as u32);
 

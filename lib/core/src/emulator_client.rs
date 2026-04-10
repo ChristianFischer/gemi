@@ -18,6 +18,7 @@
 use crate::cartridge::image_data::{FixedSizeImageData, ImageData, ImageDataMut};
 use crate::cartridge::CartridgeInfo;
 use crate::device_type::DeviceConfig;
+use crate::ppu::ppu_client::PpuClient;
 
 
 /// A trait representing the interface between the emulator and the client application.
@@ -83,7 +84,16 @@ pub trait EmulatorClient {
 /// Part of the [EmulatorClient] trait, providing mutable access the client's components.
 pub trait EmulatorClientMut: EmulatorClient
 {
+    /// A generic image data type for mutable access to the cartridge RAM data.
     type RamImageDataMut: ImageDataMut;
 
+    /// A generic PPU client type for display output.
+    type PpuClient: PpuClient;
+
+
+    /// Get mutable access for writing into the cartridge RAM.
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut;
+
+    /// Get the mutable PPU client for display output.
+    fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient;
 }

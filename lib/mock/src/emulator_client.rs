@@ -20,6 +20,7 @@ use gemi_core::cartridge::image_data::{FixedSizeImageData, ImageData, ImageDataM
 use gemi_core::cartridge::CartridgeInfo;
 use gemi_core::device_type::DeviceConfig;
 use gemi_core::emulator_client::{EmulatorClient, EmulatorClientMut};
+use gemi_core::ppu::ppu_client::{NullPpuClient, PpuClient};
 use gemi_core::utils::ioerr;
 
 
@@ -29,27 +30,30 @@ use gemi_core::utils::ioerr;
 /// for testing purposes.
 /// By default, this client is using other mock implementations for ROM, RAM, and boot ROM, but
 /// also allows selecting different implementations via the template arguments of this type.
-pub struct MockEmulatorClient<Rom, Ram, BootRom>
+pub struct MockEmulatorClient<Rom, Ram, BootRom, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
       BootRom: FixedSizeImageData<256>,
+      Display: PpuClient,
 {
     pub device_config:  DeviceConfig,
     pub cartridge_info: CartridgeInfo,
     pub cartridge_rom:  Rom,
     pub cartridge_ram:  Ram,
     pub boot_rom:       Option<BootRom>,
+    pub display:        Display,
 }
 
 
 
-impl<Rom, Ram, BootRom> MockEmulatorClient<Rom, Ram, BootRom>
+impl<Rom, Ram, BootRom, Display> MockEmulatorClient<Rom, Ram, BootRom, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
       BootRom: FixedSizeImageData<256>,
+      Display: PpuClient,
 {
     /// Creates a new instance of the mock emulator client with custom RAM and ROM images.
-    pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram) -> ioerr::Result<Self> {
+    pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram, display: Display) -> ioerr::Result<Self> {
         let cartridge_info = CartridgeInfo::create_from(&rom_data)?;
 
         Ok(
@@ -59,13 +63,14 @@ where Rom: ImageData,
                 cartridge_rom: rom_data,
                 cartridge_ram: ram_data,
                 boot_rom: None,
+                display,
             }
         )
     }
 }
 
 
-impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom> {
+impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom, NullPpuClient> {
     /// Creates a "default" instance.
     ///
     /// This instance will consist of a simple 32k ROM image with no meaningful
@@ -77,12 +82,13 @@ impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom> {
             cartridge_rom: MockImageData::new(),
             cartridge_ram: ZeroImageData::new(),
             boot_rom: None,
+            display: NullPpuClient::default(),
         }
     }
 }
 
 
-impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom> {
+impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom, NullPpuClient> {
     /// Creates an empty instance.
     ///
     /// This instance will consist of empty RAM and ROM images.
@@ -96,15 +102,17 @@ impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom> {
             cartridge_rom: ZeroImageData::new(),
             cartridge_ram: ZeroImageData::new(),
             boot_rom: None,
+            display: NullPpuClient::default(),
         }
     }
 }
 
 
-impl<Rom, Ram, BootRom> EmulatorClient for MockEmulatorClient<Rom, Ram, BootRom>
+impl<Rom, Ram, BootRom, Display> EmulatorClient for MockEmulatorClient<Rom, Ram, BootRom, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
-      BootRom: FixedSizeImageData<256>
+      BootRom: FixedSizeImageData<256>,
+      Display: PpuClient,
 {
     type BootRomImageData = BootRom;
     type RomImageData = Rom;
@@ -132,14 +140,20 @@ where Rom: ImageData,
 }
 
 
-impl<Rom, Ram, BootRom> EmulatorClientMut for MockEmulatorClient<Rom, Ram, BootRom>
+impl<Rom, Ram, BootRom, Display> EmulatorClientMut for MockEmulatorClient<Rom, Ram, BootRom, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
-      BootRom: FixedSizeImageData<256>
+      BootRom: FixedSizeImageData<256>,
+      Display: PpuClient,
 {
     type RamImageDataMut = Ram;
+    type PpuClient = Display;
 
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
         &mut self.cartridge_ram
+    }
+
+    fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient {
+        &mut self.display
     }
 }

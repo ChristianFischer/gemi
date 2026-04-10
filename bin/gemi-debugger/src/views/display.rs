@@ -90,8 +90,8 @@ impl EmulatorDisplayView {
     /// Checks whether the cached display image is outdated and updates the image, if necessary.
     fn update_display_image(&mut self, ctx: &Context, gb: &GameBoy, ui_states: &mut UiStates) {
         if self.rt.display_image.is_none() || self.rt.display_image_timestamp != gb.get_total_cycles_processed() {
-            let ppu    = &gb.get_ppu();
-            let lcd    = ppu.get_lcd();
+            let ppu    = gb.get_ppu();
+            let lcd    = gb.get_display().get_lcd();
             let size   = [lcd.get_width() as _, lcd.get_height() as _];
             let pixels = lcd.get_pixels_as_slice();
 
@@ -208,18 +208,18 @@ impl EmulatorDisplayView {
         let display_bounds = Rect::from_min_size(
                 origin,
                 Vec2::new(
-                        SCREEN_W as f32, 
+                        SCREEN_W as f32,
                         SCREEN_H as f32
                 ) * scale
         );
 
         // listen for click and hover interactions
         let response = ui.interact(
-                display_bounds, 
-                ui.id().with(1), 
+                display_bounds,
+                ui.id().with(1),
                 Sense::click()
         );
-        
+
         if response.hovered() {
             if let Some(hover_pos) = ui.input(|input| input.pointer.hover_pos()) {
                 let ppu           = emu.get_ppu();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #[cfg(feature = "std")]
 use std::fmt::{Debug, Display, Formatter, LowerHex, UpperHex};
 
+use crate::device_type::{DeviceConfig, DeviceType};
 use crate::utils::get_bit;
 
 
@@ -297,6 +298,15 @@ impl DmgDisplayPalette {
         ])
     }
 
+    
+    /// Creates the default palette for a given device.
+    pub fn default_for_device(device_config: DeviceConfig) -> Self {
+        match device_config.device {
+            DeviceType::GameBoyDmg => DmgDisplayPalette::new_green(),
+            _ => DmgDisplayPalette::new_gray(),
+        }
+    }
+
     /// Get the list of colors in this palette.
     pub fn get_colors(&self) -> &[Color; 4] {
         &self.palette
@@ -341,7 +351,7 @@ impl TileSet {
     /// the requested tile.
     pub fn get_tile_image_index(&self, tile: u8) -> usize {
         let tile = tile as usize;
-        
+
         match *self {
             TileSet::H8000 => 0x0000 + tile,
             TileSet::H8800 => 0x0100 + tile - ((tile & 0x80) << 1),
@@ -409,7 +419,7 @@ impl TileSet {
                 if address >= 0x8800 && address <= 0x8ff0 {
                     return Some(((address - 0x8000) >> 4) as u8);
                 }
-                
+
                 if address >= 0x9000 && address <= 0x97f0 {
                     return Some(((address - 0x9000) >> 4) as u8);
                 }
@@ -429,8 +439,8 @@ impl TileMap {
             true  => TileMap::H9C00,
         }
     }
-    
-    
+
+
     /// Get the selection bit, which belongs to the current TileMap.
     pub fn to_select_bit(&self) -> bool {
         match *self {
@@ -438,7 +448,7 @@ impl TileMap {
             TileMap::H9C00 => true,
         }
     }
-    
+
 
     /// Get the base address where the tilemap is stored.
     pub fn base_address(&self) -> u16 {
