@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,11 +29,16 @@ pub mod dac;
 pub mod hpf;
 #[cfg(feature = "apu")]
 pub mod mixer;
-#[cfg(feature = "apu")]
-pub mod sample;
 
 #[cfg(feature = "apu")]
 pub use apu::*;
+
+pub mod apu_client;
+pub mod sample;
+
+#[cfg(feature = "dyn_alloc")]
+pub mod audio_queue;
+
 
 
 #[cfg(not(feature = "apu"))]

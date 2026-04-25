@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::audio::GameBoyAudio;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, CartridgeInfo, DataBuffer};
 use crate::core::device_type::DeviceConfig;
@@ -28,6 +29,7 @@ pub(crate) struct GameBoyClientData {
     pub(crate) device_config: DeviceConfig,
     pub(crate) boot_rom:  Option<Box<BootRom>>,
     pub(crate) cartridge: Box<Cartridge>,
+    pub(crate) audio:     Box<GameBoyAudio>,
     pub(crate) display:   Box<GameBoyDisplay>,
 }
 
@@ -62,11 +64,16 @@ impl EmulatorClient for GameBoyClientData {
 
 impl EmulatorClientMut for GameBoyClientData {
     type RamImageDataMut = DataBuffer;
+    type ApuClient = GameBoyAudio;
     type PpuClient = GameBoyDisplay;
 
 
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
         self.cartridge.get_ram_mut()
+    }
+
+    fn get_apu_client_mut(&mut self) -> &mut Self::ApuClient {
+        &mut self.audio
     }
 
     fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient {

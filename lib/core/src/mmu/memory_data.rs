@@ -130,6 +130,9 @@ pub mod fixed_size {
     use crate::mmu::memory_data::MemoryData;
     use crate::utils::{ioerr, SerializableArray};
 
+    #[cfg(feature = "dyn_alloc")]
+    use alloc::vec::Vec;
+
 
     /// A data object storing data of fixed size.
     #[derive(Clone)]

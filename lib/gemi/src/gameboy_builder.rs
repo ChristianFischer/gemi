@@ -15,12 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::audio::GameBoyAudio;
 use crate::boot_rom::BootRom;
 use crate::cartridge::{Cartridge, CartridgeInfo};
 use crate::client_data::GameBoyClientData;
 use crate::display::GameBoyDisplay;
 use crate::GameBoy;
 
+use crate::core::apu::audio_output::{AudioOutputSpec, AudioOutputSpecError};
 use crate::core::device_type::{DeviceConfig, DeviceType, EmulationType};
 use crate::core::emulator_device::EmulatorDevice;
 use crate::core::ppu::graphic_data::DmgDisplayPalette;
@@ -34,6 +36,7 @@ pub struct Builder {
     boot_rom:               Option<Box<BootRom>>,
     cartridge:              Option<Box<Cartridge>>,
     device_type:            Option<DeviceType>,
+    audio_output_spec:      Option<AudioOutputSpec>,
     dmg_display_palette:    Option<DmgDisplayPalette>,
 }
 
@@ -42,6 +45,8 @@ pub struct Builder {
 #[derive(Debug)]
 pub enum BuilderErrorCode {
     IoError(ioerr::Error),
+
+    AudioSpecError(AudioOutputSpecError),
 
     GameBoyColorNotSupported,
 }
@@ -54,6 +59,7 @@ impl Builder {
             boot_rom:               None,
             cartridge:              None,
             device_type:            None,
+            audio_output_spec:      None,
             dmg_display_palette:    None,
         }
     }
@@ -112,6 +118,13 @@ impl Builder {
     }
 
 
+    /// Configure the audio output.
+    pub fn set_audio_output_spec(&mut self, spec: AudioOutputSpec) {
+        self.audio_output_spec = Some(spec);
+    }
+
+
+    /// Configure the palette to be used to translate DMG colors to the actual display colors.
     pub fn set_dmg_display_palette(&mut self, palette: DmgDisplayPalette) {
         self.dmg_display_palette = Some(palette);
     }
@@ -139,6 +152,9 @@ impl Builder {
             emulation: emulation_type,
         };
 
+        // create the audio interface
+        let audio = Box::new(GameBoyAudio::new());
+
         // create the display based on the selected device config
         let mut display = Box::new(GameBoyDisplay::for_device(device_config));
 
@@ -153,14 +169,25 @@ impl Builder {
                 device_config,
                 boot_rom,
                 cartridge,
+                audio,
                 display,
             }
         );
 
         // construct the GameBoy object
-        let emulator = Box::new(
+        let mut emulator = Box::new(
             EmulatorDevice::new(context_data.as_ref())
         );
+
+        // configure audio output, if specified
+        if let Some(audio_output_spec) = self.audio_output_spec {
+            emulator
+                .get_peripherals_mut().apu
+                .get_audio_output()
+                .set_audio_spec(audio_output_spec)
+                .map_err(BuilderErrorCode::AudioSpecError)?
+            ;
+        }
 
         Ok(GameBoy {
             client_data: context_data,

@@ -21,6 +21,7 @@ mod client_data;
 mod display;
 mod gameboy;
 mod gameboy_builder;
+pub mod audio;
 pub mod snapshots;
 
 // re-export the core library as "gemi::core"

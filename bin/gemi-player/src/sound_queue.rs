@@ -16,17 +16,20 @@
  */
 
 use crate::BoxError;
-use libgemi::core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
+use libgemi::core::apu::audio_output::AudioOutputSpec;
+use libgemi::core::apu::audio_queue::AudioQueue;
+use libgemi::core::apu::sample::{SampleType, StereoSample};
 use libgemi::core::apu::Apu;
-use libgemi::core::apu::{audio_output, sample};
 use sdl3::audio::*;
 use sdl3::Sdl;
 
 
 const SAMPLE_FREQ    : u32   = 48_000;
 const CHANNEL_COUNT  : u8    = 2;
-const BUFFER_SAMPLES : usize = audio_output::SAMPLE_BUFFER_SIZE;
 const DEFAULT_VOLUME : f32   = 0.10;
+
+// provide space to store 1/4 second of audio
+const AUDIO_QUEUE_SIZE: usize = (SAMPLE_FREQ as usize) / 4;
 
 
 /// SoundQueue to feed sound data into the audio device.
@@ -45,11 +48,8 @@ pub struct SoundQueue {
 
 /// SDL callback object to fetch audio samples.
 struct SoundQueueCallback {
-    /// Receiver object of the channel to receive audio samples from the backend.
-    receiver: SamplesReceiver,
-
     /// Buffer containing audio samples received from the backend.
-    buffer: Vec<sample::SampleType>,
+    buffer: AudioQueue,
 
     /// The current volume.
     volume: f32,
@@ -64,16 +64,15 @@ impl SoundQueue {
         let audio_spec = AudioSpec {
             freq:     Some(SAMPLE_FREQ as i32),
             channels: Some(CHANNEL_COUNT as i32),
-            format:   Some(sample::SampleType::audio_format()),
+            format:   Some(SampleType::audio_format()),
         };
 
         // open a channel to the APU backend to receive audio data
-        let receiver = apu.get_audio_output().open_channel(
+        apu.get_audio_output().set_audio_spec(
             AudioOutputSpec {
                 sample_rate: SAMPLE_FREQ,
             }
-        ).ok_or("Cannot connect to emulator")
-        ?;
+        )?;
 
         let audio_device = sdl_audio.open_playback_device(&audio_spec)?;
 
@@ -81,8 +80,7 @@ impl SoundQueue {
             &audio_device,
             &audio_spec,
             SoundQueueCallback {
-                receiver,
-                buffer: Vec::new(),
+                buffer: AudioQueue::alloc(AUDIO_QUEUE_SIZE),
                 volume: DEFAULT_VOLUME,
             }
         )?;
@@ -115,6 +113,14 @@ impl SoundQueue {
     pub fn get_volume(&self) -> f32 {
         self.volume
     }
+
+
+    /// Push audio samples into the audio queue.
+    pub fn push_samples(&mut self, samples: &[StereoSample]) {
+        if let Some(mut audio) = self.audio_stream.lock() {
+            audio.buffer.insert(samples);
+        }
+    }
 }
 
 
@@ -125,39 +131,34 @@ impl Drop for SoundQueue {
 }
 
 
-impl AudioCallback<sample::SampleType> for SoundQueueCallback {
+impl AudioCallback<SampleType> for SoundQueueCallback {
     fn callback(&mut self, out: &mut AudioStream, requested: i32) {
         if requested < 0 {
             return;
         }
 
-        let requested = requested as usize;
+        // get the number of frames requested
+        let requested_frames = requested as usize / CHANNEL_COUNT as usize;
 
         // try to fill the buffer with samples from the backend
-        while let Ok(samples) = self.receiver.try_recv() {
-            // transform from stereo pairs into flat buffer
-            let samples_sequence = samples
+        let samples = match self.buffer.take(requested_frames) {
+            // convert received stereo samples into a flat array of f32 samples and apply the volume
+            Some(samples) => samples
                     .into_iter()
                     .flat_map(|stereo| [stereo.left, stereo.right])
                     .map(|sample| sample.get_value())
-            ;
+                    .map(|sample| sample * self.volume)
+                    .collect::<Vec<_>>(),
 
-            self.buffer.extend(samples_sequence);
-        }
+            // if no samples are available, fill the buffer with silence
+            None => vec![0.0; requested_frames * CHANNEL_COUNT as usize],
+        };
 
-        // if there are too many samples in the buffer, drop the oldest ones
-        while self.buffer.len() > (4 * BUFFER_SAMPLES) {
-            self.buffer.drain(0..BUFFER_SAMPLES);
-        }
+        // insert into the audio stream
+        let result = out.put_data_f32(samples.as_slice());
 
-        // send buffer to audio device
-        if self.buffer.len() >= requested {
-            let samples = self.buffer.drain(..requested).collect::<Vec<_>>();
-            let result  = out.put_data_f32(samples.as_slice());
-
-            if result.is_err() {
-                println!("Error writing audio data: {}", result.err().unwrap());
-            }
+        if let Err(err) = result {
+            eprintln!("Error writing audio data: {err}");
         }
     }
 }

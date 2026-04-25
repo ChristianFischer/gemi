@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::apu::apu_client::ApuClient;
 use crate::cartridge::image_data::{FixedSizeImageData, ImageData, ImageDataMut};
 use crate::cartridge::CartridgeInfo;
 use crate::device_type::DeviceConfig;
@@ -87,12 +88,18 @@ pub trait EmulatorClientMut: EmulatorClient
     /// A generic image data type for mutable access to the cartridge RAM data.
     type RamImageDataMut: ImageDataMut;
 
+    /// A generic APU client type for audio output.
+    type ApuClient: ApuClient;
+
     /// A generic PPU client type for display output.
     type PpuClient: PpuClient;
 
 
     /// Get mutable access for writing into the cartridge RAM.
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut;
+
+    /// Get the mutable APU client for audio output.
+    fn get_apu_client_mut(&mut self) -> &mut Self::ApuClient;
 
     /// Get the mutable PPU client for display output.
     fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient;

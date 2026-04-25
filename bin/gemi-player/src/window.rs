@@ -17,6 +17,7 @@
 
 use crate::sound_queue::SoundQueue;
 use crate::BoxError;
+use libgemi::core::apu::sample::StereoSample;
 use libgemi::core::input::{Input, InputButton};
 use libgemi::core::mmu::locations::MEMORY_LOCATION_SPRITES_BEGIN;
 use libgemi::core::ppu::flags::LcdControlFlag;
@@ -404,5 +405,11 @@ impl Window {
 
         // present the framebuffer
         self.canvas.present();
+    }
+
+
+    /// Push audio samples into the audio queue.
+    pub fn push_audio_samples(&mut self, samples: &[StereoSample]) {
+        self.audio.push_samples(samples);
     }
 }

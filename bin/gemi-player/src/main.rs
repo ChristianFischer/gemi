@@ -90,6 +90,13 @@ fn run(window: &mut Window, gb: &mut GameBoy) {
             window.present(gb);
         }
 
+        // forward the audio samples to the sound queue
+        {
+            if let Some(samples) = gb.get_audio_mut().take_all() {
+                window.push_audio_samples(&samples);
+            }
+        }
+
         // handle frame times
         {
             let frame_end_time = time::Instant::now();

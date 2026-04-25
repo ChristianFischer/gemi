@@ -21,7 +21,7 @@ use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
 
 use crate::cartridge::Cartridge;
-use libgemi::core::apu::audio_output::{AudioOutputSpec, SamplesReceiver};
+use libgemi::core::apu::audio_output::AudioOutputSpec;
 use libgemi::core::device_type::{DeviceType, EmulationType};
 use libgemi::core::input::InputButton;
 use libgemi::GameBoy;
@@ -36,9 +36,6 @@ pub struct WasmPlayer {
 
     /// The rendering context of the canvas element assigned to receive the frames rendered.
     rc: CanvasRenderingContext2d,
-
-    /// The channel receiver to receive audio samples from the emulator's APU.
-    samples_receiver: Option<SamplesReceiver>,
 
     /// The key bindings to use for mapping JS key events to emulator input.
     key_bindings: KeyBindings,
@@ -120,8 +117,6 @@ impl WasmPlayer {
                 gb,
                 rc,
 
-                samples_receiver: None,
-
                 key_bindings: default_keymap(),
             }
         )
@@ -159,9 +154,14 @@ impl WasmPlayer {
     /// After doing so, audio samples may be received via [take_audio_samples].
     #[wasm_bindgen]
     pub fn open_audio(&mut self, sample_rate: u32) -> Result<(), JsValue> {
-        self.samples_receiver = self.gb.get_apu_mut().get_audio_output().open_channel(AudioOutputSpec {
-            sample_rate
-        });
+        self.gb
+                .get_apu_mut()
+                .get_audio_output()
+                .set_audio_spec(AudioOutputSpec {
+                    sample_rate
+                })
+                .map_err(|e| JsValue::from_str(&e.to_string()))?
+        ;
 
         Ok(())
     }
@@ -173,20 +173,19 @@ impl WasmPlayer {
     /// left and right channel samples.
     #[wasm_bindgen]
     pub fn take_audio_samples(&mut self) -> Result<Vec<f32>, JsValue> {
-        match &self.samples_receiver {
-            Some(receiver) => {
+        match self.gb.get_audio_mut().take_all() {
+            Some(samples) => {
                 Ok(
-                    receiver
-                        .try_iter()
-                        .fuse()
-                        .flat_map(|samples| samples.into_iter())
+                    samples
+                        .into_iter()
                         .flat_map(|sample| [sample.left.get_value(), sample.right.get_value()])
                         .collect::<Vec<_>>()
                 )
             }
 
             None => {
-                Err(JsValue::from_str("No audio channel available. Invoke open_audio first."))
+                // if no samples available, just deliver an empty list
+                Ok(Vec::new())
             }
         }
     }

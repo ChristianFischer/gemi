@@ -24,6 +24,9 @@ use crate::mmu::memory_bus::{memory_map, MemoryBusConnection};
 use crate::mmu::memory_data::{MemoryData, MemoryDataFixedSize};
 use core::cmp::max;
 
+#[cfg(feature = "dyn_alloc")]
+pub use alloc::{vec, vec::Vec};
+
 
 /// Stores the information of an active OAM DMA transfer
 /// The DMA transfer copies data from the given address

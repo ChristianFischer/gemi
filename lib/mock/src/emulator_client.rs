@@ -16,6 +16,7 @@
  */
 
 use crate::{MockBootRom, MockImageData, ZeroImageData};
+use gemi_core::apu::apu_client::{ApuClient, NullApuClient};
 use gemi_core::cartridge::image_data::{FixedSizeImageData, ImageData, ImageDataMut};
 use gemi_core::cartridge::CartridgeInfo;
 use gemi_core::device_type::DeviceConfig;
@@ -30,10 +31,11 @@ use gemi_core::utils::ioerr;
 /// for testing purposes.
 /// By default, this client is using other mock implementations for ROM, RAM, and boot ROM, but
 /// also allows selecting different implementations via the template arguments of this type.
-pub struct MockEmulatorClient<Rom, Ram, BootRom, Display>
+pub struct MockEmulatorClient<Rom, Ram, BootRom, Audio, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
       BootRom: FixedSizeImageData<256>,
+      Audio: ApuClient,
       Display: PpuClient,
 {
     pub device_config:  DeviceConfig,
@@ -41,19 +43,21 @@ where Rom: ImageData,
     pub cartridge_rom:  Rom,
     pub cartridge_ram:  Ram,
     pub boot_rom:       Option<BootRom>,
+    pub audio:          Audio,
     pub display:        Display,
 }
 
 
 
-impl<Rom, Ram, BootRom, Display> MockEmulatorClient<Rom, Ram, BootRom, Display>
+impl<Rom, Ram, BootRom, Audio, Display> MockEmulatorClient<Rom, Ram, BootRom, Audio, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
       BootRom: FixedSizeImageData<256>,
+      Audio: ApuClient,
       Display: PpuClient,
 {
     /// Creates a new instance of the mock emulator client with custom RAM and ROM images.
-    pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram, display: Display) -> ioerr::Result<Self> {
+    pub fn new(device_config: DeviceConfig, rom_data: Rom, ram_data: Ram, audio: Audio, display: Display) -> ioerr::Result<Self> {
         let cartridge_info = CartridgeInfo::create_from(&rom_data)?;
 
         Ok(
@@ -63,6 +67,7 @@ where Rom: ImageData,
                 cartridge_rom: rom_data,
                 cartridge_ram: ram_data,
                 boot_rom: None,
+                audio,
                 display,
             }
         )
@@ -70,7 +75,7 @@ where Rom: ImageData,
 }
 
 
-impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom, NullPpuClient> {
+impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom, NullApuClient, NullPpuClient> {
     /// Creates a "default" instance.
     ///
     /// This instance will consist of a simple 32k ROM image with no meaningful
@@ -82,13 +87,14 @@ impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom, NullPpuClient
             cartridge_rom: MockImageData::new(),
             cartridge_ram: ZeroImageData::new(),
             boot_rom: None,
+            audio: NullApuClient::default(),
             display: NullPpuClient::default(),
         }
     }
 }
 
 
-impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom, NullPpuClient> {
+impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom, NullApuClient, NullPpuClient> {
     /// Creates an empty instance.
     ///
     /// This instance will consist of empty RAM and ROM images.
@@ -102,16 +108,18 @@ impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom, NullPpuClient
             cartridge_rom: ZeroImageData::new(),
             cartridge_ram: ZeroImageData::new(),
             boot_rom: None,
+            audio: NullApuClient::default(),
             display: NullPpuClient::default(),
         }
     }
 }
 
 
-impl<Rom, Ram, BootRom, Display> EmulatorClient for MockEmulatorClient<Rom, Ram, BootRom, Display>
+impl<Rom, Ram, BootRom, Audio, Display> EmulatorClient for MockEmulatorClient<Rom, Ram, BootRom, Audio, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
       BootRom: FixedSizeImageData<256>,
+      Audio: ApuClient,
       Display: PpuClient,
 {
     type BootRomImageData = BootRom;
@@ -140,17 +148,23 @@ where Rom: ImageData,
 }
 
 
-impl<Rom, Ram, BootRom, Display> EmulatorClientMut for MockEmulatorClient<Rom, Ram, BootRom, Display>
+impl<Rom, Ram, BootRom, Audio, Display> EmulatorClientMut for MockEmulatorClient<Rom, Ram, BootRom, Audio, Display>
 where Rom: ImageData,
       Ram: ImageDataMut,
       BootRom: FixedSizeImageData<256>,
+      Audio: ApuClient,
       Display: PpuClient,
 {
     type RamImageDataMut = Ram;
+    type ApuClient = Audio;
     type PpuClient = Display;
 
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
         &mut self.cartridge_ram
+    }
+
+    fn get_apu_client_mut(&mut self) -> &mut Self::ApuClient {
+        &mut self.audio
     }
 
     fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient {

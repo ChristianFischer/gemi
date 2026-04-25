@@ -40,10 +40,7 @@ cgb = [
 
 # Enables the audio processing unit.
 # Disabling will remove audio support and can be used to reduce executable size.
-apu = [
-    "std",
-    "dyn_alloc",
-]
+apu = []
 
 # Enables support for serialisation/deserialisation using the "serde" crate
 serde = [

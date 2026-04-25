@@ -183,7 +183,7 @@ impl Apu {
 
 
     /// Updates the APUs internal components with the time passed.
-    pub fn update(&mut self, ec: &impl EmulatorClient, cycles: Clock) {
+    pub fn update(&mut self, ec: &mut impl EmulatorClientMut, cycles: Clock) {
         if self.state.apu_on {
             self.update_frame_sequencer(cycles);
         }
@@ -236,9 +236,9 @@ impl Apu {
 
 
     /// Updates each channel with the time passed.
-    fn update_channels(&mut self, ec: &impl EmulatorClient, cycles: Clock) {
+    fn update_channels(&mut self, ec: &mut impl EmulatorClientMut, cycles: Clock) {
         _ = ec;
-        
+
         for _ in 0..cycles {
             let run_cycles = 1;
 
@@ -260,7 +260,7 @@ impl Apu {
                 let sample = self.mixer.mix();
 
                 // push into samples buffer
-                self.audio_output.push(sample, run_cycles);
+                self.audio_output.push(ec, sample, run_cycles);
             }
         }
     }

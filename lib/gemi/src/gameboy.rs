@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::audio::GameBoyAudio;
 use crate::cartridge::Cartridge;
 use crate::client_data::GameBoyClientData;
 use crate::Builder;
@@ -111,6 +112,18 @@ impl GameBoy {
     /// Get the actual emulator instance.
     pub fn get_emulator_mut(&mut self) -> &mut EmulatorDevice {
         &mut self.emulator
+    }
+
+
+    /// Get the emulator's audio output component.
+    pub fn get_audio(&self) -> &GameBoyAudio {
+        &self.client_data.audio
+    }
+
+
+    /// Get the emulator's audio output component.
+    pub fn get_audio_mut(&mut self) -> &mut GameBoyAudio {
+        &mut self.client_data.audio
     }
 
 
