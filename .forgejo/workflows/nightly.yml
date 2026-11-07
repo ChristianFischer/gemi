@@ -1,0 +1,127 @@
+# Forgejo CI – Nightly Builds
+#
+# Runs daily and performs more extensive checks than the regular CI workflow:
+#   - Full release build of all crates
+#   - WASM build for web player and debugger
+#   - Build with minimal features (no-std check)
+#   - Doc tests and cargo doc
+#
+# These jobs do not run on every merge request to keep CI times short.
+
+name: Nightly
+
+on:
+  # Can be triggered manually via the web interface
+  workflow_dispatch:
+
+  # Run automatically daily at 02:00 UTC
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  # -------------------------------------------------------------------
+  # Full release build of all crates (requires SDL, ALSA, SQLite)
+  # -------------------------------------------------------------------
+  build-release:
+    name: Build (Release, all crates)
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: nightly-build
+
+      # gemi-player requires SDL3 (built from source), gemi-debugger requires
+      # eframe (OpenGL).  libsqlite3-dev is needed for egui's persistence backend.
+      - name: Install system dependencies
+        uses: ./.forgejo/actions/install-build-deps
+        with:
+          profile: full
+
+      - name: Release build (entire workspace)
+        run: cargo build --release --workspace
+
+  # -------------------------------------------------------------------
+  # WASM build: WebAssembly for browser player and debugger
+  # (no system dependencies – WASM target has no native libraries)
+  # -------------------------------------------------------------------
+  build-wasm:
+    name: Build (WASM)
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: nightly-wasm
+
+      - name: Add WASM target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: WASM-Build (wasm-player)
+        run: cargo build --release --target wasm32-unknown-unknown -p wasm-player
+
+      - name: WASM-Build (gemi-debugger)
+        run: cargo build --release --target wasm32-unknown-unknown -p gemi-debugger
+
+  # -------------------------------------------------------------------
+  # Minimal build: core without features (check no-std compatibility)
+  # (no system dependencies)
+  # -------------------------------------------------------------------
+  build-minimal:
+    name: Build (Minimal, no-std)
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: nightly-minimal
+
+      # Verify core compiles without std
+      - name: Core without features (no-std)
+        run: cargo build -p gemi-core --no-default-features
+
+      # Verify core compiles with individual features
+      - name: Core with std feature
+        run: cargo build -p gemi-core --no-default-features --features std
+
+      - name: Core with cgb feature
+        run: cargo build -p gemi-core --no-default-features --features cgb
+
+      - name: Core with apu feature
+        run: cargo build -p gemi-core --no-default-features --features apu
+
+  # -------------------------------------------------------------------
+  # Documentation: cargo doc without warnings
+  # (no system dependencies – doc build does not link native libraries)
+  # -------------------------------------------------------------------
+  doc:
+    name: cargo doc
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: nightly-doc
+
+      - name: Generate documentation
+        run: cargo doc --workspace --no-deps -- -D warnings

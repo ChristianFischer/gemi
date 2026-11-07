@@ -1,0 +1,20 @@
+name: 'Cargo Cache Setup'
+description: 'Restore Cargo registry, git checkouts, and target directory cache'
+inputs:
+  cache-key:
+    description: 'Cache key suffix for the Cargo cache'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Restore Rust cache
+      uses: forgejo-actions/cache@v3
+      with:
+        path: |
+          /usr/local/cargo/registry
+          /usr/local/cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ inputs.cache-key }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ inputs.cache-key }}-

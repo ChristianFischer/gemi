@@ -1,0 +1,71 @@
+# Forgejo CI – Unit Tests
+#
+# Runs unit tests and the test ROM suite on every push and merge request.
+# Uses a dedicated Rust image with a pre-installed toolchain.
+
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # -------------------------------------------------------------------
+  # Unit tests: Core libraries only (no system dependencies required)
+  # -------------------------------------------------------------------
+  unit-tests:
+    name: Unit Tests
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: unit
+
+      # Fast tests on core libraries – these are deterministic and require
+      # no system dependencies (SDL, ALSA, etc.) and no network access.
+      - name: Unit tests (core libraries)
+        run: cargo test -p gemi-core -p libgemi -p gemi-utils -p gemi-mock
+
+  # -------------------------------------------------------------------
+  # Test ROM suite: Emulator tests against known GameBoy test ROMs
+  # (ROMs are automatically downloaded by the build script via reqwest)
+  # -------------------------------------------------------------------
+  test-rom-suite:
+    name: Test ROM Suite
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: rom
+
+      # reqwest (used by tests-shared for ROM downloads) requires OpenSSL
+      # for HTTPS connectivity.  No SDL/ALSA is needed – tests run headless.
+      - name: Install system dependencies
+        uses: ./.forgejo/actions/install-build-deps
+        with:
+          profile: openssl
+
+      - name: Restore test ROMs cache
+        uses: forgejo-actions/cache@v3
+        with:
+          path: tests/test_suite/res/test_roms
+          key: ${{ runner.os }}-test-roms
+
+      # Test ROM suite: downloads ROMs and runs tests
+      # Known failures are ignored, new failures will fail the job
+      - name: Run test ROM suite
+        run: cargo test -p testrunner

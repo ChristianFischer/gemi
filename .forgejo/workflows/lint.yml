@@ -1,0 +1,55 @@
+# Forgejo CI – Linting & Formatting
+#
+# Checks code quality on every push and merge request.
+# Uses a dedicated Rust image for faster builds.
+
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # -------------------------------------------------------------------
+  # Format check: Ensure code is formatted with cargo fmt
+  # -------------------------------------------------------------------
+  fmt:
+    name: cargo fmt
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Run format check
+        run: cargo fmt --all -- --check
+
+  # -------------------------------------------------------------------
+  # Clippy: Static code analysis on all workspace crates
+  # -------------------------------------------------------------------
+  clippy:
+    name: cargo clippy
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: clippy
+
+      # Clippy on the entire workspace requires native libraries:
+      # SDL3 for gemi-player, OpenGL for gemi-debugger.
+      - name: Install system dependencies
+        uses: ./.forgejo/actions/install-build-deps
+        with:
+          profile: full
+
+      - name: Clippy (all targets)
+        run: cargo clippy --all-targets --all-features -D warnings

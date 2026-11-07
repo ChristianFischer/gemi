@@ -1,0 +1,52 @@
+# Forgejo CI – Test Report
+#
+# Runs the update-test-report binary to measure emulator accuracy
+# and save the results as an artifact.
+# Triggered manually; can also be integrated into the nightly workflow.
+# Kept as a separate, manually triggerable workflow.
+
+name: Test Report
+
+on:
+  # Can be triggered manually via the web interface
+  workflow_dispatch:
+
+jobs:
+  # -------------------------------------------------------------------
+  # Test report: Run all test ROMs and generate a report
+  # -------------------------------------------------------------------
+  test-report:
+    name: Test Report
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: report
+
+      # reqwest (used by tests-shared for ROM downloads) requires OpenSSL
+      # for HTTPS connectivity.  No SDL/ALSA is needed – the report runs headless.
+      - name: Install system dependencies
+        uses: ./.forgejo/actions/install-build-deps
+        with:
+          profile: openssl
+
+      - name: Build update-test-report
+        run: cargo build --release -p update-test-report
+
+      - name: Generate test report
+        run: |
+          # Test ROMs are automatically downloaded by the build script
+          ./target/release/update-test-report
+
+      - name: Save test report as artifact
+        uses: forgejo-actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: doc/test_report.md
+          retention-days: 30

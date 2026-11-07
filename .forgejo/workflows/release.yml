@@ -1,0 +1,74 @@
+# Forgejo CI – Release Pipeline
+#
+# Builds release binaries for Linux on new Git tags and publishes them
+# as release assets. Uses a dedicated Rust image.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  # gitea.ref contains the full ref, e.g. "refs/tags/v1.0.0"
+  TAG_NAME: ${{ gitea.ref_name }}
+
+jobs:
+  # -------------------------------------------------------------------
+  # Release build: Build and publish Linux x86_64 binaries
+  # -------------------------------------------------------------------
+  release-linux:
+    name: Release (Linux x86_64)
+    runs-on: self-hosted
+    container:
+      image: rust:slim
+    steps:
+      - name: Checkout repository
+        uses: forgejo-actions/checkout@v3
+
+      - name: Restore Rust cache
+        uses: ./.forgejo/actions/cache-setup
+        with:
+          cache-key: release
+
+      # gemi-player requires SDL3 (built from source), gemi-debugger requires
+      # eframe (OpenGL).  libsqlite3-dev is needed for egui's persistence backend.
+      # zip is needed for creating the release archive.
+      - name: Install system dependencies
+        uses: ./.forgejo/actions/install-build-deps
+        with:
+          profile: release
+
+      - name: Release build (gemi-player)
+        run: cargo build --release -p gemi
+
+      - name: Release build (gemi-debugger)
+        run: cargo build --release -p gemi-debugger
+
+      - name: Create archive
+        run: |
+          cd target/release
+          zip -j ../../gemi-${TAG_NAME}-linux-x86_64.zip \
+            gemi \
+            gemi-debugger
+
+      - name: Create release
+        uses: forgejo-actions/create-release@v1
+        with:
+          tag_name: ${{ gitea.ref }}
+          release_name: "Release $TAG_NAME"
+          draft: false
+          prerelease: false
+        env:
+          GITEA_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+
+      - name: Upload release assets
+        uses: forgejo-actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: gemi-${TAG_NAME}-linux-x86_64.zip
+          asset_name: gemi-${TAG_NAME}-linux-x86_64.zip
+          asset_content_type: application/zip
+        env:
+          GITEA_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
