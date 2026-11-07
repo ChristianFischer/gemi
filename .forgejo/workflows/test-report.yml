@@ -22,7 +22,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -45,7 +45,7 @@ jobs:
           ./target/release/update-test-report
 
       - name: Save test report as artifact
-        uses: forgejo-actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: doc/test_report.md

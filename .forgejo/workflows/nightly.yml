@@ -29,7 +29,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -57,7 +57,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -84,7 +84,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -116,7 +116,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup

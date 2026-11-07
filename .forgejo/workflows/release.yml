@@ -5,6 +5,9 @@
 
 name: Release
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -25,7 +28,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -53,22 +56,13 @@ jobs:
             gemi \
             gemi-debugger
 
-      - name: Create release
-        uses: forgejo-actions/create-release@v1
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ gitea.ref }}
-          release_name: "Release $TAG_NAME"
+          tag_name: ${{ gitea.ref_name }}
+          name: "Release $TAG_NAME"
           draft: false
           prerelease: false
+          files: gemi-${TAG_NAME}-linux-x86_64.zip
         env:
-          GITEA_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
-
-      - name: Upload release assets
-        uses: forgejo-actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: gemi-${TAG_NAME}-linux-x86_64.zip
-          asset_name: gemi-${TAG_NAME}-linux-x86_64.zip
-          asset_content_type: application/zip
-        env:
-          GITEA_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FORGEJO_TOKEN }}

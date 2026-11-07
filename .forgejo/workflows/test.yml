@@ -22,7 +22,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -45,7 +45,7 @@ jobs:
       image: rust:slim
     steps:
       - name: Checkout repository
-        uses: forgejo-actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Rust cache
         uses: ./.forgejo/actions/cache-setup
@@ -60,7 +60,7 @@ jobs:
           profile: openssl
 
       - name: Restore test ROMs cache
-        uses: forgejo-actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: tests/test_suite/res/test_roms
           key: ${{ runner.os }}-test-roms
