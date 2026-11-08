@@ -163,6 +163,13 @@ impl Builder {
             display.set_dmg_display_palette(dmg_display_palette);
         }
 
+        // create the debug client
+        #[cfg(feature = "debug_interface")]
+        let debug = Box::new(crate::debug::Debugger::new());
+
+        #[cfg(not(feature = "debug_interface"))]
+        let debug = Box::new(crate::core::debug::NullDebugListener::default());
+
         // setup the emulator context
         let context_data = Box::new(
             GameBoyClientData {
@@ -171,6 +178,7 @@ impl Builder {
                 cartridge,
                 audio,
                 display,
+                debug,
             }
         );
 

@@ -42,6 +42,9 @@ cgb = [
 # Disabling will remove audio support and can be used to reduce executable size.
 apu = []
 
+# Enables the debug listener to allow a client to react to certain debug events.
+debug_interface = []
+
 # Enables support for serialisation/deserialisation using the "serde" crate
 serde = [
     "std",

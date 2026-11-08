@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 use crate::audio::GameBoyAudio;
 use crate::cartridge::Cartridge;
 use crate::client_data::GameBoyClientData;
@@ -30,6 +29,9 @@ use crate::core::mmu::mmu::Mmu;
 use crate::core::ppu::ppu::Ppu;
 use crate::core::serial::SerialPort;
 use crate::display::GameBoyDisplay;
+
+#[cfg(feature = "debug_interface")]
+use crate::debug::Debugger;
 
 
 /// The GameBoy object providing access to all it's emulated components.
@@ -112,6 +114,20 @@ impl GameBoy {
     /// Get the actual emulator instance.
     pub fn get_emulator_mut(&mut self) -> &mut EmulatorDevice {
         &mut self.emulator
+    }
+
+
+    /// Get the emulator's debugger.
+    #[cfg(feature = "debug_interface")]
+    pub fn get_debugger(&self) -> &Debugger {
+        &self.client_data.debug
+    }
+
+
+    /// Get the emulator's debugger.
+    #[cfg(feature = "debug_interface")]
+    pub fn get_debugger_mut(&mut self) -> &mut Debugger {
+        &mut self.client_data.debug
     }
 
 

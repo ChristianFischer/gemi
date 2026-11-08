@@ -15,11 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use core::ops::{BitOr, BitOrAssign};
-
 use crate::cpu::interrupts::Interrupts;
-use crate::debug::DebugEvents;
 use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
+use core::ops::{BitOr, BitOrAssign};
+use flagset::{flags, FlagSet};
 
 
 /// Represents the signals sent from a component back to the memory bus.
@@ -30,9 +29,29 @@ pub struct MemoryBusSignals {
     pub interrupts: Interrupts,
 
     /// Flags of events which occurred during updating a component.
-    pub events: DebugEvents,
+    pub events: RuntimeEvents,
 
 }
+
+
+flags! {
+    /// An enumeration events that may occur during updating the emulator.
+    /// This does not represent actual signals sent from a GameBoy's
+    /// original hardware, but is an additional signal to provide feedback
+    /// from the emulator's process to its frontend.
+    pub enum RuntimeEvent : u8 {
+        /// The PPU completed rendering a line.
+        PpuLineCompleted    = 0b_0000_0001,
+
+        /// The PPU completed rendering a frame.
+        PpuFrameCompleted   = 0b_0000_0010,
+    }
+}
+
+
+/// A set of events occurred during updating the emulator.
+pub type RuntimeEvents = FlagSet<RuntimeEvent>;
+
 
 
 impl BitOr for MemoryBusSignals {

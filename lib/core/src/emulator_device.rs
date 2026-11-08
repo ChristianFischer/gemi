@@ -22,12 +22,12 @@ use crate::cpu::cpu::{Cpu, CpuFlag, RegisterR8, CPU_CLOCK_SPEED};
 use crate::cpu::interrupts::InterruptRegisters;
 use crate::cpu::opcode::{OpCodeContext, OpCodeResult};
 use crate::cpu::opcodes::opcode_dispatch;
-use crate::debug::{DebugEvent, DebugEvents};
+use crate::debug::DebugDelegate;
 use crate::device_type::{DeviceType, EmulationType};
 use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::input::Input;
 use crate::mmu::memory::Memory;
-use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals};
+use crate::mmu::memory_bus::{MemoryBusConnection, MemoryBusSignals, RuntimeEvent, RuntimeEvents};
 use crate::mmu::mmu::Mmu;
 use crate::ppu::ppu::{Ppu, CPU_CYCLES_PER_FRAME};
 use crate::serial::SerialPort;
@@ -69,7 +69,7 @@ pub struct EmulatorUpdateResults {
     pub cycles: Clock,
 
     /// Any debug events occurred during updating the emulator.
-    pub events: DebugEvents,
+    pub events: RuntimeEvents,
 }
 
 
@@ -224,7 +224,7 @@ impl EmulatorDevice {
                 DeviceType::GameBoyColor | DeviceType::GameBoyAdvance => 0x00,
                 _ => 0xff,
             };
-            
+
             // set the initial vram bank index to 0 on GBC
             let vbk = match device_config.emulation {
                 EmulationType::DMG => 0xff,
@@ -327,12 +327,22 @@ impl EmulatorDevice {
         loop {
             results += self.process_next(ec);
 
+            #[cfg(feature = "debug_interface")]
+            {
+                use crate::debug::DebugListener;
+
+                // stop if suspended by the debugger
+                if ec.get_debug_interface_mut().is_halted() {
+                    break;
+                }
+            }
+
             // stop after completing one frame
-            if results.events.contains(DebugEvent::PpuFrameCompleted) {
+            if results.events.contains(RuntimeEvent::PpuFrameCompleted) {
                 break;
             }
 
-            // inc ase the screen was disabled, stop after the time of one frame has passed
+            // in case the screen was disabled, stop after the time of one frame has passed
             if results.cycles >= CPU_CYCLES_PER_FRAME {
                 break;
             }
@@ -406,6 +416,10 @@ impl EmulatorDevice {
                     let remaining_cycles = context.get_cycles_consumed() - total_step_cycles;
                     signals |= self.update_components(ec, remaining_cycles);
 
+                    // notify debugger
+                    let ip = self.cpu.get_instruction_pointer();
+                    DebugDelegate::with(ec).invoke_instruction_pointer_changed(ip);
+
                     break;
                 }
             }
@@ -440,7 +454,7 @@ impl EmulatorDevice {
         ;
 
         // forward all requested interrupts into the Interrupts component.
-        self.get_peripherals_mut().interrupts.request_interrupts(signals.interrupts);
+        self.get_peripherals_mut().interrupts.request_interrupts(ec, signals.interrupts);
 
         // increment clock counters
         self.total_cycles += cycles;

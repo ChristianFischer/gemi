@@ -47,6 +47,7 @@ pub trait PpuClient {
 
 /// A dummy implementation of the PpuClient trait without functionality.
 #[derive(Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NullPpuClient;
 
 impl PpuClient for NullPpuClient {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,17 @@
 use crate::selection::{Kind, Selection};
 use gemi_utils::keybindings::KeyBindings;
 use libgemi::cartridge::Cartridge;
-use libgemi::core::debug::DebugEvent;
+use libgemi::core::debug::DebugListener;
 use libgemi::core::device_type::DeviceType;
 use libgemi::core::emulator_device::{Clock, EmulatorDevice, EmulatorUpdateResults};
 use libgemi::core::input::InputButton;
+use libgemi::core::mmu::memory_bus::RuntimeEvent;
 use libgemi::core::ppu::ppu::CPU_CYCLES_PER_FRAME;
+use libgemi::debug::breakpoint_table::BreakpointTable;
 use libgemi::GameBoy;
 use serde::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter};
+use std::ops::{Deref, DerefMut};
 use std::path::{Path, PathBuf};
 
 
@@ -51,6 +54,9 @@ pub enum UpdateMode {
     /// The execution of the emulator is currently paused.
     Paused,
 
+    /// The emulator ran into a debug breakpoint on execution.
+    DebugBreak,
+
     /// The emulator is currently running in continuous mode.
     /// This will run the emulator in real time and continuously spawn new frames.
     Continuous,
@@ -72,7 +78,7 @@ pub enum UpdateStepMode {
 
     /// Runs the emulator until the next line was completed.
     Line,
-    
+
     /// Runs the emulator for a single instruction only.
     Instruction,
 }
@@ -90,6 +96,11 @@ pub struct EmulatorState {
     /// contains the emulator instance itself.
     pub emu: EmulatorInstance,
 
+    /// Storage for emulator breakpoints.
+    /// This is stored externally to the actual emulator, so it can easily be
+    /// restored when the emulator instance gets replaced.
+    pub breakpoints: EmulatorBreakpoints,
+
     /// Various states of the UI, which contains the state of buttons
     /// or any active selection.
     pub ui: UiStates,
@@ -104,6 +115,23 @@ pub struct EmulatorInstance {
     /// Will be [None] if no ROM is loaded.
     #[serde(deserialize_with = "deserialize_emulator_instance")]
     gb: Option<GameBoy>,
+}
+
+
+/// A storage for emulator breakpoints.
+/// This object dereferences into a [BreakpointTable] object.
+/// If dereferenced mutable, it will be flagged as `modified`,
+/// so it should be updated into the emulator instance next time.
+///
+/// Once the `modified` flag is set, the breakpoint table has to be sent
+/// into the emulators actual debugger instance. This is required to
+/// keep the breakpoints consistent even when reloading snapshots
+/// or the emulator is being restarted.
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct EmulatorBreakpoints {
+    breakpoints: BreakpointTable,
+
+    breakpoints_modified: bool,
 }
 
 
@@ -125,7 +153,7 @@ pub struct UiStates {
 
     /// Describes the currently selected focus item within the UI.
     pub focus: Selection,
-    
+
     /// While moving the mouse cursor over the UI, this will contain the
     /// currently hovered item.
     pub hover: Selection,
@@ -245,6 +273,10 @@ impl EmulatorState {
         // no path known
         self.last_rom_file = None;
 
+        // set the 'modified' flag to force the table being applied to
+        // the emulator instance on next invocation
+        self.breakpoints.breakpoints_modified = true;
+
         self.instantiate_emulator_with_cartridge(cartridge)
     }
 
@@ -285,22 +317,52 @@ impl EmulatorState {
     /// Checks whether the emulator is currently running or not.
     /// This will be the case if the emulator is loaded and not paused.
     pub fn is_running(&self) -> bool {
-        self.emu.is_emulator_loaded() && !self.ui.is_paused()
+        self.emu.is_emulator_loaded()
+            && !self.emu.is_in_breakpoint()
+            && !self.ui.is_paused()
+    }
+
+
+    /// Checks whether the emulator is currently paused or not.
+    /// This will be the case if the emulator is either intentionally paused
+    /// or halted due to a breakpoint.
+    pub fn is_paused(&self) -> bool {
+        self.emu.is_in_breakpoint() || self.ui.is_paused()
     }
 
 
     /// Update the emulator, if any.
     pub fn update(&mut self) {
+        if self.breakpoints.is_modified() {
+            if let Some(gb) = &mut self.emu.gb {
+                let breakpoints_table = self.breakpoints.clone_breakpoints_table();
+                gb.get_debugger_mut().set_breakpoints_table(breakpoints_table);
+
+                self.breakpoints.reset_is_modified();
+            }
+        }
+
         self.ui.update_mode = match self.ui.update_mode {
             // stay in pause state
             UpdateMode::Paused => {
                 UpdateMode::Paused
             }
 
+            // Stay in suspended state
+            UpdateMode::DebugBreak => {
+                UpdateMode::DebugBreak
+            }
+
             // process the next frame and stay in continuous mode
             UpdateMode::Continuous => {
                 self.emu.run_frame();
-                UpdateMode::Continuous
+
+                if self.emu.is_in_breakpoint() {
+                    UpdateMode::DebugBreak
+                }
+                else {
+                    UpdateMode::Continuous
+                }
             }
 
             // process the next step and switch into pause mode
@@ -311,7 +373,12 @@ impl EmulatorState {
                     UpdateStepMode::Instruction => self.emu.run_single_step(),
                 }
 
-                UpdateMode::Paused
+                if self.emu.is_in_breakpoint() {
+                    UpdateMode::DebugBreak
+                }
+                else {
+                    UpdateMode::Paused
+                }
             }
         }
     }
@@ -367,7 +434,7 @@ impl EmulatorInstance {
     /// Process a single frame of the emulator, if any.
     pub fn run_frame(&mut self) {
         self.run_until(|_gb, cycles, result|
-                result.events.contains(DebugEvent::PpuFrameCompleted)
+                result.events.contains(RuntimeEvent::PpuFrameCompleted)
             ||  cycles >= CPU_CYCLES_PER_FRAME
         );
     }
@@ -376,7 +443,7 @@ impl EmulatorInstance {
     /// Run the emulator until the next scanline was completed drawing.
     pub fn run_line(&mut self) {
         self.run_until(|_gb, cycles, result|
-                result.events.contains(DebugEvent::PpuLineCompleted)
+                result.events.contains(RuntimeEvent::PpuLineCompleted)
             ||  cycles >= CPU_CYCLES_PER_FRAME
         );
     }
@@ -390,7 +457,7 @@ impl EmulatorInstance {
     }
 
 
-    /// Run the emulator until a certain condition is met. 
+    /// Run the emulator until a certain condition is met.
     pub fn run_until<F>(&mut self, condition: F)
         where F: Fn(&GameBoy, Clock, EmulatorUpdateResults) -> bool
     {
@@ -398,6 +465,10 @@ impl EmulatorInstance {
             let mut cycles = 0;
 
             loop {
+                if gb.get_debugger().is_halted() {
+                    break;
+                }
+
                 let result = gb.run_single_step();
                 cycles += result.cycles;
 
@@ -406,6 +477,57 @@ impl EmulatorInstance {
                 }
             }
         }
+    }
+
+
+    /// Tests whether the debugger currently suspends the emulator.
+    pub fn is_in_breakpoint(&self) -> bool {
+        if let Some(gb) = self.get_gameboy() {
+            gb.get_debugger().is_halted()
+        }
+        else {
+            false
+        }
+    }
+}
+
+
+impl EmulatorBreakpoints {
+
+    /// The DerefMut operator automatically sets the "modified", when dereferencing the
+    /// BreakpointsTable object. This can be handy when obtaining the table for an
+    /// actual modification, but may not be intended in other situations.
+    /// This function obtains a mutable reference to the table without setting the
+    /// "modified" flag. For each actual modification, the flag has to be set
+    /// explicitly.
+    pub fn get_breakpoints_table_mut_no_modify(&mut self) -> &mut BreakpointTable {
+        &mut self.breakpoints
+    }
+
+
+    /// Tells whether the inner [BreakpointTable] has pending modifications
+    /// not applied to the emulator instance.
+    pub fn is_modified(&self) -> bool {
+        self.breakpoints_modified
+    }
+
+
+    /// Sets the [BreakpointTable]'s modified flag, so the breakpoint table
+    /// will be updated in the emulator next frame.
+    pub fn set_is_modified(&mut self) {
+        self.breakpoints_modified = true;
+    }
+
+
+    /// Reset the [BreakpointTable]'s modified flag.
+    pub fn reset_is_modified(&mut self) {
+        self.breakpoints_modified = false;
+    }
+
+
+    /// Retrieves a cloned instance of the inner [BreakpointTable].
+    pub fn clone_breakpoints_table(&self) -> BreakpointTable {
+        self.breakpoints.clone()
     }
 }
 
@@ -485,6 +607,11 @@ impl Default for EmulatorState {
                 gb: None,
             },
 
+            breakpoints: EmulatorBreakpoints {
+                breakpoints: BreakpointTable::new(),
+                breakpoints_modified: false,
+            },
+
             ui: UiStates {
                 key_bindings:       make_default_key_bindings(),
                 device_type:        EmulatorDeviceType::GameBoyColor,
@@ -494,5 +621,24 @@ impl Default for EmulatorState {
                 hover:              Selection::new(Kind::Hover),
             },
         }
+    }
+}
+
+
+impl Deref for EmulatorBreakpoints {
+    type Target = BreakpointTable;
+
+    fn deref(&self) -> &Self::Target {
+        &self.breakpoints
+    }
+}
+
+
+impl DerefMut for EmulatorBreakpoints {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        // modifications will flag the object 'dirty'
+        self.breakpoints_modified = true;
+
+        &mut self.breakpoints
     }
 }

@@ -19,12 +19,12 @@ use core::cmp::min;
 use core::mem::take;
 
 use crate::cpu::interrupts::Interrupt;
-use crate::debug::DebugEvent;
+use crate::debug::DebugDelegate;
 use crate::device_type::{DeviceConfig, EmulationType};
 use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::emulator_device::Clock;
 use crate::mmu::locations::*;
-use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals};
+use crate::mmu::memory_bus::{memory_map, MemoryBusConnection, MemoryBusSignals, RuntimeEvent};
 use crate::mmu::memory_data::MemoryData;
 use crate::ppu::flags::{LcdControl, LcdControlFlag, LcdInterruptFlag, LcdInterruptFlags};
 use crate::ppu::graphic_data::*;
@@ -282,8 +282,8 @@ impl Ppu {
                 match self.mode {
                     Mode::OamScan  => self.process_oam_scan(ec),
                     Mode::DrawLine => self.process_draw_line(ec),
-                    Mode::HBlank   => self.process_hblank(),
-                    Mode::VBlank   => self.process_vblank(),
+                    Mode::HBlank   => self.process_hblank(ec),
+                    Mode::VBlank   => self.process_vblank(ec),
                 }
             }
 
@@ -547,13 +547,13 @@ impl Ppu {
     /// Process the HBlank mode after each drawn scanline.
     /// Enters Mode::OamScan for the next line or
     /// Mode::VBlank if the current line was the last one.
-    fn process_hblank(&mut self) {
+    fn process_hblank(&mut self, ec: &mut impl EmulatorClientMut) {
         let remaining_cycles = CPU_CYCLES_PER_LINE - self.current_line_cycles;
 
         if self.clock >= remaining_cycles {
             self.clock -= remaining_cycles;
 
-            self.enter_next_line();
+            self.enter_next_line(ec);
         }
     }
 
@@ -561,11 +561,11 @@ impl Ppu {
     /// Process the VBlank mode after all scanlines were drawn.
     /// Enters Mode::OamScan for the first scanline of the next frame,
     /// afters the VBlank was completed.
-    fn process_vblank(&mut self) {
+    fn process_vblank(&mut self, ec: &mut impl EmulatorClientMut) {
         if self.clock >= CPU_CYCLES_PER_LINE {
             self.clock -= CPU_CYCLES_PER_LINE;
 
-            self.enter_next_line();
+            self.enter_next_line(ec);
         }
     }
 
@@ -598,7 +598,7 @@ impl Ppu {
 
                 // frame completed rendering; this notifies frontends to
                 // display the new frame image data
-                self.signals.events |= DebugEvent::PpuFrameCompleted;
+                self.signals.events |= RuntimeEvent::PpuFrameCompleted;
             },
 
             Mode::OamScan => {
@@ -617,7 +617,9 @@ impl Ppu {
     /// LCD status byte as well as the current LY byte in memory.
     /// Enters either Mode::OamScan or Mode::VBlank depending on
     /// the next scanline.
-    fn enter_next_line(&mut self) {
+    fn enter_next_line(&mut self, ec: &mut impl EmulatorClientMut) {
+        let previous_line = self.current_line;
+
         if self.current_line == 153 {
             self.current_line = 0;
         }
@@ -646,12 +648,15 @@ impl Ppu {
             _         => unreachable!()
         }
 
+        // notify the debugger
+        DebugDelegate::with(ec).invoke_ppu_line_completed(previous_line);
+
         // notify LineCompleted after switching a line
-        self.signals.events |= DebugEvent::PpuLineCompleted;
+        self.signals.events |= RuntimeEvent::PpuLineCompleted;
 
         // begin a new frame after switching back to line #0
         if self.current_line == 0 {
-            self.on_new_frame();
+            self.on_new_frame(ec);
         }
     }
 
@@ -670,9 +675,11 @@ impl Ppu {
 
 
     /// Callback to reset data when starting a new frame
-    fn on_new_frame(&mut self) {
+    fn on_new_frame(&mut self, ec: &mut impl EmulatorClientMut) {
         self.window_line    = 0;
         self.is_first_frame = false;
+
+        DebugDelegate::with(ec).invoke_ppu_frame_completed();
     }
 
 

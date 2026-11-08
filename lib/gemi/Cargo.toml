@@ -43,6 +43,11 @@ apu = [
     "gemi-core/apu",
 ]
 
+# Enables the debug listener to allow a client to react to certain debug events.
+debug_interface = [
+    "gemi-core/debug_interface",
+]
+
 # Enables support for serialisation/deserialisation using the "serde" crate
 serde = [
     "gemi-core/serde",

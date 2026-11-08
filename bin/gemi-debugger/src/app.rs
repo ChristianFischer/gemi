@@ -133,18 +133,20 @@ impl Default for EmulatorApplication {
             ViewClass::new_oam(),
         ]);
 
-        // another sidebar containing the file browser and snapshots
+        // another sidebar containing the file browser, snapshots and breakpoints
         let tiles_sidebar_left = add_views(
             // FileBrowser is only available for non-wasm targets
             if cfg!(not(target_arch = "wasm32")) {
                 vec![
                     ViewClass::new_file_browser(),
                     ViewClass::new_snapshots(),
+                    ViewClass::new_breakpoints(),
                 ]
             }
             else {
                 vec![
                     ViewClass::new_snapshots(),
+                    ViewClass::new_breakpoints(),
                 ]
             }
         );
@@ -379,7 +381,8 @@ impl EmulatorApplication {
     fn update_player_toolbar(&mut self, ui: &mut egui::Ui) {
         let state = self.get_state_mut();
         let mut is_running = state.is_running();
-        let mut is_paused  = state.ui.is_paused();
+        let mut is_paused  = state.is_paused();
+        let in_breakpoint  = state.emu.is_in_breakpoint();
 
         // "Reload" button
         ui.add_enabled_ui(state.emu.is_emulator_loaded(), |ui| {
@@ -391,9 +394,23 @@ impl EmulatorApplication {
         });
 
         // "Play" button
-        if ui.toggle_value(&mut is_running, BUTTON_LABEL_PLAY).clicked() {
-            if is_running {
-                state.ui.set_update_mode(UpdateMode::Continuous);
+        if in_breakpoint {
+            if ui.toggle_value(&mut is_running, BUTTON_LABEL_RESUME).clicked() {
+                if is_running {
+                    // on resume, also clear remaining debugger events
+                    if let Some(gb) = state.emu.get_gameboy_mut() {
+                        gb.get_debugger_mut().clear_events();
+                    }
+
+                    state.ui.set_update_mode(UpdateMode::Continuous);
+                }
+            }
+        }
+        else {
+            if ui.toggle_value(&mut is_running, BUTTON_LABEL_PLAY).clicked() {
+                if is_running {
+                    state.ui.set_update_mode(UpdateMode::Continuous);
+                }
             }
         }
 

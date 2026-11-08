@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::debug::DebugDelegate;
 use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::emulator_device::{Clock, Peripherals};
 use crate::mmu::locations::*;
@@ -87,6 +88,14 @@ impl Mmu {
 
     /// Writes a single byte value to the memory bus on a given address.
     pub fn write_u8(&mut self, ec: &mut impl EmulatorClientMut, address: u16, value: u8) {
+        // the debugger may intercept and override the written value
+        let value = if let Some(new_value) = DebugDelegate::with(ec).invoke_mem_write(address, value) {
+            new_value
+        }
+        else {
+            value
+        };
+
         self.internal.write(ec, address, value);
     }
 

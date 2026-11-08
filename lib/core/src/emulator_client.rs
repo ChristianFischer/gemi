@@ -18,6 +18,7 @@
 use crate::apu::apu_client::ApuClient;
 use crate::cartridge::image_data::{FixedSizeImageData, ImageData, ImageDataMut};
 use crate::cartridge::CartridgeInfo;
+use crate::debug::DebugListener;
 use crate::device_type::DeviceConfig;
 use crate::ppu::ppu_client::PpuClient;
 
@@ -93,6 +94,9 @@ pub trait EmulatorClientMut: EmulatorClient
 
     /// A generic PPU client type for display output.
     type PpuClient: PpuClient;
+    
+    /// A debug interface to receive debug events.
+    type DebugInterface: DebugListener;
 
 
     /// Get mutable access for writing into the cartridge RAM.
@@ -103,4 +107,7 @@ pub trait EmulatorClientMut: EmulatorClient
 
     /// Get the mutable PPU client for display output.
     fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient;
+    
+    /// Get the mutable debug interface for receiving debug events.
+    fn get_debug_interface_mut(&mut self) -> &mut Self::DebugInterface;
 }

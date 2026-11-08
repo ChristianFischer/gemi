@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,17 @@
 
 use std::ops::Range;
 
-use egui::{vec2, Grid, RichText, ScrollArea, Sense, TextStyle, Ui};
+use egui::{vec2, Align2, Color32, Grid, RichText, ScrollArea, Sense, TextStyle, Ui};
 
 use libgemi::core::cpu::opcode::{Instruction, Token};
+use libgemi::debug::breakpoints::{AddressBreakpoint, Breakpoint};
 use libgemi::GameBoy;
 
 use crate::event::UiEvent;
 use crate::highlight::test_selection;
 use crate::selection::{Kind, Selected};
-use crate::state::{EmulatorState, UiStates};
+use crate::state::{EmulatorBreakpoints, EmulatorState, UiStates};
+use crate::strings::{MARKER_BREAKPOINT_DISABLED, MARKER_BREAKPOINT_ENABLED, MARKER_BREAKPOINT_FIRED};
 use crate::ui::style::GemiStyle;
 use crate::views::View;
 
@@ -102,7 +104,7 @@ impl View for DisassemblyView {
     fn ui(&mut self, state: &mut EmulatorState, ui: &mut Ui) {
         if let Some(gb) = state.emu.get_gameboy() {
             self.update_disassembly(ui, &mut state.ui, gb);
-            self.render_disassembly_list(ui, &mut state.ui, gb);
+            self.render_disassembly_list(ui, &mut state.ui, &mut state.breakpoints, gb);
         }
     }
 
@@ -181,7 +183,7 @@ impl DisassemblyView {
 
 
     /// Renders the actual UI using the currently stored disassembly cache.
-    fn render_disassembly_list(&mut self, ui: &mut Ui, ui_states: &mut UiStates, gb: &GameBoy) {
+    fn render_disassembly_list(&mut self, ui: &mut Ui, ui_states: &mut UiStates, breakpoints: &mut EmulatorBreakpoints, gb: &GameBoy) {
         let (line_content_height, line_height_padded) = Self::compute_line_height(ui);
         let available_rows = self.rt.disassembly_cache.get_lines_count();
 
@@ -250,10 +252,10 @@ impl DisassemblyView {
                         .min_col_width(0.0)
                         .num_columns(4)
                         .show(ui, |ui| -> Option<()> {
-                            // verify all lines which need to be drawn. 
+                            // verify all lines which need to be drawn.
                             // Stops if at least one line fails to be verified
                             self.rt.disassembly_cache.verify_lines(display_rows.clone(), gb)?;
-                            
+
                             for row in display_rows {
                                 // get an entry, if still valid, otherwise will leave the rendering
                                 let entry = self.rt.disassembly_cache.get_instruction(row)?;
@@ -262,6 +264,11 @@ impl DisassemblyView {
                                 let line_bounds = egui::Rect::from_min_size(
                                     ui.cursor().left_top(),
                                     vec2(viewport_width, line_height_padded)
+                                );
+
+                                let line_bounds_inner = egui::Rect::from_min_size(
+                                    line_bounds.left_top(),
+                                    vec2(viewport_width, line_content_height)
                                 );
 
                                 // check whether it's selected or not
@@ -280,9 +287,6 @@ impl DisassemblyView {
                                     );
                                 }
 
-                                // render the actual element
-                                entry.render_as_row(ui, gb);
-
                                 // mouse interaction with the current row
                                 let line_response = ui.interact(line_bounds, ui.id().with(row), Sense::click());
 
@@ -293,6 +297,9 @@ impl DisassemblyView {
                                 if line_response.clicked() {
                                     ui_states.focus.toggle(selection_key.clone());
                                 }
+
+                                // render the actual element
+                                entry.render_as_row(ui, breakpoints, gb, &line_bounds_inner);
                             }
 
                             Some(())
@@ -608,17 +615,73 @@ impl InstructionDisplayEntry {
 
 
     /// Renders a single instruction into a row
-    fn render_as_row(&self, ui: &mut Ui, gb: &GameBoy) {
+    fn render_as_row(&self, ui: &mut Ui, breakpoints: &mut EmulatorBreakpoints, gb: &GameBoy, line_bounds: &egui::Rect) {
         // is current
         {
-            let current_pc = gb.get_cpu().get_instruction_pointer();
-            let is_current = current_pc == self.instruction.opcode_address;
+            let current_pc     = gb.get_cpu().get_instruction_pointer();
+            let is_current     = current_pc == self.instruction.opcode_address;
+            let breakpoint     = AddressBreakpoint(self.instruction.opcode_address);
+            let has_breakpoint = breakpoints.instruction_breakpoints.has_breakpoint(&breakpoint);
 
-            if is_current {
-                ui.label("\u{23f5}");
+            let (icon_id, icon_area) = ui.allocate_space(vec2(16.0, line_bounds.height()));
+            let icon_center = icon_area.center();
+
+            // breakpoint marker
+            if has_breakpoint {
+                let is_enabled = breakpoints.instruction_breakpoints
+                    .get_breakpoint_attr(&breakpoint)
+                    .map(|attr| attr.enabled)
+                    .unwrap_or(false);
+
+                let is_breakpoint_fired = gb
+                    .get_debugger()
+                    .is_halted_by(Breakpoint::InstructionHit(breakpoint.clone()));
+
+                ui.painter().text(
+                    icon_center,
+                    Align2::CENTER_CENTER,
+                    if is_enabled {
+                        MARKER_BREAKPOINT_ENABLED
+                    }
+                    else {
+                        MARKER_BREAKPOINT_DISABLED
+                    },
+                    TextStyle::Body.resolve(ui.style()),
+                    Color32::RED
+                );
+
+                // add a marker if this breakpoint caused the debugger to halt
+                if is_breakpoint_fired {
+                    ui.painter().text(
+                        icon_center,
+                        Align2::CENTER_CENTER,
+                        MARKER_BREAKPOINT_FIRED,
+                        TextStyle::Body.resolve(ui.style()),
+                        Color32::YELLOW
+                    );
+                }
             }
-            else {
-                ui.allocate_space(vec2(12.0, 0.0));
+
+            // current instruction marker
+            if is_current {
+                ui.painter().text(
+                    icon_center,
+                    Align2::CENTER_CENTER,
+                    "\u{23f5}",
+                    TextStyle::Body.resolve(ui.style()),
+                    Color32::GRAY
+                );
+            }
+
+            // handle click on the icon bar
+            let response = ui.interact(icon_area, icon_id, Sense::click());
+            if response.clicked() {
+                if has_breakpoint {
+                    breakpoints.instruction_breakpoints.remove_breakpoint(&breakpoint);
+                }
+                else {
+                    breakpoints.instruction_breakpoints.add_breakpoint(breakpoint);
+                }
             }
         }
 

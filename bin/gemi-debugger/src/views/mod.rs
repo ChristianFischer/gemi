@@ -21,6 +21,7 @@ use libgemi::core::ppu::graphic_data::TileMap;
 use crate::event::UiEvent;
 use crate::selection::Selected;
 use crate::state::EmulatorState;
+use crate::views::breakpoints::BreakpointsView;
 use crate::views::cartridge_info::CartridgeInfoView;
 use crate::views::cpu::CpuView;
 use crate::views::disassembly::DisassemblyView;
@@ -33,6 +34,7 @@ use crate::views::snapshots::SnapshotsView;
 use crate::views::sprites::SpritesView;
 use crate::views::tilemap::TileMapView;
 
+mod breakpoints;
 mod cartridge_info;
 mod cpu;
 mod disassembly;
@@ -86,6 +88,7 @@ pub enum ViewClass {
     Palettes(PaletteView),
     Oam(OamView),
     Snapshots(SnapshotsView),
+    Breakpoints(BreakpointsView),
 }
 
 
@@ -93,7 +96,7 @@ pub type Instantiate = fn() -> ViewClass;
 
 
 impl ViewClass {
-    pub const ALL : [(&'static str, Instantiate); 13] = [
+    pub const ALL : [(&'static str, Instantiate); 14] = [
         ("Display",         ViewClass::new_display_view),
         ("CartridgeInfo",   ViewClass::new_cartridge_info),
         ("Cpu",             ViewClass::new_cpu),
@@ -107,6 +110,7 @@ impl ViewClass {
         ("TileMap #9C00",   || ViewClass::new_tile_map(TileMap::H9C00)),
         ("FileBrowser",     ViewClass::new_file_browser),
         ("Snapshots",       ViewClass::new_snapshots),
+        ("Breakpoints",     ViewClass::new_breakpoints),
     ];
     
     
@@ -174,6 +178,12 @@ impl ViewClass {
     pub fn new_snapshots() -> ViewClass {
         ViewClass::Snapshots(SnapshotsView::new())
     }
+
+
+    /// Creates a new [`BreakpointsView`] object.
+    pub fn new_breakpoints() -> ViewClass {
+        ViewClass::Breakpoints(BreakpointsView::new())
+    }
 }
 
 
@@ -191,6 +201,7 @@ impl View for ViewClass {
             ViewClass::Palettes(v)      => v.title(state),
             ViewClass::Oam(v)           => v.title(state),
             ViewClass::Snapshots(v)     => v.title(state),
+            ViewClass::Breakpoints(v)   => v.title(state),
         }
     }
 
@@ -208,6 +219,7 @@ impl View for ViewClass {
             ViewClass::Palettes(v)      => v.ui(state, ui),
             ViewClass::Oam(v)           => v.ui(state, ui),
             ViewClass::Snapshots(v)     => v.ui(state, ui),
+            ViewClass::Breakpoints(v)   => v.ui(state, ui),
         }
     }
 
@@ -225,6 +237,7 @@ impl View for ViewClass {
             ViewClass::Palettes(v)      => v.get_current_selection(),
             ViewClass::Oam(v)           => v.get_current_selection(),
             ViewClass::Snapshots(v)     => v.get_current_selection(),
+            ViewClass::Breakpoints(v)   => v.get_current_selection(),
         }
     }
 
@@ -242,6 +255,7 @@ impl View for ViewClass {
             ViewClass::Palettes(v)      => v.handle_ui_event(event),
             ViewClass::Oam(v)           => v.handle_ui_event(event),
             ViewClass::Snapshots(v)     => v.handle_ui_event(event),
+            ViewClass::Breakpoints(v)   => v.handle_ui_event(event),
         }
     }
 
@@ -259,6 +273,7 @@ impl View for ViewClass {
             ViewClass::Palettes(v)      => v.on_emulator_loaded(state),
             ViewClass::Oam(v)           => v.on_emulator_loaded(state),
             ViewClass::Snapshots(v)     => v.on_emulator_loaded(state),
+            ViewClass::Breakpoints(v)   => v.on_emulator_loaded(state),
         }
     }
 }

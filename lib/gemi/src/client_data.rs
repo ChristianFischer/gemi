@@ -31,6 +31,12 @@ pub(crate) struct GameBoyClientData {
     pub(crate) cartridge: Box<Cartridge>,
     pub(crate) audio:     Box<GameBoyAudio>,
     pub(crate) display:   Box<GameBoyDisplay>,
+
+    #[cfg(feature = "debug_interface")]
+    pub(crate) debug: Box<crate::debug::Debugger>,
+
+    #[cfg(not(feature = "debug_interface"))]
+    pub(crate) debug: Box<crate::core::debug::NullDebugListener>,
 }
 
 
@@ -67,6 +73,12 @@ impl EmulatorClientMut for GameBoyClientData {
     type ApuClient = GameBoyAudio;
     type PpuClient = GameBoyDisplay;
 
+    #[cfg(feature = "debug_interface")]
+    type DebugInterface = crate::debug::Debugger;
+
+    #[cfg(not(feature = "debug_interface"))]
+    type DebugInterface = crate::core::debug::NullDebugListener;
+
 
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
         self.cartridge.get_ram_mut()
@@ -78,6 +90,10 @@ impl EmulatorClientMut for GameBoyClientData {
 
     fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient {
         &mut self.display
+    }
+
+    fn get_debug_interface_mut(&mut self) -> &mut Self::DebugInterface {
+        &mut self.debug
     }
 }
 

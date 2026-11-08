@@ -26,6 +26,7 @@ wasm-bindgen-futures = "0.4"
 path = "../../lib/gemi"
 features = [
     "cgb",
+    "debug_interface",
     "serde",
     "snapshots",
 ]

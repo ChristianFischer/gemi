@@ -24,6 +24,9 @@ mod gameboy_builder;
 pub mod audio;
 pub mod snapshots;
 
+#[cfg(feature = "debug_interface")]
+pub mod debug;
+
 // re-export the core library as "gemi::core"
 pub use gemi_core as core;
 

@@ -19,6 +19,7 @@ use crate::{MockBootRom, MockImageData, ZeroImageData};
 use gemi_core::apu::apu_client::{ApuClient, NullApuClient};
 use gemi_core::cartridge::image_data::{FixedSizeImageData, ImageData, ImageDataMut};
 use gemi_core::cartridge::CartridgeInfo;
+use gemi_core::debug::NullDebugListener;
 use gemi_core::device_type::DeviceConfig;
 use gemi_core::emulator_client::{EmulatorClient, EmulatorClientMut};
 use gemi_core::ppu::ppu_client::{NullPpuClient, PpuClient};
@@ -38,13 +39,14 @@ where Rom: ImageData,
       Audio: ApuClient,
       Display: PpuClient,
 {
-    pub device_config:  DeviceConfig,
-    pub cartridge_info: CartridgeInfo,
-    pub cartridge_rom:  Rom,
-    pub cartridge_ram:  Ram,
-    pub boot_rom:       Option<BootRom>,
-    pub audio:          Audio,
-    pub display:        Display,
+    pub device_config:      DeviceConfig,
+    pub cartridge_info:     CartridgeInfo,
+    pub cartridge_rom:      Rom,
+    pub cartridge_ram:      Ram,
+    pub boot_rom:           Option<BootRom>,
+    pub audio:              Audio,
+    pub display:            Display,
+    pub debug_interface:    NullDebugListener,
 }
 
 
@@ -69,6 +71,7 @@ where Rom: ImageData,
                 boot_rom: None,
                 audio,
                 display,
+                debug_interface: NullDebugListener::default(),
             }
         )
     }
@@ -89,6 +92,7 @@ impl MockEmulatorClient<MockImageData, ZeroImageData, MockBootRom, NullApuClient
             boot_rom: None,
             audio: NullApuClient::default(),
             display: NullPpuClient::default(),
+            debug_interface: NullDebugListener::default(),
         }
     }
 }
@@ -110,6 +114,7 @@ impl MockEmulatorClient<ZeroImageData, ZeroImageData, MockBootRom, NullApuClient
             boot_rom: None,
             audio: NullApuClient::default(),
             display: NullPpuClient::default(),
+            debug_interface: NullDebugListener::default(),
         }
     }
 }
@@ -158,6 +163,7 @@ where Rom: ImageData,
     type RamImageDataMut = Ram;
     type ApuClient = Audio;
     type PpuClient = Display;
+    type DebugInterface = NullDebugListener;
 
     fn get_cartridge_ram_mut(&mut self) -> &mut Self::RamImageDataMut {
         &mut self.cartridge_ram
@@ -169,5 +175,9 @@ where Rom: ImageData,
 
     fn get_ppu_client_mut(&mut self) -> &mut Self::PpuClient {
         &mut self.display
+    }
+
+    fn get_debug_interface_mut(&mut self) -> &mut Self::DebugInterface {
+        &mut self.debug_interface
     }
 }

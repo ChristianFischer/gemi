@@ -15,13 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::debug::DebugDelegate;
 use crate::emulator_client::{EmulatorClient, EmulatorClientMut};
 use crate::mmu::locations::*;
 use crate::mmu::memory_bus::MemoryBusConnection;
+use core::fmt::{Display, Formatter};
 use flagset::{flags, FlagSet};
 
 flags! {
     /// An enumeration of all interrupts available.
+    #[derive(Hash, Ord, PartialOrd)]
+    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub enum Interrupt : u8 {
         VBlank      = 0b_0000_0001,
         LcdStat     = 0b_0000_0010,
@@ -52,13 +56,25 @@ pub struct InterruptRegisters {
 
 impl Interrupt {
     /// An array containing all possible interrupts for easier iteration.
-    const ALL_INTERRUPTS : [Interrupt; 5] = [
+    pub const ALL_INTERRUPTS : [Interrupt; 5] = [
         Interrupt::VBlank,
         Interrupt::LcdStat,
         Interrupt::Timer,
         Interrupt::Serial,
         Interrupt::Input
     ];
+
+
+    /// Get the name of this interrupt.
+    pub fn name(&self) -> &'static str {
+        match self {
+            Interrupt::VBlank  => "VBlank",
+            Interrupt::LcdStat => "LcdStat",
+            Interrupt::Timer   => "Timer",
+            Interrupt::Serial  => "Serial",
+            Interrupt::Input   => "Input",
+        }
+    }
 
 
     /// Get the address this interrupt will jump to when fired.
@@ -70,6 +86,14 @@ impl Interrupt {
             Interrupt::Serial   => 0x0058,
             Interrupt::Input    => 0x0060,
         }
+    }
+}
+
+
+#[cfg(feature = "std")]
+impl Display for Interrupt {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        f.write_str(self.name())
     }
 }
 
@@ -88,8 +112,9 @@ impl InterruptRegisters {
     /// This will set the according interrupt bit. If Interrupts
     /// are enabled for the CPU, the instruction pointer will jump
     /// to the according interrupt address, otherwise it will be ignored.
-    pub fn request_interrupt(&mut self, interrupt: Interrupt) {
+    pub fn request_interrupt(&mut self, ec: &mut impl EmulatorClientMut, interrupt: Interrupt) {
         self.interrupts_flagged |= interrupt;
+        DebugDelegate::with(ec).invoke_interrupt_triggered(interrupt);
     }
 
 
@@ -97,8 +122,10 @@ impl InterruptRegisters {
     /// This will set the according interrupt bit. If Interrupts
     /// are enabled for the CPU, the instruction pointer will jump
     /// to the according interrupt address, otherwise it will be ignored.
-    pub fn request_interrupts(&mut self, interrupts: impl Into<Interrupts>) {
+    pub fn request_interrupts(&mut self, ec: &mut impl EmulatorClientMut, interrupts: impl Into<Interrupts>) {
+        let interrupts: Interrupts = interrupts.into();
         self.interrupts_flagged |= interrupts;
+        DebugDelegate::with(ec).invoke_interrupt_triggered(interrupts);
     }
 
 

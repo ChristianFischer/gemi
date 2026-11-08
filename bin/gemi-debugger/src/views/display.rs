@@ -162,7 +162,7 @@ impl EmulatorDisplayView {
     /// Tells whether to highlight the recent drawn pixels in a certain [UpdateMode] or not.
     fn display_highlight_in_mode(mode: &UpdateMode) -> bool {
         match mode {
-            UpdateMode::Paused | UpdateMode::Step => true,
+            UpdateMode::Paused | UpdateMode::DebugBreak | UpdateMode::Step => true,
             UpdateMode::Continuous => false,
         }
     }
