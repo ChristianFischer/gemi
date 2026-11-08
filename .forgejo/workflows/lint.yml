@@ -19,7 +19,7 @@ jobs:
     name: cargo fmt
     runs-on: self-hosted
     container:
-      image: rust:slim
+      image: cimg/rust:1.99-node
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
     name: cargo clippy
     runs-on: self-hosted
     container:
-      image: rust:slim
+      image: cimg/rust:1.99-node
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

@@ -14,7 +14,7 @@ on:
       - "v*"
 
 env:
-  # gitea.ref contains the full ref, e.g. "refs/tags/v1.0.0"
+  # gitea.ref_name contains the short ref name, e.g. "v1.0.0"
   TAG_NAME: ${{ gitea.ref_name }}
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
     name: Release (Linux x86_64)
     runs-on: self-hosted
     container:
-      image: rust:slim
+      image: cimg/rust:1.99-node
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
