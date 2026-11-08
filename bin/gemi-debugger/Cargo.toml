@@ -4,18 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-chrono = { version = "0.4.38", features = ["serde"] }
-eframe = { version = "0.33.3", default-features = true, features = [ "default_fonts", "glow", "persistence", ] }
-egui = { version = "0.33.3", default-features = true }
-egui_extras = { version = "0.33.3", default-features = false, features = [] }
-egui_tiles = { version = "0.14.1", default-features = false, features = ["serde"] }
-lazy_static = { version = "1.5.0", default-features = false, features = [] }
-rfd = { version = "0.17.2", default-features = false, features = ["xdg-portal"] }
-serde = { version = "1.0.214", default-features = false, features = ["std", "derive"] }
+chrono = { version = "0.4", features = ["serde"] }
+eframe = { version = "0.37", default-features = true, features = [ "default_fonts", "glow", "persistence", ] }
+egui = { version = "0.37", default-features = true }
+egui_extras = { version = "0.37", default-features = false, features = [] }
+egui_tiles = { version = "0.18", default-features = false, features = ["serde"] }
+lazy_static = { version = "1.5", default-features = false, features = [] }
+rfd = { version = "0.18", default-features = false, features = ["xdg-portal"] }
+serde = { version = "1.0", default-features = false, features = ["std", "derive"] }
 
 # desktop:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-futures = "0.3.31"
+futures = "0.3"
 
 # wasm:
 [target.'cfg(target_arch = "wasm32")'.dependencies]

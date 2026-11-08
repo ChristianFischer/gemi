@@ -274,19 +274,19 @@ impl<Source> MemoryEditor<Source> {
 
         None
     }
-    
-    
+
+
     /// Adds a new highlight range to the memory editor.
     /// The range will have a color assigned, but the actual range has to be set
     /// using [set_highlight_range], given the index returned by this function.
     pub fn add_highlight_range(&mut self, color: Color32) -> usize {
         let new_index = self.state.highlighted_address_ranges.len();
-        
+
         self.state.highlighted_address_ranges.push(HighlightAddressRange {
             color,
             range: None,
         });
-        
+
         new_index
     }
 
@@ -320,8 +320,8 @@ impl<Source> MemoryEditor<Source> {
             }
         }
     }
-    
-    
+
+
     /// Clears any highlighted address range.
     pub fn clear_highlight(&mut self, index: usize) {
         if let Some(element) = self.state.highlighted_address_ranges.get_mut(index) {
@@ -687,7 +687,7 @@ impl<Source> MemoryEditor<Source> {
             )
         );
 
-        let hover_response  = ui.interact(line_bounds, ui.id().with(1), Sense::hover());
+        let hover_response  = ui.interact(line_bounds, ui.scope_id().with(1), Sense::hover());
         let is_line_hovered = hover_response.hovered();
 
         if is_line_hovered {
@@ -709,7 +709,7 @@ impl<Source> MemoryEditor<Source> {
         for highlight in &self.state.highlighted_address_ranges {
             if let Some(highlight_range) = &highlight.range {
                 if
-                        highlight_range.start < line_address_range.end 
+                        highlight_range.start < line_address_range.end
                     &&  highlight_range.end > line_address_range.start
                 {
                     // determine the start and end of the highlight capped to the line boundaries
@@ -742,7 +742,7 @@ impl<Source> MemoryEditor<Source> {
                             Stroke::new(2.0, highlight.color),
                             StrokeKind::Inside
                         );
-                    } 
+                    }
                     else {
                         // fully filled if not selected
                         ui.painter().rect_filled(
@@ -857,8 +857,8 @@ impl<Source> MemoryEditor<Source> {
                 .char_limit(2)
                 .clip_text(false)
                 .margin(Vec2::new(0.0, 0.0))
-                .horizontal_align(egui::Align::Center)
-                .frame(false)
+                .align(egui::Align2::CENTER_CENTER)
+                .frame(egui::Frame::default())
                 .show(ui)
     }
 
@@ -929,7 +929,7 @@ impl<Source> MemoryEditor<Source> {
                 // Only return a cursor position if both cursors are equal,
                 // meaning there is no selection
                 if a == b {
-                    Some(a)
+                    Some(a.into())
                 }
                 else {
                     None
@@ -1187,7 +1187,7 @@ impl MemoryArea {
 impl Default for MemoryEditorRuntimeData {
     fn default() -> Self {
         Self {
-            id:                             Id::new(""),
+            id:                             Id::unique(std::any::type_name::<Self>()),
             need_to_update_runtime:         true,
             last_frame_width:               0.0,
             line_content_height:            0.0,

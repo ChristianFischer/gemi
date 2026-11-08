@@ -376,7 +376,7 @@ mod render_breakpoint_table {
 
             let (_, header_response, body_response) = response;
             let was_modified_by_header = header_response.inner;
-            let was_modified_by_body   = body_response.unwrap().inner;
+            let was_modified_by_body   = body_response.map(|response| response.inner).unwrap_or(false);
 
             was_modified_by_body || was_modified_by_header
         }
@@ -400,8 +400,8 @@ mod render_breakpoint_table {
     pub(super) fn display_editable_value<V>(ui: &mut Ui, value: &mut V, format: ValueFormat) -> bool
     where V: Sized + Copy + PartialEq + LowerHex + UpperHex + TryFrom<u32> + std::fmt::Display
     {
-        let edit_mode_id    = ui.id().with("edit_mode");
-        let edit_content_id = ui.id().with("edit_content");
+        let edit_mode_id    = ui.scope_id().with("edit_mode");
+        let edit_content_id = ui.scope_id().with("edit_content");
 
         // read the edit mode flag
         let is_editing = ui.ctx()

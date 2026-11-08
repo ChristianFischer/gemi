@@ -28,7 +28,7 @@ use crate::views::{View, ViewClass};
 pub struct ViewToInsert {
     /// The actual [ViewClass] to be added.
     pub view: ViewClass,
-    
+
     /// The ID of the tile, where it should be added,
     /// usually a Tab container.
     pub insert_at: TileId,
@@ -49,7 +49,7 @@ pub struct TreeBehaviour {
     /// Stores a [ViewClass] which was created and shall be added into the UI.
     #[serde(skip)]
     view_to_insert: Option<ViewToInsert>,
-    
+
     /// Some options to control the behaviour of the tiled UI.
     #[serde(skip)]
     simplification_options: SimplificationOptions,
@@ -67,9 +67,9 @@ impl TreeBehaviour {
     pub fn get_state_mut(&mut self) -> &mut EmulatorState {
         &mut self.state
     }
-    
-    
-    /// If a [ViewClass] was prepared to be added, take the 
+
+
+    /// If a [ViewClass] was prepared to be added, take the
     /// view from the behaviour object.
     /// The view will be cleared from the behaviour after this.
     pub fn take_view_insert(&mut self) -> Option<ViewToInsert> {
@@ -82,7 +82,7 @@ impl Default for TreeBehaviour {
     fn default() -> Self {
         Self {
             state: EmulatorState::default(),
-            
+
             view_to_insert: None,
 
             simplification_options: SimplificationOptions {
@@ -95,7 +95,7 @@ impl Default for TreeBehaviour {
 
 
 impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
-    fn pane_ui(&mut self, ui: &mut Ui, _tile_id: TileId, pane: &mut ViewClass) -> UiResponse {
+    fn pane_ui(&mut self, ui: &mut Ui, tile_id: TileId, pane: &mut ViewClass) -> UiResponse {
         let available_rect = ui.available_rect_before_wrap();
 
         // create a rectangle aligned to pixels for each child
@@ -107,7 +107,7 @@ impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
         // new ui object using the child rectangle
         let mut child_ui = Ui::new(
                 ui.ctx().clone(),
-                ui.id().with(_tile_id),
+                ui.scope_id().with(tile_id),
                 UiBuilder::new()
                     .layer_id(ui.layer_id())
                     .max_rect(child_rect)
@@ -137,7 +137,7 @@ impl egui_tiles::Behavior<ViewClass> for TreeBehaviour {
         ui.menu_button(strings::BUTTON_LABEL_ADD, |ui| {
             for (name, instantiate) in &ViewClass::ALL {
                 if ui.button(*name).clicked() {
-                    self.view_to_insert = Some(ViewToInsert { 
+                    self.view_to_insert = Some(ViewToInsert {
                         view: instantiate(),
                         insert_at: tile_id
                     });

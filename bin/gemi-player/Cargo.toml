@@ -14,7 +14,7 @@ path = "../../lib/gemi"
 path = "../../lib/utils"
 
 [dependencies.sdl3]
-version = "0.17.3"
+version = "0.22"
 features = [
     "build-from-source-static",
     "static-link",

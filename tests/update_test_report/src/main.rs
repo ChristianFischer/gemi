@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 by Christian Fischer
+ * Copyright (C) 2022-2026 by Christian Fischer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::report_generator::TestReportGenerator;
+use futures::{future, StreamExt};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
-use futures::{future, StreamExt};
-use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use tests_shared::config::{SOURCE_URL, TESTRUNNER_PATH, TESTRUNNER_SUBDIR_ROM_FILES};
-use tests_shared::download::download_test_roms;
+use tests_shared::download::download_test_roms_async;
 use tests_shared::io_utils::{update_file, Workspace};
-use tests_shared::test_suites::{ALL_TEST_SUITES, TestSuite};
-use crate::report_generator::TestReportGenerator;
+use tests_shared::test_suites::{TestSuite, ALL_TEST_SUITES};
 
 
 mod report_generator;
@@ -78,7 +78,7 @@ pub async fn main() {
 
     // download test ROM archive, if the target directory does not exist yet
     if !workspace.get_root_path().is_dir() {
-        download_test_roms(workspace.get_root_path(), &SOURCE_URL);
+        download_test_roms_async(workspace.get_root_path(), SOURCE_URL).await;
     }
 
     // progress bar manager

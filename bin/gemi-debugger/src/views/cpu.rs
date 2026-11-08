@@ -268,8 +268,8 @@ impl CpuView {
                     .char_limit(max_characters)
                     .clip_text(false)
                     .margin(Vec2::new(0.0, 0.0))
-                    .horizontal_align(egui::Align::Center)
-                    .frame(false)
+                    .align(egui::Align2::CENTER_CENTER)
+                    .frame(egui::Frame::default())
                     .font(style.style.clone())
                     .ui(ui)
                 ;

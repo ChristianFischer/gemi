@@ -288,7 +288,7 @@ impl DisassemblyView {
                                 }
 
                                 // mouse interaction with the current row
-                                let line_response = ui.interact(line_bounds, ui.id().with(row), Sense::click());
+                                let line_response = ui.interact(line_bounds, ui.scope_id().with(row), Sense::click());
 
                                 // handle hover state
                                 ui_states.hover.set(selection_key.clone(), line_response.hovered());

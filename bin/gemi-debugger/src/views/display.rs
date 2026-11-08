@@ -216,7 +216,7 @@ impl EmulatorDisplayView {
         // listen for click and hover interactions
         let response = ui.interact(
                 display_bounds,
-                ui.id().with(1),
+                ui.scope_id().with(1),
                 Sense::click()
         );
 
@@ -265,7 +265,7 @@ impl EmulatorDisplayView {
                             .translate(vec2(-8.0, -16.0))
                             .mul(scale)
                             .translate(origin.to_vec2()),
-                    ui.id().with(2),
+                    ui.scope_id().with(2),
                     Sense::hover()
                 )
                     .on_hover_ui(|ui| {

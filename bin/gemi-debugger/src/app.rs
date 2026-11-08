@@ -19,7 +19,7 @@ use std::path::PathBuf;
 use std::sync::mpsc::{channel, Receiver, TryRecvError};
 
 use eframe::{CreationContext, Frame};
-use egui::{ComboBox, Context, UiKind};
+use egui::{ComboBox, Context, Ui, UiKind};
 use egui_tiles::{Container, Tile};
 use libgemi::cartridge::Cartridge;
 use libgemi::core::ppu::graphic_data::TileMap;
@@ -191,7 +191,7 @@ impl Default for EmulatorApplication {
         };
 
         // create the tree object
-        let tree = egui_tiles::Tree::new("gemi", main_view, tiles);
+        let tree = egui_tiles::Tree::new(egui::Id::unique("gemi"), main_view, tiles);
 
         Self {
             tree,
@@ -205,14 +205,11 @@ impl Default for EmulatorApplication {
 
 
 impl eframe::App for EmulatorApplication {
-    fn update(&mut self, ctx: &Context, frame: &mut Frame) {
+    fn logic(&mut self, ctx: &Context, _frame: &mut Frame) {
         sprite_cache::on_frame();
 
         self.get_state_mut().update();
 
-        self.update_menu_bar(ctx, frame);
-        self.update_center_panel(ctx, frame);
-        self.update_message_box(ctx, frame);
         self.update_input(ctx);
         self.handle_open_file();
         self.handle_frame_response();
@@ -223,6 +220,13 @@ impl eframe::App for EmulatorApplication {
         if self.get_state().is_running() {
             ctx.request_repaint();
         }
+    }
+
+
+    fn ui(&mut self, ui: &mut Ui, frame: &mut Frame) {
+        self.show_menu_bar(ui, frame);
+        self.show_center_panel(ui, frame);
+        self.show_message_box(ui, frame);
     }
 
 
@@ -271,16 +275,16 @@ impl EmulatorApplication {
 
 
     /// Handle the menu bar at the top of the window.
-    fn update_menu_bar(&mut self, ctx: &Context, frame: &mut Frame) {
-        egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
+    fn show_menu_bar(&mut self, ui: &mut Ui, frame: &mut Frame) {
+        egui::Panel::top("menu_bar").show(ui, |ui| {
             ui.horizontal(|ui| {
                 let enabled = !self.is_message_box_open();
 
                 ui.add_enabled_ui(enabled, |ui| {
-                    ui.menu_button("File", |ui| self.update_submenu_file(ui, frame));
+                    ui.menu_button("File", |ui| self.show_submenu_file(ui, frame));
                     ui.separator();
 
-                    self.update_player_toolbar(ui);
+                    self.render_player_toolbar(ui);
                 });
             });
         });
@@ -288,7 +292,7 @@ impl EmulatorApplication {
 
 
     /// Handle the "File" submenu of the menu bar.
-    fn update_submenu_file(&mut self, ui: &mut egui::Ui, _frame: &mut Frame) {
+    fn show_submenu_file(&mut self, ui: &mut egui::Ui, _frame: &mut Frame) {
         // "Open" button to open a ROM file
         if ui.button("Open").clicked() {
             ui.close_kind(UiKind::Menu);
@@ -378,7 +382,7 @@ impl EmulatorApplication {
     }
 
 
-    fn update_player_toolbar(&mut self, ui: &mut egui::Ui) {
+    fn render_player_toolbar(&mut self, ui: &mut egui::Ui) {
         let state = self.get_state_mut();
         let mut is_running = state.is_running();
         let mut is_paused  = state.is_paused();
@@ -483,9 +487,9 @@ impl EmulatorApplication {
 
 
     /// Handle the content area of the window.
-    fn update_center_panel(&mut self, ctx: &Context, _frame: &mut Frame) {
+    fn show_center_panel(&mut self, ui: &mut Ui, _frame: &mut Frame) {
         egui::CentralPanel::default().show(
-            ctx,
+            ui,
             |ui| {
                 let enabled = !self.is_message_box_open();
 
@@ -498,13 +502,13 @@ impl EmulatorApplication {
 
 
     /// Handle the message box, if any.
-    fn update_message_box(&mut self, ctx: &Context, _frame: &mut Frame) {
+    fn show_message_box(&mut self, ui: &mut Ui, _frame: &mut Frame) {
         if let Some(msg) = &self.display_message {
             // render message box window
             egui::Window::new("Message")
                 .collapsible(false)
                 .resizable(false)
-                .show(ctx, |ui| {
+                .show(ui, |ui| {
                     ui.label(msg);
                     if ui.button("Ok").clicked() {
                         // set the flag to close the message box window

@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-indicatif = "0.17.8"
-futures = "0.3.31"
-tokio = { version = "1.41.1", features = ["rt-multi-thread", "macros"] }
-tokio-stream = "0.1.16"
+indicatif = "0.18"
+futures = "0.3"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tokio-stream = "0.1"
 libgemi = { path = "../../lib/gemi" }
 tests-shared = { path = "../shared" }

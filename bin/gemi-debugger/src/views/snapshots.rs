@@ -85,7 +85,7 @@ impl View for SnapshotsView {
         let item_height = text_height;
 
         ui.vertical(|ui| {
-            egui::TopBottomPanel::top("snapshots_menu_bar").show_inside(ui, |ui| {
+            egui::Panel::top("snapshots_menu_bar").show(ui, |ui| {
                 ui.horizontal(|ui| {
                     self.update_toolbar(ui, state);
                 });
